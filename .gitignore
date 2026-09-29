@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+*.log
+images/*
+!images/.gitkeep
+# Postman desktop's local workspace sync (can contain saved passwords/tokens).
+# The shareable files are postman/*.postman_collection.json and *.postman_environment.json
+postman/postman/
+postman/.postman/
