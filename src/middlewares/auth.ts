@@ -3,7 +3,7 @@ import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import { env } from '../config/env';
 import type { Role } from '../constants/roles';
 import { HttpError } from '../errors/HttpError';
-import { User } from '../models';
+import { RevokedToken, User } from '../models';
 import { verifyAccessToken } from '../utils/jwt';
 
 /**
@@ -35,10 +35,24 @@ export const authenticate: RequestHandler = async (req, _res, next) => {
     throw err;
   }
 
-  const user = await User.findByPk(payload.sub, { attributes: ['id', 'email', 'role'] });
+  // Tokens that were logged out stay invalid until they would have expired anyway
+  if (payload.jti && (await RevokedToken.findByPk(payload.jti, { attributes: ['jti'] }))) {
+    throw HttpError.unauthorized('Token has been revoked (logged out), log in again');
+  }
+
+  const user = await User.findByPk(payload.sub, {
+    attributes: ['id', 'email', 'role'],
+    include: [{ association: 'approval', attributes: ['isActive'] }],
+  });
   if (!user) throw HttpError.unauthorized('User no longer exists');
 
+  // Only activated accounts may use the API (no approval yet counts as not activated)
+  if (user.approval?.isActive !== true) {
+    throw HttpError.notActivated();
+  }
+
   req.user = { id: user.id, email: user.email, role: user.role };
+  req.accessToken = { jti: payload.jti, expiresAt: new Date(payload.exp * 1000) };
   next();
 };
 

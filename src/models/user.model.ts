@@ -11,10 +11,12 @@ import {
 } from 'sequelize';
 import bcrypt from 'bcryptjs';
 import { sequelize } from '../config/database';
-import { ALL_ROLES, Role } from '../constants/roles';
+import { ALL_ROLES, ROLES, Role } from '../constants/roles';
 import type { DbModels } from '.';
+import type { Approval } from './approval.model';
 import type { Image } from './image.model';
 import type { Notification } from './notification.model';
+import type { Product } from './product.model';
 import type { Tenant } from './tenant.model';
 
 const SALT_ROUNDS = 12;
@@ -37,21 +39,30 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   declare email: string;
   declare role: Role;
   declare faceImageId: ForeignKey<Image['id']> | null;
+  /** Tenants only: their tenant name. Required for tenants, always null for other roles. */
+  declare tenantName: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
   // Relations (populated when loaded with `include`)
   declare faceImage?: NonAttribute<Image>;
-  declare tenant?: NonAttribute<Tenant>;
+  declare products?: NonAttribute<Product[]>;
   declare notifications?: NonAttribute<Notification[]>;
+  declare approval?: NonAttribute<Approval>;
+  /** Tenants only: their tenant profile (tenants table). */
+  declare tenant?: NonAttribute<Tenant>;
 
-  static associate({ Image, Tenant, Notification }: DbModels) {
+  static associate({ Image, Product, Notification, Approval, Tenant }: DbModels) {
     // users.face_image_id - images.id (one-to-one)
     User.belongsTo(Image, { as: 'faceImage', foreignKey: 'faceImageId', onDelete: 'SET NULL' });
-    // tenants.user_id - users.id (one-to-one)
-    User.hasOne(Tenant, { as: 'tenant', foreignKey: 'userId' });
+    // products.tenant_id > users.id (a tenant user has many products)
+    User.hasMany(Product, { as: 'products', foreignKey: 'tenantId' });
     // notifications.user_id > users.id (one user has many notifications)
     User.hasMany(Notification, { as: 'notifications', foreignKey: 'userId' });
+    // approvals.user_id - users.id (one-to-one): user.approval.isActive
+    User.hasOne(Approval, { as: 'approval', foreignKey: 'userId' });
+    // tenants.user_id - users.id (one-to-one: a tenant user has one tenant profile)
+    User.hasOne(Tenant, { as: 'tenant', foreignKey: 'userId' });
   }
 
   comparePassword(plain: string): Promise<boolean> {
@@ -92,6 +103,8 @@ User.init(
       unique: true,
       references: { model: 'images', key: 'id' },
     },
+    // Nullable in the table because admins/superadmins have no tenant name; required for tenants (see validate below)
+    tenantName: { type: DataTypes.STRING, allowNull: true, validate: { notEmpty: true } },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
@@ -99,6 +112,19 @@ User.init(
     sequelize,
     tableName: 'users',
     modelName: 'User',
+    validate: {
+      // Tenants must have a tenant name: required when created and can't be emptied later.
+      // Checked only on create/change so older tenants without one can still update other fields.
+      tenantNameMatchesRole(this: User) {
+        if (this.role === ROLES.TENANT) {
+          if ((this.isNewRecord || this.changed('tenantName')) && !this.tenantName?.trim()) {
+            throw new Error('tenantName is required for tenant accounts');
+          }
+        } else if (this.tenantName != null) {
+          throw new Error('Only tenant accounts have a tenantName');
+        }
+      },
+    },
     // Password hash is never loaded unless explicitly requested with User.scope('withPassword')
     defaultScope: { attributes: { exclude: ['password'] } },
     scopes: { withPassword: { attributes: { include: ['password'] } } },

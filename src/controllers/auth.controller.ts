@@ -1,5 +1,5 @@
 import type { RequestHandler } from 'express';
-import { ALL_ROLES, type Role } from '../constants/roles';
+import { ALL_ROLES, ROLES, type Role } from '../constants/roles';
 import { HttpError } from '../errors/HttpError';
 import * as authService from '../services/auth.service';
 
@@ -36,6 +36,14 @@ export const register: RequestHandler = async (req, res) => {
   if (faceImageId !== null && !Number.isInteger(faceImageId)) {
     errors.push({ field: 'faceImageId', message: 'faceImageId must be an integer image id' });
   }
+  // Every tenant must have a tenant name; other roles don't have one
+  const isTenant = body.role === ROLES.TENANT;
+  if (isTenant && (typeof body.tenantName !== 'string' || !body.tenantName.trim())) {
+    errors.push({ field: 'tenantName', message: 'tenantName is required for tenant accounts' });
+  }
+  if (!isTenant && body.tenantName !== undefined) {
+    errors.push({ field: 'tenantName', message: 'tenantName is only used for tenant accounts' });
+  }
   if (errors.length) throw HttpError.badRequest('Validation failed', errors);
 
   const user = await authService.register(req.user!, {
@@ -46,8 +54,15 @@ export const register: RequestHandler = async (req, res) => {
     password: body.password as string,
     role: body.role as Role,
     faceImageId: faceImageId as number | null,
+    ...(isTenant && { tenantName: (body.tenantName as string).trim() }),
   });
   res.status(201).json({ success: true, data: user });
+};
+
+/** POST /api/auth/logout — revokes the token sent with this request. */
+export const logout: RequestHandler = async (req, res) => {
+  await authService.logout(req.user!, req.accessToken!);
+  res.json({ success: true, data: { message: 'Logged out, this token can no longer be used' } });
 };
 
 export const me: RequestHandler = async (req, res) => {
@@ -56,7 +71,7 @@ export const me: RequestHandler = async (req, res) => {
 };
 
 const UPDATABLE_TEXT_FIELDS = ['firstName', 'lastName', 'phoneNumber', 'email'] as const;
-const UPDATABLE_FIELDS = [...UPDATABLE_TEXT_FIELDS, 'password', 'currentPassword', 'faceImageId'];
+const UPDATABLE_FIELDS = [...UPDATABLE_TEXT_FIELDS, 'password', 'currentPassword', 'faceImageId', 'tenantName'];
 const LOCKED_FIELDS: Record<string, string> = {
   id: 'id cannot be changed',
   role: 'role cannot be changed',
@@ -100,6 +115,16 @@ export const updateMe: RequestHandler = async (req, res) => {
       errors.push({ field: 'faceImageId', message: 'faceImageId must be an integer image id, or null to remove it' });
     } else {
       input.faceImageId = body.faceImageId as number | null;
+    }
+  }
+
+  if (body.tenantName !== undefined) {
+    if (req.user!.role !== ROLES.TENANT) {
+      errors.push({ field: 'tenantName', message: 'Only tenant accounts have a tenantName' });
+    } else if (typeof body.tenantName !== 'string' || !body.tenantName.trim()) {
+      errors.push({ field: 'tenantName', message: 'tenantName cannot be empty' });
+    } else {
+      input.tenantName = body.tenantName.trim();
     }
   }
 

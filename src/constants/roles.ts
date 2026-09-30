@@ -24,3 +24,19 @@ export const READABLE_ROLES: Record<Role, Role[]> = {
   [ROLES.ADMIN]: [ROLES.TENANT],
   [ROLES.TENANT]: [],
 };
+
+/** Which roles' accounts each role may activate/deactivate (PATCH /api/approvals/:id?type=user). */
+export const APPROVABLE_ROLES: Record<Role, Role[]> = {
+  [ROLES.SUPERADMIN]: [ROLES.ADMIN, ROLES.TENANT],
+  [ROLES.ADMIN]: [ROLES.TENANT],
+  [ROLES.TENANT]: [],
+};
+
+/** Roles that may activate/deactivate products (every product belongs to a tenant). */
+export const PRODUCT_APPROVER_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.ADMIN];
+
+/** Only tenants create/update/delete products, and only their own products. */
+export const PRODUCT_OWNER_ROLES: Role[] = [ROLES.TENANT];
+
+/** Roles that can read every product (tenants only see their own). */
+export const PRODUCT_READ_ALL_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.ADMIN];

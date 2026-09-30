@@ -25,10 +25,10 @@ export class Image extends Model<InferAttributes<Image>, InferCreationAttributes
 
   // Relations (populated when loaded with `include`)
   declare user?: NonAttribute<User>;
-  declare tenant?: NonAttribute<Tenant>;
   declare product?: NonAttribute<Product>;
+  declare tenant?: NonAttribute<Tenant>;
 
-  static associate({ User, Tenant, Product }: DbModels) {
+  static associate({ User, Product, Tenant }: DbModels) {
     // users.face_image_id - images.id (one-to-one)
     Image.hasOne(User, { as: 'user', foreignKey: 'faceImageId' });
     // tenants.logo_id - images.id (one-to-one)

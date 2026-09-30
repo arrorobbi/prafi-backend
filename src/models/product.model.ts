@@ -11,7 +11,7 @@ import { sequelize } from '../config/database';
 import type { DbModels } from '.';
 import type { Approval } from './approval.model';
 import type { Image } from './image.model';
-import type { Tenant } from './tenant.model';
+import type { User } from './user.model';
 
 export class Product extends Model<InferAttributes<Product>, InferCreationAttributes<Product>> {
   declare id: CreationOptional<string>;
@@ -21,22 +21,23 @@ export class Product extends Model<InferAttributes<Product>, InferCreationAttrib
   declare qty: number;
   declare imageId: ForeignKey<Image['id']> | null;
   declare approvalId: ForeignKey<Approval['id']> | null;
-  declare tenantId: ForeignKey<Tenant['id']>;
+  /** The tenant user who owns this product. */
+  declare tenantId: ForeignKey<User['id']>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
   // Relations (populated when loaded with `include`)
   declare image?: NonAttribute<Image>;
   declare approval?: NonAttribute<Approval>;
-  declare tenant?: NonAttribute<Tenant>;
+  declare tenant?: NonAttribute<User>;
 
-  static associate({ Image, Approval, Tenant }: DbModels) {
+  static associate({ Image, Approval, User }: DbModels) {
     // products.image_id - images.id (one-to-one)
     Product.belongsTo(Image, { as: 'image', foreignKey: 'imageId', onDelete: 'SET NULL' });
     // products.approval_id - approvals.id (one-to-one)
     Product.belongsTo(Approval, { as: 'approval', foreignKey: 'approvalId', onDelete: 'SET NULL' });
-    // products.tenant_id > tenants.id (many products per tenant)
-    Product.belongsTo(Tenant, { as: 'tenant', foreignKey: 'tenantId', onDelete: 'CASCADE' });
+    // products.tenant_id > users.id (a tenant user has many products; deleting the user deletes them)
+    Product.belongsTo(User, { as: 'tenant', foreignKey: 'tenantId', onDelete: 'CASCADE' });
   }
 }
 
@@ -62,7 +63,7 @@ Product.init(
     tenantId: {
       type: DataTypes.UUID,
       allowNull: false,
-      references: { model: 'tenants', key: 'id' },
+      references: { model: 'users', key: 'id' },
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

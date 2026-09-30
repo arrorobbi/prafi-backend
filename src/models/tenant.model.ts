@@ -10,10 +10,10 @@ import {
 import { sequelize } from '../config/database';
 import type { DbModels } from '.';
 import type { Image } from './image.model';
-import type { Product } from './product.model';
 import type { TenantCategory } from './tenantCategory.model';
 import type { User } from './user.model';
 
+/** A tenant user's tenant profile. Products belong to the tenant user, not to this profile. */
 export class Tenant extends Model<InferAttributes<Tenant>, InferCreationAttributes<Tenant>> {
   declare id: CreationOptional<string>;
   declare name: string;
@@ -34,17 +34,14 @@ export class Tenant extends Model<InferAttributes<Tenant>, InferCreationAttribut
   declare logo?: NonAttribute<Image>;
   declare category?: NonAttribute<TenantCategory>;
   declare owner?: NonAttribute<User>;
-  declare products?: NonAttribute<Product[]>;
 
-  static associate({ Image, TenantCategory, User, Product }: DbModels) {
+  static associate({ Image, TenantCategory, User }: DbModels) {
     // tenants.logo_id - images.id (one-to-one)
     Tenant.belongsTo(Image, { as: 'logo', foreignKey: 'logoId', onDelete: 'SET NULL' });
     // tenants.category_id > tenant_categories.id (many tenants per category; a category in use can't be deleted)
     Tenant.belongsTo(TenantCategory, { as: 'category', foreignKey: 'categoryId', onDelete: 'RESTRICT' });
     // tenants.user_id - users.id (one-to-one; deleting the user deletes the tenant)
     Tenant.belongsTo(User, { as: 'owner', foreignKey: 'userId', onDelete: 'CASCADE' });
-    // products.tenant_id > tenants.id (one tenant has many products)
-    Tenant.hasMany(Product, { as: 'products', foreignKey: 'tenantId' });
   }
 }
 

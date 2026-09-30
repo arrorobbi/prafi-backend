@@ -27,6 +27,16 @@ export class HttpError extends Error {
     return new HttpError(404, message, 'NOT_FOUND');
   }
 
+  /** The account exists but its approval is not active (checked at login and on every request). */
+  static notActivated() {
+    return new HttpError(403, 'The user is not activated, contact the administrator', 'USER_NOT_ACTIVATED');
+  }
+
+  /** An endpoint that needs an :id was called without one (missing, empty, "null" or "undefined"). */
+  static idNotProvided() {
+    return new HttpError(400, 'ID not provided', 'ID_NOT_PROVIDED');
+  }
+
   static conflict(message = 'Conflict', details?: unknown) {
     return new HttpError(409, message, 'CONFLICT', details);
   }

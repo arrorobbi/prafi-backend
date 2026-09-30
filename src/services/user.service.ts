@@ -13,7 +13,7 @@ export interface ListUsersOptions {
 export async function list({ readableRoles, role, page, limit }: ListUsersOptions) {
   const { rows, count } = await User.findAndCountAll({
     where: { role: role ?? readableRoles },
-    include: [{ association: 'faceImage' }],
+    include: [{ association: 'faceImage' }, { association: 'approval' }],
     order: [['createdAt', 'DESC']],
     limit,
     offset: (page - 1) * limit,

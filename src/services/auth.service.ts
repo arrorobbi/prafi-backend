@@ -1,7 +1,8 @@
 import bcrypt from 'bcryptjs';
+import { Op } from 'sequelize';
 import { CREATABLE_ROLES, type Role } from '../constants/roles';
 import { HttpError } from '../errors/HttpError';
-import { Image, User } from '../models';
+import { Image, RevokedToken, User } from '../models';
 import type { AuthUser } from '../types/express';
 import { signAccessToken } from '../utils/jwt';
 
@@ -13,6 +14,8 @@ export interface RegisterInput {
   password: string;
   role: Role;
   faceImageId?: number | null;
+  /** Required for tenant accounts, not allowed for other roles. */
+  tenantName?: string;
 }
 
 // Compared against when the email doesn't exist, so response time doesn't reveal which emails are registered
@@ -21,6 +24,7 @@ const DUMMY_HASH = bcrypt.hashSync('dummy-password-for-timing', 12);
 export async function login(email: string, password: string) {
   const user = await User.scope('withPassword').findOne({
     where: { email: email.trim().toLowerCase() },
+    include: [{ association: 'approval', attributes: ['isActive'] }],
   });
 
   const passwordOk = user
@@ -30,6 +34,9 @@ export async function login(email: string, password: string) {
   if (!user || !passwordOk) {
     throw HttpError.unauthorized('Invalid email or password');
   }
+
+  // Checked only after the password is correct, so activation status isn't revealed to anyone else
+  if (user.approval?.isActive !== true) throw HttpError.notActivated();
 
   const accessToken = signAccessToken({ sub: user.id, role: user.role });
   return { accessToken, tokenType: 'Bearer', user: user.toJSON() };
@@ -68,6 +75,8 @@ export interface UpdateProfileInput {
   currentPassword?: string;
   /** Image id from POST /api/images, or null to remove the face image. */
   faceImageId?: number | null;
+  /** Tenants only: change their tenant name (cannot be emptied). */
+  tenantName?: string;
 }
 
 /** Updates the logged-in user's own account. id and role are never changed here. */
@@ -98,8 +107,29 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
   return getProfile(user.id);
 }
 
+/**
+ * Logs out the token used for this request: it is rejected from now on, even though it hasn't expired.
+ * Only this token is revoked, so the user's other sessions (other devices/logins) stay logged in.
+ */
+export async function logout(user: AuthUser, token: { jti?: string; expiresAt: Date }) {
+  if (!token.jti) {
+    throw HttpError.badRequest(
+      `This token was issued before logout existed and can't be revoked; it expires at ${token.expiresAt.toISOString()}. Log in again to get a new token.`,
+    );
+  }
+
+  // Revoked entries are only needed until the token would have expired anyway
+  await RevokedToken.destroy({ where: { expiresAt: { [Op.lt]: new Date() } } });
+  await RevokedToken.findOrCreate({
+    where: { jti: token.jti },
+    defaults: { jti: token.jti, userId: user.id, expiresAt: token.expiresAt },
+  });
+}
+
 export async function getProfile(userId: string) {
-  const user = await User.findByPk(userId, { include: [{ association: 'faceImage' }] });
+  const user = await User.findByPk(userId, {
+    include: [{ association: 'faceImage' }, { association: 'approval' }],
+  });
   if (!user) throw HttpError.notFound('User not found');
   return user;
 }

@@ -26,7 +26,8 @@ export const env = {
 
   jwt: {
     secret: required('JWT_SECRET'),
-    expiresIn: process.env.JWT_EXPIRES_IN ?? '1d',
+    // Access tokens expire after 1 hour; the user must log in again afterwards
+    expiresIn: process.env.JWT_EXPIRES_IN ?? '1h',
   },
 
   corsOrigin: (process.env.CORS_ORIGIN ?? '')

@@ -1,6 +1,6 @@
-/** Creates the initial superadmin account (idempotent). Run with `npm run db:seed`. */
+/** Creates the initial superadmin account with an active approval (idempotent). Run with `npm run db:seed`. */
 import { ROLES } from '../constants/roles';
-import { sequelize, User } from '../models';
+import { Approval, sequelize, User } from '../models';
 
 async function main() {
   const email = process.env.SEED_ADMIN_EMAIL ?? 'superadmin@example.com';
@@ -20,6 +20,14 @@ async function main() {
   });
 
   console.log(created ? `Superadmin created: ${user.email}` : `Superadmin already exists: ${user.email}`);
+
+  // The auth middleware only lets activated users through, and the superadmin is the one who activates others
+  const [approval] = await Approval.findOrCreate({
+    where: { userId: user.id },
+    defaults: { userId: user.id, reason: 'Initial superadmin account', isActive: true },
+  });
+  if (!approval.isActive) await approval.update({ isActive: true });
+  console.log(`Superadmin approval: active`);
 }
 
 main()
