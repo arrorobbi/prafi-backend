@@ -23,8 +23,8 @@ async function main() {
 
   // The auth middleware only lets activated users through, and the superadmin is the one who activates others
   const [approval] = await Approval.findOrCreate({
-    where: { userId: user.id },
-    defaults: { userId: user.id, reason: 'Initial superadmin account', isActive: true },
+    where: { userId: user.id, type: 'user' },
+    defaults: { userId: user.id, type: 'user', reason: 'Initial superadmin account', isActive: true },
   });
   if (!approval.isActive) await approval.update({ isActive: true });
   console.log(`Superadmin approval: active`);

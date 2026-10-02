@@ -5,6 +5,7 @@ import { HttpError } from '../errors/HttpError';
 import { Approval, Image, RevokedToken, sequelize, User } from '../models';
 import type { AuthUser } from '../types/express';
 import { signAccessToken } from '../utils/jwt';
+import * as imageService from './image.service';
 import { notify } from './notification.service';
 import { endUserSessions } from '../realtime/socket';
 
@@ -75,14 +76,13 @@ export async function register(creator: AuthUser | null, input: RegisterInput) {
 
   // The user and their approval are created together, so a user never exists without one.
   // Duplicate email / already-used faceImageId → UniqueConstraintError → 409 via the error handler
-  const user = await sequelize.transaction(async (transaction) => {
+  const { user, approval } = await sequelize.transaction(async (transaction) => {
     const created = await User.create({ ...input, faceImageId: input.faceImageId ?? null }, { transaction });
-    await Approval.create({ userId: created.id, isActive, reason }, { transaction });
-    return created;
+    return { user: created, approval: await Approval.create({ userId: created.id, isActive, reason }, { transaction }) };
   });
 
-  if (user.role === ROLES.ADMIN) await notify.adminRegistered(user);
-  else if (user.role === ROLES.TENANT) await notify.tenantRegistered(user);
+  if (user.role === ROLES.ADMIN) await notify.adminRegistered(user, approval.id);
+  else if (user.role === ROLES.TENANT) await notify.tenantRegistered(user, approval.id);
   return getProfile(user.id);
 }
 
@@ -124,7 +124,10 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
 
   // The password is hashed by the model's beforeSave hook.
   // Email taken / faceImageId used by another user → UniqueConstraintError → 409 via the error handler
+  const oldFaceImageId = user.faceImageId;
   await user.update(changes);
+  // A new face image (or null) replaces the old one: its record and file are deleted
+  if (changes.faceImageId !== undefined) await imageService.removeReplaced(oldFaceImageId, changes.faceImageId);
   return getProfile(user.id);
 }
 

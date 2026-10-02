@@ -102,7 +102,10 @@ export async function create(user: AuthUser, input: ProductInput) {
 
   // imageId already used by another product → UniqueConstraintError → 409 via the error handler
   const product = await sequelize.transaction(async (transaction) => {
-    const approval = await Approval.create({ reason: 'Waiting for approval', isActive: false }, { transaction });
+    const approval = await Approval.create(
+      { type: 'product', userId: user.id, reason: 'Waiting for approval', isActive: false },
+      { transaction },
+    );
     return Product.create({ ...input, tenantId: user.id, approvalId: approval.id }, { transaction });
   });
   const created = await getById(user, product.id);
@@ -114,7 +117,10 @@ export async function update(user: AuthUser, id: string, changes: Partial<Produc
   const product = await findOwnProduct(user, id);
   if (changes.imageId !== undefined) await assertImageExists(changes.imageId);
 
+  const oldImageId = product.imageId;
   await product.update(changes);
+  // A new image replaces the old one: its record and file are deleted
+  if (changes.imageId !== undefined) await imageService.removeReplaced(oldImageId, changes.imageId);
   const updated = await getById(user, product.id);
   await notify.productUpdated(updated, { tenantName: updated.tenant?.tenantName });
   return updated;

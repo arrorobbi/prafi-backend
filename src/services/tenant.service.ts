@@ -87,9 +87,8 @@ export async function updateMine(user: AuthUser, changes: Partial<TenantInput>) 
 
   const oldLogoId = tenant.logoId;
   await tenant.update(changes);
-  if (changes.logoId !== undefined && changes.logoId !== oldLogoId) {
-    await imageService.remove(oldLogoId).catch(() => {});
-  }
+  // A new logo replaces the old one: its record and file are deleted
+  if (changes.logoId !== undefined) await imageService.removeReplaced(oldLogoId, changes.logoId);
   await notify.tenantProfileUpdated(tenant);
   return getMine(user);
 }

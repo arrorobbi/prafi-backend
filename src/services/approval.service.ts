@@ -60,7 +60,7 @@ async function setUserApproval(
 
   // Only a real change (active → inactive) made by an admin notifies the superadmins
   if (wasActive && !values.isActive && actor.role === ROLES.ADMIN) {
-    await notify.userDeactivatedByAdmin(actor, user);
+    await notify.userDeactivatedByAdmin(actor, user, approval.id);
   }
   // A deactivated user is disconnected from realtime right away
   if (!values.isActive) await endUserSessions(user.id, 'deactivated');
@@ -74,7 +74,7 @@ async function setProductApproval(actor: AuthUser, productId: string, values: { 
   }
 
   // Creating the approval and linking it to the product must succeed or fail together
-  const { result, product, wasActive } = await sequelize.transaction(async (transaction) => {
+  const { result, product, wasActive, approvalId } = await sequelize.transaction(async (transaction) => {
     const product = await Product.findByPk(productId, {
       attributes: ['id', 'name', 'approvalId', 'tenantId'],
       include: [{ association: 'approval' }],
@@ -85,16 +85,53 @@ async function setProductApproval(actor: AuthUser, productId: string, values: { 
     let approval = product.approval;
     const wasActive = approval?.isActive === true;
     if (approval) {
-      await approval.update(values, { transaction });
+      // Older product approvals may not have their owner recorded yet
+      await approval.update({ ...values, type: 'product', userId: product.tenantId }, { transaction });
     } else {
-      approval = await Approval.create(values, { transaction });
+      approval = await Approval.create({ ...values, type: 'product', userId: product.tenantId }, { transaction });
       await product.update({ approvalId: approval.id }, { transaction });
     }
 
-    return { result: { type: 'product' as const, id: product.id, name: product.name, approval }, product, wasActive };
+    return { result: { type: 'product' as const, id: product.id, name: product.name }, product, wasActive, approvalId: approval.id };
   });
 
   // Notify only on a real change, after it is saved (re-sending the same value notifies nobody)
-  if (wasActive !== values.isActive) await notify.productActivationChanged(actor, product, values.isActive);
-  return result;
+  if (wasActive !== values.isActive) {
+    await notify.productActivationChanged(actor, { ...product.get(), approvalId }, values.isActive);
+  }
+  return { ...result, ...(await productApprovalView(approvalId)) };
+}
+
+/**
+ * A product approval with who it belongs to:
+ * { approval, user: { id, firstName, lastName, …, tenant: {…} | null, productId, product: {…} } }
+ */
+async function productApprovalView(approvalId: number) {
+  const approval = await Approval.findByPk(approvalId, {
+    include: [
+      {
+        association: 'user',
+        attributes: ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'tenantName'],
+        include: [
+          {
+            association: 'tenant',
+            include: [{ association: 'category' }, { association: 'logo' }],
+          },
+        ],
+      },
+      { association: 'product', include: [{ association: 'image' }] },
+    ],
+  });
+  if (!approval) throw HttpError.notFound('Persetujuan tidak ditemukan');
+
+  const { user, product, ...rest } = approval.toJSON() as unknown as Record<string, any>;
+  return {
+    approval: rest,
+    user: user && {
+      ...user,
+      tenant: user.tenant ?? null,
+      productId: product?.id ?? null,
+      product: product ?? null,
+    },
+  };
 }

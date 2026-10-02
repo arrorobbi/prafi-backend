@@ -13,13 +13,26 @@ interface Payload {
   description: string;
   entityType?: NotificationEntityType;
   entityId?: string;
+  /** Activation notifications: the approval of the user/product the notification is about. */
+  approvalId?: number | null;
 }
+
+/**
+ * Activation notifications carry their approval, so the frontend knows what needs (de)activating and
+ * its current status. To change it: PATCH /api/approvals/:entityId?type=<entityType>.
+ */
+const APPROVAL_INCLUDE = {
+  association: 'approval',
+  attributes: ['id', 'type', 'userId', 'isActive', 'reason', 'updatedAt'],
+  // Whose approval it is: the account owner (type 'user') or the product owner (type 'product')
+  include: [{ association: 'user', attributes: { exclude: ['password'] } }],
+};
 
 // ---------- sending ----------
 
-/** Same shape as the REST API returns (no userId/approvalId). */
+/** Same shape as the REST API returns (no userId). */
 function toClient(n: Notification) {
-  const { userId: _userId, approvalId: _approvalId, ...rest } = n.toJSON() as unknown as Record<string, unknown>;
+  const { userId: _userId, ...rest } = n.toJSON() as unknown as Record<string, unknown>;
   return rest;
 }
 
@@ -33,9 +46,12 @@ async function toUsers(userIds: string[], payload: Payload) {
       description: payload.description,
       entityType: payload.entityType ?? null,
       entityId: payload.entityId ?? null,
+      approvalId: payload.approvalId ?? null,
       readAt: null,
     })),
   );
+  // Reloaded so the pushed notification includes its approval, like GET /api/notifications
+  const sent = await Notification.findAll({ where: { id: created.map((n) => n.id) }, include: [APPROVAL_INCLUDE] });
 
   // Realtime: push each copy to its recipient, with their new unread count
   const counts = (await Notification.findAll({
@@ -45,7 +61,7 @@ async function toUsers(userIds: string[], payload: Payload) {
     raw: true,
   })) as unknown as { userId: string; count: string }[];
   const unread = new Map(counts.map((c) => [c.userId, Number(c.count)]));
-  for (const n of created) {
+  for (const n of sent) {
     emitToUser(n.userId, E.NOTIFICATION_NEW, { notification: toClient(n), unreadCount: unread.get(n.userId) ?? 0 });
   }
 }
@@ -78,7 +94,7 @@ const fullName = (u: { firstName: string; lastName: string }) => `${u.firstName}
 /** The events below are called from the services after their own change has been saved. */
 export const notify = {
   /** superadmin: a new admin waits for activation */
-  adminRegistered: (admin: { id: string; firstName: string; lastName: string; email: string }) =>
+  adminRegistered: (admin: { id: string; firstName: string; lastName: string; email: string }, approvalId: number) =>
     safely('adminRegistered', () =>
       toRole(ROLES.SUPERADMIN, {
         type: T.ADMIN_PENDING_ACTIVATION,
@@ -86,11 +102,15 @@ export const notify = {
         description: `${fullName(admin)} (${admin.email}) was registered as admin and needs to be activated.`,
         entityType: 'user',
         entityId: admin.id,
+        approvalId,
       }),
     ),
 
   /** admin: a new tenant signed up */
-  tenantRegistered: (tenant: { id: string; firstName: string; lastName: string; email: string; tenantName?: string | null }) =>
+  tenantRegistered: (
+    tenant: { id: string; firstName: string; lastName: string; email: string; tenantName?: string | null },
+    approvalId: number,
+  ) =>
     safely('tenantRegistered', () =>
       toRole(ROLES.ADMIN, {
         type: T.TENANT_REGISTERED,
@@ -98,14 +118,18 @@ export const notify = {
         description: `${tenant.tenantName ?? fullName(tenant)} (${tenant.email}) just signed up as a tenant.`,
         entityType: 'user',
         entityId: tenant.id,
+        approvalId,
       }),
     ),
 
   /** superadmin + admin: review the new product; tenant: it is under review */
-  productSubmitted: (product: { id: string; name: string }, owner: { id: string; tenantName?: string | null }) =>
+  productSubmitted: (
+    product: { id: string; name: string; approvalId: number | null },
+    owner: { id: string; tenantName?: string | null },
+  ) =>
     safely('productSubmitted', async () => {
       const by = owner.tenantName ?? 'A tenant';
-      const link = { entityType: 'product' as const, entityId: product.id };
+      const link = { entityType: 'product' as const, entityId: product.id, approvalId: product.approvalId };
       await toRole(ROLES.SUPERADMIN, {
         type: T.PRODUCT_SUBMITTED,
         name: 'New product waiting for approval',
@@ -157,11 +181,11 @@ export const notify = {
    */
   productActivationChanged: (
     actor: AuthUser,
-    product: { id: string; name: string; tenantId: string },
+    product: { id: string; name: string; tenantId: string; approvalId: number | null },
     isActive: boolean,
   ) =>
     safely('productActivationChanged', async () => {
-      const link = { entityType: 'product' as const, entityId: product.id };
+      const link = { entityType: 'product' as const, entityId: product.id, approvalId: product.approvalId };
       if (isActive) {
         await toRole(ROLES.ADMIN, {
           type: T.PRODUCT_PUBLISHED,
@@ -186,7 +210,7 @@ export const notify = {
     }),
 
   /** superadmin: an admin deactivated a user account (only real changes notify) */
-  userDeactivatedByAdmin: (actor: AuthUser, user: { id: string; email: string; role: Role }) =>
+  userDeactivatedByAdmin: (actor: AuthUser, user: { id: string; email: string; role: Role }, approvalId: number) =>
     safely('userDeactivatedByAdmin', () =>
       toRole(ROLES.SUPERADMIN, {
         type: T.USER_DEACTIVATED,
@@ -194,6 +218,7 @@ export const notify = {
         description: `${actor.email} deactivated the ${user.role} account ${user.email}.`,
         entityType: 'user',
         entityId: user.id,
+        approvalId,
       }),
     ),
 };
@@ -211,7 +236,8 @@ export async function list(user: AuthUser, { page, limit, unreadOnly }: ListNoti
   const [{ rows, count }, unreadCount] = await Promise.all([
     Notification.findAndCountAll({
       where,
-      attributes: { exclude: ['userId', 'approvalId'] },
+      attributes: { exclude: ['userId'] },
+      include: [APPROVAL_INCLUDE],
       order: [['createdAt', 'DESC'], ['id', 'DESC']],
       limit,
       offset: (page - 1) * limit,
@@ -224,7 +250,11 @@ export async function list(user: AuthUser, { page, limit, unreadOnly }: ListNoti
 export const countUnread = (user: AuthUser) => Notification.count({ where: { userId: user.id, readAt: null } });
 
 async function findOwn(user: AuthUser, id: number) {
-  const notification = await Notification.findOne({ where: { id, userId: user.id }, attributes: { exclude: ['approvalId'] } });
+  const notification = await Notification.findOne({
+    where: { id, userId: user.id },
+    attributes: { exclude: ['userId'] },
+    include: [APPROVAL_INCLUDE],
+  });
   if (!notification) throw HttpError.notFound('Notifikasi tidak ditemukan');
   return notification;
 }

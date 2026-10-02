@@ -27,6 +27,7 @@ export class Notification extends Model<
   declare description: string;
   /** Recipient. */
   declare userId: ForeignKey<User['id']>;
+  /** Set on activation notifications: the approval to activate/deactivate (current status in approval.isActive). */
   declare approvalId: ForeignKey<Approval['id']> | null;
   /** What the notification is about, so the frontend can link to it (e.g. 'product' + product id). */
   declare entityType: NotificationEntityType | null;
@@ -43,7 +44,7 @@ export class Notification extends Model<
   static associate({ User, Approval }: DbModels) {
     // notifications.user_id > users.id (many notifications per user)
     Notification.belongsTo(User, { as: 'user', foreignKey: 'userId', onDelete: 'CASCADE' });
-    // notifications.approval_id - approvals.id (one-to-one)
+    // notifications.approval_id > approvals.id (many-to-one: every recipient's copy points to the same approval)
     Notification.belongsTo(Approval, { as: 'approval', foreignKey: 'approvalId', onDelete: 'SET NULL' });
   }
 }
@@ -62,7 +63,6 @@ Notification.init(
     approvalId: {
       type: DataTypes.INTEGER,
       allowNull: true,
-      unique: true,
       references: { model: 'approvals', key: 'id' },
     },
     entityType: { type: DataTypes.STRING(32), allowNull: true },
@@ -84,6 +84,7 @@ Notification.init(
     indexes: [
       { name: 'notifications_user_id_created_at', fields: ['user_id', 'created_at'] },
       { name: 'notifications_user_id_read_at', fields: ['user_id', 'read_at'] },
+      { name: 'notifications_approval_id', fields: ['approval_id'] },
     ],
   },
 );

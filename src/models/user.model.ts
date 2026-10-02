@@ -49,6 +49,7 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   declare products?: NonAttribute<Product[]>;
   declare notifications?: NonAttribute<Notification[]>;
   declare approval?: NonAttribute<Approval>;
+  declare productApprovals?: NonAttribute<Approval[]>;
   /** Tenants only: their tenant profile (tenants table). */
   declare tenant?: NonAttribute<Tenant>;
 
@@ -59,8 +60,10 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
     User.hasMany(Product, { as: 'products', foreignKey: 'tenantId' });
     // notifications.user_id > users.id (one user has many notifications)
     User.hasMany(Notification, { as: 'notifications', foreignKey: 'userId' });
-    // approvals.user_id - users.id (one-to-one): user.approval.isActive
-    User.hasOne(Approval, { as: 'approval', foreignKey: 'userId' });
+    // approvals.user_id - users.id (one-to-one, type 'user'): the account approval, user.approval.isActive
+    User.hasOne(Approval, { as: 'approval', foreignKey: 'userId', scope: { type: 'user' } });
+    // approvals.user_id > users.id (type 'product'): the approvals of this tenant's products
+    User.hasMany(Approval, { as: 'productApprovals', foreignKey: 'userId', scope: { type: 'product' } });
     // tenants.user_id - users.id (one-to-one: a tenant user has one tenant profile)
     User.hasOne(Tenant, { as: 'tenant', foreignKey: 'userId' });
   }
