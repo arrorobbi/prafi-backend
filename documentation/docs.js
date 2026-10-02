@@ -1,17 +1,39 @@
 (function () {
   var root = document.documentElement;
-  // Theme: light by default, remembered per browser
-  var stored = null;
-  try { stored = localStorage.getItem('prafi-docs-theme'); } catch (e) {}
-  if (stored === 'dark') root.setAttribute('data-theme', 'dark');
+  var set = function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} };
+  var TEXT = {
+    en: { light: '☀ Light', dark: '☾ Dark', copied: 'Copied', search: 'Search endpoints… press /' },
+    id: { light: '☀ Terang', dark: '☾ Gelap', copied: 'Tersalin', search: 'Cari endpoint… tekan /' }
+  };
+  var lang = function () { return root.getAttribute('data-lang') === 'id' ? 'id' : 'en'; };
   var themeBtn = document.getElementById('theme-toggle');
-  var setThemeLabel = function () { themeBtn.textContent = root.getAttribute('data-theme') === 'dark' ? '☀ Light' : '☾ Dark'; };
-  setThemeLabel();
+  var search = document.getElementById('search');
+  var refreshLabels = function () {
+    var T = TEXT[lang()];
+    themeBtn.textContent = root.getAttribute('data-theme') === 'dark' ? T.light : T.dark;
+    search.setAttribute('placeholder', T.search);
+    search.setAttribute('aria-label', T.search);
+    document.querySelectorAll('.lang-switch button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-set-lang') === lang())); });
+  };
+  refreshLabels();
+
+  // Theme: light by default, remembered per browser
   themeBtn.addEventListener('click', function () {
     var dark = root.getAttribute('data-theme') !== 'dark';
     if (dark) root.setAttribute('data-theme', 'dark'); else root.removeAttribute('data-theme');
-    try { localStorage.setItem('prafi-docs-theme', dark ? 'dark' : 'light'); } catch (e) {}
-    setThemeLabel();
+    set('prafi-docs-theme', dark ? 'dark' : 'light');
+    refreshLabels();
+  });
+
+  // Language: English / Bahasa Indonesia, remembered per browser
+  document.querySelectorAll('[data-set-lang]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var l = b.getAttribute('data-set-lang');
+      root.setAttribute('data-lang', l);
+      root.setAttribute('lang', l);
+      set('prafi-docs-lang', l);
+      refreshLabels();
+    });
   });
 
   // Base URL: when served by the backend, {{baseUrl}} is this server
@@ -27,13 +49,16 @@
     var btn = e.target.closest('.copy');
     if (!btn) return;
     var text = btn.id === 'copy-base' ? base : btn.getAttribute('data-copy');
-    var done = function () { var old = btn.textContent; btn.textContent = 'Copied'; btn.classList.add('done'); setTimeout(function () { btn.textContent = old; btn.classList.remove('done'); }, 1200); };
+    var done = function () {
+      var old = btn.innerHTML;
+      btn.textContent = TEXT[lang()].copied; btn.classList.add('done');
+      setTimeout(function () { btn.innerHTML = old; btn.classList.remove('done'); }, 1200);
+    };
     if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, function () {});
     else { var t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done(); } catch (err) {} t.remove(); }
   });
 
-  // Search
-  var search = document.getElementById('search');
+  // Search (matches English and Indonesian titles)
   var navItems = document.querySelectorAll('aside li[data-search]');
   var endpoints = document.querySelectorAll('article.endpoint');
   var navFolders = document.querySelectorAll('aside .nav-folder[data-folder]');

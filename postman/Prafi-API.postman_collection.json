@@ -320,7 +320,7 @@
                 "me"
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, admin, tenant)\n\nUpdates your own account; send only the fields to change: `firstName`, `lastName`, `phoneNumber`, `email`, `faceImageId` (or `null`), `tenantName` (tenants only), `password` + `currentPassword`.\n\n`id` and `role` can never be changed.",
+            "description": "**Access:** any logged-in role (superadmin, admin, tenant)\n\nUpdates your own account; send only the fields to change: `firstName`, `lastName`, `phoneNumber`, `email`, `faceImageId` (or `null`), `tenantName` (tenants only), `password` + `currentPassword`.\n\n`id` and `role` can never be changed. Replacing `faceImageId` (or setting it to `null`) deletes the old image and its file.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"firstName\": \"Andi\",\n  \"phoneNumber\": \"081234567899\"\n}",
@@ -347,7 +347,7 @@
     },
     {
       "name": "Images",
-      "description": "Image upload (max 5 MB; jpg, png, webp, gif). Upload first, then use the returned id as `faceImageId`, product `imageId` or tenant `logoId`. Files are served publicly at `imgUrl`.",
+      "description": "Image upload (max 5 MB; jpg, png, webp, gif). Upload first, then use the returned id as `faceImageId`, product `imageId` or tenant `logoId`. Files are served publicly at `imgUrl`. When a record's image is replaced, the old image and its file are deleted automatically.",
       "item": [
         {
           "name": "Upload Image (All roles)",
@@ -759,7 +759,7 @@
                 "{{productId}}"
               ]
             },
-            "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `qty`, `imageId`. Activation cannot be changed here.",
+            "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `qty`, `imageId`. Activation cannot be changed here. Replacing `imageId` deletes the old image and its file.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"qty\": 25\n}",
@@ -1165,7 +1165,7 @@
                 "me"
               ]
             },
-            "description": "**Access:** tenant\n\nSend only the fields to change. Admins get `TENANT_PROFILE_UPDATED`.",
+            "description": "**Access:** tenant\n\nSend only the fields to change. Admins get `TENANT_PROFILE_UPDATED`. Replacing `logoId` deletes the old logo and its file.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"operationalHours\": \"07:00 - 23:00\"\n}",

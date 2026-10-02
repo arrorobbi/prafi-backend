@@ -1,10 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Prafi API Docs</title>
-<meta name="description" content="Prafi API reference: endpoints, roles, request bodies and realtime notifications.">
+<meta name="description" content="Prafi API reference (English / Bahasa Indonesia): endpoints, roles, request bodies and realtime notifications.">
+<script src="docs-init.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -153,70 +154,84 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
   .topbar { padding: 0 12px; gap: 8px; }
   .logo span.name { display: none; }
 }
+@media (max-width: 600px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .stat:last-child { grid-column: span 2; }
+}
+
+html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { display: none !important; }
+.lang-switch { display: inline-flex; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; height: 40px; background: var(--surface); }
+.lang-switch button { border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; font-weight: 700; padding: 0 12px; cursor: pointer; }
+.lang-switch button + button { border-left: 1px solid var(--border); }
+.lang-switch button[aria-pressed="true"] { background: var(--primary); color: #fff; }
 </style>
 </head>
 <body>
 <header class="topbar">
-  <button id="menu-toggle" class="icon-btn" type="button" aria-label="Endpoints menu">☰</button>
+  <button id="menu-toggle" class="icon-btn" type="button" aria-label="Menu">☰</button>
   <a class="logo" href="#top"><span class="logo-mark">P</span><span class="name">Prafi API</span><small>REST + Socket.IO</small></a>
   <label class="search-wrap">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
     <input id="search" type="search" placeholder="Search endpoints… press /" aria-label="Search endpoints">
   </label>
+  <div class="lang-switch" role="group" aria-label="Language / Bahasa">
+    <button type="button" data-set-lang="en" title="English">EN</button>
+    <button type="button" data-set-lang="id" title="Bahasa Indonesia">ID</button>
+  </div>
   <button id="theme-toggle" class="icon-btn" type="button">☾ Dark</button>
 </header>
 <div class="layout">
 <aside id="sidebar">
   <ul>
-    <li class="nav-folder"><a class="nav-folder-link" href="#top">Overview</a></li>
+    <li class="nav-folder"><a class="nav-folder-link" href="#top"><span data-l="en">Overview</span><span data-l="id">Ringkasan</span></a></li>
     
   <li class="nav-folder" data-folder="health">
     <a class="nav-folder-link" href="#health">Health<span class="count">1</span></a>
-    <ul><li data-search="health health check (public) get {{baseurl}}/api/health"><a href="#health--health-check"><span class="nav-method m-get">GET</span><span>Health Check</span></a></li></ul>
+    <ul><li data-search="health health health check (public) cek status server get {{baseurl}}/api/health"><a href="#health--health-check"><span class="nav-method m-get">GET</span><span><span data-l="en">Health Check</span><span data-l="id">Cek Status Server</span></span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="auth">
     <a class="nav-folder-link" href="#auth">Auth<span class="count">6</span></a>
-    <ul><li data-search="auth login (public) post {{baseurl}}/api/auth/login"><a href="#auth--login"><span class="nav-method m-post">POST</span><span>Login</span></a></li><li data-search="auth logout (all roles) post {{baseurl}}/api/auth/logout"><a href="#auth--logout"><span class="nav-method m-post">POST</span><span>Logout</span></a></li><li data-search="auth register admin (superadmin) post {{baseurl}}/api/auth/register/admin"><a href="#auth--register-admin"><span class="nav-method m-post">POST</span><span>Register Admin</span></a></li><li data-search="auth register tenant (public) post {{baseurl}}/api/auth/register/tenant"><a href="#auth--register-tenant"><span class="nav-method m-post">POST</span><span>Register Tenant</span></a></li><li data-search="auth me (all roles) get {{baseurl}}/api/auth/me"><a href="#auth--me"><span class="nav-method m-get">GET</span><span>Me</span></a></li><li data-search="auth update me (all roles) patch {{baseurl}}/api/auth/me"><a href="#auth--update-me"><span class="nav-method m-patch">PATCH</span><span>Update Me</span></a></li></ul>
+    <ul><li data-search="auth auth login (public) login post {{baseurl}}/api/auth/login"><a href="#auth--login"><span class="nav-method m-post">POST</span><span>Login</span></a></li><li data-search="auth auth logout (all roles) logout post {{baseurl}}/api/auth/logout"><a href="#auth--logout"><span class="nav-method m-post">POST</span><span>Logout</span></a></li><li data-search="auth auth register admin (superadmin) daftarkan admin post {{baseurl}}/api/auth/register/admin"><a href="#auth--register-admin"><span class="nav-method m-post">POST</span><span><span data-l="en">Register Admin</span><span data-l="id">Daftarkan Admin</span></span></a></li><li data-search="auth auth register tenant (public) daftar sebagai tenant post {{baseurl}}/api/auth/register/tenant"><a href="#auth--register-tenant"><span class="nav-method m-post">POST</span><span><span data-l="en">Register Tenant</span><span data-l="id">Daftar sebagai Tenant</span></span></a></li><li data-search="auth auth me (all roles) akun saya get {{baseurl}}/api/auth/me"><a href="#auth--me"><span class="nav-method m-get">GET</span><span><span data-l="en">Me</span><span data-l="id">Akun Saya</span></span></a></li><li data-search="auth auth update me (all roles) ubah akun saya patch {{baseurl}}/api/auth/me"><a href="#auth--update-me"><span class="nav-method m-patch">PATCH</span><span><span data-l="en">Update Me</span><span data-l="id">Ubah Akun Saya</span></span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="images">
-    <a class="nav-folder-link" href="#images">Images<span class="count">3</span></a>
-    <ul><li data-search="images upload image (all roles) post {{baseurl}}/api/images"><a href="#images--upload-image"><span class="nav-method m-post">POST</span><span>Upload Image</span></a></li><li data-search="images open image (public) get {{baseurl}}{{imagepath}}"><a href="#images--open-image"><span class="nav-method m-get">GET</span><span>Open Image</span></a></li><li data-search="images delete image (tenant) delete {{baseurl}}/api/images/{{imageid}}"><a href="#images--delete-image"><span class="nav-method m-delete">DEL</span><span>Delete Image</span></a></li></ul>
+    <a class="nav-folder-link" href="#images"><span data-l="en">Images</span><span data-l="id">Gambar</span><span class="count">3</span></a>
+    <ul><li data-search="images gambar upload image (all roles) unggah gambar post {{baseurl}}/api/images"><a href="#images--upload-image"><span class="nav-method m-post">POST</span><span><span data-l="en">Upload Image</span><span data-l="id">Unggah Gambar</span></span></a></li><li data-search="images gambar open image (public) buka gambar get {{baseurl}}{{imagepath}}"><a href="#images--open-image"><span class="nav-method m-get">GET</span><span><span data-l="en">Open Image</span><span data-l="id">Buka Gambar</span></span></a></li><li data-search="images gambar delete image (tenant) hapus gambar delete {{baseurl}}/api/images/{{imageid}}"><a href="#images--delete-image"><span class="nav-method m-delete">DEL</span><span><span data-l="en">Delete Image</span><span data-l="id">Hapus Gambar</span></span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="users">
-    <a class="nav-folder-link" href="#users">Users<span class="count">1</span></a>
-    <ul><li data-search="users list users (superadmin, admin) get {{baseurl}}/api/users?page=1&amp;limit=20"><a href="#users--list-users"><span class="nav-method m-get">GET</span><span>List Users</span></a></li></ul>
+    <a class="nav-folder-link" href="#users"><span data-l="en">Users</span><span data-l="id">Pengguna</span><span class="count">1</span></a>
+    <ul><li data-search="users pengguna list users (superadmin, admin) daftar pengguna get {{baseurl}}/api/users?page=1&amp;limit=20"><a href="#users--list-users"><span class="nav-method m-get">GET</span><span><span data-l="en">List Users</span><span data-l="id">Daftar Pengguna</span></span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="approvals">
-    <a class="nav-folder-link" href="#approvals">Approvals<span class="count">2</span></a>
-    <ul><li data-search="approvals activate / deactivate user (superadmin, admin) patch {{baseurl}}/api/approvals/{{userid}}?type=user"><a href="#approvals--activate-deactivate-user"><span class="nav-method m-patch">PATCH</span><span>Activate / Deactivate User</span></a></li><li data-search="approvals activate / deactivate product (admin) patch {{baseurl}}/api/approvals/{{productid}}?type=product"><a href="#approvals--activate-deactivate-product"><span class="nav-method m-patch">PATCH</span><span>Activate / Deactivate Product</span></a></li></ul>
+    <a class="nav-folder-link" href="#approvals"><span data-l="en">Approvals</span><span data-l="id">Persetujuan</span><span class="count">2</span></a>
+    <ul><li data-search="approvals persetujuan activate / deactivate user (superadmin, admin) aktifkan / nonaktifkan pengguna patch {{baseurl}}/api/approvals/{{userid}}?type=user"><a href="#approvals--activate-deactivate-user"><span class="nav-method m-patch">PATCH</span><span><span data-l="en">Activate / Deactivate User</span><span data-l="id">Aktifkan / Nonaktifkan Pengguna</span></span></a></li><li data-search="approvals persetujuan activate / deactivate product (admin) aktifkan / nonaktifkan produk patch {{baseurl}}/api/approvals/{{productid}}?type=product"><a href="#approvals--activate-deactivate-product"><span class="nav-method m-patch">PATCH</span><span><span data-l="en">Activate / Deactivate Product</span><span data-l="id">Aktifkan / Nonaktifkan Produk</span></span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="products">
-    <a class="nav-folder-link" href="#products">Products<span class="count">5</span></a>
-    <ul><li data-search="products list products (all roles) get {{baseurl}}/api/products?page=1&amp;limit=20"><a href="#products--list-products"><span class="nav-method m-get">GET</span><span>List Products</span></a></li><li data-search="products get product (all roles) get {{baseurl}}/api/products/{{productid}}"><a href="#products--get-product"><span class="nav-method m-get">GET</span><span>Get Product</span></a></li><li data-search="products create product (tenant) post {{baseurl}}/api/products"><a href="#products--create-product"><span class="nav-method m-post">POST</span><span>Create Product</span></a></li><li data-search="products update product (tenant) patch {{baseurl}}/api/products/{{productid}}"><a href="#products--update-product"><span class="nav-method m-patch">PATCH</span><span>Update Product</span></a></li><li data-search="products delete product (tenant) delete {{baseurl}}/api/products/{{productid}}"><a href="#products--delete-product"><span class="nav-method m-delete">DEL</span><span>Delete Product</span></a></li></ul>
+    <a class="nav-folder-link" href="#products"><span data-l="en">Products</span><span data-l="id">Produk</span><span class="count">5</span></a>
+    <ul><li data-search="products produk list products (all roles) daftar produk get {{baseurl}}/api/products?page=1&amp;limit=20"><a href="#products--list-products"><span class="nav-method m-get">GET</span><span><span data-l="en">List Products</span><span data-l="id">Daftar Produk</span></span></a></li><li data-search="products produk get product (all roles) detail produk get {{baseurl}}/api/products/{{productid}}"><a href="#products--get-product"><span class="nav-method m-get">GET</span><span><span data-l="en">Get Product</span><span data-l="id">Detail Produk</span></span></a></li><li data-search="products produk create product (tenant) buat produk post {{baseurl}}/api/products"><a href="#products--create-product"><span class="nav-method m-post">POST</span><span><span data-l="en">Create Product</span><span data-l="id">Buat Produk</span></span></a></li><li data-search="products produk update product (tenant) ubah produk patch {{baseurl}}/api/products/{{productid}}"><a href="#products--update-product"><span class="nav-method m-patch">PATCH</span><span><span data-l="en">Update Product</span><span data-l="id">Ubah Produk</span></span></a></li><li data-search="products produk delete product (tenant) hapus produk delete {{baseurl}}/api/products/{{productid}}"><a href="#products--delete-product"><span class="nav-method m-delete">DEL</span><span><span data-l="en">Delete Product</span><span data-l="id">Hapus Produk</span></span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="landing">
     <a class="nav-folder-link" href="#landing">Landing<span class="count">1</span></a>
-    <ul><li data-search="landing landing products (public) get {{baseurl}}/api/landing/products?page=1&amp;limit=20"><a href="#landing--landing-products"><span class="nav-method m-get">GET</span><span>Landing Products</span></a></li></ul>
+    <ul><li data-search="landing landing landing products (public) produk landing get {{baseurl}}/api/landing/products?page=1&amp;limit=20"><a href="#landing--landing-products"><span class="nav-method m-get">GET</span><span><span data-l="en">Landing Products</span><span data-l="id">Produk Landing</span></span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="tenant-categories">
-    <a class="nav-folder-link" href="#tenant-categories">Tenant Categories<span class="count">5</span></a>
-    <ul><li data-search="tenant categories list tenant categories (superadmin, admin) get {{baseurl}}/api/tenant-categories?page=1&amp;limit=20"><a href="#tenant-categories--list-tenant-categories"><span class="nav-method m-get">GET</span><span>List Tenant Categories</span></a></li><li data-search="tenant categories get tenant category (superadmin, admin) get {{baseurl}}/api/tenant-categories/{{categoryid}}"><a href="#tenant-categories--get-tenant-category"><span class="nav-method m-get">GET</span><span>Get Tenant Category</span></a></li><li data-search="tenant categories create tenant category (superadmin, admin) post {{baseurl}}/api/tenant-categories"><a href="#tenant-categories--create-tenant-category"><span class="nav-method m-post">POST</span><span>Create Tenant Category</span></a></li><li data-search="tenant categories update tenant category (superadmin, admin) patch {{baseurl}}/api/tenant-categories/{{categoryid}}"><a href="#tenant-categories--update-tenant-category"><span class="nav-method m-patch">PATCH</span><span>Update Tenant Category</span></a></li><li data-search="tenant categories delete tenant category (superadmin, admin) delete {{baseurl}}/api/tenant-categories/{{categoryid}}"><a href="#tenant-categories--delete-tenant-category"><span class="nav-method m-delete">DEL</span><span>Delete Tenant Category</span></a></li></ul>
+    <a class="nav-folder-link" href="#tenant-categories"><span data-l="en">Tenant Categories</span><span data-l="id">Kategori Tenant</span><span class="count">5</span></a>
+    <ul><li data-search="tenant categories kategori tenant list tenant categories (superadmin, admin) daftar kategori tenant get {{baseurl}}/api/tenant-categories?page=1&amp;limit=20"><a href="#tenant-categories--list-tenant-categories"><span class="nav-method m-get">GET</span><span><span data-l="en">List Tenant Categories</span><span data-l="id">Daftar Kategori Tenant</span></span></a></li><li data-search="tenant categories kategori tenant get tenant category (superadmin, admin) detail kategori tenant get {{baseurl}}/api/tenant-categories/{{categoryid}}"><a href="#tenant-categories--get-tenant-category"><span class="nav-method m-get">GET</span><span><span data-l="en">Get Tenant Category</span><span data-l="id">Detail Kategori Tenant</span></span></a></li><li data-search="tenant categories kategori tenant create tenant category (superadmin, admin) buat kategori tenant post {{baseurl}}/api/tenant-categories"><a href="#tenant-categories--create-tenant-category"><span class="nav-method m-post">POST</span><span><span data-l="en">Create Tenant Category</span><span data-l="id">Buat Kategori Tenant</span></span></a></li><li data-search="tenant categories kategori tenant update tenant category (superadmin, admin) ubah kategori tenant patch {{baseurl}}/api/tenant-categories/{{categoryid}}"><a href="#tenant-categories--update-tenant-category"><span class="nav-method m-patch">PATCH</span><span><span data-l="en">Update Tenant Category</span><span data-l="id">Ubah Kategori Tenant</span></span></a></li><li data-search="tenant categories kategori tenant delete tenant category (superadmin, admin) hapus kategori tenant delete {{baseurl}}/api/tenant-categories/{{categoryid}}"><a href="#tenant-categories--delete-tenant-category"><span class="nav-method m-delete">DEL</span><span><span data-l="en">Delete Tenant Category</span><span data-l="id">Hapus Kategori Tenant</span></span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="tenants">
-    <a class="nav-folder-link" href="#tenants">Tenants<span class="count">6</span></a>
-    <ul><li data-search="tenants get my tenant (tenant) get {{baseurl}}/api/tenants/me"><a href="#tenants--get-my-tenant"><span class="nav-method m-get">GET</span><span>Get My Tenant</span></a></li><li data-search="tenants create my tenant (tenant) post {{baseurl}}/api/tenants/me"><a href="#tenants--create-my-tenant"><span class="nav-method m-post">POST</span><span>Create My Tenant</span></a></li><li data-search="tenants update my tenant (tenant) patch {{baseurl}}/api/tenants/me"><a href="#tenants--update-my-tenant"><span class="nav-method m-patch">PATCH</span><span>Update My Tenant</span></a></li><li data-search="tenants delete my tenant (tenant) delete {{baseurl}}/api/tenants/me"><a href="#tenants--delete-my-tenant"><span class="nav-method m-delete">DEL</span><span>Delete My Tenant</span></a></li><li data-search="tenants list tenants (superadmin, admin) get {{baseurl}}/api/tenants?page=1&amp;limit=20"><a href="#tenants--list-tenants"><span class="nav-method m-get">GET</span><span>List Tenants</span></a></li><li data-search="tenants get tenant (superadmin, admin) get {{baseurl}}/api/tenants/{{tenantprofileid}}"><a href="#tenants--get-tenant"><span class="nav-method m-get">GET</span><span>Get Tenant</span></a></li></ul>
+    <a class="nav-folder-link" href="#tenants"><span data-l="en">Tenants</span><span data-l="id">Tenant</span><span class="count">6</span></a>
+    <ul><li data-search="tenants tenant get my tenant (tenant) profil tenant saya get {{baseurl}}/api/tenants/me"><a href="#tenants--get-my-tenant"><span class="nav-method m-get">GET</span><span><span data-l="en">Get My Tenant</span><span data-l="id">Profil Tenant Saya</span></span></a></li><li data-search="tenants tenant create my tenant (tenant) buat profil tenant saya post {{baseurl}}/api/tenants/me"><a href="#tenants--create-my-tenant"><span class="nav-method m-post">POST</span><span><span data-l="en">Create My Tenant</span><span data-l="id">Buat Profil Tenant Saya</span></span></a></li><li data-search="tenants tenant update my tenant (tenant) ubah profil tenant saya patch {{baseurl}}/api/tenants/me"><a href="#tenants--update-my-tenant"><span class="nav-method m-patch">PATCH</span><span><span data-l="en">Update My Tenant</span><span data-l="id">Ubah Profil Tenant Saya</span></span></a></li><li data-search="tenants tenant delete my tenant (tenant) hapus profil tenant saya delete {{baseurl}}/api/tenants/me"><a href="#tenants--delete-my-tenant"><span class="nav-method m-delete">DEL</span><span><span data-l="en">Delete My Tenant</span><span data-l="id">Hapus Profil Tenant Saya</span></span></a></li><li data-search="tenants tenant list tenants (superadmin, admin) daftar tenant get {{baseurl}}/api/tenants?page=1&amp;limit=20"><a href="#tenants--list-tenants"><span class="nav-method m-get">GET</span><span><span data-l="en">List Tenants</span><span data-l="id">Daftar Tenant</span></span></a></li><li data-search="tenants tenant get tenant (superadmin, admin) detail tenant get {{baseurl}}/api/tenants/{{tenantprofileid}}"><a href="#tenants--get-tenant"><span class="nav-method m-get">GET</span><span><span data-l="en">Get Tenant</span><span data-l="id">Detail Tenant</span></span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="notifications">
-    <a class="nav-folder-link" href="#notifications">Notifications<span class="count">5</span></a>
-    <ul><li data-search="notifications list notifications (all roles) get {{baseurl}}/api/notifications?page=1&amp;limit=20"><a href="#notifications--list-notifications"><span class="nav-method m-get">GET</span><span>List Notifications</span></a></li><li data-search="notifications unread count (all roles) get {{baseurl}}/api/notifications/unread-count"><a href="#notifications--unread-count"><span class="nav-method m-get">GET</span><span>Unread Count</span></a></li><li data-search="notifications mark notification read (all roles) patch {{baseurl}}/api/notifications/{{notificationid}}/read"><a href="#notifications--mark-notification-read"><span class="nav-method m-patch">PATCH</span><span>Mark Notification Read</span></a></li><li data-search="notifications mark all read (all roles) patch {{baseurl}}/api/notifications/read-all"><a href="#notifications--mark-all-read"><span class="nav-method m-patch">PATCH</span><span>Mark All Read</span></a></li><li data-search="notifications delete notification (all roles) delete {{baseurl}}/api/notifications/{{notificationid}}"><a href="#notifications--delete-notification"><span class="nav-method m-delete">DEL</span><span>Delete Notification</span></a></li></ul>
+    <a class="nav-folder-link" href="#notifications"><span data-l="en">Notifications</span><span data-l="id">Notifikasi</span><span class="count">5</span></a>
+    <ul><li data-search="notifications notifikasi list notifications (all roles) daftar notifikasi get {{baseurl}}/api/notifications?page=1&amp;limit=20"><a href="#notifications--list-notifications"><span class="nav-method m-get">GET</span><span><span data-l="en">List Notifications</span><span data-l="id">Daftar Notifikasi</span></span></a></li><li data-search="notifications notifikasi unread count (all roles) jumlah belum dibaca get {{baseurl}}/api/notifications/unread-count"><a href="#notifications--unread-count"><span class="nav-method m-get">GET</span><span><span data-l="en">Unread Count</span><span data-l="id">Jumlah Belum Dibaca</span></span></a></li><li data-search="notifications notifikasi mark notification read (all roles) tandai sudah dibaca patch {{baseurl}}/api/notifications/{{notificationid}}/read"><a href="#notifications--mark-notification-read"><span class="nav-method m-patch">PATCH</span><span><span data-l="en">Mark Notification Read</span><span data-l="id">Tandai Sudah Dibaca</span></span></a></li><li data-search="notifications notifikasi mark all read (all roles) tandai semua sudah dibaca patch {{baseurl}}/api/notifications/read-all"><a href="#notifications--mark-all-read"><span class="nav-method m-patch">PATCH</span><span><span data-l="en">Mark All Read</span><span data-l="id">Tandai Semua Sudah Dibaca</span></span></a></li><li data-search="notifications notifikasi delete notification (all roles) hapus notifikasi delete {{baseurl}}/api/notifications/{{notificationid}}"><a href="#notifications--delete-notification"><span class="nav-method m-delete">DEL</span><span><span data-l="en">Delete Notification</span><span data-l="id">Hapus Notifikasi</span></span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="realtime-websocket">
     <a class="nav-folder-link" href="#realtime-websocket">Realtime (WebSocket)<span class="count">1</span></a>
-    <ul><li data-search="realtime (websocket) socket.io endpoint reachable (public) get {{baseurl}}/socket.io/?eio=4&amp;transport=polling"><a href="#realtime-websocket--socket-io-endpoint-reachable"><span class="nav-method m-get">GET</span><span>Socket.IO Endpoint Reachable</span></a></li></ul>
+    <ul><li data-search="realtime (websocket) realtime (websocket) socket.io endpoint reachable (public) cek endpoint socket.io get {{baseurl}}/socket.io/?eio=4&amp;transport=polling"><a href="#realtime-websocket--socket-io-endpoint-reachable"><span class="nav-method m-get">GET</span><span><span data-l="en">Socket.IO Endpoint Reachable</span><span data-l="id">Cek Endpoint Socket.IO</span></span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="examples">
-    <a class="nav-folder-link" href="#examples">Examples<span class="count">2</span></a>
-    <ul><li data-search="examples admin ping (superadmin, admin) get {{baseurl}}/api/admin/ping"><a href="#examples--admin-ping"><span class="nav-method m-get">GET</span><span>Admin Ping</span></a></li><li data-search="examples role ping (all roles) get {{baseurl}}/api/tenant/ping"><a href="#examples--role-ping"><span class="nav-method m-get">GET</span><span>Role Ping</span></a></li></ul>
+    <a class="nav-folder-link" href="#examples"><span data-l="en">Examples</span><span data-l="id">Contoh</span><span class="count">2</span></a>
+    <ul><li data-search="examples contoh admin ping (superadmin, admin) ping admin get {{baseurl}}/api/admin/ping"><a href="#examples--admin-ping"><span class="nav-method m-get">GET</span><span><span data-l="en">Admin Ping</span><span data-l="id">Ping Admin</span></span></a></li><li data-search="examples contoh role ping (all roles) ping role get {{baseurl}}/api/tenant/ping"><a href="#examples--role-ping"><span class="nav-method m-get">GET</span><span><span data-l="en">Role Ping</span><span data-l="id">Ping Role</span></span></a></li></ul>
   </li>
   </ul>
 </aside>
@@ -224,17 +239,16 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
 <div class="content">
   <section class="hero">
     <h1>Prafi API</h1>
-    <p>Backend for Prafi: accounts and roles, tenants, products, approvals and realtime notifications. Every request below shows who can call it.</p>
-    <div class="base-url"><span>Base URL</span><code id="base-url">http://localhost:4000</code><button class="copy" id="copy-base" type="button">Copy</button></div>
+    <p><span data-l="en">Backend for Prafi: accounts and roles, tenants, products, approvals and realtime notifications. Every request below shows who can call it.</span><span data-l="id">Backend untuk Prafi: akun dan role, tenant, produk, persetujuan, dan notifikasi realtime. Setiap request di bawah menunjukkan siapa yang boleh memanggilnya.</span></p>
+    <div class="base-url"><span>Base URL</span><code id="base-url">http://localhost:4000</code><button class="copy" id="copy-base" type="button"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div>
     <div class="stats">
-      <div class="stat"><b>38</b><span>endpoints</span></div>
-      <div class="stat"><b>12</b><span>groups</span></div>
-      <div class="stat"><b>3</b><span>roles</span></div>
+      <div class="stat"><b>38</b><span><span data-l="en">endpoints</span><span data-l="id">endpoint</span></span></div>
+      <div class="stat"><b>12</b><span><span data-l="en">groups</span><span data-l="id">grup</span></span></div>
+      <div class="stat"><b>3</b><span><span data-l="en">roles</span><span data-l="id">role</span></span></div>
       <div class="stat"><b>17 · 8 · 8 · 5</b><span>get · post · patch · delete</span></div>
     </div>
   </section>
-  <section class="overview" id="overview">
-    <p>Backend API for Prafi (Express + Sequelize + PostgreSQL), with realtime notifications over Socket.IO.</p>
+  <section class="overview" data-l="en"><p>Backend API for Prafi (Express + Sequelize + PostgreSQL), with realtime notifications over Socket.IO.</p>
 <h3>Setup (once)</h3>
 <ol><li>Import this collection and <code>Prafi-Local.postman_environment.json</code>, then select <strong>Prafi Local</strong> (environment dropdown, top right).</li><li>In <strong>Prafi Local</strong> set <code>loginEmail</code> / <code>loginPassword</code> (Current value) to the superadmin from <code>.env</code> (<code>SEED_ADMIN_EMAIL</code> / <code>SEED_ADMIN_PASSWORD</code>), then Ctrl+S.</li><li>Start the server (<code>npm run dev</code> or <code>npm run build &amp;&amp; npm start</code>). <code>baseUrl</code> is <code>http://localhost:4000</code>.</li></ol>
 <h3>Login and roles</h3>
@@ -250,26 +264,41 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
 <ul><li>Success: <code>{ &quot;success&quot;: true, &quot;data&quot;: …, &quot;meta&quot;?: { page, limit, total, totalPages } }</code></li><li>Error: <code>{ &quot;success&quot;: false, &quot;error&quot;: { &quot;code&quot;, &quot;message&quot;, &quot;details&quot;? } }</code></li><li><code>message</code> and <code>details[].message</code> are in <strong>Bahasa Indonesia</strong> (ready to show in the frontend). <code>code</code> and <code>field</code> stay in English; frontend logic should switch on <code>code</code>.</li></ul>
 <div class="table-wrap"><table><thead><tr><th>status</th><th>code (examples)</th><th>meaning</th></tr></thead><tbody><tr><td>400</td><td><code>VALIDATION_ERROR</code>, <code>BAD_REQUEST</code>, <code>ID_NOT_PROVIDED</code></td><td>invalid input (<code>details</code> lists the fields)</td></tr><tr><td>401</td><td><code>UNAUTHORIZED</code></td><td>no/invalid/expired/logged-out token → log in again</td></tr><tr><td>403</td><td><code>FORBIDDEN</code>, <code>USER_NOT_ACTIVATED</code></td><td>wrong role, or the account is not activated</td></tr><tr><td>404</td><td><code>NOT_FOUND</code></td><td>not found, or not yours</td></tr><tr><td>409</td><td><code>UNIQUE_CONSTRAINT</code>, <code>STILL_IN_USE</code>, <code>CONFLICT</code></td><td>duplicate value, record still in use</td></tr><tr><td>413</td><td><code>FILE_TOO_LARGE</code></td><td>image over 5 MB</td></tr></tbody></table></div>
 <h3>Notifications and realtime</h3>
-<p>Every role gets notifications for the events that concern them (see <strong>Notifications</strong>); activation notifications include the <code>approval</code> with <code>userId</code> and the <code>user</code>. They arrive live over Socket.IO as <code>notification:new</code> (see <strong>Realtime (WebSocket)</strong> for connecting in Postman and in the frontend).</p>
-  </section>
+<p>Every role gets notifications for the events that concern them (see <strong>Notifications</strong>); activation notifications include the <code>approval</code> with <code>userId</code> and the <code>user</code>. They arrive live over Socket.IO as <code>notification:new</code> (see <strong>Realtime (WebSocket)</strong> for connecting in Postman and in the frontend).</p></section><section class="overview" data-l="id"><p>Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi realtime melalui Socket.IO.</p>
+<h3>Persiapan (sekali saja)</h3>
+<ol><li>Import koleksi ini dan <code>Prafi-Local.postman_environment.json</code>, lalu pilih <strong>Prafi Local</strong> (dropdown environment, kanan atas).</li><li>Di <strong>Prafi Local</strong>, isi <code>loginEmail</code> / <code>loginPassword</code> (kolom Current value) dengan akun superadmin dari <code>.env</code> (<code>SEED_ADMIN_EMAIL</code> / <code>SEED_ADMIN_PASSWORD</code>), lalu Ctrl+S.</li><li>Jalankan server (<code>npm run dev</code> atau <code>npm run build &amp;&amp; npm start</code>). <code>baseUrl</code> adalah <code>http://localhost:4000</code>.</li></ol>
+<h3>Login dan role</h3>
+<ul><li>Setiap request memakai <strong>Bearer <code>{{token}}</code></strong> (diatur di koleksi; request mewarisinya). Request publik memakai <em>No Auth</em>.</li><li><strong>Auth → Login</strong> menyimpan token ke <code>{{token}}</code> (berlaku <strong>1 jam</strong>). Untuk berganti role, ubah <code>loginEmail</code> / <code>loginPassword</code> (atau body Login) lalu kirim Login lagi.</li><li><strong>Nama setiap request menunjukkan siapa yang boleh memanggilnya</strong>: <code>(All roles)</code> = superadmin, admin, dan tenant; <code>(superadmin, admin)</code>, <code>(admin)</code>, <code>(tenant)</code>… = hanya role tersebut; <code>(Public)</code> = tanpa login. Role lain mendapat <strong>403</strong>.</li></ul>
+<div class="table-wrap"><table><thead><tr><th>role</th><th>dibuat oleh</th><th>status awal</th><th>dapat</th></tr></thead><tbody><tr><td>superadmin</td><td>seed (<code>npm run db:seed</code>)</td><td>aktif</td><td>mendaftarkan admin, mengaktifkan akun admin/tenant, membaca semua data, mengelola kategori tenant</td></tr><tr><td>admin</td><td>superadmin (<em>Register Admin</em>)</td><td><strong>tidak aktif</strong> sampai diaktifkan superadmin</td><td>mengaktifkan akun tenant <strong>dan produk</strong>, membaca user/produk/tenant, mengelola kategori tenant</td></tr><tr><td>tenant</td><td>pendaftaran publik (<em>Register Tenant</em>)</td><td>aktif</td><td>mengelola produk dan profil tenant miliknya sendiri</td></tr></tbody></table></div>
+<h3>Endpoint</h3>
+<div class="table-wrap"><table><thead><tr><th>folder</th><th>endpoint</th><th>akses</th></tr></thead><tbody><tr><td>Health</td><td><code>GET /api/health</code></td><td>Publik</td></tr><tr><td>Auth</td><td><code>POST /api/auth/login</code></td><td>Publik</td></tr><tr><td>Auth</td><td><code>POST /api/auth/logout</code></td><td>Semua role</td></tr><tr><td>Auth</td><td><code>POST /api/auth/register/admin</code></td><td>superadmin</td></tr><tr><td>Auth</td><td><code>POST /api/auth/register/tenant</code></td><td>Publik</td></tr><tr><td>Auth</td><td><code>GET /api/auth/me</code></td><td>Semua role</td></tr><tr><td>Auth</td><td><code>PATCH /api/auth/me</code></td><td>Semua role</td></tr><tr><td>Gambar</td><td><code>POST /api/images</code></td><td>Semua role</td></tr><tr><td>Gambar</td><td><code>GET {{imagePath}}</code></td><td>Publik</td></tr><tr><td>Gambar</td><td><code>DELETE /api/images/{{imageId}}</code></td><td>tenant</td></tr><tr><td>Pengguna</td><td><code>GET /api/users</code></td><td>superadmin, admin</td></tr><tr><td>Persetujuan</td><td><code>PATCH /api/approvals/{{userId}}</code></td><td>superadmin, admin</td></tr><tr><td>Persetujuan</td><td><code>PATCH /api/approvals/{{productId}}</code></td><td>admin</td></tr><tr><td>Produk</td><td><code>GET /api/products</code></td><td>Semua role</td></tr><tr><td>Produk</td><td><code>GET /api/products/{{productId}}</code></td><td>Semua role</td></tr><tr><td>Produk</td><td><code>POST /api/products</code></td><td>tenant</td></tr><tr><td>Produk</td><td><code>PATCH /api/products/{{productId}}</code></td><td>tenant</td></tr><tr><td>Produk</td><td><code>DELETE /api/products/{{productId}}</code></td><td>tenant</td></tr><tr><td>Landing</td><td><code>GET /api/landing/products</code></td><td>Publik</td></tr><tr><td>Kategori Tenant</td><td><code>GET /api/tenant-categories</code></td><td>superadmin, admin</td></tr><tr><td>Kategori Tenant</td><td><code>GET /api/tenant-categories/{{categoryId}}</code></td><td>superadmin, admin</td></tr><tr><td>Kategori Tenant</td><td><code>POST /api/tenant-categories</code></td><td>superadmin, admin</td></tr><tr><td>Kategori Tenant</td><td><code>PATCH /api/tenant-categories/{{categoryId}}</code></td><td>superadmin, admin</td></tr><tr><td>Kategori Tenant</td><td><code>DELETE /api/tenant-categories/{{categoryId}}</code></td><td>superadmin, admin</td></tr><tr><td>Tenant</td><td><code>GET /api/tenants/me</code></td><td>tenant</td></tr><tr><td>Tenant</td><td><code>POST /api/tenants/me</code></td><td>tenant</td></tr><tr><td>Tenant</td><td><code>PATCH /api/tenants/me</code></td><td>tenant</td></tr><tr><td>Tenant</td><td><code>DELETE /api/tenants/me</code></td><td>tenant</td></tr><tr><td>Tenant</td><td><code>GET /api/tenants</code></td><td>superadmin, admin</td></tr><tr><td>Tenant</td><td><code>GET /api/tenants/{{tenantProfileId}}</code></td><td>superadmin, admin</td></tr><tr><td>Notifikasi</td><td><code>GET /api/notifications</code></td><td>Semua role</td></tr><tr><td>Notifikasi</td><td><code>GET /api/notifications/unread-count</code></td><td>Semua role</td></tr><tr><td>Notifikasi</td><td><code>PATCH /api/notifications/{{notificationId}}/read</code></td><td>Semua role</td></tr><tr><td>Notifikasi</td><td><code>PATCH /api/notifications/read-all</code></td><td>Semua role</td></tr><tr><td>Notifikasi</td><td><code>DELETE /api/notifications/{{notificationId}}</code></td><td>Semua role</td></tr><tr><td>Contoh</td><td><code>GET /api/admin/ping</code></td><td>superadmin, admin</td></tr><tr><td>Contoh</td><td><code>GET /api/tenant/ping</code></td><td>Semua role</td></tr><tr><td>Realtime (WebSocket)</td><td>Socket.IO di <code>{{baseUrl}}</code></td><td>Semua role (Bearer token)</td></tr></tbody></table></div>
+<h3>Variabel yang disimpan</h3>
+<p>Request menyimpan nilai yang dibutuhkan request berikutnya: <code>token</code>, <code>currentUserId</code>, <code>currentRole</code> (Login) · <code>userId</code>, <code>userRole</code>, <code>registeredEmail</code> (Register) · <code>imageId</code>, <code>imagePath</code> (Upload Image) · <code>productId</code> · <code>categoryId</code> · <code>tenantProfileId</code> · <code>notificationId</code>. Setiap penyimpanan dicetak di Postman Console.</p>
+<h3>Contoh alur</h3>
+<ol><li><strong>Login</strong> sebagai superadmin → <strong>Register Admin</strong> → <strong>Activate / Deactivate User</strong> (mengaktifkan admin baru) → <strong>Create Tenant Category</strong>.</li><li><strong>Register Tenant</strong> → isi <code>loginEmail</code> = <code>{{registeredEmail}}</code>, <code>loginPassword</code> = <code>{{newUserPassword}}</code> → <strong>Login</strong> (sekarang sebagai tenant) → <strong>Upload Image</strong> → <strong>Create My Tenant</strong> → <strong>Upload Image</strong> lagi → <strong>Create Product</strong>.</li><li><strong>Login</strong> sebagai admin (<code>admin…@prafi.test</code> / <code>{{newUserPassword}}</code>) → <strong>List Notifications</strong> → <strong>Activate / Deactivate Product</strong> → produk muncul di <strong>Landing Products</strong>.</li></ol>
+<h3>Respons</h3>
+<ul><li>Berhasil: <code>{ &quot;success&quot;: true, &quot;data&quot;: …, &quot;meta&quot;?: { page, limit, total, totalPages } }</code></li><li>Gagal: <code>{ &quot;success&quot;: false, &quot;error&quot;: { &quot;code&quot;, &quot;message&quot;, &quot;details&quot;? } }</code></li><li><code>message</code> dan <code>details[].message</code> berbahasa <strong>Indonesia</strong> (siap ditampilkan di frontend). <code>code</code> dan <code>field</code> tetap berbahasa Inggris; logika frontend sebaiknya memakai <code>code</code>.</li></ul>
+<div class="table-wrap"><table><thead><tr><th>status</th><th>code (contoh)</th><th>arti</th></tr></thead><tbody><tr><td>400</td><td><code>VALIDATION_ERROR</code>, <code>BAD_REQUEST</code>, <code>ID_NOT_PROVIDED</code></td><td>input tidak valid (<code>details</code> berisi daftar field)</td></tr><tr><td>401</td><td><code>UNAUTHORIZED</code></td><td>token tidak ada/tidak valid/kedaluwarsa/sudah logout → login lagi</td></tr><tr><td>403</td><td><code>FORBIDDEN</code>, <code>USER_NOT_ACTIVATED</code></td><td>role tidak sesuai, atau akun belum diaktifkan</td></tr><tr><td>404</td><td><code>NOT_FOUND</code></td><td>tidak ditemukan, atau bukan milik Anda</td></tr><tr><td>409</td><td><code>UNIQUE_CONSTRAINT</code>, <code>STILL_IN_USE</code>, <code>CONFLICT</code></td><td>nilai duplikat, data masih digunakan</td></tr><tr><td>413</td><td><code>FILE_TOO_LARGE</code></td><td>gambar lebih dari 5 MB</td></tr></tbody></table></div>
+<h3>Notifikasi dan realtime</h3>
+<p>Setiap role menerima notifikasi untuk kejadian yang berkaitan dengannya (lihat <strong>Notifikasi</strong>); notifikasi aktivasi menyertakan <code>approval</code> beserta <code>userId</code> dan <code>user</code>. Notifikasi dikirim langsung melalui Socket.IO sebagai <code>notification:new</code> (lihat <strong>Realtime (WebSocket)</strong> untuk cara terhubung di Postman dan di frontend).</p></section>
   
 <section class="folder" id="health">
   <div class="folder-title"><h2>Health</h2><span class="pill">1 endpoint</span></div>
-  <div class="folder-desc"><p>Server status. No login needed.</p></div>
+  <div class="folder-desc" data-l="en"><p>Server status. No login needed.</p></div><div class="folder-desc" data-l="id"><p>Status server. Tidak perlu login.</p></div>
   
-<article class="endpoint m-get" id="health--health-check" data-search="health health check (public) get {{baseurl}}/api/health">
+<article class="endpoint m-get" id="health--health-check" data-search="health health health check (public) cek status server get {{baseurl}}/api/health">
   <header class="endpoint-head">
-    <h3><a href="#health--health-check">Health Check</a></h3>
-    <div class="badges"><span class="badge role-public">Public</span></div>
+    <h3><a href="#health--health-check"><span data-l="en">Health Check</span><span data-l="id">Cek Status Server</span></a></h3>
+    <div class="badges"><span class="badge role-public"><span data-l="en">Public</span><span data-l="id">Publik</span></span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/api/health</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/health" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/health"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-open"></span>No authentication needed</p>
+  <p class="auth"><span class="dot dot-open"></span><span data-l="en">No authentication needed</span><span data-l="id">Tanpa autentikasi</span></p>
   <div class="endpoint-body">
-    <p>Returns <code>{ status: &quot;ok&quot; }</code> when the API is running.</p>
+    <div data-l="en"><p>Returns <code>{ status: &quot;ok&quot; }</code> when the API is running.</p></div><div data-l="id"><p>Mengembalikan <code>{ status: &quot;ok&quot; }</code> saat API berjalan.</p></div>
     
     
   </div>
@@ -277,77 +306,82 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
 </section>
 
 <section class="folder" id="auth">
-  <div class="folder-title"><h2>Auth</h2><span class="pill">6 endpoints</span></div>
-  <div class="folder-desc"><p>Login, logout, registration and your own account (<code>/api/auth</code>).</p>
+  <div class="folder-title"><h2>Auth</h2><span class="pill">6 <span data-l="en">endpoints</span><span data-l="id">endpoint</span></span></div>
+  <div class="folder-desc" data-l="en"><p>Login, logout, registration and your own account (<code>/api/auth</code>).</p>
 <p><strong>Login</strong> saves the token to <code>{{token}}</code>, which every other request uses. To act as another role, change <code>loginEmail</code> / <code>loginPassword</code> (or the body) and send Login again.</p>
-<p><strong>Registration</strong>: admin accounts are created by a superadmin and start <strong>inactive</strong> (activate them in Approvals). Tenant accounts sign up publicly and are <strong>active</strong> right away.</p></div>
+<p><strong>Registration</strong>: admin accounts are created by a superadmin and start <strong>inactive</strong> (activate them in Approvals). Tenant accounts sign up publicly and are <strong>active</strong> right away.</p></div><div class="folder-desc" data-l="id"><p>Login, logout, pendaftaran, dan akun Anda sendiri (<code>/api/auth</code>).</p>
+<p><strong>Login</strong> menyimpan token ke <code>{{token}}</code>, yang dipakai semua request lain. Untuk bertindak sebagai role lain, ubah <code>loginEmail</code> / <code>loginPassword</code> (atau body) lalu kirim Login lagi.</p>
+<p><strong>Pendaftaran</strong>: akun admin dibuat oleh superadmin dan awalnya <strong>tidak aktif</strong> (aktifkan di Persetujuan). Akun tenant mendaftar sendiri secara publik dan langsung <strong>aktif</strong>.</p></div>
   
-<article class="endpoint m-post" id="auth--login" data-search="auth login (public) post {{baseurl}}/api/auth/login">
+<article class="endpoint m-post" id="auth--login" data-search="auth auth login (public) login post {{baseurl}}/api/auth/login">
   <header class="endpoint-head">
     <h3><a href="#auth--login">Login</a></h3>
-    <div class="badges"><span class="badge role-public">Public</span></div>
+    <div class="badges"><span class="badge role-public"><span data-l="en">Public</span><span data-l="id">Publik</span></span></div>
   </header>
   <div class="url">
     <span class="method">POST</span>
     <code class="url-text">{{baseUrl}}/api/auth/login</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/login" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/login"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-open"></span>No authentication needed</p>
+  <p class="auth"><span class="dot dot-open"></span><span data-l="en">No authentication needed</span><span data-l="id">Tanpa autentikasi</span></p>
   <div class="endpoint-body">
-    <p>Logs in and saves the access token as <code>{{token}}</code> (valid for 1 hour), plus <code>{{currentUserId}}</code> and <code>{{currentRole}}</code>.</p>
+    <div data-l="en"><p>Logs in and saves the access token as <code>{{token}}</code> (valid for 1 hour), plus <code>{{currentUserId}}</code> and <code>{{currentRole}}</code>.</p>
 <ul><li>superadmin: the seed account (<code>SEED_ADMIN_EMAIL</code> / <code>SEED_ADMIN_PASSWORD</code> in <code>.env</code>)</li><li>admin / tenant: an account made with the Register requests (password <code>{{newUserPassword}}</code>; the email is saved as <code>{{registeredEmail}}</code>)</li></ul>
-<p>Errors: 401 wrong email/password, 403 <code>USER_NOT_ACTIVATED</code> (account not activated yet).</p>
+<p>Errors: 401 wrong email/password, 403 <code>USER_NOT_ACTIVATED</code> (account not activated yet).</p></div><div data-l="id"><p>Masuk dan menyimpan access token sebagai <code>{{token}}</code> (berlaku 1 jam), serta <code>{{currentUserId}}</code> dan <code>{{currentRole}}</code>.</p>
+<ul><li>superadmin: akun seed (<code>SEED_ADMIN_EMAIL</code> / <code>SEED_ADMIN_PASSWORD</code> di <code>.env</code>)</li><li>admin / tenant: akun yang dibuat dengan request Register (password <code>{{newUserPassword}}</code>; email disimpan sebagai <code>{{registeredEmail}}</code>)</li></ul>
+<p>Error: 401 email/password salah, 403 <code>USER_NOT_ACTIVATED</code> (akun belum diaktifkan).</p></div>
     
-    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+    <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;email&quot;: &quot;{{loginEmail}}&quot;,
   &quot;password&quot;: &quot;{{loginPassword}}&quot;
-}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;email&quot;: &quot;{{loginEmail}}&quot;,
   &quot;password&quot;: &quot;{{loginPassword}}&quot;
 }</code></pre>
   </div>
 </article>
 
-<article class="endpoint m-post" id="auth--logout" data-search="auth logout (all roles) post {{baseurl}}/api/auth/logout">
+<article class="endpoint m-post" id="auth--logout" data-search="auth auth logout (all roles) logout post {{baseurl}}/api/auth/logout">
   <header class="endpoint-head">
     <h3><a href="#auth--logout">Logout</a></h3>
-    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+    <div class="badges"><span class="badge role-all-roles"><span data-l="en">All roles</span><span data-l="id">Semua role</span></span></div>
   </header>
   <div class="url">
     <span class="method">POST</span>
     <code class="url-text">{{baseUrl}}/api/auth/logout</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/logout" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/logout"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Revokes the token used for this request (other sessions stay logged in) and clears <code>{{token}}</code>. Its open WebSocket connections receive <code>session:ended</code> (<code>logged_out</code>).</p>
+    <div data-l="en"><p>Revokes the token used for this request (other sessions stay logged in) and clears <code>{{token}}</code>. Its open WebSocket connections receive <code>session:ended</code> (<code>logged_out</code>).</p></div><div data-l="id"><p>Mencabut token yang dipakai untuk request ini (sesi lain tetap login) dan mengosongkan <code>{{token}}</code>. Koneksi WebSocket yang memakai token ini menerima <code>session:ended</code> (<code>logged_out</code>).</p></div>
     
     
   </div>
 </article>
 
-<article class="endpoint m-post" id="auth--register-admin" data-search="auth register admin (superadmin) post {{baseurl}}/api/auth/register/admin">
+<article class="endpoint m-post" id="auth--register-admin" data-search="auth auth register admin (superadmin) daftarkan admin post {{baseurl}}/api/auth/register/admin">
   <header class="endpoint-head">
-    <h3><a href="#auth--register-admin">Register Admin</a></h3>
+    <h3><a href="#auth--register-admin"><span data-l="en">Register Admin</span><span data-l="id">Daftarkan Admin</span></a></h3>
     <div class="badges"><span class="badge role-superadmin">superadmin</span></div>
   </header>
   <div class="url">
     <span class="method">POST</span>
     <code class="url-text">{{baseUrl}}/api/auth/register/admin</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/register/admin" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/register/admin"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Creates an <strong>admin</strong> account. It starts inactive (<code>approval.isActive: false</code>) and cannot log in until activated with <em>Approvals → Activate / Deactivate User</em>. Every superadmin gets an <code>ADMIN_PENDING_ACTIVATION</code> notification.</p>
-<p>Saves <code>{{userId}}</code>, <code>{{userRole}}</code> and <code>{{registeredEmail}}</code>. Optional: <code>faceImageId</code> (upload it first).</p>
+    <div data-l="en"><p>Creates an <strong>admin</strong> account. It starts inactive (<code>approval.isActive: false</code>) and cannot log in until activated with <em>Approvals → Activate / Deactivate User</em>. Every superadmin gets an <code>ADMIN_PENDING_ACTIVATION</code> notification.</p>
+<p>Saves <code>{{userId}}</code>, <code>{{userRole}}</code> and <code>{{registeredEmail}}</code>. Optional: <code>faceImageId</code> (upload it first).</p></div><div data-l="id"><p>Membuat akun <strong>admin</strong>. Awalnya tidak aktif (<code>approval.isActive: false</code>) dan tidak bisa login sampai diaktifkan lewat <em>Persetujuan → Aktifkan / Nonaktifkan Pengguna</em>. Setiap superadmin menerima notifikasi <code>ADMIN_PENDING_ACTIVATION</code>.</p>
+<p>Menyimpan <code>{{userId}}</code>, <code>{{userRole}}</code>, dan <code>{{registeredEmail}}</code>. Opsional: <code>faceImageId</code> (unggah gambarnya dulu).</p></div>
     
-    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+    <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;firstName&quot;: &quot;Andi&quot;,
   &quot;lastName&quot;: &quot;Wijaya&quot;,
   &quot;phoneNumber&quot;: &quot;081234567890&quot;,
   &quot;email&quot;: &quot;admin{{$timestamp}}@prafi.test&quot;,
   &quot;password&quot;: &quot;{{newUserPassword}}&quot;
-}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;firstName&quot;: &quot;Andi&quot;,
   &quot;lastName&quot;: &quot;Wijaya&quot;,
   &quot;phoneNumber&quot;: &quot;081234567890&quot;,
@@ -357,29 +391,30 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
   </div>
 </article>
 
-<article class="endpoint m-post" id="auth--register-tenant" data-search="auth register tenant (public) post {{baseurl}}/api/auth/register/tenant">
+<article class="endpoint m-post" id="auth--register-tenant" data-search="auth auth register tenant (public) daftar sebagai tenant post {{baseurl}}/api/auth/register/tenant">
   <header class="endpoint-head">
-    <h3><a href="#auth--register-tenant">Register Tenant</a></h3>
-    <div class="badges"><span class="badge role-public">Public</span></div>
+    <h3><a href="#auth--register-tenant"><span data-l="en">Register Tenant</span><span data-l="id">Daftar sebagai Tenant</span></a></h3>
+    <div class="badges"><span class="badge role-public"><span data-l="en">Public</span><span data-l="id">Publik</span></span></div>
   </header>
   <div class="url">
     <span class="method">POST</span>
     <code class="url-text">{{baseUrl}}/api/auth/register/tenant</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/register/tenant" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/register/tenant"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-open"></span>No authentication needed</p>
+  <p class="auth"><span class="dot dot-open"></span><span data-l="en">No authentication needed</span><span data-l="id">Tanpa autentikasi</span></p>
   <div class="endpoint-body">
-    <p>Public sign-up, no token needed. The tenant is <strong>active right away</strong>. <code>tenantName</code> is required. Every admin gets a <code>TENANT_REGISTERED</code> notification.</p>
-<p>Saves <code>{{userId}}</code>, <code>{{userRole}}</code> and <code>{{registeredEmail}}</code>.</p>
+    <div data-l="en"><p>Public sign-up, no token needed. The tenant is <strong>active right away</strong>. <code>tenantName</code> is required. Every admin gets a <code>TENANT_REGISTERED</code> notification.</p>
+<p>Saves <code>{{userId}}</code>, <code>{{userRole}}</code> and <code>{{registeredEmail}}</code>.</p></div><div data-l="id"><p>Pendaftaran publik, tanpa token. Tenant <strong>langsung aktif</strong>. <code>tenantName</code> wajib diisi. Setiap admin menerima notifikasi <code>TENANT_REGISTERED</code>.</p>
+<p>Menyimpan <code>{{userId}}</code>, <code>{{userRole}}</code>, dan <code>{{registeredEmail}}</code>.</p></div>
     
-    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+    <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;firstName&quot;: &quot;Budi&quot;,
   &quot;lastName&quot;: &quot;Santoso&quot;,
   &quot;phoneNumber&quot;: &quot;081298765432&quot;,
   &quot;email&quot;: &quot;tenant{{$timestamp}}@prafi.test&quot;,
   &quot;password&quot;: &quot;{{newUserPassword}}&quot;,
   &quot;tenantName&quot;: &quot;Warung Budi&quot;
-}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;firstName&quot;: &quot;Budi&quot;,
   &quot;lastName&quot;: &quot;Santoso&quot;,
   &quot;phoneNumber&quot;: &quot;081298765432&quot;,
@@ -390,43 +425,44 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
   </div>
 </article>
 
-<article class="endpoint m-get" id="auth--me" data-search="auth me (all roles) get {{baseurl}}/api/auth/me">
+<article class="endpoint m-get" id="auth--me" data-search="auth auth me (all roles) akun saya get {{baseurl}}/api/auth/me">
   <header class="endpoint-head">
-    <h3><a href="#auth--me">Me</a></h3>
-    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+    <h3><a href="#auth--me"><span data-l="en">Me</span><span data-l="id">Akun Saya</span></a></h3>
+    <div class="badges"><span class="badge role-all-roles"><span data-l="en">All roles</span><span data-l="id">Semua role</span></span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/api/auth/me</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/me" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/me"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>The logged-in account with its <code>faceImage</code> and account <code>approval</code>.</p>
+    <div data-l="en"><p>The logged-in account with its <code>faceImage</code> and account <code>approval</code>.</p></div><div data-l="id"><p>Akun yang sedang login beserta <code>faceImage</code> dan <code>approval</code> akunnya.</p></div>
     
     
   </div>
 </article>
 
-<article class="endpoint m-patch" id="auth--update-me" data-search="auth update me (all roles) patch {{baseurl}}/api/auth/me">
+<article class="endpoint m-patch" id="auth--update-me" data-search="auth auth update me (all roles) ubah akun saya patch {{baseurl}}/api/auth/me">
   <header class="endpoint-head">
-    <h3><a href="#auth--update-me">Update Me</a></h3>
-    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+    <h3><a href="#auth--update-me"><span data-l="en">Update Me</span><span data-l="id">Ubah Akun Saya</span></a></h3>
+    <div class="badges"><span class="badge role-all-roles"><span data-l="en">All roles</span><span data-l="id">Semua role</span></span></div>
   </header>
   <div class="url">
     <span class="method">PATCH</span>
     <code class="url-text">{{baseUrl}}/api/auth/me</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/me" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/me"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Updates your own account; send only the fields to change: <code>firstName</code>, <code>lastName</code>, <code>phoneNumber</code>, <code>email</code>, <code>faceImageId</code> (or <code>null</code>), <code>tenantName</code> (tenants only), <code>password</code> + <code>currentPassword</code>.</p>
-<p><code>id</code> and <code>role</code> can never be changed.</p>
+    <div data-l="en"><p>Updates your own account; send only the fields to change: <code>firstName</code>, <code>lastName</code>, <code>phoneNumber</code>, <code>email</code>, <code>faceImageId</code> (or <code>null</code>), <code>tenantName</code> (tenants only), <code>password</code> + <code>currentPassword</code>.</p>
+<p><code>id</code> and <code>role</code> can never be changed. Replacing <code>faceImageId</code> (or setting it to <code>null</code>) deletes the old image and its file.</p></div><div data-l="id"><p>Mengubah akun Anda sendiri; kirim hanya field yang ingin diubah: <code>firstName</code>, <code>lastName</code>, <code>phoneNumber</code>, <code>email</code>, <code>faceImageId</code> (atau <code>null</code>), <code>tenantName</code> (khusus tenant), <code>password</code> + <code>currentPassword</code>.</p>
+<p><code>id</code> dan <code>role</code> tidak pernah bisa diubah. Jika <code>faceImageId</code> diganti (atau <code>null</code>), gambar lama beserta filenya dihapus.</p></div>
     
-    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+    <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;firstName&quot;: &quot;Andi&quot;,
   &quot;phoneNumber&quot;: &quot;081234567899&quot;
-}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;firstName&quot;: &quot;Andi&quot;,
   &quot;phoneNumber&quot;: &quot;081234567899&quot;
 }</code></pre>
@@ -435,59 +471,60 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
 </section>
 
 <section class="folder" id="images">
-  <div class="folder-title"><h2>Images</h2><span class="pill">3 endpoints</span></div>
-  <div class="folder-desc"><p>Image upload (max 5 MB; jpg, png, webp, gif). Upload first, then use the returned id as <code>faceImageId</code>, product <code>imageId</code> or tenant <code>logoId</code>. Files are served publicly at <code>imgUrl</code>.</p></div>
+  <div class="folder-title"><h2><span data-l="en">Images</span><span data-l="id">Gambar</span></h2><span class="pill">3 <span data-l="en">endpoints</span><span data-l="id">endpoint</span></span></div>
+  <div class="folder-desc" data-l="en"><p>Image upload (max 5 MB; jpg, png, webp, gif). Upload first, then use the returned id as <code>faceImageId</code>, product <code>imageId</code> or tenant <code>logoId</code>. Files are served publicly at <code>imgUrl</code>. When a record's image is replaced, the old image and its file are deleted automatically.</p></div><div class="folder-desc" data-l="id"><p>Unggah gambar (maks. 5 MB; jpg, png, webp, gif). Unggah dulu, lalu pakai id yang dikembalikan sebagai <code>faceImageId</code>, <code>imageId</code> produk, atau <code>logoId</code> tenant. File dapat diakses publik di <code>imgUrl</code>. Jika gambar sebuah data diganti, gambar lama dan filenya otomatis dihapus.</p></div>
   
-<article class="endpoint m-post" id="images--upload-image" data-search="images upload image (all roles) post {{baseurl}}/api/images">
+<article class="endpoint m-post" id="images--upload-image" data-search="images gambar upload image (all roles) unggah gambar post {{baseurl}}/api/images">
   <header class="endpoint-head">
-    <h3><a href="#images--upload-image">Upload Image</a></h3>
-    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+    <h3><a href="#images--upload-image"><span data-l="en">Upload Image</span><span data-l="id">Unggah Gambar</span></a></h3>
+    <div class="badges"><span class="badge role-all-roles"><span data-l="en">All roles</span><span data-l="id">Semua role</span></span></div>
   </header>
   <div class="url">
     <span class="method">POST</span>
     <code class="url-text">{{baseUrl}}/api/images</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/images" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/images"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>multipart/form-data, field <strong>image</strong> (pick a file in Body → form-data). Saves <code>{{imageId}}</code> and <code>{{imagePath}}</code> (<code>imgUrl</code>; the response also has the full link in <code>url</code>).</p>
-<p>An image can be used once: as one product image, one tenant logo or one face image.</p>
+    <div data-l="en"><p>multipart/form-data, field <strong>image</strong> (pick a file in Body → form-data). Saves <code>{{imageId}}</code> and <code>{{imagePath}}</code> (<code>imgUrl</code>; the response also has the full link in <code>url</code>).</p>
+<p>An image can be used once: as one product image, one tenant logo or one face image.</p></div><div data-l="id"><p>multipart/form-data, field <strong>image</strong> (pilih file di Body → form-data). Menyimpan <code>{{imageId}}</code> dan <code>{{imagePath}}</code> (<code>imgUrl</code>; respons juga berisi link lengkap di <code>url</code>).</p>
+<p>Satu gambar hanya bisa dipakai sekali: sebagai satu gambar produk, satu logo tenant, atau satu foto wajah.</p></div>
     
-    <h4>Request body <span class="muted">multipart/form-data</span></h4><div class="table-wrap"><table><thead><tr><th>field</th><th>type</th><th>example</th></tr></thead><tbody><tr><td><code>image</code></td><td>file</td><td>sample-face.png</td></tr><tr><td><code>altText</code></td><td>text</td><td>Sample image</td></tr></tbody></table></div>
+    <h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">multipart/form-data</span></h4><div class="table-wrap"><table><thead><tr><th>field</th><th><span data-l="en">type</span><span data-l="id">tipe</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th></tr></thead><tbody><tr><td><code>image</code></td><td>file</td><td>sample-face.png</td></tr><tr><td><code>altText</code></td><td>text</td><td>Sample image</td></tr></tbody></table></div>
   </div>
 </article>
 
-<article class="endpoint m-get" id="images--open-image" data-search="images open image (public) get {{baseurl}}{{imagepath}}">
+<article class="endpoint m-get" id="images--open-image" data-search="images gambar open image (public) buka gambar get {{baseurl}}{{imagepath}}">
   <header class="endpoint-head">
-    <h3><a href="#images--open-image">Open Image</a></h3>
-    <div class="badges"><span class="badge role-public">Public</span></div>
+    <h3><a href="#images--open-image"><span data-l="en">Open Image</span><span data-l="id">Buka Gambar</span></a></h3>
+    <div class="badges"><span class="badge role-public"><span data-l="en">Public</span><span data-l="id">Publik</span></span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}{{imagePath}}</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}{{imagePath}}" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}{{imagePath}}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-open"></span>No authentication needed</p>
+  <p class="auth"><span class="dot dot-open"></span><span data-l="en">No authentication needed</span><span data-l="id">Tanpa autentikasi</span></p>
   <div class="endpoint-body">
-    <p>The public link of the uploaded image (<code>{{baseUrl}}</code> + <code>imgUrl</code>), as the frontend would load it.</p>
+    <div data-l="en"><p>The public link of the uploaded image (<code>{{baseUrl}}</code> + <code>imgUrl</code>), as the frontend would load it.</p></div><div data-l="id"><p>Link publik gambar yang diunggah (<code>{{baseUrl}}</code> + <code>imgUrl</code>), seperti yang dimuat oleh frontend.</p></div>
     
     
   </div>
 </article>
 
-<article class="endpoint m-delete" id="images--delete-image" data-search="images delete image (tenant) delete {{baseurl}}/api/images/{{imageid}}">
+<article class="endpoint m-delete" id="images--delete-image" data-search="images gambar delete image (tenant) hapus gambar delete {{baseurl}}/api/images/{{imageid}}">
   <header class="endpoint-head">
-    <h3><a href="#images--delete-image">Delete Image</a></h3>
+    <h3><a href="#images--delete-image"><span data-l="en">Delete Image</span><span data-l="id">Hapus Gambar</span></a></h3>
     <div class="badges"><span class="badge role-tenant">tenant</span></div>
   </header>
   <div class="url">
     <span class="method">DELETE</span>
     <code class="url-text">{{baseUrl}}/api/images/{{imageId}}</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/images/{{imageId}}" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/images/{{imageId}}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Deletes the image record and file. An image still used as a tenant logo cannot be deleted (409 <code>STILL_IN_USE</code>).</p>
+    <div data-l="en"><p>Deletes the image record and file. An image still used as a tenant logo cannot be deleted (409 <code>STILL_IN_USE</code>).</p></div><div data-l="id"><p>Menghapus data dan file gambar. Gambar yang masih dipakai sebagai logo tenant tidak bisa dihapus (409 <code>STILL_IN_USE</code>).</p></div>
     
     
   </div>
@@ -495,54 +532,57 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
 </section>
 
 <section class="folder" id="users">
-  <div class="folder-title"><h2>Users</h2><span class="pill">1 endpoint</span></div>
-  <div class="folder-desc"><p>Account lists. Tenants only have <em>Auth → Me</em>.</p></div>
+  <div class="folder-title"><h2><span data-l="en">Users</span><span data-l="id">Pengguna</span></h2><span class="pill">1 endpoint</span></div>
+  <div class="folder-desc" data-l="en"><p>Account lists. Tenants only have <em>Auth → Me</em>.</p></div><div class="folder-desc" data-l="id"><p>Daftar akun. Tenant hanya punya <em>Auth → Akun Saya</em>.</p></div>
   
-<article class="endpoint m-get" id="users--list-users" data-search="users list users (superadmin, admin) get {{baseurl}}/api/users?page=1&amp;limit=20">
+<article class="endpoint m-get" id="users--list-users" data-search="users pengguna list users (superadmin, admin) daftar pengguna get {{baseurl}}/api/users?page=1&amp;limit=20">
   <header class="endpoint-head">
-    <h3><a href="#users--list-users">List Users</a></h3>
+    <h3><a href="#users--list-users"><span data-l="en">List Users</span><span data-l="id">Daftar Pengguna</span></a></h3>
     <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/api/users?page=1&amp;limit=20</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/users?page=1&amp;limit=20" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/users?page=1&amp;limit=20"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>superadmin sees every account; admin sees tenant accounts only. Optional <code>role</code> filter. Each user includes <code>faceImage</code> and <code>approval</code>.</p>
-    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td>yes</td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td>yes</td></tr><tr><td><code>role</code></td><td><code>tenant</code></td><td><span class="muted">optional</span></td></tr></tbody></table></div>
+    <div data-l="en"><p>superadmin sees every account; admin sees tenant accounts only. Optional <code>role</code> filter. Each user includes <code>faceImage</code> and <code>approval</code>.</p></div><div data-l="id"><p>superadmin melihat semua akun; admin hanya melihat akun tenant. Filter <code>role</code> opsional. Setiap user menyertakan <code>faceImage</code> dan <code>approval</code>.</p></div>
+    <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>role</code></td><td><code>tenant</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr></tbody></table></div>
     
   </div>
 </article>
 </section>
 
 <section class="folder" id="approvals">
-  <div class="folder-title"><h2>Approvals</h2><span class="pill">2 endpoints</span></div>
-  <div class="folder-desc"><p>Activate / deactivate accounts and products: <code>PATCH /api/approvals/:id?type=user|product</code>. <code>:id</code> is the <strong>user id</strong> or <strong>product id</strong> (not the approval id).</p>
+  <div class="folder-title"><h2><span data-l="en">Approvals</span><span data-l="id">Persetujuan</span></h2><span class="pill">2 <span data-l="en">endpoints</span><span data-l="id">endpoint</span></span></div>
+  <div class="folder-desc" data-l="en"><p>Activate / deactivate accounts and products: <code>PATCH /api/approvals/:id?type=user|product</code>. <code>:id</code> is the <strong>user id</strong> or <strong>product id</strong> (not the approval id).</p>
 <div class="table-wrap"><table><thead><tr><th>type</th><th>who can</th><th>what</th></tr></thead><tbody><tr><td><code>user</code></td><td>superadmin → admin and tenant accounts; admin → tenant accounts</td><td>an inactive account cannot log in, and is disconnected from realtime right away</td></tr><tr><td><code>product</code></td><td>admin only</td><td>active products appear on the landing page</td></tr></tbody></table></div>
-<p>Every approval has a <code>type</code> (<code>user</code> = account approval, <code>product</code> = product approval) and a <code>userId</code> (the account, or the tenant who owns the product).</p></div>
+<p>Every approval has a <code>type</code> (<code>user</code> = account approval, <code>product</code> = product approval) and a <code>userId</code> (the account, or the tenant who owns the product).</p></div><div class="folder-desc" data-l="id"><p>Mengaktifkan / menonaktifkan akun dan produk: <code>PATCH /api/approvals/:id?type=user|product</code>. <code>:id</code> adalah <strong>id user</strong> atau <strong>id produk</strong> (bukan id approval).</p>
+<div class="table-wrap"><table><thead><tr><th>type</th><th>siapa yang bisa</th><th>dampak</th></tr></thead><tbody><tr><td><code>user</code></td><td>superadmin → akun admin dan tenant; admin → akun tenant</td><td>akun yang tidak aktif tidak bisa login, dan langsung diputus dari realtime</td></tr><tr><td><code>product</code></td><td>hanya admin</td><td>produk aktif tampil di halaman landing</td></tr></tbody></table></div>
+<p>Setiap approval memiliki <code>type</code> (<code>user</code> = approval akun, <code>product</code> = approval produk) dan <code>userId</code> (pemilik akun, atau tenant pemilik produk).</p></div>
   
-<article class="endpoint m-patch" id="approvals--activate-deactivate-user" data-search="approvals activate / deactivate user (superadmin, admin) patch {{baseurl}}/api/approvals/{{userid}}?type=user">
+<article class="endpoint m-patch" id="approvals--activate-deactivate-user" data-search="approvals persetujuan activate / deactivate user (superadmin, admin) aktifkan / nonaktifkan pengguna patch {{baseurl}}/api/approvals/{{userid}}?type=user">
   <header class="endpoint-head">
-    <h3><a href="#approvals--activate-deactivate-user">Activate / Deactivate User</a></h3>
+    <h3><a href="#approvals--activate-deactivate-user"><span data-l="en">Activate / Deactivate User</span><span data-l="id">Aktifkan / Nonaktifkan Pengguna</span></a></h3>
     <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
   </header>
   <div class="url">
     <span class="method">PATCH</span>
     <code class="url-text">{{baseUrl}}/api/approvals/{{userId}}?type=user</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/approvals/{{userId}}?type=user" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/approvals/{{userId}}?type=user"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p><code>isActive</code>: true/false. <code>role</code>: the target account's role, as a confirmation (must match). <code>reason</code>: optional.</p>
-<p>Uses <code>{{userId}}</code> / <code>{{userRole}}</code> saved by the Register requests. Deactivating ends the user's sessions (<code>session:ended</code>, reason <code>deactivated</code>).</p>
-    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>type</code></td><td><code>user</code></td><td>yes</td></tr></tbody></table></div>
-    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+    <div data-l="en"><p><code>isActive</code>: true/false. <code>role</code>: the target account's role, as a confirmation (must match). <code>reason</code>: optional.</p>
+<p>Uses <code>{{userId}}</code> / <code>{{userRole}}</code> saved by the Register requests. Deactivating ends the user's sessions (<code>session:ended</code>, reason <code>deactivated</code>).</p></div><div data-l="id"><p><code>isActive</code>: true/false. <code>role</code>: role akun yang dituju, sebagai konfirmasi (harus sesuai). <code>reason</code>: opsional.</p>
+<p>Memakai <code>{{userId}}</code> / <code>{{userRole}}</code> yang disimpan oleh request Register. Menonaktifkan akun mengakhiri sesi user tersebut (<code>session:ended</code>, reason <code>deactivated</code>).</p></div>
+    <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>type</code></td><td><code>user</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr></tbody></table></div>
+    <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;isActive&quot;: true,
   &quot;role&quot;: &quot;{{userRole}}&quot;,
   &quot;reason&quot;: &quot;Data lengkap&quot;
-}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;isActive&quot;: true,
   &quot;role&quot;: &quot;{{userRole}}&quot;,
   &quot;reason&quot;: &quot;Data lengkap&quot;
@@ -550,26 +590,29 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
   </div>
 </article>
 
-<article class="endpoint m-patch" id="approvals--activate-deactivate-product" data-search="approvals activate / deactivate product (admin) patch {{baseurl}}/api/approvals/{{productid}}?type=product">
+<article class="endpoint m-patch" id="approvals--activate-deactivate-product" data-search="approvals persetujuan activate / deactivate product (admin) aktifkan / nonaktifkan produk patch {{baseurl}}/api/approvals/{{productid}}?type=product">
   <header class="endpoint-head">
-    <h3><a href="#approvals--activate-deactivate-product">Activate / Deactivate Product</a></h3>
+    <h3><a href="#approvals--activate-deactivate-product"><span data-l="en">Activate / Deactivate Product</span><span data-l="id">Aktifkan / Nonaktifkan Produk</span></a></h3>
     <div class="badges"><span class="badge role-admin">admin</span></div>
   </header>
   <div class="url">
     <span class="method">PATCH</span>
     <code class="url-text">{{baseUrl}}/api/approvals/{{productId}}?type=product</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/approvals/{{productId}}?type=product" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/approvals/{{productId}}?type=product"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Approves a product (shown on the landing page) or takes it down. The owner gets <code>PRODUCT_APPROVED</code>; admins get <code>PRODUCT_PUBLISHED</code>; deactivation notifies superadmins.</p>
+    <div data-l="en"><p>Approves a product (shown on the landing page) or takes it down. The owner gets <code>PRODUCT_APPROVED</code>; admins get <code>PRODUCT_PUBLISHED</code>; deactivation notifies superadmins.</p>
 <p>The response includes who owns it:</p>
 <pre><code class="lang-json">{ &quot;type&quot;: &quot;product&quot;, &quot;id&quot;: &quot;…&quot;, &quot;name&quot;: &quot;…&quot;, &quot;approval&quot;: { &quot;type&quot;: &quot;product&quot;, &quot;userId&quot;: &quot;…&quot;, &quot;isActive&quot;: true, … },
-  &quot;user&quot;: { &quot;firstName&quot;: &quot;Budi&quot;, &quot;lastName&quot;: &quot;Santoso&quot;, …, &quot;tenant&quot;: { … } | null, &quot;productId&quot;: &quot;…&quot;, &quot;product&quot;: { … } } }</code></pre>
-    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>type</code></td><td><code>product</code></td><td>yes</td></tr></tbody></table></div>
-    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+  &quot;user&quot;: { &quot;firstName&quot;: &quot;Budi&quot;, &quot;lastName&quot;: &quot;Santoso&quot;, …, &quot;tenant&quot;: { … } | null, &quot;productId&quot;: &quot;…&quot;, &quot;product&quot;: { … } } }</code></pre></div><div data-l="id"><p>Menyetujui produk (tampil di halaman landing) atau menurunkannya. Pemilik menerima <code>PRODUCT_APPROVED</code>; admin menerima <code>PRODUCT_PUBLISHED</code>; penonaktifan memberi tahu superadmin.</p>
+<p>Respons menyertakan pemilik produk:</p>
+<pre><code class="lang-json">{ &quot;type&quot;: &quot;product&quot;, &quot;id&quot;: &quot;…&quot;, &quot;name&quot;: &quot;…&quot;, &quot;approval&quot;: { &quot;type&quot;: &quot;product&quot;, &quot;userId&quot;: &quot;…&quot;, &quot;isActive&quot;: true, … },
+  &quot;user&quot;: { &quot;firstName&quot;: &quot;Budi&quot;, &quot;lastName&quot;: &quot;Santoso&quot;, …, &quot;tenant&quot;: { … } | null, &quot;productId&quot;: &quot;…&quot;, &quot;product&quot;: { … } } }</code></pre></div>
+    <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>type</code></td><td><code>product</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr></tbody></table></div>
+    <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;isActive&quot;: true
-}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;isActive&quot;: true
 }</code></pre>
   </div>
@@ -577,66 +620,66 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
 </section>
 
 <section class="folder" id="products">
-  <div class="folder-title"><h2>Products</h2><span class="pill">5 endpoints</span></div>
-  <div class="folder-desc"><p>Tenants manage their own products; superadmin/admin read all of them. New products start <strong>inactive</strong> and wait for an admin (<em>Approvals → Activate / Deactivate Product</em>).</p></div>
+  <div class="folder-title"><h2><span data-l="en">Products</span><span data-l="id">Produk</span></h2><span class="pill">5 <span data-l="en">endpoints</span><span data-l="id">endpoint</span></span></div>
+  <div class="folder-desc" data-l="en"><p>Tenants manage their own products; superadmin/admin read all of them. New products start <strong>inactive</strong> and wait for an admin (<em>Approvals → Activate / Deactivate Product</em>).</p></div><div class="folder-desc" data-l="id"><p>Tenant mengelola produknya sendiri; superadmin/admin membaca semua produk. Produk baru awalnya <strong>tidak aktif</strong> dan menunggu admin (<em>Persetujuan → Aktifkan / Nonaktifkan Produk</em>).</p></div>
   
-<article class="endpoint m-get" id="products--list-products" data-search="products list products (all roles) get {{baseurl}}/api/products?page=1&amp;limit=20">
+<article class="endpoint m-get" id="products--list-products" data-search="products produk list products (all roles) daftar produk get {{baseurl}}/api/products?page=1&amp;limit=20">
   <header class="endpoint-head">
-    <h3><a href="#products--list-products">List Products</a></h3>
-    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+    <h3><a href="#products--list-products"><span data-l="en">List Products</span><span data-l="id">Daftar Produk</span></a></h3>
+    <div class="badges"><span class="badge role-all-roles"><span data-l="en">All roles</span><span data-l="id">Semua role</span></span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/api/products?page=1&amp;limit=20</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/products?page=1&amp;limit=20" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/products?page=1&amp;limit=20"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>superadmin/admin: every product. tenant: only their own. Optional <code>isActive</code> filter (e.g. <code>false</code> = waiting for approval).</p>
-    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td>yes</td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td>yes</td></tr><tr><td><code>isActive</code></td><td><code>false</code></td><td><span class="muted">optional</span></td></tr></tbody></table></div>
+    <div data-l="en"><p>superadmin/admin: every product. tenant: only their own. Optional <code>isActive</code> filter (e.g. <code>false</code> = waiting for approval).</p></div><div data-l="id"><p>superadmin/admin: semua produk. tenant: hanya produk miliknya. Filter <code>isActive</code> opsional (mis. <code>false</code> = menunggu persetujuan).</p></div>
+    <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>isActive</code></td><td><code>false</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr></tbody></table></div>
     
   </div>
 </article>
 
-<article class="endpoint m-get" id="products--get-product" data-search="products get product (all roles) get {{baseurl}}/api/products/{{productid}}">
+<article class="endpoint m-get" id="products--get-product" data-search="products produk get product (all roles) detail produk get {{baseurl}}/api/products/{{productid}}">
   <header class="endpoint-head">
-    <h3><a href="#products--get-product">Get Product</a></h3>
-    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+    <h3><a href="#products--get-product"><span data-l="en">Get Product</span><span data-l="id">Detail Produk</span></a></h3>
+    <div class="badges"><span class="badge role-all-roles"><span data-l="en">All roles</span><span data-l="id">Semua role</span></span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/api/products/{{productId}}</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/products/{{productId}}" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/products/{{productId}}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Tenants get 404 for products that are not theirs.</p>
+    <div data-l="en"><p>Tenants get 404 for products that are not theirs.</p></div><div data-l="id"><p>Tenant mendapat 404 untuk produk yang bukan miliknya.</p></div>
     
     
   </div>
 </article>
 
-<article class="endpoint m-post" id="products--create-product" data-search="products create product (tenant) post {{baseurl}}/api/products">
+<article class="endpoint m-post" id="products--create-product" data-search="products produk create product (tenant) buat produk post {{baseurl}}/api/products">
   <header class="endpoint-head">
-    <h3><a href="#products--create-product">Create Product</a></h3>
+    <h3><a href="#products--create-product"><span data-l="en">Create Product</span><span data-l="id">Buat Produk</span></a></h3>
     <div class="badges"><span class="badge role-tenant">tenant</span></div>
   </header>
   <div class="url">
     <span class="method">POST</span>
     <code class="url-text">{{baseUrl}}/api/products</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/products" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/products"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Upload the image first (<em>Images → Upload Image</em>); <code>imageId</code> is required. Saves <code>{{productId}}</code>. Superadmins and admins get <code>PRODUCT_SUBMITTED</code>, the tenant gets <code>PRODUCT_UNDER_REVIEW</code>.</p>
+    <div data-l="en"><p>Upload the image first (<em>Images → Upload Image</em>); <code>imageId</code> is required. Saves <code>{{productId}}</code>. Superadmins and admins get <code>PRODUCT_SUBMITTED</code>, the tenant gets <code>PRODUCT_UNDER_REVIEW</code>.</p></div><div data-l="id"><p>Unggah gambarnya dulu (<em>Gambar → Unggah Gambar</em>); <code>imageId</code> wajib diisi. Menyimpan <code>{{productId}}</code>. Superadmin dan admin menerima <code>PRODUCT_SUBMITTED</code>, tenant menerima <code>PRODUCT_UNDER_REVIEW</code>.</p></div>
     
-    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+    <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
   &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
   &quot;details&quot;: &quot;250 ml, es&quot;,
   &quot;qty&quot;: 10,
   &quot;imageId&quot;: {{imageId}}
-}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
   &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
   &quot;details&quot;: &quot;250 ml, es&quot;,
@@ -646,41 +689,41 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
   </div>
 </article>
 
-<article class="endpoint m-patch" id="products--update-product" data-search="products update product (tenant) patch {{baseurl}}/api/products/{{productid}}">
+<article class="endpoint m-patch" id="products--update-product" data-search="products produk update product (tenant) ubah produk patch {{baseurl}}/api/products/{{productid}}">
   <header class="endpoint-head">
-    <h3><a href="#products--update-product">Update Product</a></h3>
+    <h3><a href="#products--update-product"><span data-l="en">Update Product</span><span data-l="id">Ubah Produk</span></a></h3>
     <div class="badges"><span class="badge role-tenant">tenant</span></div>
   </header>
   <div class="url">
     <span class="method">PATCH</span>
     <code class="url-text">{{baseUrl}}/api/products/{{productId}}</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/products/{{productId}}" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/products/{{productId}}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Own products only. Send any of <code>name</code>, <code>description</code>, <code>details</code>, <code>qty</code>, <code>imageId</code>. Activation cannot be changed here.</p>
+    <div data-l="en"><p>Own products only. Send any of <code>name</code>, <code>description</code>, <code>details</code>, <code>qty</code>, <code>imageId</code>. Activation cannot be changed here. Replacing <code>imageId</code> deletes the old image and its file.</p></div><div data-l="id"><p>Hanya produk milik sendiri. Kirim salah satu dari <code>name</code>, <code>description</code>, <code>details</code>, <code>qty</code>, <code>imageId</code>. Aktivasi tidak bisa diubah di sini. Jika <code>imageId</code> diganti, gambar lama beserta filenya dihapus.</p></div>
     
-    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+    <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;qty&quot;: 25
-}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;qty&quot;: 25
 }</code></pre>
   </div>
 </article>
 
-<article class="endpoint m-delete" id="products--delete-product" data-search="products delete product (tenant) delete {{baseurl}}/api/products/{{productid}}">
+<article class="endpoint m-delete" id="products--delete-product" data-search="products produk delete product (tenant) hapus produk delete {{baseurl}}/api/products/{{productid}}">
   <header class="endpoint-head">
-    <h3><a href="#products--delete-product">Delete Product</a></h3>
+    <h3><a href="#products--delete-product"><span data-l="en">Delete Product</span><span data-l="id">Hapus Produk</span></a></h3>
     <div class="badges"><span class="badge role-tenant">tenant</span></div>
   </header>
   <div class="url">
     <span class="method">DELETE</span>
     <code class="url-text">{{baseUrl}}/api/products/{{productId}}</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/products/{{productId}}" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/products/{{productId}}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Own products only. Also deletes its approval and image.</p>
+    <div data-l="en"><p>Own products only. Also deletes its approval and image.</p></div><div data-l="id"><p>Hanya produk milik sendiri. Approval dan gambarnya ikut dihapus.</p></div>
     
     
   </div>
@@ -689,60 +732,60 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
 
 <section class="folder" id="landing">
   <div class="folder-title"><h2>Landing</h2><span class="pill">1 endpoint</span></div>
-  <div class="folder-desc"><p>Public pages for visitors.</p></div>
+  <div class="folder-desc" data-l="en"><p>Public pages for visitors.</p></div><div class="folder-desc" data-l="id"><p>Halaman publik untuk pengunjung.</p></div>
   
-<article class="endpoint m-get" id="landing--landing-products" data-search="landing landing products (public) get {{baseurl}}/api/landing/products?page=1&amp;limit=20">
+<article class="endpoint m-get" id="landing--landing-products" data-search="landing landing landing products (public) produk landing get {{baseurl}}/api/landing/products?page=1&amp;limit=20">
   <header class="endpoint-head">
-    <h3><a href="#landing--landing-products">Landing Products</a></h3>
-    <div class="badges"><span class="badge role-public">Public</span></div>
+    <h3><a href="#landing--landing-products"><span data-l="en">Landing Products</span><span data-l="id">Produk Landing</span></a></h3>
+    <div class="badges"><span class="badge role-public"><span data-l="en">Public</span><span data-l="id">Publik</span></span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/api/landing/products?page=1&amp;limit=20</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/landing/products?page=1&amp;limit=20" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/landing/products?page=1&amp;limit=20"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-open"></span>No authentication needed</p>
+  <p class="auth"><span class="dot dot-open"></span><span data-l="en">No authentication needed</span><span data-l="id">Tanpa autentikasi</span></p>
   <div class="endpoint-body">
-    <p>Active (approved) products only, without private data (no owner email/phone, no approval reason).</p>
-    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td>yes</td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td>yes</td></tr></tbody></table></div>
+    <div data-l="en"><p>Active (approved) products only, without private data (no owner email/phone, no approval reason).</p></div><div data-l="id"><p>Hanya produk aktif (sudah disetujui), tanpa data pribadi (tanpa email/telepon pemilik, tanpa alasan approval).</p></div>
+    <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr></tbody></table></div>
     
   </div>
 </article>
 </section>
 
 <section class="folder" id="tenant-categories">
-  <div class="folder-title"><h2>Tenant Categories</h2><span class="pill">5 endpoints</span></div>
-  <div class="folder-desc"><p>Categories a tenant profile belongs to (e.g. Kuliner, Fashion). Managed by superadmin and admin.</p></div>
+  <div class="folder-title"><h2><span data-l="en">Tenant Categories</span><span data-l="id">Kategori Tenant</span></h2><span class="pill">5 <span data-l="en">endpoints</span><span data-l="id">endpoint</span></span></div>
+  <div class="folder-desc" data-l="en"><p>Categories a tenant profile belongs to (e.g. Kuliner, Fashion). Managed by superadmin and admin.</p></div><div class="folder-desc" data-l="id"><p>Kategori untuk profil tenant (mis. Kuliner, Fashion). Dikelola oleh superadmin dan admin.</p></div>
   
-<article class="endpoint m-get" id="tenant-categories--list-tenant-categories" data-search="tenant categories list tenant categories (superadmin, admin) get {{baseurl}}/api/tenant-categories?page=1&amp;limit=20">
+<article class="endpoint m-get" id="tenant-categories--list-tenant-categories" data-search="tenant categories kategori tenant list tenant categories (superadmin, admin) daftar kategori tenant get {{baseurl}}/api/tenant-categories?page=1&amp;limit=20">
   <header class="endpoint-head">
-    <h3><a href="#tenant-categories--list-tenant-categories">List Tenant Categories</a></h3>
+    <h3><a href="#tenant-categories--list-tenant-categories"><span data-l="en">List Tenant Categories</span><span data-l="id">Daftar Kategori Tenant</span></a></h3>
     <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/api/tenant-categories?page=1&amp;limit=20</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant-categories?page=1&amp;limit=20" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant-categories?page=1&amp;limit=20"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Sorted by name.</p>
-    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td>yes</td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td>yes</td></tr></tbody></table></div>
+    <div data-l="en"><p>Sorted by name.</p></div><div data-l="id"><p>Diurutkan berdasarkan nama.</p></div>
+    <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr></tbody></table></div>
     
   </div>
 </article>
 
-<article class="endpoint m-get" id="tenant-categories--get-tenant-category" data-search="tenant categories get tenant category (superadmin, admin) get {{baseurl}}/api/tenant-categories/{{categoryid}}">
+<article class="endpoint m-get" id="tenant-categories--get-tenant-category" data-search="tenant categories kategori tenant get tenant category (superadmin, admin) detail kategori tenant get {{baseurl}}/api/tenant-categories/{{categoryid}}">
   <header class="endpoint-head">
-    <h3><a href="#tenant-categories--get-tenant-category">Get Tenant Category</a></h3>
+    <h3><a href="#tenant-categories--get-tenant-category"><span data-l="en">Get Tenant Category</span><span data-l="id">Detail Kategori Tenant</span></a></h3>
     <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/api/tenant-categories/{{categoryId}}</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant-categories/{{categoryId}}" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant-categories/{{categoryId}}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
     
     
@@ -750,63 +793,63 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
   </div>
 </article>
 
-<article class="endpoint m-post" id="tenant-categories--create-tenant-category" data-search="tenant categories create tenant category (superadmin, admin) post {{baseurl}}/api/tenant-categories">
+<article class="endpoint m-post" id="tenant-categories--create-tenant-category" data-search="tenant categories kategori tenant create tenant category (superadmin, admin) buat kategori tenant post {{baseurl}}/api/tenant-categories">
   <header class="endpoint-head">
-    <h3><a href="#tenant-categories--create-tenant-category">Create Tenant Category</a></h3>
+    <h3><a href="#tenant-categories--create-tenant-category"><span data-l="en">Create Tenant Category</span><span data-l="id">Buat Kategori Tenant</span></a></h3>
     <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
   </header>
   <div class="url">
     <span class="method">POST</span>
     <code class="url-text">{{baseUrl}}/api/tenant-categories</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant-categories" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant-categories"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Names are unique. Saves <code>{{categoryId}}</code>.</p>
+    <div data-l="en"><p>Names are unique. Saves <code>{{categoryId}}</code>.</p></div><div data-l="id"><p>Nama harus unik. Menyimpan <code>{{categoryId}}</code>.</p></div>
     
-    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+    <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;name&quot;: &quot;Kuliner {{$timestamp}}&quot;
-}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;name&quot;: &quot;Kuliner {{$timestamp}}&quot;
 }</code></pre>
   </div>
 </article>
 
-<article class="endpoint m-patch" id="tenant-categories--update-tenant-category" data-search="tenant categories update tenant category (superadmin, admin) patch {{baseurl}}/api/tenant-categories/{{categoryid}}">
+<article class="endpoint m-patch" id="tenant-categories--update-tenant-category" data-search="tenant categories kategori tenant update tenant category (superadmin, admin) ubah kategori tenant patch {{baseurl}}/api/tenant-categories/{{categoryid}}">
   <header class="endpoint-head">
-    <h3><a href="#tenant-categories--update-tenant-category">Update Tenant Category</a></h3>
+    <h3><a href="#tenant-categories--update-tenant-category"><span data-l="en">Update Tenant Category</span><span data-l="id">Ubah Kategori Tenant</span></a></h3>
     <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
   </header>
   <div class="url">
     <span class="method">PATCH</span>
     <code class="url-text">{{baseUrl}}/api/tenant-categories/{{categoryId}}</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant-categories/{{categoryId}}" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant-categories/{{categoryId}}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
     
     
-    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+    <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;name&quot;: &quot;Kuliner &amp; Minuman {{$timestamp}}&quot;
-}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;name&quot;: &quot;Kuliner &amp; Minuman {{$timestamp}}&quot;
 }</code></pre>
   </div>
 </article>
 
-<article class="endpoint m-delete" id="tenant-categories--delete-tenant-category" data-search="tenant categories delete tenant category (superadmin, admin) delete {{baseurl}}/api/tenant-categories/{{categoryid}}">
+<article class="endpoint m-delete" id="tenant-categories--delete-tenant-category" data-search="tenant categories kategori tenant delete tenant category (superadmin, admin) hapus kategori tenant delete {{baseurl}}/api/tenant-categories/{{categoryid}}">
   <header class="endpoint-head">
-    <h3><a href="#tenant-categories--delete-tenant-category">Delete Tenant Category</a></h3>
+    <h3><a href="#tenant-categories--delete-tenant-category"><span data-l="en">Delete Tenant Category</span><span data-l="id">Hapus Kategori Tenant</span></a></h3>
     <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
   </header>
   <div class="url">
     <span class="method">DELETE</span>
     <code class="url-text">{{baseUrl}}/api/tenant-categories/{{categoryId}}</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant-categories/{{categoryId}}" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant-categories/{{categoryId}}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>A category still used by a tenant profile cannot be deleted (409 <code>STILL_IN_USE</code>).</p>
+    <div data-l="en"><p>A category still used by a tenant profile cannot be deleted (409 <code>STILL_IN_USE</code>).</p></div><div data-l="id"><p>Kategori yang masih dipakai oleh profil tenant tidak bisa dihapus (409 <code>STILL_IN_USE</code>).</p></div>
     
     
   </div>
@@ -814,42 +857,42 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
 </section>
 
 <section class="folder" id="tenants">
-  <div class="folder-title"><h2>Tenants</h2><span class="pill">6 endpoints</span></div>
-  <div class="folder-desc"><p>Tenant (shop) profiles. A tenant user manages <strong>their own</strong> profile at <code>/api/tenants/me</code>; superadmin/admin read every profile.</p></div>
+  <div class="folder-title"><h2><span data-l="en">Tenants</span><span data-l="id">Tenant</span></h2><span class="pill">6 <span data-l="en">endpoints</span><span data-l="id">endpoint</span></span></div>
+  <div class="folder-desc" data-l="en"><p>Tenant (shop) profiles. A tenant user manages <strong>their own</strong> profile at <code>/api/tenants/me</code>; superadmin/admin read every profile.</p></div><div class="folder-desc" data-l="id"><p>Profil tenant (toko). User tenant mengelola profil <strong>miliknya sendiri</strong> di <code>/api/tenants/me</code>; superadmin/admin membaca semua profil.</p></div>
   
-<article class="endpoint m-get" id="tenants--get-my-tenant" data-search="tenants get my tenant (tenant) get {{baseurl}}/api/tenants/me">
+<article class="endpoint m-get" id="tenants--get-my-tenant" data-search="tenants tenant get my tenant (tenant) profil tenant saya get {{baseurl}}/api/tenants/me">
   <header class="endpoint-head">
-    <h3><a href="#tenants--get-my-tenant">Get My Tenant</a></h3>
+    <h3><a href="#tenants--get-my-tenant"><span data-l="en">Get My Tenant</span><span data-l="id">Profil Tenant Saya</span></a></h3>
     <div class="badges"><span class="badge role-tenant">tenant</span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/api/tenants/me</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants/me" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants/me"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>404 if you have not created your profile yet.</p>
+    <div data-l="en"><p>404 if you have not created your profile yet.</p></div><div data-l="id"><p>404 jika Anda belum membuat profil.</p></div>
     
     
   </div>
 </article>
 
-<article class="endpoint m-post" id="tenants--create-my-tenant" data-search="tenants create my tenant (tenant) post {{baseurl}}/api/tenants/me">
+<article class="endpoint m-post" id="tenants--create-my-tenant" data-search="tenants tenant create my tenant (tenant) buat profil tenant saya post {{baseurl}}/api/tenants/me">
   <header class="endpoint-head">
-    <h3><a href="#tenants--create-my-tenant">Create My Tenant</a></h3>
+    <h3><a href="#tenants--create-my-tenant"><span data-l="en">Create My Tenant</span><span data-l="id">Buat Profil Tenant Saya</span></a></h3>
     <div class="badges"><span class="badge role-tenant">tenant</span></div>
   </header>
   <div class="url">
     <span class="method">POST</span>
     <code class="url-text">{{baseUrl}}/api/tenants/me</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants/me" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants/me"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>One profile per tenant. Required: every field except <code>name</code> (defaults to your tenantName). <code>logoId</code>: upload the logo first. <code>categoryId</code>: a tenant category (created by superadmin/admin). Saves <code>{{tenantProfileId}}</code>.</p>
+    <div data-l="en"><p>One profile per tenant. Required: every field except <code>name</code> (defaults to your tenantName). <code>logoId</code>: upload the logo first. <code>categoryId</code>: a tenant category (created by superadmin/admin). Saves <code>{{tenantProfileId}}</code>.</p></div><div data-l="id"><p>Satu profil per tenant. Wajib: semua field kecuali <code>name</code> (bawaan: tenantName Anda). <code>logoId</code>: unggah logo dulu. <code>categoryId</code>: kategori tenant (dibuat oleh superadmin/admin). Menyimpan <code>{{tenantProfileId}}</code>.</p></div>
     
-    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+    <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;name&quot;: &quot;Warung Budi&quot;,
   &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
   &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
@@ -860,7 +903,7 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
   &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
   &quot;logoId&quot;: {{imageId}},
   &quot;categoryId&quot;: {{categoryId}}
-}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;name&quot;: &quot;Warung Budi&quot;,
   &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
   &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
@@ -875,75 +918,75 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
   </div>
 </article>
 
-<article class="endpoint m-patch" id="tenants--update-my-tenant" data-search="tenants update my tenant (tenant) patch {{baseurl}}/api/tenants/me">
+<article class="endpoint m-patch" id="tenants--update-my-tenant" data-search="tenants tenant update my tenant (tenant) ubah profil tenant saya patch {{baseurl}}/api/tenants/me">
   <header class="endpoint-head">
-    <h3><a href="#tenants--update-my-tenant">Update My Tenant</a></h3>
+    <h3><a href="#tenants--update-my-tenant"><span data-l="en">Update My Tenant</span><span data-l="id">Ubah Profil Tenant Saya</span></a></h3>
     <div class="badges"><span class="badge role-tenant">tenant</span></div>
   </header>
   <div class="url">
     <span class="method">PATCH</span>
     <code class="url-text">{{baseUrl}}/api/tenants/me</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants/me" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants/me"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Send only the fields to change. Admins get <code>TENANT_PROFILE_UPDATED</code>.</p>
+    <div data-l="en"><p>Send only the fields to change. Admins get <code>TENANT_PROFILE_UPDATED</code>. Replacing <code>logoId</code> deletes the old logo and its file.</p></div><div data-l="id"><p>Kirim hanya field yang ingin diubah. Admin menerima <code>TENANT_PROFILE_UPDATED</code>. Jika <code>logoId</code> diganti, logo lama beserta filenya dihapus.</p></div>
     
-    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+    <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;operationalHours&quot;: &quot;07:00 - 23:00&quot;
-}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;operationalHours&quot;: &quot;07:00 - 23:00&quot;
 }</code></pre>
   </div>
 </article>
 
-<article class="endpoint m-delete" id="tenants--delete-my-tenant" data-search="tenants delete my tenant (tenant) delete {{baseurl}}/api/tenants/me">
+<article class="endpoint m-delete" id="tenants--delete-my-tenant" data-search="tenants tenant delete my tenant (tenant) hapus profil tenant saya delete {{baseurl}}/api/tenants/me">
   <header class="endpoint-head">
-    <h3><a href="#tenants--delete-my-tenant">Delete My Tenant</a></h3>
+    <h3><a href="#tenants--delete-my-tenant"><span data-l="en">Delete My Tenant</span><span data-l="id">Hapus Profil Tenant Saya</span></a></h3>
     <div class="badges"><span class="badge role-tenant">tenant</span></div>
   </header>
   <div class="url">
     <span class="method">DELETE</span>
     <code class="url-text">{{baseUrl}}/api/tenants/me</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants/me" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants/me"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Deletes your tenant profile (your account stays).</p>
+    <div data-l="en"><p>Deletes your tenant profile (your account stays).</p></div><div data-l="id"><p>Menghapus profil tenant Anda (akun Anda tetap ada).</p></div>
     
     
   </div>
 </article>
 
-<article class="endpoint m-get" id="tenants--list-tenants" data-search="tenants list tenants (superadmin, admin) get {{baseurl}}/api/tenants?page=1&amp;limit=20">
+<article class="endpoint m-get" id="tenants--list-tenants" data-search="tenants tenant list tenants (superadmin, admin) daftar tenant get {{baseurl}}/api/tenants?page=1&amp;limit=20">
   <header class="endpoint-head">
-    <h3><a href="#tenants--list-tenants">List Tenants</a></h3>
+    <h3><a href="#tenants--list-tenants"><span data-l="en">List Tenants</span><span data-l="id">Daftar Tenant</span></a></h3>
     <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/api/tenants?page=1&amp;limit=20</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants?page=1&amp;limit=20" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants?page=1&amp;limit=20"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Every tenant profile with its owner, logo and category. Optional <code>categoryId</code> filter.</p>
-    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td>yes</td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td>yes</td></tr><tr><td><code>categoryId</code></td><td><code>{{categoryId}}</code></td><td><span class="muted">optional</span></td></tr></tbody></table></div>
+    <div data-l="en"><p>Every tenant profile with its owner, logo and category. Optional <code>categoryId</code> filter.</p></div><div data-l="id"><p>Semua profil tenant beserta pemilik, logo, dan kategorinya. Filter <code>categoryId</code> opsional.</p></div>
+    <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>categoryId</code></td><td><code>{{categoryId}}</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr></tbody></table></div>
     
   </div>
 </article>
 
-<article class="endpoint m-get" id="tenants--get-tenant" data-search="tenants get tenant (superadmin, admin) get {{baseurl}}/api/tenants/{{tenantprofileid}}">
+<article class="endpoint m-get" id="tenants--get-tenant" data-search="tenants tenant get tenant (superadmin, admin) detail tenant get {{baseurl}}/api/tenants/{{tenantprofileid}}">
   <header class="endpoint-head">
-    <h3><a href="#tenants--get-tenant">Get Tenant</a></h3>
+    <h3><a href="#tenants--get-tenant"><span data-l="en">Get Tenant</span><span data-l="id">Detail Tenant</span></a></h3>
     <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/api/tenants/{{tenantProfileId}}</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants/{{tenantProfileId}}" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants/{{tenantProfileId}}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
     
     
@@ -953,45 +996,52 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
 </section>
 
 <section class="folder" id="notifications">
-  <div class="folder-title"><h2>Notifications</h2><span class="pill">5 endpoints</span></div>
-  <div class="folder-desc"><p>Notifications for every role (<code>/api/notifications</code>, Bearer <code>{{token}}</code>). They are created automatically by actions in the other folders.</p>
+  <div class="folder-title"><h2><span data-l="en">Notifications</span><span data-l="id">Notifikasi</span></h2><span class="pill">5 <span data-l="en">endpoints</span><span data-l="id">endpoint</span></span></div>
+  <div class="folder-desc" data-l="en"><p>Notifications for every role (<code>/api/notifications</code>, Bearer <code>{{token}}</code>). They are created automatically by actions in the other folders.</p>
 <div class="table-wrap"><table><thead><tr><th>type</th><th>who gets it</th><th>when</th></tr></thead><tbody><tr><td><code>ADMIN_PENDING_ACTIVATION</code></td><td>superadmin</td><td>a new admin is registered (needs activation)</td></tr><tr><td><code>PRODUCT_SUBMITTED</code></td><td>superadmin, admin</td><td>a tenant creates a product</td></tr><tr><td><code>USER_DEACTIVATED</code></td><td>superadmin</td><td>an admin deactivates a user account</td></tr><tr><td><code>PRODUCT_DEACTIVATED</code></td><td>superadmin</td><td>an admin deactivates a product</td></tr><tr><td><code>PRODUCT_PUBLISHED</code></td><td>admin</td><td>an admin activates a product (now on the landing page)</td></tr><tr><td><code>PRODUCT_UPDATED</code></td><td>admin</td><td>a tenant updates a product</td></tr><tr><td><code>TENANT_PROFILE_UPDATED</code></td><td>admin</td><td>a tenant updates their tenant profile</td></tr><tr><td><code>TENANT_REGISTERED</code></td><td>admin</td><td>a new tenant signs up</td></tr><tr><td><code>PRODUCT_UNDER_REVIEW</code></td><td>tenant (owner)</td><td>they create a product</td></tr><tr><td><code>PRODUCT_APPROVED</code></td><td>tenant (owner)</td><td>their product is activated</td></tr></tbody></table></div>
 <p>Each notification: <code>id</code>, <code>type</code> (switch on it in the frontend), <code>name</code> (title), <code>description</code> (message), <code>entityType</code> + <code>entityId</code> (what to open: <code>user</code>, <code>product</code> or <code>tenant</code>), <code>approvalId</code> + <code>approval</code>, <code>isRead</code>, <code>readAt</code>, <code>createdAt</code>.</p>
 <p><strong>Activation notifications</strong> (<code>ADMIN_PENDING_ACTIVATION</code>, <code>TENANT_REGISTERED</code>, <code>PRODUCT_SUBMITTED</code>, <code>PRODUCT_UNDER_REVIEW</code>, <code>PRODUCT_PUBLISHED</code>, <code>PRODUCT_APPROVED</code>, <code>PRODUCT_DEACTIVATED</code>, <code>USER_DEACTIVATED</code>) include the approval of the user/product they are about:</p>
 <pre><code class="lang-json">&quot;approval&quot;: { &quot;id&quot;: 137, &quot;type&quot;: &quot;user&quot;, &quot;userId&quot;: &quot;&lt;id&gt;&quot;, &quot;isActive&quot;: false, &quot;reason&quot;: &quot;Waiting for activation by a superadmin&quot;, &quot;updatedAt&quot;: &quot;...&quot;,
   &quot;user&quot;: { &quot;id&quot;: &quot;&lt;id&gt;&quot;, &quot;firstName&quot;: &quot;Andi&quot;, &quot;lastName&quot;: &quot;Wijaya&quot;, &quot;email&quot;: &quot;...&quot;, &quot;phoneNumber&quot;: &quot;...&quot;, &quot;role&quot;: &quot;admin&quot;, &quot;tenantName&quot;: null, ... } }</code></pre>
 <p><code>approval.isActive</code> is the <strong>current</strong> status (not a copy from when it was sent), so the frontend can show an <em>Activate</em> button only while it is still <code>false</code>. To activate: <code>PATCH /api/approvals/{entityId}?type={entityType}</code> (body <code>{ &quot;isActive&quot;: true, &quot;role&quot;: &quot;admin&quot; }</code> for users, <code>{ &quot;isActive&quot;: true }</code> for products). Other notifications (<code>PRODUCT_UPDATED</code>, <code>TENANT_PROFILE_UPDATED</code>) have <code>approvalId: null</code>, <code>approval: null</code>. If the product is deleted, <code>approval</code> becomes <code>null</code>. Every user only ever sees their own notifications (others → 404).</p>
-<p>Endpoints: <code>GET /api/notifications?page=&amp;limit=&amp;unread=true</code> (newest first, <code>meta.unreadCount</code> for the badge), <code>GET /api/notifications/unread-count</code>, <code>PATCH /api/notifications/:id/read</code>, <code>PATCH /api/notifications/read-all</code>, <code>DELETE /api/notifications/:id</code>. <code>approval.user</code> is whose approval it is (the account owner, or the tenant who owns the product); it never contains the password.</p></div>
+<p>Endpoints: <code>GET /api/notifications?page=&amp;limit=&amp;unread=true</code> (newest first, <code>meta.unreadCount</code> for the badge), <code>GET /api/notifications/unread-count</code>, <code>PATCH /api/notifications/:id/read</code>, <code>PATCH /api/notifications/read-all</code>, <code>DELETE /api/notifications/:id</code>. <code>approval.user</code> is whose approval it is (the account owner, or the tenant who owns the product); it never contains the password.</p></div><div class="folder-desc" data-l="id"><p>Notifikasi untuk setiap role (<code>/api/notifications</code>, Bearer <code>{{token}}</code>). Notifikasi dibuat otomatis oleh aksi di folder lain.</p>
+<div class="table-wrap"><table><thead><tr><th>type</th><th>penerima</th><th>kapan</th></tr></thead><tbody><tr><td><code>ADMIN_PENDING_ACTIVATION</code></td><td>superadmin</td><td>admin baru didaftarkan (perlu diaktifkan)</td></tr><tr><td><code>PRODUCT_SUBMITTED</code></td><td>superadmin, admin</td><td>tenant membuat produk</td></tr><tr><td><code>USER_DEACTIVATED</code></td><td>superadmin</td><td>admin menonaktifkan akun user</td></tr><tr><td><code>PRODUCT_DEACTIVATED</code></td><td>superadmin</td><td>admin menonaktifkan produk</td></tr><tr><td><code>PRODUCT_PUBLISHED</code></td><td>admin</td><td>admin mengaktifkan produk (kini tampil di landing)</td></tr><tr><td><code>PRODUCT_UPDATED</code></td><td>admin</td><td>tenant mengubah produk</td></tr><tr><td><code>TENANT_PROFILE_UPDATED</code></td><td>admin</td><td>tenant mengubah profil tenantnya</td></tr><tr><td><code>TENANT_REGISTERED</code></td><td>admin</td><td>tenant baru mendaftar</td></tr><tr><td><code>PRODUCT_UNDER_REVIEW</code></td><td>tenant (pemilik)</td><td>tenant membuat produk</td></tr><tr><td><code>PRODUCT_APPROVED</code></td><td>tenant (pemilik)</td><td>produknya diaktifkan</td></tr></tbody></table></div>
+<p>Setiap notifikasi: <code>id</code>, <code>type</code> (dipakai frontend untuk menentukan tampilan), <code>name</code> (judul), <code>description</code> (pesan), <code>entityType</code> + <code>entityId</code> (data yang dibuka: <code>user</code>, <code>product</code>, atau <code>tenant</code>), <code>approvalId</code> + <code>approval</code>, <code>isRead</code>, <code>readAt</code>, <code>createdAt</code>.</p>
+<p><strong>Notifikasi aktivasi</strong> (<code>ADMIN_PENDING_ACTIVATION</code>, <code>TENANT_REGISTERED</code>, <code>PRODUCT_SUBMITTED</code>, <code>PRODUCT_UNDER_REVIEW</code>, <code>PRODUCT_PUBLISHED</code>, <code>PRODUCT_APPROVED</code>, <code>PRODUCT_DEACTIVATED</code>, <code>USER_DEACTIVATED</code>) menyertakan approval dari user/produk yang dibahas:</p>
+<pre><code class="lang-json">&quot;approval&quot;: { &quot;id&quot;: 137, &quot;type&quot;: &quot;user&quot;, &quot;userId&quot;: &quot;&lt;id&gt;&quot;, &quot;isActive&quot;: false, &quot;reason&quot;: &quot;Waiting for activation by a superadmin&quot;, &quot;updatedAt&quot;: &quot;...&quot;,
+  &quot;user&quot;: { &quot;id&quot;: &quot;&lt;id&gt;&quot;, &quot;firstName&quot;: &quot;Andi&quot;, &quot;lastName&quot;: &quot;Wijaya&quot;, &quot;email&quot;: &quot;...&quot;, &quot;phoneNumber&quot;: &quot;...&quot;, &quot;role&quot;: &quot;admin&quot;, &quot;tenantName&quot;: null, ... } }</code></pre>
+<p><code>approval.isActive</code> adalah status <strong>terkini</strong> (bukan salinan saat notifikasi dikirim), sehingga frontend bisa menampilkan tombol <em>Aktifkan</em> hanya selama nilainya masih <code>false</code>. Untuk mengaktifkan: <code>PATCH /api/approvals/{entityId}?type={entityType}</code> (body <code>{ &quot;isActive&quot;: true, &quot;role&quot;: &quot;admin&quot; }</code> untuk user, <code>{ &quot;isActive&quot;: true }</code> untuk produk). Notifikasi lain (<code>PRODUCT_UPDATED</code>, <code>TENANT_PROFILE_UPDATED</code>) memiliki <code>approvalId: null</code>, <code>approval: null</code>. Jika produk dihapus, <code>approval</code> menjadi <code>null</code>. Setiap user hanya bisa melihat notifikasinya sendiri (milik orang lain → 404).</p>
+<p>Endpoint: <code>GET /api/notifications?page=&amp;limit=&amp;unread=true</code> (terbaru di atas, <code>meta.unreadCount</code> untuk badge), <code>GET /api/notifications/unread-count</code>, <code>PATCH /api/notifications/:id/read</code>, <code>PATCH /api/notifications/read-all</code>, <code>DELETE /api/notifications/:id</code>. <code>approval.user</code> adalah pemilik approval tersebut (pemilik akun, atau tenant pemilik produk); tidak pernah berisi password.</p></div>
   
-<article class="endpoint m-get" id="notifications--list-notifications" data-search="notifications list notifications (all roles) get {{baseurl}}/api/notifications?page=1&amp;limit=20">
+<article class="endpoint m-get" id="notifications--list-notifications" data-search="notifications notifikasi list notifications (all roles) daftar notifikasi get {{baseurl}}/api/notifications?page=1&amp;limit=20">
   <header class="endpoint-head">
-    <h3><a href="#notifications--list-notifications">List Notifications</a></h3>
-    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+    <h3><a href="#notifications--list-notifications"><span data-l="en">List Notifications</span><span data-l="id">Daftar Notifikasi</span></a></h3>
+    <div class="badges"><span class="badge role-all-roles"><span data-l="en">All roles</span><span data-l="id">Semua role</span></span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/api/notifications?page=1&amp;limit=20</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/notifications?page=1&amp;limit=20" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/notifications?page=1&amp;limit=20"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Your own notifications, newest first. <code>meta.unreadCount</code> for the badge. Saves the newest one as <code>{{notificationId}}</code>.</p>
-    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td>yes</td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td>yes</td></tr><tr><td><code>unread</code></td><td><code>true</code></td><td><span class="muted">optional</span></td></tr></tbody></table></div>
+    <div data-l="en"><p>Your own notifications, newest first. <code>meta.unreadCount</code> for the badge. Saves the newest one as <code>{{notificationId}}</code>.</p></div><div data-l="id"><p>Notifikasi milik Anda, terbaru di atas. <code>meta.unreadCount</code> untuk badge. Menyimpan notifikasi terbaru sebagai <code>{{notificationId}}</code>.</p></div>
+    <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>unread</code></td><td><code>true</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr></tbody></table></div>
     
   </div>
 </article>
 
-<article class="endpoint m-get" id="notifications--unread-count" data-search="notifications unread count (all roles) get {{baseurl}}/api/notifications/unread-count">
+<article class="endpoint m-get" id="notifications--unread-count" data-search="notifications notifikasi unread count (all roles) jumlah belum dibaca get {{baseurl}}/api/notifications/unread-count">
   <header class="endpoint-head">
-    <h3><a href="#notifications--unread-count">Unread Count</a></h3>
-    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+    <h3><a href="#notifications--unread-count"><span data-l="en">Unread Count</span><span data-l="id">Jumlah Belum Dibaca</span></a></h3>
+    <div class="badges"><span class="badge role-all-roles"><span data-l="en">All roles</span><span data-l="id">Semua role</span></span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/api/notifications/unread-count</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/notifications/unread-count" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/notifications/unread-count"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
     
     
@@ -999,17 +1049,17 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
   </div>
 </article>
 
-<article class="endpoint m-patch" id="notifications--mark-notification-read" data-search="notifications mark notification read (all roles) patch {{baseurl}}/api/notifications/{{notificationid}}/read">
+<article class="endpoint m-patch" id="notifications--mark-notification-read" data-search="notifications notifikasi mark notification read (all roles) tandai sudah dibaca patch {{baseurl}}/api/notifications/{{notificationid}}/read">
   <header class="endpoint-head">
-    <h3><a href="#notifications--mark-notification-read">Mark Notification Read</a></h3>
-    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+    <h3><a href="#notifications--mark-notification-read"><span data-l="en">Mark Notification Read</span><span data-l="id">Tandai Sudah Dibaca</span></a></h3>
+    <div class="badges"><span class="badge role-all-roles"><span data-l="en">All roles</span><span data-l="id">Semua role</span></span></div>
   </header>
   <div class="url">
     <span class="method">PATCH</span>
     <code class="url-text">{{baseUrl}}/api/notifications/{{notificationId}}/read</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/notifications/{{notificationId}}/read" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/notifications/{{notificationId}}/read"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
     
     
@@ -1017,35 +1067,35 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
   </div>
 </article>
 
-<article class="endpoint m-patch" id="notifications--mark-all-read" data-search="notifications mark all read (all roles) patch {{baseurl}}/api/notifications/read-all">
+<article class="endpoint m-patch" id="notifications--mark-all-read" data-search="notifications notifikasi mark all read (all roles) tandai semua sudah dibaca patch {{baseurl}}/api/notifications/read-all">
   <header class="endpoint-head">
-    <h3><a href="#notifications--mark-all-read">Mark All Read</a></h3>
-    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+    <h3><a href="#notifications--mark-all-read"><span data-l="en">Mark All Read</span><span data-l="id">Tandai Semua Sudah Dibaca</span></a></h3>
+    <div class="badges"><span class="badge role-all-roles"><span data-l="en">All roles</span><span data-l="id">Semua role</span></span></div>
   </header>
   <div class="url">
     <span class="method">PATCH</span>
     <code class="url-text">{{baseUrl}}/api/notifications/read-all</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/notifications/read-all" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/notifications/read-all"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Returns <code>{ updated }</code> (how many were marked).</p>
+    <div data-l="en"><p>Returns <code>{ updated }</code> (how many were marked).</p></div><div data-l="id"><p>Mengembalikan <code>{ updated }</code> (jumlah yang ditandai).</p></div>
     
     
   </div>
 </article>
 
-<article class="endpoint m-delete" id="notifications--delete-notification" data-search="notifications delete notification (all roles) delete {{baseurl}}/api/notifications/{{notificationid}}">
+<article class="endpoint m-delete" id="notifications--delete-notification" data-search="notifications notifikasi delete notification (all roles) hapus notifikasi delete {{baseurl}}/api/notifications/{{notificationid}}">
   <header class="endpoint-head">
-    <h3><a href="#notifications--delete-notification">Delete Notification</a></h3>
-    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+    <h3><a href="#notifications--delete-notification"><span data-l="en">Delete Notification</span><span data-l="id">Hapus Notifikasi</span></a></h3>
+    <div class="badges"><span class="badge role-all-roles"><span data-l="en">All roles</span><span data-l="id">Semua role</span></span></div>
   </header>
   <div class="url">
     <span class="method">DELETE</span>
     <code class="url-text">{{baseUrl}}/api/notifications/{{notificationId}}</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/notifications/{{notificationId}}" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/notifications/{{notificationId}}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
     
     
@@ -1056,7 +1106,7 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
 
 <section class="folder" id="realtime-websocket">
   <div class="folder-title"><h2>Realtime (WebSocket)</h2><span class="pill">1 endpoint</span></div>
-  <div class="folder-desc"><p>Realtime notifications over <strong>Socket.IO</strong> (same host and port as the API).</p>
+  <div class="folder-desc" data-l="en"><p>Realtime notifications over <strong>Socket.IO</strong> (same host and port as the API).</p>
 <blockquote><p>Postman collection files cannot contain Socket.IO requests, so create one by hand (once):</p>
 <ol><li><strong>New → Socket.IO</strong>, URL <code>{{baseUrl}}</code> (the client version: <strong>v4</strong>).</li><li><strong>Headers</strong>: <code>Authorization</code> = <code>Bearer {{token}}</code> (or <strong>Settings → Handshake auth</strong>: <code>{ &quot;token&quot;: &quot;{{token}}&quot; }</code>).</li><li><strong>Events</strong> tab: add listeners <code>notification:new</code>, <code>notification:unread-count</code>, <code>session:ended</code> and turn them on.</li><li><strong>Connect</strong>. Then run requests from this collection in another tab (e.g. create a product as a tenant) and watch the events arrive.</li><li>Save it into this collection (Save → Prafi API) so it stays next to the REST requests.</li></ol></blockquote>
 <p><strong>Auth</strong>: the same access token as the REST API. A missing/invalid/expired/revoked token or a deactivated user is refused with <code>connect_error</code> (<code>err.message</code>, <code>err.data.code</code> e.g. <code>UNAUTHORIZED</code>, <code>USER_NOT_ACTIVATED</code>).</p>
@@ -1072,42 +1122,58 @@ socket.on('notification:new', ({ notification, unreadCount }) =&gt; { addToList(
 socket.on('session:ended', ({ message }) =&gt; { logout(); alert(message); });
 socket.on('connect_error', (err) =&gt; { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATED'].includes(err.data?.code)) logout(); });
 // after logging in again (new token): socket.disconnect().connect();</code></pre>
-<p>The request below only checks that the Socket.IO endpoint is reachable (engine.io handshake, no events).</p></div>
+<p>The request below only checks that the Socket.IO endpoint is reachable (engine.io handshake, no events).</p></div><div class="folder-desc" data-l="id"><p>Notifikasi realtime melalui <strong>Socket.IO</strong> (host dan port yang sama dengan API).</p>
+<blockquote><p>File koleksi Postman tidak bisa memuat request Socket.IO, jadi buat satu secara manual (sekali saja):</p>
+<ol><li><strong>New → Socket.IO</strong>, URL <code>{{baseUrl}}</code> (versi client: <strong>v4</strong>).</li><li><strong>Headers</strong>: <code>Authorization</code> = <code>Bearer {{token}}</code> (atau <strong>Settings → Handshake auth</strong>: <code>{ &quot;token&quot;: &quot;{{token}}&quot; }</code>).</li><li>Tab <strong>Events</strong>: tambahkan listener <code>notification:new</code>, <code>notification:unread-count</code>, <code>session:ended</code> lalu aktifkan.</li><li><strong>Connect</strong>. Lalu jalankan request dari koleksi ini di tab lain (mis. buat produk sebagai tenant) dan lihat event yang masuk.</li><li>Simpan ke koleksi ini (Save → Prafi API) agar berada di samping request REST.</li></ol></blockquote>
+<p><strong>Auth</strong>: access token yang sama dengan REST API. Token yang tidak ada/tidak valid/kedaluwarsa/dicabut atau user yang dinonaktifkan akan ditolak dengan <code>connect_error</code> (<code>err.message</code>, <code>err.data.code</code> mis. <code>UNAUTHORIZED</code>, <code>USER_NOT_ACTIVATED</code>).</p>
+<p><strong>Event (server → client)</strong></p>
+<div class="table-wrap"><table><thead><tr><th>event</th><th>payload</th><th>kapan</th></tr></thead><tbody><tr><td><code>notification:unread-count</code></td><td><code>{ count }</code></td><td>tepat setelah terhubung, dan setelah tandai dibaca / tandai semua / hapus (menyinkronkan semua tab)</td></tr><tr><td><code>notification:new</code></td><td><code>{ notification, unreadCount }</code></td><td>notifikasi baru dibuat untuk user ini (bentuknya sama dengan item <code>GET /api/notifications</code>)</td></tr><tr><td><code>session:ended</code></td><td><code>{ reason, message }</code></td><td><code>reason</code>: <code>logged_out</code> (token ini logout), <code>deactivated</code> (akun dinonaktifkan), <code>token_expired</code> (token 1 jam kedaluwarsa). Server lalu memutus koneksi; frontend sebaiknya me-logout user.</td></tr></tbody></table></div>
+<p>Setiap user hanya menerima event miliknya; semua tab/perangkat milik user tersebut ikut menerimanya.</p>
+<p><strong>Frontend (socket.io-client v4)</strong></p>
+<pre><code class="lang-js">import { io } from 'socket.io-client';
+
+const socket = io(API_URL, { auth: (cb) =&gt; cb({ token: localStorage.getItem('token') }) });
+socket.on('notification:unread-count', ({ count }) =&gt; setBadge(count));
+socket.on('notification:new', ({ notification, unreadCount }) =&gt; { addToList(notification); setBadge(unreadCount); toast(notification.name); });
+socket.on('session:ended', ({ message }) =&gt; { logout(); alert(message); });
+socket.on('connect_error', (err) =&gt; { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATED'].includes(err.data?.code)) logout(); });
+// setelah login lagi (token baru): socket.disconnect().connect();</code></pre>
+<p>Request di bawah hanya memeriksa bahwa endpoint Socket.IO bisa dijangkau (handshake engine.io, tanpa event).</p></div>
   
-<article class="endpoint m-get" id="realtime-websocket--socket-io-endpoint-reachable" data-search="realtime (websocket) socket.io endpoint reachable (public) get {{baseurl}}/socket.io/?eio=4&amp;transport=polling">
+<article class="endpoint m-get" id="realtime-websocket--socket-io-endpoint-reachable" data-search="realtime (websocket) realtime (websocket) socket.io endpoint reachable (public) cek endpoint socket.io get {{baseurl}}/socket.io/?eio=4&amp;transport=polling">
   <header class="endpoint-head">
-    <h3><a href="#realtime-websocket--socket-io-endpoint-reachable">Socket.IO Endpoint Reachable</a></h3>
-    <div class="badges"><span class="badge role-public">Public</span></div>
+    <h3><a href="#realtime-websocket--socket-io-endpoint-reachable"><span data-l="en">Socket.IO Endpoint Reachable</span><span data-l="id">Cek Endpoint Socket.IO</span></a></h3>
+    <div class="badges"><span class="badge role-public"><span data-l="en">Public</span><span data-l="id">Publik</span></span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/socket.io/?EIO=4&amp;transport=polling</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/socket.io/?EIO=4&amp;transport=polling" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/socket.io/?EIO=4&amp;transport=polling"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-open"></span>No authentication needed</p>
+  <p class="auth"><span class="dot dot-open"></span><span data-l="en">No authentication needed</span><span data-l="id">Tanpa autentikasi</span></p>
   <div class="endpoint-body">
-    <p>Engine.IO handshake: 200 with a session id means the realtime server is up. To receive events, create a Socket.IO request (see the folder description).</p>
-    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>EIO</code></td><td><code>4</code></td><td>yes</td></tr><tr><td><code>transport</code></td><td><code>polling</code></td><td>yes</td></tr></tbody></table></div>
+    <div data-l="en"><p>Engine.IO handshake: 200 with a session id means the realtime server is up. To receive events, create a Socket.IO request (see the folder description).</p></div><div data-l="id"><p>Handshake Engine.IO: 200 dengan session id berarti server realtime berjalan. Untuk menerima event, buat request Socket.IO (lihat deskripsi folder).</p></div>
+    <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>EIO</code></td><td><code>4</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>transport</code></td><td><code>polling</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr></tbody></table></div>
     
   </div>
 </article>
 </section>
 
 <section class="folder" id="examples">
-  <div class="folder-title"><h2>Examples</h2><span class="pill">2 endpoints</span></div>
-  <div class="folder-desc"><p>Role-protected sample routes, handy to check which role the current <code>{{token}}</code> has.</p></div>
+  <div class="folder-title"><h2><span data-l="en">Examples</span><span data-l="id">Contoh</span></h2><span class="pill">2 <span data-l="en">endpoints</span><span data-l="id">endpoint</span></span></div>
+  <div class="folder-desc" data-l="en"><p>Role-protected sample routes, handy to check which role the current <code>{{token}}</code> has.</p></div><div class="folder-desc" data-l="id"><p>Contoh route yang dilindungi role, berguna untuk mengecek role dari <code>{{token}}</code> saat ini.</p></div>
   
-<article class="endpoint m-get" id="examples--admin-ping" data-search="examples admin ping (superadmin, admin) get {{baseurl}}/api/admin/ping">
+<article class="endpoint m-get" id="examples--admin-ping" data-search="examples contoh admin ping (superadmin, admin) ping admin get {{baseurl}}/api/admin/ping">
   <header class="endpoint-head">
-    <h3><a href="#examples--admin-ping">Admin Ping</a></h3>
+    <h3><a href="#examples--admin-ping"><span data-l="en">Admin Ping</span><span data-l="id">Ping Admin</span></a></h3>
     <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/api/admin/ping</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/admin/ping" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/admin/ping"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
     
     
@@ -1115,25 +1181,25 @@ socket.on('connect_error', (err) =&gt; { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATE
   </div>
 </article>
 
-<article class="endpoint m-get" id="examples--role-ping" data-search="examples role ping (all roles) get {{baseurl}}/api/tenant/ping">
+<article class="endpoint m-get" id="examples--role-ping" data-search="examples contoh role ping (all roles) ping role get {{baseurl}}/api/tenant/ping">
   <header class="endpoint-head">
-    <h3><a href="#examples--role-ping">Role Ping</a></h3>
-    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+    <h3><a href="#examples--role-ping"><span data-l="en">Role Ping</span><span data-l="id">Ping Role</span></a></h3>
+    <div class="badges"><span class="badge role-all-roles"><span data-l="en">All roles</span><span data-l="id">Semua role</span></span></div>
   </header>
   <div class="url">
     <span class="method">GET</span>
     <code class="url-text">{{baseUrl}}/api/tenant/ping</code>
-    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant/ping" aria-label="Copy">Copy</button>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant/ping"><span data-l="en">Copy</span><span data-l="id">Salin</span></button>
   </div>
-  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <p>Answers with your role and email.</p>
+    <div data-l="en"><p>Answers with your role and email.</p></div><div data-l="id"><p>Membalas dengan role dan email Anda.</p></div>
     
     
   </div>
 </article>
 </section>
-  <footer>Generated from <code>postman/Prafi-API.postman_collection.json</code> on 2026-10-02 · regenerate with <code>npm run docs</code></footer>
+  <footer><span data-l="en">Generated from <code>postman/Prafi-API.postman_collection.json</code> on 2026-10-02 · regenerate with <code>npm run docs</code></span><span data-l="id">Dibuat dari <code>postman/Prafi-API.postman_collection.json</code> pada 2026-10-02 · buat ulang dengan <code>npm run docs</code></span></footer>
 </div>
 </main>
 </div>

@@ -1,5 +1,6 @@
 /**
- * Builds documentation/index.html from the Postman collection, so the docs always match it.
+ * Builds documentation/ (index.html, docs.js, docs-init.js) from the Postman collection, so the docs always match it.
+ * English comes from the collection; Bahasa Indonesia from docs.id.md next to this file (EN / ID switch on the page).
  * Run: npm run docs. Served by the backend at /docs; documentation/index.html also opens directly in a browser.
  */
 import fs from 'node:fs';
@@ -121,6 +122,88 @@ function markdown(md: string): string {
   return out.join('\n');
 }
 
+// ---------- languages ----------
+// English comes from the Postman collection; Bahasa Indonesia from docs.id.md (same sections, matched by name).
+
+type Lang = 'en' | 'id';
+interface Translated {
+  title?: string;
+  md: string;
+}
+
+function loadIndonesian() {
+  const file = path.join(__dirname, 'docs.id.md');
+  const result = { overview: undefined as string | undefined, folders: new Map<string, Translated>(), requests: new Map<string, Translated>() };
+  if (!fs.existsSync(file)) return result;
+  const parts = fs.readFileSync(file, 'utf8').replace(/\r/g, '').split(/^=== /m).slice(1);
+  for (const part of parts) {
+    const [head, ...rest] = part.split('\n');
+    const md = rest.join('\n').trim();
+    if (head.trim() === 'OVERVIEW') {
+      result.overview = md;
+      continue;
+    }
+    const m = head.match(/^(FOLDER|REQ)\s+(.+?)(?:\s*=>\s*(.+))?\s*$/);
+    if (!m) continue;
+    (m[1] === 'FOLDER' ? result.folders : result.requests).set(m[2], { title: m[3]?.trim(), md });
+  }
+  return result;
+}
+const id = loadIndonesian();
+
+const missing: string[] = [];
+if (!id.overview) missing.push('OVERVIEW');
+for (const f of collection.item) {
+  if (!id.folders.has(f.name)) missing.push(`FOLDER ${f.name}`);
+  for (const r of f.item) if (!id.requests.has(r.name)) missing.push(`REQ ${r.name}`);
+}
+
+/** Interface text in both languages. */
+const UI = {
+  overview: { en: 'Overview', id: 'Ringkasan' },
+  endpoints: { en: 'endpoints', id: 'endpoint' },
+  endpoint: { en: 'endpoint', id: 'endpoint' },
+  groups: { en: 'groups', id: 'grup' },
+  roles: { en: 'roles', id: 'role' },
+  methods: { en: 'get · post · patch · delete', id: 'get · post · patch · delete' },
+  hero: {
+    en: 'Backend for Prafi: accounts and roles, tenants, products, approvals and realtime notifications. Every request below shows who can call it.',
+    id: 'Backend untuk Prafi: akun dan role, tenant, produk, persetujuan, dan notifikasi realtime. Setiap request di bawah menunjukkan siapa yang boleh memanggilnya.',
+  },
+  baseUrl: { en: 'Base URL', id: 'Base URL' },
+  copy: { en: 'Copy', id: 'Salin' },
+  queryParams: { en: 'Query parameters', id: 'Parameter query' },
+  requestBody: { en: 'Request body', id: 'Body request' },
+  name: { en: 'name', id: 'nama' },
+  example: { en: 'example', id: 'contoh' },
+  required: { en: 'required', id: 'wajib' },
+  optional: { en: 'optional', id: 'opsional' },
+  yes: { en: 'yes', id: 'ya' },
+  field: { en: 'field', id: 'field' },
+  type: { en: 'type', id: 'tipe' },
+  noAuth: { en: 'No authentication needed', id: 'Tanpa autentikasi' },
+  authorization: { en: 'Authorization:', id: 'Otorisasi:' },
+  footer: {
+    en: 'Generated from <code>postman/Prafi-API.postman_collection.json</code> on {date} · regenerate with <code>npm run docs</code>',
+    id: 'Dibuat dari <code>postman/Prafi-API.postman_collection.json</code> pada {date} · buat ulang dengan <code>npm run docs</code>',
+  },
+} satisfies Record<string, Record<Lang, string>>;
+const ROLE_LABELS: Record<string, Record<Lang, string>> = {
+  'All roles': { en: 'All roles', id: 'Semua role' },
+  Public: { en: 'Public', id: 'Publik' },
+};
+
+/** Inline text in both languages; only the active one is shown (CSS on <html data-lang>). */
+const t = (pair: Record<Lang, string>) =>
+  pair.en === pair.id ? pair.en : `<span data-l="en">${pair.en}</span><span data-l="id">${pair.id}</span>`;
+/** A block (rendered Markdown) in both languages; falls back to English when there is no translation. */
+const block = (enMd: string, idMd: string | undefined, tag = 'div', cls = '') => {
+  const en = markdown(enMd);
+  const idHtml = idMd === undefined ? en : markdown(idMd);
+  const c = cls ? ` class="${cls}"` : '';
+  return en === idHtml ? `<${tag}${c}>${en}</${tag}>` : `<${tag}${c} data-l="en">${en}</${tag}><${tag}${c} data-l="id">${idHtml}</${tag}>`;
+};
+
 // ---------- page ----------
 
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -129,22 +212,28 @@ const splitName = (name: string) => {
   return m ? { title: m[1], access: m[2] } : { title: name, access: '' };
 };
 const urlOf = (u: PmUrl | string) => (typeof u === 'string' ? u : u.raw ?? '');
+const folderTitle = (f: PmFolder) => ({ en: escapeHtml(f.name), id: escapeHtml(id.folders.get(f.name)?.title ?? f.name) });
+const requestTitle = (r: PmRequest) => {
+  const { title } = splitName(r.name);
+  return { en: escapeHtml(title), id: escapeHtml(id.requests.get(r.name)?.title ?? title) };
+};
 
 function accessBadges(access: string) {
   if (!access) return '';
   return access
     .split(',')
     .map((a) => a.trim())
-    .map((a) => `<span class="badge role-${slug(a)}">${escapeHtml(a)}</span>`)
+    .map((a) => `<span class="badge role-${slug(a)}">${t(ROLE_LABELS[a] ?? { en: escapeHtml(a), id: escapeHtml(a) })}</span>`)
     .join('');
 }
 
-const copyButton = (text: string, label = 'Copy') =>
-  `<button class="copy" type="button" data-copy="${escapeHtml(text)}" aria-label="${label}">${label}</button>`;
+const copyButton = (text: string) =>
+  `<button class="copy" type="button" data-copy="${escapeHtml(text)}">${t(UI.copy)}</button>`;
 
 function requestBlock(folder: PmFolder, r: PmRequest) {
   const { title, access } = splitName(r.name);
-  const id = `${slug(folder.name)}--${slug(title)}`;
+  const anchor = `${slug(folder.name)}--${slug(title)}`;
+  const names = requestTitle(r);
   const method = r.request.method.toUpperCase();
   const url = urlOf(r.request.url);
   const query = typeof r.request.url === 'string' ? [] : r.request.url.query ?? [];
@@ -154,28 +243,29 @@ function requestBlock(folder: PmFolder, r: PmRequest) {
   let body = '';
   if (r.request.body?.mode === 'raw' && r.request.body.raw) {
     body =
-      `<div class="block-head"><h4>Request body <span class="muted">application/json</span></h4>${copyButton(r.request.body.raw)}</div>` +
+      `<div class="block-head"><h4>${t(UI.requestBody)} <span class="muted">application/json</span></h4>${copyButton(r.request.body.raw)}</div>` +
       `<pre><code class="lang-json">${escapeHtml(r.request.body.raw)}</code></pre>`;
   } else if (r.request.body?.mode === 'formdata') {
     body =
-      '<h4>Request body <span class="muted">multipart/form-data</span></h4><div class="table-wrap"><table><thead><tr><th>field</th><th>type</th><th>example</th></tr></thead><tbody>' +
+      `<h4>${t(UI.requestBody)} <span class="muted">multipart/form-data</span></h4><div class="table-wrap"><table><thead><tr><th>${t(UI.field)}</th><th>${t(UI.type)}</th><th>${t(UI.example)}</th></tr></thead><tbody>` +
       (r.request.body.formdata ?? [])
         .map((f) => `<tr><td><code>${escapeHtml(f.key)}</code></td><td>${escapeHtml(f.type ?? 'text')}</td><td>${escapeHtml(f.value ?? f.src ?? '')}</td></tr>`)
         .join('') +
       '</tbody></table></div>';
   }
   const params = query.length
-    ? '<h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody>' +
+    ? `<h4>${t(UI.queryParams)}</h4><div class="table-wrap"><table><thead><tr><th>${t(UI.name)}</th><th>${t(UI.example)}</th><th>${t(UI.required)}</th></tr></thead><tbody>` +
       query
-        .map((q) => `<tr><td><code>${escapeHtml(q.key)}</code></td><td><code>${escapeHtml(q.value)}</code></td><td>${q.disabled ? '<span class="muted">optional</span>' : 'yes'}</td></tr>`)
+        .map((q) => `<tr><td><code>${escapeHtml(q.key)}</code></td><td><code>${escapeHtml(q.value)}</code></td><td>${q.disabled ? `<span class="muted">${t(UI.optional)}</span>` : t(UI.yes)}</td></tr>`)
         .join('') +
       '</tbody></table></div>'
     : '';
+  const searchText = `${folder.name} ${id.folders.get(folder.name)?.title ?? ''} ${r.name} ${names.id} ${method} ${url}`.toLowerCase();
 
   return `
-<article class="endpoint m-${method.toLowerCase()}" id="${id}" data-search="${escapeHtml(`${folder.name} ${r.name} ${method} ${url}`.toLowerCase())}">
+<article class="endpoint m-${method.toLowerCase()}" id="${anchor}" data-search="${escapeHtml(searchText)}">
   <header class="endpoint-head">
-    <h3><a href="#${id}">${escapeHtml(title)}</a></h3>
+    <h3><a href="#${anchor}">${t(names)}</a></h3>
     <div class="badges">${accessBadges(access)}</div>
   </header>
   <div class="url">
@@ -183,9 +273,9 @@ function requestBlock(folder: PmFolder, r: PmRequest) {
     <code class="url-text">${escapeHtml(url)}</code>
     ${copyButton(url)}
   </div>
-  <p class="auth">${isPublic ? '<span class="dot dot-open"></span>No authentication needed' : '<span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code>'}</p>
+  <p class="auth">${isPublic ? `<span class="dot dot-open"></span>${t(UI.noAuth)}` : `<span class="dot dot-lock"></span>${t(UI.authorization)} <code>Bearer {{token}}</code>`}</p>
   <div class="endpoint-body">
-    ${markdown(desc)}
+    ${desc.trim() ? block(desc, id.requests.get(r.name)?.md || undefined) : ''}
     ${params}
     ${body}
   </div>
@@ -197,12 +287,14 @@ const nav = folders
   .map(
     (f) => `
   <li class="nav-folder" data-folder="${slug(f.name)}">
-    <a class="nav-folder-link" href="#${slug(f.name)}">${escapeHtml(f.name)}<span class="count">${f.item.length}</span></a>
+    <a class="nav-folder-link" href="#${slug(f.name)}">${t(folderTitle(f))}<span class="count">${f.item.length}</span></a>
     <ul>${f.item
       .map((r) => {
         const { title } = splitName(r.name);
+        const names = requestTitle(r);
         const m = r.request.method.toUpperCase();
-        return `<li data-search="${escapeHtml(`${f.name} ${r.name} ${m} ${urlOf(r.request.url)}`.toLowerCase())}"><a href="#${slug(f.name)}--${slug(title)}"><span class="nav-method m-${m.toLowerCase()}">${m === 'DELETE' ? 'DEL' : m}</span><span>${escapeHtml(title)}</span></a></li>`;
+        const searchText = `${f.name} ${id.folders.get(f.name)?.title ?? ''} ${r.name} ${names.id} ${m} ${urlOf(r.request.url)}`.toLowerCase();
+        return `<li data-search="${escapeHtml(searchText)}"><a href="#${slug(f.name)}--${slug(title)}"><span class="nav-method m-${m.toLowerCase()}">${m === 'DELETE' ? 'DEL' : m}</span><span>${t(names)}</span></a></li>`;
       })
       .join('')}</ul>
   </li>`,
@@ -213,8 +305,8 @@ const sections = folders
   .map(
     (f) => `
 <section class="folder" id="${slug(f.name)}">
-  <div class="folder-title"><h2>${escapeHtml(f.name)}</h2><span class="pill">${f.item.length} endpoint${f.item.length === 1 ? '' : 's'}</span></div>
-  <div class="folder-desc">${markdown(f.description ?? '')}</div>
+  <div class="folder-title"><h2>${t(folderTitle(f))}</h2><span class="pill">${f.item.length} ${t(f.item.length === 1 ? UI.endpoint : UI.endpoints)}</span></div>
+  ${block(f.description ?? '', id.folders.get(f.name)?.md || undefined, 'div', 'folder-desc')}
   ${f.item.map((r) => requestBlock(f, r)).join('\n')}
 </section>`,
   )
@@ -224,6 +316,7 @@ const requestCount = folders.reduce((n, f) => n + f.item.length, 0);
 const methodCount = (m: string) => folders.reduce((n, f) => n + f.item.filter((r) => r.request.method.toUpperCase() === m).length, 0);
 const generatedAt = new Date().toISOString().slice(0, 10);
 const title = collection.info.name;
+
 
 // ---------- styles ----------
 
@@ -372,24 +465,63 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 6
   .topbar { padding: 0 12px; gap: 8px; }
   .logo span.name { display: none; }
 }
+@media (max-width: 600px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .stat:last-child { grid-column: span 2; }
+}
 `;
 
-// ---------- behaviour (separate file: the server's Content-Security-Policy blocks inline scripts) ----------
+
+// ---------- behaviour (separate files: the server's Content-Security-Policy blocks inline scripts) ----------
+
+/** Runs in <head> before the page is drawn, so the saved theme and language show without a flash. */
+const initJs = `(function () {
+  var root = document.documentElement, get = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  if (get('prafi-docs-theme') === 'dark') root.setAttribute('data-theme', 'dark');
+  // Language: ?lang=en|id in the link, then the saved choice, then the browser language
+  var fromUrl = (location.search.match(/[?&]lang=(en|id)\\b/) || [])[1];
+  var lang = fromUrl || get('prafi-docs-lang') || ((navigator.language || '').toLowerCase().indexOf('id') === 0 ? 'id' : 'en');
+  root.setAttribute('data-lang', lang);
+  root.setAttribute('lang', lang);
+})();
+`;
 
 const js = `(function () {
   var root = document.documentElement;
-  // Theme: light by default, remembered per browser
-  var stored = null;
-  try { stored = localStorage.getItem('prafi-docs-theme'); } catch (e) {}
-  if (stored === 'dark') root.setAttribute('data-theme', 'dark');
+  var set = function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} };
+  var TEXT = {
+    en: { light: '☀ Light', dark: '☾ Dark', copied: 'Copied', search: 'Search endpoints… press /' },
+    id: { light: '☀ Terang', dark: '☾ Gelap', copied: 'Tersalin', search: 'Cari endpoint… tekan /' }
+  };
+  var lang = function () { return root.getAttribute('data-lang') === 'id' ? 'id' : 'en'; };
   var themeBtn = document.getElementById('theme-toggle');
-  var setThemeLabel = function () { themeBtn.textContent = root.getAttribute('data-theme') === 'dark' ? '☀ Light' : '☾ Dark'; };
-  setThemeLabel();
+  var search = document.getElementById('search');
+  var refreshLabels = function () {
+    var T = TEXT[lang()];
+    themeBtn.textContent = root.getAttribute('data-theme') === 'dark' ? T.light : T.dark;
+    search.setAttribute('placeholder', T.search);
+    search.setAttribute('aria-label', T.search);
+    document.querySelectorAll('.lang-switch button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-set-lang') === lang())); });
+  };
+  refreshLabels();
+
+  // Theme: light by default, remembered per browser
   themeBtn.addEventListener('click', function () {
     var dark = root.getAttribute('data-theme') !== 'dark';
     if (dark) root.setAttribute('data-theme', 'dark'); else root.removeAttribute('data-theme');
-    try { localStorage.setItem('prafi-docs-theme', dark ? 'dark' : 'light'); } catch (e) {}
-    setThemeLabel();
+    set('prafi-docs-theme', dark ? 'dark' : 'light');
+    refreshLabels();
+  });
+
+  // Language: English / Bahasa Indonesia, remembered per browser
+  document.querySelectorAll('[data-set-lang]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var l = b.getAttribute('data-set-lang');
+      root.setAttribute('data-lang', l);
+      root.setAttribute('lang', l);
+      set('prafi-docs-lang', l);
+      refreshLabels();
+    });
   });
 
   // Base URL: when served by the backend, {{baseUrl}} is this server
@@ -405,13 +537,16 @@ const js = `(function () {
     var btn = e.target.closest('.copy');
     if (!btn) return;
     var text = btn.id === 'copy-base' ? base : btn.getAttribute('data-copy');
-    var done = function () { var old = btn.textContent; btn.textContent = 'Copied'; btn.classList.add('done'); setTimeout(function () { btn.textContent = old; btn.classList.remove('done'); }, 1200); };
+    var done = function () {
+      var old = btn.innerHTML;
+      btn.textContent = TEXT[lang()].copied; btn.classList.add('done');
+      setTimeout(function () { btn.innerHTML = old; btn.classList.remove('done'); }, 1200);
+    };
     if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, function () {});
     else { var t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done(); } catch (err) {} t.remove(); }
   });
 
-  // Search
-  var search = document.getElementById('search');
+  // Search (matches English and Indonesian titles)
   var navItems = document.querySelectorAll('aside li[data-search]');
   var endpoints = document.querySelectorAll('article.endpoint');
   var navFolders = document.querySelectorAll('aside .nav-folder[data-folder]');
@@ -463,34 +598,48 @@ const js = `(function () {
 })();
 `;
 
+/** Shows only the active language; English is the fallback before docs-init.js runs. */
+const langCss = `
+html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { display: none !important; }
+.lang-switch { display: inline-flex; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; height: 40px; background: var(--surface); }
+.lang-switch button { border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; font-weight: 700; padding: 0 12px; cursor: pointer; }
+.lang-switch button + button { border-left: 1px solid var(--border); }
+.lang-switch button[aria-pressed="true"] { background: var(--primary); color: #fff; }
+`;
+
 // ---------- page ----------
 
 const html = `<!doctype html>
-<html lang="en">
+<html lang="en" data-lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(title)} Docs</title>
-<meta name="description" content="${escapeHtml(title)} reference: endpoints, roles, request bodies and realtime notifications.">
+<meta name="description" content="${escapeHtml(title)} reference (English / Bahasa Indonesia): endpoints, roles, request bodies and realtime notifications.">
+<script src="docs-init.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>${css}</style>
+<style>${css}${langCss}</style>
 </head>
 <body>
 <header class="topbar">
-  <button id="menu-toggle" class="icon-btn" type="button" aria-label="Endpoints menu">☰</button>
+  <button id="menu-toggle" class="icon-btn" type="button" aria-label="Menu">☰</button>
   <a class="logo" href="#top"><span class="logo-mark">P</span><span class="name">${escapeHtml(title)}</span><small>REST + Socket.IO</small></a>
   <label class="search-wrap">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
     <input id="search" type="search" placeholder="Search endpoints… press /" aria-label="Search endpoints">
   </label>
+  <div class="lang-switch" role="group" aria-label="Language / Bahasa">
+    <button type="button" data-set-lang="en" title="English">EN</button>
+    <button type="button" data-set-lang="id" title="Bahasa Indonesia">ID</button>
+  </div>
   <button id="theme-toggle" class="icon-btn" type="button">☾ Dark</button>
 </header>
 <div class="layout">
 <aside id="sidebar">
   <ul>
-    <li class="nav-folder"><a class="nav-folder-link" href="#top">Overview</a></li>
+    <li class="nav-folder"><a class="nav-folder-link" href="#top">${t(UI.overview)}</a></li>
     ${nav}
   </ul>
 </aside>
@@ -498,20 +647,18 @@ const html = `<!doctype html>
 <div class="content">
   <section class="hero">
     <h1>${escapeHtml(title)}</h1>
-    <p>Backend for Prafi: accounts and roles, tenants, products, approvals and realtime notifications. Every request below shows who can call it.</p>
-    <div class="base-url"><span>Base URL</span><code id="base-url">http://localhost:4000</code><button class="copy" id="copy-base" type="button">Copy</button></div>
+    <p>${t(UI.hero)}</p>
+    <div class="base-url"><span>${t(UI.baseUrl)}</span><code id="base-url">http://localhost:4000</code><button class="copy" id="copy-base" type="button">${t(UI.copy)}</button></div>
     <div class="stats">
-      <div class="stat"><b>${requestCount}</b><span>endpoints</span></div>
-      <div class="stat"><b>${folders.length}</b><span>groups</span></div>
-      <div class="stat"><b>3</b><span>roles</span></div>
-      <div class="stat"><b>${methodCount('GET')} · ${methodCount('POST')} · ${methodCount('PATCH')} · ${methodCount('DELETE')}</b><span>get · post · patch · delete</span></div>
+      <div class="stat"><b>${requestCount}</b><span>${t(UI.endpoints)}</span></div>
+      <div class="stat"><b>${folders.length}</b><span>${t(UI.groups)}</span></div>
+      <div class="stat"><b>3</b><span>${t(UI.roles)}</span></div>
+      <div class="stat"><b>${methodCount('GET')} · ${methodCount('POST')} · ${methodCount('PATCH')} · ${methodCount('DELETE')}</b><span>${t(UI.methods)}</span></div>
     </div>
   </section>
-  <section class="overview" id="overview">
-    ${markdown(collection.info.description ?? '')}
-  </section>
+  ${block(collection.info.description ?? '', id.overview, 'section', 'overview')}
   ${sections}
-  <footer>Generated from <code>postman/Prafi-API.postman_collection.json</code> on ${generatedAt} · regenerate with <code>npm run docs</code></footer>
+  <footer>${t({ en: UI.footer.en.replace('{date}', generatedAt), id: UI.footer.id.replace('{date}', generatedAt) })}</footer>
 </div>
 </main>
 </div>
@@ -523,5 +670,9 @@ const html = `<!doctype html>
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 fs.writeFileSync(path.join(OUT_DIR, 'index.html'), html);
+fs.writeFileSync(path.join(OUT_DIR, 'docs-init.js'), initJs);
 fs.writeFileSync(path.join(OUT_DIR, 'docs.js'), js);
-console.log(`documentation/index.html + docs.js: ${folders.length} groups, ${requestCount} endpoints`);
+console.log(`documentation/: ${folders.length} groups, ${requestCount} endpoints, English + Bahasa Indonesia`);
+if (missing.length) {
+  console.warn(`Not translated yet (shown in English), add to src/scripts/docs.id.md:\n  - ${missing.join('\n  - ')}`);
+}
