@@ -17,7 +17,7 @@ export const imageUpload = multer({
   limits: { fileSize: MAX_IMAGE_SIZE, files: 1 },
   fileFilter: (_req, file, cb) => {
     if (IMAGE_MIME_TYPES[file.mimetype]) return cb(null, true);
-    cb(HttpError.badRequest(`Only ${Object.keys(IMAGE_MIME_TYPES).join(', ')} images are allowed`));
+    cb(HttpError.badRequest(`Hanya gambar ${Object.keys(IMAGE_MIME_TYPES).join(', ')} yang diizinkan`));
   },
 });
 

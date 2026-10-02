@@ -1,6 +1,7 @@
 import { app } from './app';
 import { env } from './config/env';
 import { sequelize } from './models';
+import { closeRealtime, initRealtime } from './realtime/socket';
 
 async function start() {
   try {
@@ -13,10 +14,13 @@ async function start() {
 
   const server = app.listen(env.port, () => {
     console.log(`Server running on http://localhost:${env.port} (${env.nodeEnv})`);
+    console.log(`WebSocket (Socket.IO) on ws://localhost:${env.port}`);
   });
+  initRealtime(server);
 
   const shutdown = (signal: string) => {
     console.log(`${signal} received, shutting down...`);
+    void closeRealtime();
     server.close(async () => {
       await sequelize.close();
       process.exit(0);

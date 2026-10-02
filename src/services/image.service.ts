@@ -22,7 +22,7 @@ export async function createFromUpload(file: Express.Multer.File, altText?: stri
 /** Deletes an Image record and its file on disk. */
 export async function remove(id: number) {
   const image = await Image.findByPk(id);
-  if (!image) throw HttpError.notFound('Image not found');
+  if (!image) throw HttpError.notFound('Gambar tidak ditemukan');
 
   await image.destroy();
   const filename = path.basename(image.imgUrl);

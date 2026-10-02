@@ -13,17 +13,17 @@ export const list: RequestHandler = async (req, res) => {
 
   const errors: { field: string; message: string }[] = [];
   if (role !== undefined && !readableRoles.includes(role as Role)) {
-    errors.push({ field: 'role', message: `role must be one of: ${readableRoles.join(', ')}` });
+    errors.push({ field: 'role', message: `role harus salah satu dari: ${readableRoles.join(', ')}` });
   }
   const pageNum = Number(page);
   if (!Number.isInteger(pageNum) || pageNum < 1) {
-    errors.push({ field: 'page', message: 'page must be a positive integer' });
+    errors.push({ field: 'page', message: 'page harus berupa bilangan bulat positif' });
   }
   const limitNum = Number(limit);
   if (!Number.isInteger(limitNum) || limitNum < 1 || limitNum > MAX_LIMIT) {
-    errors.push({ field: 'limit', message: `limit must be an integer between 1 and ${MAX_LIMIT}` });
+    errors.push({ field: 'limit', message: `limit harus berupa bilangan bulat antara 1 dan ${MAX_LIMIT}` });
   }
-  if (errors.length) throw HttpError.badRequest('Validation failed', errors);
+  if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);
 
   const { users, meta } = await userService.list({
     readableRoles,

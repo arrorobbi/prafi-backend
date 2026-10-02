@@ -3,7 +3,7 @@ import { HttpError } from '../errors/HttpError';
 import * as imageService from '../services/image.service';
 
 export const upload: RequestHandler = async (req, res) => {
-  if (!req.file) throw HttpError.badRequest('Image file is required (multipart field "image")');
+  if (!req.file) throw HttpError.badRequest('File gambar wajib diunggah (field multipart "image")');
 
   const { altText } = (req.body ?? {}) as { altText?: unknown };
   const image = await imageService.createFromUpload(
@@ -15,7 +15,7 @@ export const upload: RequestHandler = async (req, res) => {
 
 export const remove: RequestHandler = async (req, res) => {
   const id = Number(req.params.id);
-  if (!Number.isInteger(id)) throw HttpError.badRequest('Invalid image id');
+  if (!Number.isInteger(id)) throw HttpError.badRequest('ID gambar tidak valid');
 
   await imageService.remove(id);
   res.json({ success: true, data: null });

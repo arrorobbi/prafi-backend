@@ -5,7 +5,10 @@ import approvalRoutes from './approval.routes';
 import authRoutes from './auth.routes';
 import imageRoutes from './image.routes';
 import landingRoutes from './landing.routes';
+import notificationRoutes from './notification.routes';
 import productRoutes from './product.routes';
+import tenantRoutes from './tenant.routes';
+import tenantCategoryRoutes from './tenantCategory.routes';
 import userRoutes from './user.routes';
 
 const router = Router();
@@ -19,7 +22,10 @@ router.use('/images', imageRoutes);
 router.use('/users', userRoutes);
 router.use('/approvals', approvalRoutes);
 router.use('/products', productRoutes);
+router.use('/tenants', tenantRoutes);
+router.use('/tenant-categories', tenantCategoryRoutes);
 router.use('/landing', landingRoutes);
+router.use('/notifications', notificationRoutes);
 
 // Example of role-protected routes — replace with real feature routes
 router.get('/admin/ping', authenticate, authorize(ROLES.SUPERADMIN, ROLES.ADMIN), (req, res) => {

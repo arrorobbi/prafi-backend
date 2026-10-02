@@ -25,21 +25,21 @@ export const setApproval: RequestHandler = async (req, res) => {
 
   const errors: { field: string; message: string }[] = [];
   if (!type) {
-    errors.push({ field: 'type', message: `type query param must be one of: ${APPROVAL_TYPES.join(', ')}` });
+    errors.push({ field: 'type', message: `parameter query type harus salah satu dari: ${APPROVAL_TYPES.join(', ')}` });
   }
-  if (!UUID_RE.test(id)) errors.push({ field: 'id', message: 'id must be a valid UUID' });
-  if (typeof isActive !== 'boolean') errors.push({ field: 'isActive', message: 'isActive must be true or false' });
+  if (!UUID_RE.test(id)) errors.push({ field: 'id', message: 'id harus berupa UUID yang valid' });
+  if (typeof isActive !== 'boolean') errors.push({ field: 'isActive', message: 'isActive harus bernilai true atau false' });
   if (reason !== undefined && (typeof reason !== 'string' || !reason.trim() || reason.length > MAX_REASON_LENGTH)) {
-    errors.push({ field: 'reason', message: `reason must be a non-empty string up to ${MAX_REASON_LENGTH} characters` });
+    errors.push({ field: 'reason', message: `reason harus berupa teks yang tidak kosong, maksimal ${MAX_REASON_LENGTH} karakter` });
   }
   // type=user: `role` confirms which kind of account is being activated; it must match the user's actual role
   if (type === 'user' && !ALL_ROLES.includes(role as Role)) {
-    errors.push({ field: 'role', message: `role is required for type=user and must be one of: ${ALL_ROLES.join(', ')}` });
+    errors.push({ field: 'role', message: `role wajib diisi untuk type=user dan harus salah satu dari: ${ALL_ROLES.join(', ')}` });
   }
   if (type === 'product' && role !== undefined) {
-    errors.push({ field: 'role', message: 'role is only used with type=user' });
+    errors.push({ field: 'role', message: 'role hanya digunakan untuk type=user' });
   }
-  if (errors.length) throw HttpError.badRequest('Validation failed', errors);
+  if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);
 
   const result = await approvalService.setApproval(req.user!, type!, id, {
     isActive: isActive as boolean,

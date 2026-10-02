@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Prafi API",
-    "description": "Backend API (Express + Sequelize + PostgreSQL).\n\n**Setup (once)**\n1. Import this collection and `Prafi-Local.postman_environment.json`.\n2. Select **Prafi Local** in the environment dropdown (top right).\n3. In **Prafi Local**, set `superadminPassword` (same as SEED_ADMIN_PASSWORD in .env) in the **Current value** column, then Ctrl+S.\n\n**Automatic saving**: after every Login, the token is saved to the environment as `{{token}}` (last logged-in user) and `{{superadminToken}}` / `{{adminToken}}` / `{{tenantToken}}`. Register and Upload save `adminEmail`, `tenantEmail`, `imageId`, `imageUrl`. Each save is printed in the Postman Console. Scripts write the environment **Current value** (Initial value stays empty on purpose).\n\n**Collection Runner**: turn on *Keep variable values* (Persist responses / variables) so values from the run stay in the environment afterwards.\n\n**Roles**: superadmin → can create admin, admin → can create tenant.\n\n**Responses**: `{ success: true, data }` or `{ success: false, error: { code, message, details? } }`.\n\n**Activation**: new admin/tenant accounts must be activated before they can log in (the collection does this right after each Register).\n\n**Token**: every request uses `{{token}}` (collection → Authorization), which each Login request sets to the account that just logged in. Log in as the role a request needs first — the request names say which, e.g. \"(by Superadmin)\", \"(tenant)\", \"(admin)\". The role tokens (`superadminToken`, `adminToken`, `tenantToken`) are still saved, but no request uses them.\n\n**Tokens**: role-specific requests use their own token (`{{superadminToken}}`, `{{adminToken}}`, `{{tenantToken}}`). Requests without their own auth (Me, Update Me, List Users) use the collection default `{{token}}` = whoever logged in last.",
+    "description": "Backend API (Express + Sequelize + PostgreSQL).\n\n**Setup (once)**\n1. Import this collection and `Prafi-Local.postman_environment.json`.\n2. Select **Prafi Local** in the environment dropdown (top right).\n3. In **Prafi Local**, set `superadminPassword` (same as SEED_ADMIN_PASSWORD in .env) in the **Current value** column, then Ctrl+S.\n\n**Automatic saving**: after every Login, the token is saved to the environment as `{{token}}` (last logged-in user) and `{{superadminToken}}` / `{{adminToken}}` / `{{tenantToken}}`. Register and Upload save `adminEmail`, `tenantEmail`, `imageId`, `imageUrl`. Each save is printed in the Postman Console. Scripts write the environment **Current value** (Initial value stays empty on purpose).\n\n**Collection Runner**: turn on *Keep variable values* (Persist responses / variables) so values from the run stay in the environment afterwards.\n\n**Roles**: superadmin → can create admin, admin → can create tenant.\n\n**Responses**: `{ success: true, data }` or `{ success: false, error: { code, message, details? } }`. Error `message` and `details[].message` are in Bahasa Indonesia (ready to show in the frontend); `code` and `field` stay in English, so frontend logic should switch on `code`, not on the message text.\n\n**Activation**: new **admin** accounts start inactive and must be activated by a superadmin before they can log in (the collection does this right after Register - Admin). New **tenant** accounts sign up publicly (no token) and are active right away.\n\n**Token**: every request uses `{{token}}` (collection → Authorization), which each Login request sets to the account that just logged in. Log in as the role a request needs first — the request names say which, e.g. \"(by Superadmin)\", \"(tenant)\", \"(admin)\". The role tokens (`superadminToken`, `adminToken`, `tenantToken`) are still saved, but no request uses them.\n\n**Tokens**: role-specific requests use their own token (`{{superadminToken}}`, `{{adminToken}}`, `{{tenantToken}}`). Requests without their own auth (Me, Update Me, List Users) use the collection default `{{token}}` = whoever logged in last.\n\n**Tenants**: tenant users manage their own tenant profile at `/api/tenants/me`; superadmin/admin read all at `/api/tenants`.\n\n**Tenant categories**: superadmin/admin manage them at `/api/tenant-categories`; every tenant profile needs a `categoryId`.\n\n**Notifications**: every role gets notifications at `/api/notifications` (see folder 9 for the list of types and who receives them).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -140,7 +140,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Andi\",\n  \"lastName\": \"Wijaya\",\n  \"phoneNumber\": \"081234567890\",\n  \"email\": \"admin{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\",\n  \"role\": \"admin\"\n}",
+              "raw": "{\n  \"firstName\": \"Andi\",\n  \"lastName\": \"Wijaya\",\n  \"phoneNumber\": \"081234567890\",\n  \"email\": \"admin{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -148,17 +148,18 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
+              "raw": "{{baseUrl}}/api/auth/register/admin",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "auth",
-                "register"
+                "register",
+                "admin"
               ]
             },
-            "description": "Requires **superadmin** token. A superadmin can only create `admin` accounts.\n\nBody: `firstName`, `lastName`, `phoneNumber`, `email`, `password` (min 8), `role` — all required. `faceImageId` optional (id from **Images / Upload Image**).\n\nErrors: 400 validation, 401 no/invalid token, 403 role not allowed, 409 email or faceImageId already used.",
+            "description": "`POST /api/auth/register/admin` — **superadmin only**. Creates an admin that starts **inactive** (`approval.isActive = false`), so it cannot log in until a superadmin runs **Activate Admin**.\n\nBody: `firstName`, `lastName`, `phoneNumber`, `email`, `password` (min 8) — all required; `faceImageId` optional. No `role` needed (the URL decides it).\n\nErrors: 400 validation, 401 no token, 403 not a superadmin, 409 email or faceImageId already used.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -181,7 +182,53 @@
                   "var data = pm.response.json().data;",
                   "if (data) save('adminId', data.id);",
                   "if (data) save('adminEmail', data.email);",
-                  "pm.test('Password is not returned', () => pm.expect(data).to.not.have.property('password'));"
+                  "pm.test('Password is not returned', () => pm.expect(data).to.not.have.property('password'));",
+                  "pm.test('Admin starts inactive', () => pm.expect(data.approval.isActive).to.equal(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "New Admin Cannot Log In Yet (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "A newly registered admin is inactive, so login returns 403 `USER_NOT_ACTIVATED` until a superadmin activates it (next request)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));",
+                  "pm.test('USER_NOT_ACTIVATED', () => pm.expect(pm.response.json().error.code).to.equal('USER_NOT_ACTIVATED'));"
                 ]
               }
             }
@@ -394,7 +441,7 @@
       "description": "Register a tenant with the uploaded face image, then log in as that tenant.",
       "item": [
         {
-          "name": "Register - Tenant with face image (by Admin)",
+          "name": "Register - Tenant (public, no token)",
           "request": {
             "method": "POST",
             "header": [
@@ -405,7 +452,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Budi\",\n  \"lastName\": \"Santoso\",\n  \"phoneNumber\": \"08123456789\",\n  \"email\": \"tenant{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\",\n  \"role\": \"tenant\",\n  \"tenantName\": \"Warung Kopi Budi\",\n  \"faceImageId\": {{imageId}}\n}",
+              "raw": "{\n  \"firstName\": \"Budi\",\n  \"lastName\": \"Santoso\",\n  \"phoneNumber\": \"08123456789\",\n  \"email\": \"tenant{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\",\n  \"tenantName\": \"Warung Kopi Budi\",\n  \"faceImageId\": {{imageId}}\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -413,26 +460,20 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
+              "raw": "{{baseUrl}}/api/auth/register/tenant",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "auth",
-                "register"
+                "register",
+                "tenant"
               ]
             },
-            "description": "Requires **admin** token. An admin can only create `tenant` accounts.\n\nRun **Images / Upload Image** first — its `id` is saved to `{{imageId}}` and used as `faceImageId` here. Each image can belong to only one user (409 otherwise).",
+            "description": "`POST /api/auth/register/tenant` — **public sign-up, no token needed**: anyone can create a tenant account. The tenant is **active right away** (`approval.isActive = true`) and can log in immediately.\n\nBody: `firstName`, `lastName`, `phoneNumber`, `email`, `password` (min 8), `tenantName` — all required; `faceImageId` optional (from **Upload Image**). No `role` needed (the URL decides it).\n\nErrors: 400 validation (e.g. missing tenantName), 409 email or faceImageId already used.",
             "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
+              "type": "noauth"
             }
           },
           "event": [
@@ -446,68 +487,8 @@
                   "var data = pm.response.json().data;",
                   "if (data) save('tenantId', data.id);",
                   "if (data) save('tenantEmail', data.email);",
-                  "pm.test('Face image is linked', () => pm.expect(data.faceImage.url).to.be.a('string'));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Activate Tenant (by Admin)",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"isActive\": true,\n  \"role\": \"tenant\",\n  \"reason\": \"Account verified\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/approvals/{{tenantId}}?type=user",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "approvals",
-                "{{tenantId}}"
-              ],
-              "query": [
-                {
-                  "key": "type",
-                  "value": "user"
-                }
-              ]
-            },
-            "description": "New accounts cannot log in until activated. Activates the tenant created above (`{{tenantId}}`).\n\nBody: `isActive` (true/false, required), `role` (required — must match the user's actual role; it is a safety check and never changes the role), `reason` (optional, defaults to \"Activated by <role>\").\n\nRules: superadmin → admin and tenant accounts, admin → tenant accounts. Nobody can change the superadmin. Takes effect immediately, even for tokens already issued.",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "pm.test('isActive is true', () => pm.expect(pm.response.json().data.approval.isActive).to.equal(true));"
+                  "pm.test('Face image is linked', () => pm.expect(data.faceImage.url).to.be.a('string'));",
+                  "pm.test('Tenant is active right away', () => pm.expect(data.approval.isActive).to.equal(true));"
                 ]
               }
             }
@@ -1109,7 +1090,7 @@
     },
     {
       "name": "6. Products",
-      "description": "Product CRUD. Rules: only **tenants** create/update/delete, and only **their own** products. **superadmin/admin** can read every product (and activate/deactivate it), but not create/update/delete.\n\nRuns in order: tenant uploads an image → creates a product (starts **inactive**, `approval.isActive = false`) → reads/updates it → admin lists pending products and activates it → superadmin deactivates it → tenant deletes it.",
+      "description": "Product CRUD. Rules: only **tenants** create/update/delete, and only **their own** products. **superadmin/admin** can read every product (and activate/deactivate it), but not create/update/delete.\n\nRuns in order: tenant uploads an image → creates a product (starts **inactive**, `approval.isActive = false`) → reads/updates it → admin lists pending products and activates it → superadmin reads it (but cannot change its activation) → admin deactivates it → tenant deletes it.",
       "item": [
         {
           "name": "Switch to Tenant (login)",
@@ -1671,7 +1652,7 @@
                 }
               ]
             },
-            "description": "superadmin or admin make the product active (visible as approved).\n\n`PATCH /api/approvals/:productId?type=product`, body: `isActive` (required), `reason` (optional). Uses `{{productId}}` from Create Product.",
+            "description": "**Admin only** — makes the product active (approved). The superadmin cannot change product activation (403).\n\n`PATCH /api/approvals/:productId?type=product`, body: `isActive` (required), `reason` (optional). Uses `{{productId}}` from Create Product.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -1857,7 +1838,7 @@
           ]
         },
         {
-          "name": "Deactivate Product (superadmin)",
+          "name": "Superadmin Cannot Change Product Activation (403)",
           "request": {
             "method": "PATCH",
             "header": [
@@ -1892,7 +1873,127 @@
                 }
               ]
             },
-            "description": "superadmin or admin deactivate a product.\n\n`PATCH /api/approvals/:productId?type=product`, body: `isActive` (required), `reason` (optional). Uses `{{productId}}` from Create Product.",
+            "description": "Negative example: only **admin** can activate/deactivate products. The superadmin can still read products, but gets 403 here.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// {{productId}} is set by Create Product (empty if create failed or the product was deleted)",
+                  "if (!pm.variables.get('productId')) {",
+                  "  console.log('productId is not set, skipping ' + pm.info.requestName);",
+                  "  if (pm.execution && pm.execution.skipRequest) pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Switch to Admin (login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in as the admin so the next requests (which all use `{{token}}`) run as that user.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Deactivate Product (admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": false,\n  \"reason\": \"Out of stock\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/approvals/{{productId}}?type=product",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "approvals",
+                "{{productId}}"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "product"
+                }
+              ]
+            },
+            "description": "`PATCH /api/approvals/:productId?type=product` — **admin only**. Body: `isActive` (required), `reason` (optional). Uses `{{productId}}` from Create Product.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -2034,7 +2135,1633 @@
       ]
     },
     {
-      "name": "7. Cleanup & Logout",
+      "name": "7. Tenant Categories",
+      "description": "Tenant categories (`/api/tenant-categories`). Only **superadmin** and **admin** can create, read, update and delete tenant categories; tenants get 403. All requests use the Bearer `{{token}}`.\n\nEvery tenant profile needs a `categoryId`, so this folder creates one and saves it to `{{categoryId}}` for **8. Tenants**. It also shows update, a 404-free read, and deleting an unused category. A category that tenants still use cannot be deleted (409 `STILL_IN_USE`).",
+      "item": [
+        {
+          "name": "Switch to Admin (login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in as the admin so the next requests (which all use `{{token}}`) run as that user.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Tenant Category (admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-categories"
+              ]
+            },
+            "description": "`POST /api/tenant-categories` — superadmin/admin. Body: `name` (required, unique). Saves the id to `{{categoryId}}`.\n\nErrors: 400 missing name / unknown fields, 403 tenant, 409 name already exists."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var save = (key, value) => { pm.environment.set(key, value); pm.collectionVariables.set(key, value); console.log('saved {{' + key + '}}'); };",
+                  "var data = pm.response.json().data;",
+                  "if (data) save('categoryId', data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Tenant Categories (admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-categories?page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-categories"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "`GET /api/tenant-categories` — superadmin/admin. Sorted by name. Query: `page`, `limit` (max 100)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has paging meta', () => pm.expect(pm.response.json().meta).to.have.property('total'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Tenant Category (admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-categories",
+                "{{categoryId}}"
+              ]
+            },
+            "description": "`GET /api/tenant-categories/:id` — superadmin/admin. 404 if it does not exist."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Tenant Category (admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-categories",
+                "{{categoryId}}"
+              ]
+            },
+            "description": "`PATCH /api/tenant-categories/:id` — superadmin/admin. Body: `name`. 409 if another category already has that name."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Unused Category (admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Temporary {{$timestamp}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-categories"
+              ]
+            },
+            "description": "Creates a second category that no tenant uses, to show delete below. Saves `{{tempCategoryId}}`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var save = (key, value) => { pm.environment.set(key, value); pm.collectionVariables.set(key, value); console.log('saved {{' + key + '}}'); };",
+                  "var data = pm.response.json().data;",
+                  "if (data) save('tempCategoryId', data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Unused Category (admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-categories/{{tempCategoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-categories",
+                "{{tempCategoryId}}"
+              ]
+            },
+            "description": "`DELETE /api/tenant-categories/:id` — superadmin/admin. Works only when no tenant uses the category; otherwise 409 `STILL_IN_USE`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var save = (key, value) => { pm.environment.set(key, value); pm.collectionVariables.set(key, value); console.log('saved {{' + key + '}}'); };",
+                  "save('tempCategoryId', '');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Switch to Tenant (login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{tenantEmail}}\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in as the tenant so the next requests (which all use `{{token}}`) run as that user.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tenant Cannot Manage Categories (403)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-categories"
+              ]
+            },
+            "description": "Negative example: tenants get 403 on every `/api/tenant-categories` endpoint (list, read, create, update, delete)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "8. Tenants",
+      "description": "Tenant profile endpoints. **Rules:** a **tenant** user creates, reads, updates and deletes **only their own** tenant profile at `/api/tenants/me` (one profile per tenant user). **superadmin / admin** read every tenant (`GET /api/tenants`, `GET /api/tenants/:id`) but cannot create/update/delete. All endpoints use the Bearer `{{token}}`.\n\nRuns in order: tenant uploads a logo → creates its profile → reads/updates it → admin lists all tenants → superadmin reads one by id → tenant deletes it.\n\n**Needs `{{categoryId}}`:** it is set by **7. Tenant Categories → Create Tenant Category**. If it is missing, Create My Tenant stops with a clear error.",
+      "item": [
+        {
+          "name": "Switch to Tenant (login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{tenantEmail}}\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in as the tenant so the next requests (which all use `{{token}}`) run as that user.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Upload Tenant Logo (tenant)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "sample-face.png",
+                  "description": "jpg / png / webp / gif, max 5 MB"
+                },
+                {
+                  "key": "altText",
+                  "value": "Tenant logo",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/images",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "images"
+              ]
+            },
+            "description": "A tenant profile requires a logo. The returned id is saved to `{{tenantLogoId}}`.\n\nIn Postman desktop, re-select the file in the `image` row."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var save = (key, value) => { pm.environment.set(key, value); pm.collectionVariables.set(key, value); console.log('saved {{' + key + '}}'); };",
+                  "var data = pm.response.json().data;",
+                  "if (data) save('tenantLogoId', data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create My Tenant (tenant)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Warung Kopi Budi\",\n  \"description\": \"Single-origin coffee and snacks\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00-22:00\",\n  \"fbLink\": \"https://facebook.com/warungkopibudi\",\n  \"whatsappLink\": \"https://wa.me/6281234567890\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"logoId\": {{tenantLogoId}},\n  \"categoryId\": {{categoryId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants",
+                "me"
+              ]
+            },
+            "description": "`POST /api/tenants/me` — tenant only, one profile per tenant user. Saves `{{tenantProfileId}}`. `categoryId` is required and must be an existing tenant category (from **7. Tenant Categories**).\n\nBody: `description`, `address`, `area`, `operationalHours`, `fbLink`, `whatsappLink`, `gmapsLink`, `logoId`, `categoryId` — required. `name` — optional, defaults to your `tenantName`.\n\nErrors: 400 validation / unknown logo or category, 403 not a tenant, 409 you already have a profile or the logo is used by another tenant."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Fail loudly (instead of skipping silently) when a required variable is missing",
+                  "if (!pm.variables.get('categoryId')) throw new Error('{{categoryId}} is not set: run \"Create Tenant Category (admin)\" in 7. Tenant Categories first');",
+                  "if (!pm.variables.get('tenantLogoId')) throw new Error('{{tenantLogoId}} is not set: run \"Upload Tenant Logo (tenant)\" first');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var save = (key, value) => { pm.environment.set(key, value); pm.collectionVariables.set(key, value); console.log('saved {{' + key + '}}'); };",
+                  "var data = pm.response.json().data;",
+                  "if (data) save('tenantProfileId', data.id);",
+                  "pm.test('Has logo and category', () => { pm.expect(data.logo.url).to.be.a('string'); pm.expect(data.category.id).to.be.a('number'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get My Tenant (tenant)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants",
+                "me"
+              ]
+            },
+            "description": "`GET /api/tenants/me` — your own tenant profile with `logo` and `category`. 404 if you have not created one yet."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var missing = [\"tenantProfileId\"].filter((v) => !pm.variables.get(v));",
+                  "if (missing.length) {",
+                  "  console.log('Skipping ' + pm.info.requestName + ': not set: ' + missing.join(', '));",
+                  "  if (pm.execution && pm.execution.skipRequest) pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update My Tenant (tenant)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": \"Jl. Asia Afrika No. 8\",\n  \"operationalHours\": \"07:00-23:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants",
+                "me"
+              ]
+            },
+            "description": "`PATCH /api/tenants/me` — send only the fields to change: `name`, `description`, `address`, `area`, `operationalHours`, `fbLink`, `whatsappLink`, `gmapsLink`, `logoId`, `categoryId`.\n\nReplacing `logoId` deletes the old logo image. Not allowed (400): `id`, `userId`, timestamps, unknown fields, empty body."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var missing = [\"tenantProfileId\"].filter((v) => !pm.variables.get(v));",
+                  "if (missing.length) {",
+                  "  console.log('Skipping ' + pm.info.requestName + ': not set: ' + missing.join(', '));",
+                  "  if (pm.execution && pm.execution.skipRequest) pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Address updated', () => pm.expect(pm.response.json().data.address).to.equal('Jl. Asia Afrika No. 8'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Switch to Admin (login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in as the admin so the next requests (which all use `{{token}}`) run as that user.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Cannot Use /tenants/me (403)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants",
+                "me"
+              ]
+            },
+            "description": "Negative example: `/api/tenants/me` is for tenant users only, so superadmin/admin get 403 (also for POST/PATCH/DELETE)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List All Tenants (admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants?page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "`GET /api/tenants` — superadmin/admin. Every tenant with `logo`, `category` and `owner` (id, name, email, tenantName). Query: `page`, `limit` (max 100), `categoryId` (optional filter). Tenants get 403."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has paging meta', () => pm.expect(pm.response.json().meta).to.have.property('total'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Switch to Superadmin (login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{superadminEmail}}\",\n  \"password\": \"{{superadminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in as the superadmin so the next requests (which all use `{{token}}`) run as that user.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Tenant by Id (superadmin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants/{{tenantProfileId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants",
+                "{{tenantProfileId}}"
+              ]
+            },
+            "description": "`GET /api/tenants/:id` — superadmin/admin read one tenant (with owner). 404 if it does not exist."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var missing = [\"tenantProfileId\"].filter((v) => !pm.variables.get(v));",
+                  "if (missing.length) {",
+                  "  console.log('Skipping ' + pm.info.requestName + ': not set: ' + missing.join(', '));",
+                  "  if (pm.execution && pm.execution.skipRequest) pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Switch to Tenant (login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{tenantEmail}}\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in as the tenant so the next requests (which all use `{{token}}`) run as that user.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete My Tenant (tenant)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants",
+                "me"
+              ]
+            },
+            "description": "`DELETE /api/tenants/me` — deletes your tenant profile and its logo (image + file). Your user account and products are not affected."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var missing = [\"tenantProfileId\"].filter((v) => !pm.variables.get(v));",
+                  "if (missing.length) {",
+                  "  console.log('Skipping ' + pm.info.requestName + ': not set: ' + missing.join(', '));",
+                  "  if (pm.execution && pm.execution.skipRequest) pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var save = (key, value) => { pm.environment.set(key, value); pm.collectionVariables.set(key, value); console.log('saved {{' + key + '}}'); };",
+                  "save('tenantProfileId', '');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "9. Notifications",
+      "description": "Notifications for every role (`/api/notifications`, Bearer `{{token}}`). They are created automatically by the actions earlier in the collection.\n\n| type | who gets it | when |\n|---|---|---|\n| `ADMIN_PENDING_ACTIVATION` | superadmin | a new admin is registered (needs activation) |\n| `PRODUCT_SUBMITTED` | superadmin, admin | a tenant creates a product |\n| `USER_DEACTIVATED` | superadmin | an admin deactivates a user account |\n| `PRODUCT_DEACTIVATED` | superadmin | an admin deactivates a product |\n| `PRODUCT_PUBLISHED` | admin | an admin activates a product (now on the landing page) |\n| `PRODUCT_UPDATED` | admin | a tenant updates a product |\n| `TENANT_PROFILE_UPDATED` | admin | a tenant updates their tenant profile |\n| `TENANT_REGISTERED` | admin | a new tenant signs up |\n| `PRODUCT_UNDER_REVIEW` | tenant (owner) | they create a product |\n| `PRODUCT_APPROVED` | tenant (owner) | their product is activated |\n\nEach notification: `id`, `type` (switch on it in the frontend), `name` (title), `description` (message), `entityType` + `entityId` (what to open: `user`, `product` or `tenant`), `isRead`, `readAt`, `createdAt`. Every user only ever sees their own notifications (others → 404).\n\nEndpoints: `GET /api/notifications?page=&limit=&unread=true` (newest first, `meta.unreadCount` for the badge), `GET /api/notifications/unread-count`, `PATCH /api/notifications/:id/read`, `PATCH /api/notifications/read-all`, `DELETE /api/notifications/:id`.",
+      "item": [
+        {
+          "name": "Switch to Tenant (login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{tenantEmail}}\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in as the tenant so the next requests (which all use `{{token}}`) run as that user.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "My Notifications (tenant)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications?page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "`GET /api/notifications` — your own notifications, newest first. Query: `page`, `limit` (max 100), `unread=true` for unread only. `meta.unreadCount` = badge number. Saves the newest id to `{{notificationId}}`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Contains PRODUCT_UNDER_REVIEW, PRODUCT_APPROVED', () => { var t = pm.response.json().data.map((n) => n.type); pm.expect(t).to.include('PRODUCT_UNDER_REVIEW'); pm.expect(t).to.include('PRODUCT_APPROVED'); });",
+                  "pm.test('Has unreadCount', () => pm.expect(pm.response.json().meta).to.have.property('unreadCount'));",
+                  "var save = (key, value) => { pm.environment.set(key, value); pm.collectionVariables.set(key, value); console.log('saved {{' + key + '}}'); };",
+                  "var first = pm.response.json().data[0];",
+                  "if (first) save('notificationId', first.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unread Count (tenant)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications/unread-count",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "unread-count"
+              ]
+            },
+            "description": "`GET /api/notifications/unread-count` — `{ count }`. Cheap to poll for the badge."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has count', () => pm.expect(pm.response.json().data.count).to.be.a('number'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mark Notification Read (tenant)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications/{{notificationId}}/read",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "{{notificationId}}",
+                "read"
+              ]
+            },
+            "description": "`PATCH /api/notifications/:id/read` — marks one of your notifications as read (`isRead: true`, `readAt` set). 404 if it is not yours."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Is read', () => pm.expect(pm.response.json().data.isRead).to.equal(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mark All Read (tenant)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications/read-all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "read-all"
+              ]
+            },
+            "description": "`PATCH /api/notifications/read-all` — marks all your unread notifications as read. Returns `{ updated }`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Notification (tenant)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications/{{notificationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "{{notificationId}}"
+              ]
+            },
+            "description": "`DELETE /api/notifications/:id` — deletes one of your notifications. 404 if it is not yours."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var save = (key, value) => { pm.environment.set(key, value); pm.collectionVariables.set(key, value); console.log('saved {{' + key + '}}'); };",
+                  "save('notificationId', '');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Switch to Admin (login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in as the admin so the next requests (which all use `{{token}}`) run as that user.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Notifications",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications?page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "The admin's own notifications: new tenants, products to review, product/tenant updates, published products."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Contains TENANT_REGISTERED, PRODUCT_SUBMITTED, PRODUCT_UPDATED, PRODUCT_PUBLISHED', () => { var t = pm.response.json().data.map((n) => n.type); pm.expect(t).to.include('TENANT_REGISTERED'); pm.expect(t).to.include('PRODUCT_SUBMITTED'); pm.expect(t).to.include('PRODUCT_UPDATED'); pm.expect(t).to.include('PRODUCT_PUBLISHED'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Switch to Superadmin (login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{superadminEmail}}\",\n  \"password\": \"{{superadminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in as the superadmin so the next requests (which all use `{{token}}`) run as that user.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Superadmin Notifications (unread)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications?unread=true&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ],
+              "query": [
+                {
+                  "key": "unread",
+                  "value": "true"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "The superadmin's unread notifications: admins waiting for activation, new products, and deactivations done by admins."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Contains ADMIN_PENDING_ACTIVATION, PRODUCT_SUBMITTED', () => { var t = pm.response.json().data.map((n) => n.type); pm.expect(t).to.include('ADMIN_PENDING_ACTIVATION'); pm.expect(t).to.include('PRODUCT_SUBMITTED'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Switch to Tenant (login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{tenantEmail}}\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in as the tenant so the next requests (which all use `{{token}}`) run as that user.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "10. Realtime (WebSocket)",
+      "description": "Realtime notifications over **Socket.IO** (same host and port as the API).\n\n> Postman collection files cannot contain Socket.IO requests, so create one by hand (once):\n> 1. **New → Socket.IO**, URL `{{baseUrl}}` (the client version: **v4**).\n> 2. **Headers**: `Authorization` = `Bearer {{token}}` (or **Settings → Handshake auth**: `{ \"token\": \"{{token}}\" }`).\n> 3. **Events** tab: add listeners `notification:new`, `notification:unread-count`, `session:ended` and turn them on.\n> 4. **Connect**. Then run requests from this collection in another tab (e.g. create a product as a tenant) and watch the events arrive.\n> 5. Save it into this collection (Save → Prafi API) so it stays next to the REST requests.\n\n**Auth**: the same access token as the REST API. A missing/invalid/expired/revoked token or a deactivated user is refused with `connect_error` (`err.message`, `err.data.code` e.g. `UNAUTHORIZED`, `USER_NOT_ACTIVATED`).\n\n**Events (server → client)**\n\n| event | payload | when |\n|---|---|---|\n| `notification:unread-count` | `{ count }` | right after connecting, and after mark-read / read-all / delete (syncs every open tab) |\n| `notification:new` | `{ notification, unreadCount }` | a notification is created for this user (same shape as `GET /api/notifications` items) |\n| `session:ended` | `{ reason, message }` | `reason`: `logged_out` (this token logged out), `deactivated` (account deactivated), `token_expired` (1 h token expired). The server then disconnects; the frontend should log the user out. |\n\nEach user only receives their own events; all tabs/devices of a user receive them.\n\n**Frontend (socket.io-client v4)**\n```js\nimport { io } from 'socket.io-client';\n\nconst socket = io(API_URL, { auth: (cb) => cb({ token: localStorage.getItem('token') }) });\nsocket.on('notification:unread-count', ({ count }) => setBadge(count));\nsocket.on('notification:new', ({ notification, unreadCount }) => { addToList(notification); setBadge(unreadCount); toast(notification.name); });\nsocket.on('session:ended', ({ message }) => { logout(); alert(message); });\nsocket.on('connect_error', (err) => { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATED'].includes(err.data?.code)) logout(); });\n// after logging in again (new token): socket.disconnect().connect();\n```\n\nThe request below only checks that the Socket.IO endpoint is reachable (engine.io handshake, no events).",
+      "item": [
+        {
+          "name": "Socket.IO Endpoint Reachable",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/socket.io/?EIO=4&transport=polling",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "socket.io",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "EIO",
+                  "value": "4"
+                },
+                {
+                  "key": "transport",
+                  "value": "polling"
+                }
+              ]
+            },
+            "description": "Engine.IO handshake used by Socket.IO clients. 200 with a session id means the realtime server is up. Authentication happens in the next step (the Socket.IO connect), which Postman runs in a Socket.IO request, see the folder description."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Handshake returns a session id and websocket upgrade', () => {",
+                  "    var open = JSON.parse(pm.response.text().replace(/^0/, ''));",
+                  "    pm.expect(open.sid).to.be.a('string');",
+                  "    pm.expect(open.upgrades).to.include('websocket');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "11. Cleanup & Logout",
       "description": "Deletes the uploaded image, then logs out every role (tenant, admin, superadmin) and checks each logged-out token is rejected. Run this folder last: after it, every saved token is revoked, so run the Login requests again before other requests.",
       "item": [
         {
@@ -2155,7 +3882,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status 401', () => pm.response.to.have.status(401));",
-                  "pm.test('Says revoked', () => pm.expect(pm.response.json().error.message).to.include('revoked'));"
+                  "pm.test('Says token is no longer valid', () => pm.expect(pm.response.json().error.message).to.include('tidak berlaku'));"
                 ]
               }
             }
@@ -2203,6 +3930,47 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Tenant Category (admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-categories",
+                "{{categoryId}}"
+              ]
+            },
+            "description": "Removes the category created in **7. Tenant Categories** (the tenant profile using it was deleted in **8. Tenants**)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var save = (key, value) => { pm.environment.set(key, value); pm.collectionVariables.set(key, value); console.log('saved {{' + key + '}}'); };",
+                  "save('categoryId', '');"
                 ]
               }
             }
@@ -2281,7 +4049,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status 401', () => pm.response.to.have.status(401));",
-                  "pm.test('Says revoked', () => pm.expect(pm.response.json().error.message).to.include('revoked'));"
+                  "pm.test('Says token is no longer valid', () => pm.expect(pm.response.json().error.message).to.include('tidak berlaku'));"
                 ]
               }
             }
@@ -2407,7 +4175,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status 401', () => pm.response.to.have.status(401));",
-                  "pm.test('Says revoked', () => pm.expect(pm.response.json().error.message).to.include('revoked'));"
+                  "pm.test('Says token is no longer valid', () => pm.expect(pm.response.json().error.message).to.include('tidak berlaku'));"
                 ]
               }
             }

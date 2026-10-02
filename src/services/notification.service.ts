@@ -1,0 +1,252 @@
+import { Op, fn, col } from 'sequelize';
+import { ROLES, type Role } from '../constants/roles';
+import { NOTIFICATION_TYPES as T, type NotificationEntityType, type NotificationType } from '../constants/notifications';
+import { REALTIME_EVENTS as E } from '../constants/realtime';
+import { HttpError } from '../errors/HttpError';
+import { Notification, User } from '../models';
+import { emitToUser } from '../realtime/socket';
+import type { AuthUser } from '../types/express';
+
+interface Payload {
+  type: NotificationType;
+  name: string;
+  description: string;
+  entityType?: NotificationEntityType;
+  entityId?: string;
+}
+
+// ---------- sending ----------
+
+/** Same shape as the REST API returns (no userId/approvalId). */
+function toClient(n: Notification) {
+  const { userId: _userId, approvalId: _approvalId, ...rest } = n.toJSON() as unknown as Record<string, unknown>;
+  return rest;
+}
+
+async function toUsers(userIds: string[], payload: Payload) {
+  if (!userIds.length) return;
+  const created = await Notification.bulkCreate(
+    userIds.map((userId) => ({
+      userId,
+      type: payload.type,
+      name: payload.name,
+      description: payload.description,
+      entityType: payload.entityType ?? null,
+      entityId: payload.entityId ?? null,
+      readAt: null,
+    })),
+  );
+
+  // Realtime: push each copy to its recipient, with their new unread count
+  const counts = (await Notification.findAll({
+    attributes: ['userId', [fn('COUNT', col('id')), 'count']],
+    where: { userId: userIds, readAt: null },
+    group: ['userId'],
+    raw: true,
+  })) as unknown as { userId: string; count: string }[];
+  const unread = new Map(counts.map((c) => [c.userId, Number(c.count)]));
+  for (const n of created) {
+    emitToUser(n.userId, E.NOTIFICATION_NEW, { notification: toClient(n), unreadCount: unread.get(n.userId) ?? 0 });
+  }
+}
+
+/** Realtime: tell every open tab of this user the new unread count. */
+async function pushUnreadCount(user: AuthUser) {
+  emitToUser(user.id, E.NOTIFICATION_UNREAD_COUNT, { count: await countUnread(user) });
+}
+
+/** Every user with this role gets their own copy. */
+async function toRole(role: Role, payload: Payload) {
+  const users = await User.findAll({ where: { role }, attributes: ['id'] });
+  await toUsers(users.map((u) => u.id), payload);
+}
+
+/**
+ * Notifications must never break the action that triggered them:
+ * failures are logged and swallowed, and the caller does not wait on the result's success.
+ */
+async function safely(event: string, send: () => Promise<unknown>) {
+  try {
+    await send();
+  } catch (err) {
+    console.error(`[notifications] failed to send "${event}":`, err);
+  }
+}
+
+const fullName = (u: { firstName: string; lastName: string }) => `${u.firstName} ${u.lastName}`;
+
+/** The events below are called from the services after their own change has been saved. */
+export const notify = {
+  /** superadmin: a new admin waits for activation */
+  adminRegistered: (admin: { id: string; firstName: string; lastName: string; email: string }) =>
+    safely('adminRegistered', () =>
+      toRole(ROLES.SUPERADMIN, {
+        type: T.ADMIN_PENDING_ACTIVATION,
+        name: 'New admin waiting for activation',
+        description: `${fullName(admin)} (${admin.email}) was registered as admin and needs to be activated.`,
+        entityType: 'user',
+        entityId: admin.id,
+      }),
+    ),
+
+  /** admin: a new tenant signed up */
+  tenantRegistered: (tenant: { id: string; firstName: string; lastName: string; email: string; tenantName?: string | null }) =>
+    safely('tenantRegistered', () =>
+      toRole(ROLES.ADMIN, {
+        type: T.TENANT_REGISTERED,
+        name: 'New tenant registered',
+        description: `${tenant.tenantName ?? fullName(tenant)} (${tenant.email}) just signed up as a tenant.`,
+        entityType: 'user',
+        entityId: tenant.id,
+      }),
+    ),
+
+  /** superadmin + admin: review the new product; tenant: it is under review */
+  productSubmitted: (product: { id: string; name: string }, owner: { id: string; tenantName?: string | null }) =>
+    safely('productSubmitted', async () => {
+      const by = owner.tenantName ?? 'A tenant';
+      const link = { entityType: 'product' as const, entityId: product.id };
+      await toRole(ROLES.SUPERADMIN, {
+        type: T.PRODUCT_SUBMITTED,
+        name: 'New product waiting for approval',
+        description: `${by} created "${product.name}". It waits for an admin to review and activate it.`,
+        ...link,
+      });
+      await toRole(ROLES.ADMIN, {
+        type: T.PRODUCT_SUBMITTED,
+        name: 'New product to review',
+        description: `${by} created "${product.name}". Please review and activate it.`,
+        ...link,
+      });
+      await toUsers([owner.id], {
+        type: T.PRODUCT_UNDER_REVIEW,
+        name: 'Product under review',
+        description: `"${product.name}" was created and is under review. You will be notified when it is approved.`,
+        ...link,
+      });
+    }),
+
+  /** admin: a tenant changed a product */
+  productUpdated: (product: { id: string; name: string }, owner: { tenantName?: string | null }) =>
+    safely('productUpdated', () =>
+      toRole(ROLES.ADMIN, {
+        type: T.PRODUCT_UPDATED,
+        name: 'Product updated',
+        description: `${owner.tenantName ?? 'A tenant'} updated "${product.name}".`,
+        entityType: 'product',
+        entityId: product.id,
+      }),
+    ),
+
+  /** admin: a tenant changed their tenant profile */
+  tenantProfileUpdated: (tenant: { id: string; name: string }) =>
+    safely('tenantProfileUpdated', () =>
+      toRole(ROLES.ADMIN, {
+        type: T.TENANT_PROFILE_UPDATED,
+        name: 'Tenant profile updated',
+        description: `${tenant.name} updated their tenant profile.`,
+        entityType: 'tenant',
+        entityId: tenant.id,
+      }),
+    ),
+
+  /**
+   * A product's activation changed (only real changes notify, not re-sending the same value).
+   * activated → admin: it is on the landing page; tenant: it is approved.
+   * deactivated by an admin → superadmin.
+   */
+  productActivationChanged: (
+    actor: AuthUser,
+    product: { id: string; name: string; tenantId: string },
+    isActive: boolean,
+  ) =>
+    safely('productActivationChanged', async () => {
+      const link = { entityType: 'product' as const, entityId: product.id };
+      if (isActive) {
+        await toRole(ROLES.ADMIN, {
+          type: T.PRODUCT_PUBLISHED,
+          name: 'Product published',
+          description: `"${product.name}" was activated by ${actor.email} and is now on the landing page.`,
+          ...link,
+        });
+        await toUsers([product.tenantId], {
+          type: T.PRODUCT_APPROVED,
+          name: 'Product approved',
+          description: `"${product.name}" was approved and is now visible on the landing page.`,
+          ...link,
+        });
+      } else if (actor.role === ROLES.ADMIN) {
+        await toRole(ROLES.SUPERADMIN, {
+          type: T.PRODUCT_DEACTIVATED,
+          name: 'Product deactivated by an admin',
+          description: `${actor.email} deactivated the product "${product.name}".`,
+          ...link,
+        });
+      }
+    }),
+
+  /** superadmin: an admin deactivated a user account (only real changes notify) */
+  userDeactivatedByAdmin: (actor: AuthUser, user: { id: string; email: string; role: Role }) =>
+    safely('userDeactivatedByAdmin', () =>
+      toRole(ROLES.SUPERADMIN, {
+        type: T.USER_DEACTIVATED,
+        name: 'User deactivated by an admin',
+        description: `${actor.email} deactivated the ${user.role} account ${user.email}.`,
+        entityType: 'user',
+        entityId: user.id,
+      }),
+    ),
+};
+
+// ---------- reading (own notifications only) ----------
+
+export interface ListNotificationsOptions {
+  page: number;
+  limit: number;
+  unreadOnly: boolean;
+}
+
+export async function list(user: AuthUser, { page, limit, unreadOnly }: ListNotificationsOptions) {
+  const where = { userId: user.id, ...(unreadOnly && { readAt: null }) };
+  const [{ rows, count }, unreadCount] = await Promise.all([
+    Notification.findAndCountAll({
+      where,
+      attributes: { exclude: ['userId', 'approvalId'] },
+      order: [['createdAt', 'DESC'], ['id', 'DESC']],
+      limit,
+      offset: (page - 1) * limit,
+    }),
+    countUnread(user),
+  ]);
+  return { notifications: rows, meta: { page, limit, total: count, totalPages: Math.ceil(count / limit), unreadCount } };
+}
+
+export const countUnread = (user: AuthUser) => Notification.count({ where: { userId: user.id, readAt: null } });
+
+async function findOwn(user: AuthUser, id: number) {
+  const notification = await Notification.findOne({ where: { id, userId: user.id }, attributes: { exclude: ['approvalId'] } });
+  if (!notification) throw HttpError.notFound('Notifikasi tidak ditemukan');
+  return notification;
+}
+
+export async function markRead(user: AuthUser, id: number) {
+  const notification = await findOwn(user, id);
+  if (!notification.readAt) {
+    await notification.update({ readAt: new Date() });
+    await pushUnreadCount(user);
+  }
+  return notification;
+}
+
+export async function markAllRead(user: AuthUser) {
+  const [updated] = await Notification.update({ readAt: new Date() }, { where: { userId: user.id, readAt: { [Op.is]: null } } });
+  if (updated) await pushUnreadCount(user);
+  return { updated };
+}
+
+export async function remove(user: AuthUser, id: number) {
+  const notification = await findOwn(user, id);
+  const wasUnread = !notification.readAt;
+  await notification.destroy();
+  if (wasUnread) await pushUnreadCount(user);
+}

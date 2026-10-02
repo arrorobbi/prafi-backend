@@ -24,7 +24,8 @@ export class Tenant extends Model<InferAttributes<Tenant>, InferCreationAttribut
   declare fbLink: string;
   declare whatsappLink: string;
   declare gmapsLink: string;
-  declare logoId: ForeignKey<Image['id']> | null;
+  /** Required: upload the logo first via POST /api/images. */
+  declare logoId: ForeignKey<Image['id']>;
   declare categoryId: ForeignKey<TenantCategory['id']>;
   declare userId: ForeignKey<User['id']>;
   declare createdAt: CreationOptional<Date>;
@@ -36,8 +37,8 @@ export class Tenant extends Model<InferAttributes<Tenant>, InferCreationAttribut
   declare owner?: NonAttribute<User>;
 
   static associate({ Image, TenantCategory, User }: DbModels) {
-    // tenants.logo_id - images.id (one-to-one)
-    Tenant.belongsTo(Image, { as: 'logo', foreignKey: 'logoId', onDelete: 'SET NULL' });
+    // tenants.logo_id - images.id (one-to-one; the logo is required, so an image in use as a logo can't be deleted)
+    Tenant.belongsTo(Image, { as: 'logo', foreignKey: 'logoId', onDelete: 'RESTRICT' });
     // tenants.category_id > tenant_categories.id (many tenants per category; a category in use can't be deleted)
     Tenant.belongsTo(TenantCategory, { as: 'category', foreignKey: 'categoryId', onDelete: 'RESTRICT' });
     // tenants.user_id - users.id (one-to-one; deleting the user deletes the tenant)
@@ -58,7 +59,7 @@ Tenant.init(
     gmapsLink: { type: DataTypes.STRING, allowNull: false },
     logoId: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       unique: true,
       references: { model: 'images', key: 'id' },
     },

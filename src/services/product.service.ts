@@ -4,6 +4,7 @@ import { HttpError } from '../errors/HttpError';
 import { Approval, Image, Product, sequelize } from '../models';
 import type { AuthUser } from '../types/express';
 import * as imageService from './image.service';
+import { notify } from './notification.service';
 
 export interface ProductInput {
   name: string;
@@ -36,8 +37,8 @@ const canReadAll = (user: AuthUser) => PRODUCT_READ_ALL_ROLES.includes(user.role
 async function assertImageExists(imageId: number) {
   const image = await Image.findByPk(imageId, { attributes: ['id'] });
   if (!image) {
-    throw HttpError.badRequest('Validation failed', [
-      { field: 'imageId', message: 'Image not found, upload it first via POST /api/images' },
+    throw HttpError.badRequest('Validasi gagal', [
+      { field: 'imageId', message: 'Gambar tidak ditemukan, unggah terlebih dahulu melalui POST /api/images' },
     ]);
   }
 }
@@ -83,7 +84,7 @@ export async function listActive({ page, limit }: Omit<ListProductsOptions, 'isA
 export async function getById(user: AuthUser, id: string) {
   const product = await Product.findByPk(id, { include: productInclude() });
   if (!product || (!canReadAll(user) && product.tenantId !== user.id)) {
-    throw HttpError.notFound('Product not found');
+    throw HttpError.notFound('Produk tidak ditemukan');
   }
   return product;
 }
@@ -91,7 +92,7 @@ export async function getById(user: AuthUser, id: string) {
 /** A tenant's own product, or 404. */
 async function findOwnProduct(user: AuthUser, id: string) {
   const product = await Product.findOne({ where: { id, tenantId: user.id } });
-  if (!product) throw HttpError.notFound('Product not found');
+  if (!product) throw HttpError.notFound('Produk tidak ditemukan');
   return product;
 }
 
@@ -104,7 +105,9 @@ export async function create(user: AuthUser, input: ProductInput) {
     const approval = await Approval.create({ reason: 'Waiting for approval', isActive: false }, { transaction });
     return Product.create({ ...input, tenantId: user.id, approvalId: approval.id }, { transaction });
   });
-  return getById(user, product.id);
+  const created = await getById(user, product.id);
+  await notify.productSubmitted(created, { id: user.id, tenantName: created.tenant?.tenantName });
+  return created;
 }
 
 export async function update(user: AuthUser, id: string, changes: Partial<ProductInput>) {
@@ -112,7 +115,9 @@ export async function update(user: AuthUser, id: string, changes: Partial<Produc
   if (changes.imageId !== undefined) await assertImageExists(changes.imageId);
 
   await product.update(changes);
-  return getById(user, product.id);
+  const updated = await getById(user, product.id);
+  await notify.productUpdated(updated, { tenantName: updated.tenant?.tenantName });
+  return updated;
 }
 
 /** Deletes the product together with its approval and its image (file included). */

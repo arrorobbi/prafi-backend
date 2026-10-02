@@ -15,8 +15,21 @@ export const CREATABLE_ROLES: Record<Role, Role[]> = {
   [ROLES.TENANT]: [],
 };
 
-/** Roles that are allowed to register other users. */
-export const REGISTRAR_ROLES: Role[] = ALL_ROLES.filter((role) => CREATABLE_ROLES[role].length > 0);
+/** Roles anyone can sign up for without logging in (POST /api/auth/register/tenant). */
+export const PUBLIC_REGISTRATION_ROLES: Role[] = [ROLES.TENANT];
+
+/** Roles allowed to register accounts of `role`, e.g. registrarsOf('admin') → ['superadmin']. */
+export const registrarsOf = (role: Role): Role[] => ALL_ROLES.filter((r) => CREATABLE_ROLES[r].includes(role));
+
+/**
+ * Whether a newly registered account can log in right away.
+ * Admins wait for a superadmin to activate them; tenants are active immediately.
+ */
+export const ACTIVE_ON_REGISTRATION: Record<Role, boolean> = {
+  [ROLES.SUPERADMIN]: true,
+  [ROLES.ADMIN]: false,
+  [ROLES.TENANT]: true,
+};
 
 /** Which roles' accounts each role is allowed to list (GET /api/users). Tenants only have /api/auth/me. */
 export const READABLE_ROLES: Record<Role, Role[]> = {
@@ -32,11 +45,20 @@ export const APPROVABLE_ROLES: Record<Role, Role[]> = {
   [ROLES.TENANT]: [],
 };
 
-/** Roles that may activate/deactivate products (every product belongs to a tenant). */
-export const PRODUCT_APPROVER_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.ADMIN];
+/** Only admins activate/deactivate products; superadmins can read products but not change their activation. */
+export const PRODUCT_APPROVER_ROLES: Role[] = [ROLES.ADMIN];
 
 /** Only tenants create/update/delete products, and only their own products. */
 export const PRODUCT_OWNER_ROLES: Role[] = [ROLES.TENANT];
 
 /** Roles that can read every product (tenants only see their own). */
 export const PRODUCT_READ_ALL_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.ADMIN];
+
+/** Only tenant users create/read/update/delete a tenant profile, and only their own (/api/tenants/me). */
+export const TENANT_OWNER_ROLES: Role[] = [ROLES.TENANT];
+
+/** Roles that can read every tenant profile (GET /api/tenants, GET /api/tenants/:id). */
+export const TENANT_READ_ALL_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.ADMIN];
+
+/** Roles that create/read/update/delete tenant categories (/api/tenant-categories). */
+export const TENANT_CATEGORY_MANAGER_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.ADMIN];

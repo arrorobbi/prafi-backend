@@ -9,13 +9,13 @@ const MAX_LIMIT = 100;
 const TEXT_FIELDS = ['name', 'description', 'details'] as const;
 const UPDATABLE_FIELDS: string[] = [...TEXT_FIELDS, 'qty', 'imageId'];
 const LOCKED_FIELDS: Record<string, string> = {
-  id: 'id cannot be changed',
-  tenantId: 'a product always belongs to the tenant who created it',
-  approvalId: 'approvalId is set by the server',
-  approval: 'only superadmin/admin can activate products (PATCH /api/approvals/:id?type=product)',
-  isActive: 'only superadmin/admin can activate products (PATCH /api/approvals/:id?type=product)',
-  createdAt: 'createdAt is set by the server',
-  updatedAt: 'updatedAt is set by the server',
+  id: 'id tidak dapat diubah',
+  tenantId: 'produk selalu dimiliki oleh tenant yang membuatnya',
+  approvalId: 'approvalId diatur oleh server',
+  approval: 'hanya admin yang dapat mengaktifkan produk (PATCH /api/approvals/:id?type=product)',
+  isActive: 'hanya admin yang dapat mengaktifkan produk (PATCH /api/approvals/:id?type=product)',
+  createdAt: 'createdAt diatur oleh server',
+  updatedAt: 'updatedAt diatur oleh server',
 };
 
 type FieldError = { field: string; message: string };
@@ -27,45 +27,45 @@ function parseProductBody(body: Record<string, unknown>, partial: boolean) {
 
   for (const field of Object.keys(body)) {
     if (LOCKED_FIELDS[field]) errors.push({ field, message: LOCKED_FIELDS[field] });
-    else if (!UPDATABLE_FIELDS.includes(field)) errors.push({ field, message: `${field} is not a product field` });
+    else if (!UPDATABLE_FIELDS.includes(field)) errors.push({ field, message: `${field} bukan field produk` });
   }
 
   for (const field of TEXT_FIELDS) {
     if (body[field] === undefined) {
-      if (!partial) errors.push({ field, message: `${field} is required` });
+      if (!partial) errors.push({ field, message: `${field} wajib diisi` });
     } else if (typeof body[field] !== 'string' || !(body[field] as string).trim()) {
-      errors.push({ field, message: `${field} cannot be empty` });
+      errors.push({ field, message: `${field} tidak boleh kosong` });
     } else {
       input[field] = (body[field] as string).trim();
     }
   }
 
   if (body.qty === undefined) {
-    if (!partial) errors.push({ field: 'qty', message: 'qty is required' });
+    if (!partial) errors.push({ field: 'qty', message: 'qty wajib diisi' });
   } else if (!Number.isInteger(body.qty) || (body.qty as number) < 0) {
-    errors.push({ field: 'qty', message: 'qty must be a whole number, 0 or more' });
+    errors.push({ field: 'qty', message: 'qty harus berupa bilangan bulat, minimal 0' });
   } else {
     input.qty = body.qty as number;
   }
 
   if (body.imageId === undefined) {
-    if (!partial) errors.push({ field: 'imageId', message: 'imageId is required, upload the image first via POST /api/images' });
+    if (!partial) errors.push({ field: 'imageId', message: 'imageId wajib diisi, unggah gambar terlebih dahulu melalui POST /api/images' });
   } else if (!Number.isInteger(body.imageId)) {
-    errors.push({ field: 'imageId', message: 'imageId must be an integer image id' });
+    errors.push({ field: 'imageId', message: 'imageId harus berupa ID gambar (bilangan bulat)' });
   } else {
     input.imageId = body.imageId as number;
   }
 
-  if (errors.length) throw HttpError.badRequest('Validation failed', errors);
+  if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);
   if (partial && Object.keys(input).length === 0) {
-    throw HttpError.badRequest(`Send at least one field to update: ${UPDATABLE_FIELDS.join(', ')}`);
+    throw HttpError.badRequest(`Kirim minimal satu field untuk diubah: ${UPDATABLE_FIELDS.join(', ')}`);
   }
   return input;
 }
 
 function parseId(value: unknown) {
   const id = String(value);
-  if (!UUID_RE.test(id)) throw HttpError.badRequest('Validation failed', [{ field: 'id', message: 'id must be a valid UUID' }]);
+  if (!UUID_RE.test(id)) throw HttpError.badRequest('Validasi gagal', [{ field: 'id', message: 'id harus berupa UUID yang valid' }]);
   return id;
 }
 
@@ -75,15 +75,15 @@ export const list: RequestHandler = async (req, res) => {
 
   const errors: FieldError[] = [];
   const pageNum = Number(page);
-  if (!Number.isInteger(pageNum) || pageNum < 1) errors.push({ field: 'page', message: 'page must be a positive integer' });
+  if (!Number.isInteger(pageNum) || pageNum < 1) errors.push({ field: 'page', message: 'page harus berupa bilangan bulat positif' });
   const limitNum = Number(limit);
   if (!Number.isInteger(limitNum) || limitNum < 1 || limitNum > MAX_LIMIT) {
-    errors.push({ field: 'limit', message: `limit must be an integer between 1 and ${MAX_LIMIT}` });
+    errors.push({ field: 'limit', message: `limit harus berupa bilangan bulat antara 1 dan ${MAX_LIMIT}` });
   }
   if (isActive !== undefined && isActive !== 'true' && isActive !== 'false') {
-    errors.push({ field: 'isActive', message: 'isActive must be true or false' });
+    errors.push({ field: 'isActive', message: 'isActive harus bernilai true atau false' });
   }
-  if (errors.length) throw HttpError.badRequest('Validation failed', errors);
+  if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);
 
   const { products, meta } = await productService.list(req.user!, {
     page: pageNum,
@@ -99,12 +99,12 @@ export const listPublic: RequestHandler = async (req, res) => {
 
   const errors: FieldError[] = [];
   const pageNum = Number(page);
-  if (!Number.isInteger(pageNum) || pageNum < 1) errors.push({ field: 'page', message: 'page must be a positive integer' });
+  if (!Number.isInteger(pageNum) || pageNum < 1) errors.push({ field: 'page', message: 'page harus berupa bilangan bulat positif' });
   const limitNum = Number(limit);
   if (!Number.isInteger(limitNum) || limitNum < 1 || limitNum > MAX_LIMIT) {
-    errors.push({ field: 'limit', message: `limit must be an integer between 1 and ${MAX_LIMIT}` });
+    errors.push({ field: 'limit', message: `limit harus berupa bilangan bulat antara 1 dan ${MAX_LIMIT}` });
   }
-  if (errors.length) throw HttpError.badRequest('Validation failed', errors);
+  if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);
 
   const { products, meta } = await productService.listActive({ page: pageNum, limit: limitNum });
   res.json({ success: true, data: products, meta });

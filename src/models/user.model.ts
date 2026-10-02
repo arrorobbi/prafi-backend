@@ -23,7 +23,7 @@ const SALT_ROUNDS = 12;
 
 /** A user's role is set once at registration and can never be changed afterwards. */
 function roleIsImmutable(value: unknown, instance: Model | null = null): never {
-  const message = 'role cannot be changed';
+  const message = 'role tidak dapat diubah';
   throw new ValidationError(message, [
     // Bulk updates have no instance; Sequelize accepts null there at runtime
     new ValidationErrorItem(message, 'validation error', 'role', String(value), instance as Model, 'immutable', 'immutable', []),
@@ -118,10 +118,10 @@ User.init(
       tenantNameMatchesRole(this: User) {
         if (this.role === ROLES.TENANT) {
           if ((this.isNewRecord || this.changed('tenantName')) && !this.tenantName?.trim()) {
-            throw new Error('tenantName is required for tenant accounts');
+            throw new Error('tenantName wajib diisi untuk akun tenant');
           }
         } else if (this.tenantName != null) {
-          throw new Error('Only tenant accounts have a tenantName');
+          throw new Error('Hanya akun tenant yang memiliki tenantName');
         }
       },
     },

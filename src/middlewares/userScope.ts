@@ -12,7 +12,7 @@ export const scopeReadableRoles: RequestHandler = (req, _res, next) => {
 
   const readableRoles = READABLE_ROLES[req.user.role];
   if (!readableRoles.length) {
-    throw HttpError.forbidden('You do not have permission to view other accounts, use /api/auth/me');
+    throw HttpError.forbidden('Anda tidak memiliki izin untuk melihat akun lain, gunakan /api/auth/me');
   }
 
   req.readableRoles = readableRoles;
