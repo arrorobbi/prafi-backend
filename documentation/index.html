@@ -3,150 +3,237 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Prafi API Documentation</title>
+<title>Prafi API Docs</title>
+<meta name="description" content="Prafi API reference: endpoints, roles, request bodies and realtime notifications.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #ffffff; --bg-soft: #f6f7f9; --bg-code: #f3f4f6; --text: #1f2328; --muted: #656d76; --border: #d8dee4;
-  --accent: #0b6bcb; --sidebar: #fafbfc;
-  --get: #0f7b3f; --post: #a15c00; --patch: #6b3fa0; --put: #1d5fa8; --delete: #b42318;
-  --role-public: #e7f5ec; --role-public-t: #0f7b3f; --role-all: #e8f1fb; --role-all-t: #0b5cad;
-  --role-superadmin: #fdecec; --role-superadmin-t: #a8201a; --role-admin: #fff3e0; --role-admin-t: #9a5200;
-  --role-tenant: #f1ecfb; --role-tenant-t: #5b3a97;
+  --bg: #f5f7fb; --surface: #ffffff; --surface-2: #f8fafc; --text: #0f172a; --muted: #64748b; --border: #e4e8f0;
+  --primary: #4f46e5; --primary-soft: #eef2ff; --shadow: 0 1px 2px rgba(15,23,42,.04), 0 6px 18px rgba(15,23,42,.06);
+  --hero: linear-gradient(120deg, #4338ca 0%, #7c3aed 45%, #db2777 100%);
+  --code-bg: #0f172a; --code-text: #e2e8f0; --inline-code: #eef2ff; --inline-code-text: #4338ca;
+  --get: #059669; --get-soft: #ecfdf5; --post: #ea580c; --post-soft: #fff7ed;
+  --patch: #7c3aed; --patch-soft: #f5f3ff; --put: #2563eb; --put-soft: #eff6ff; --delete: #e11d48; --delete-soft: #fff1f2;
+  --r-public: #047857; --r-public-bg: #d1fae5; --r-all: #1d4ed8; --r-all-bg: #dbeafe; --r-superadmin: #be123c; --r-superadmin-bg: #ffe4e6;
+  --r-admin: #b45309; --r-admin-bg: #fef3c7; --r-tenant: #6d28d9; --r-tenant-bg: #ede9fe;
+  --method-text: #ffffff;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f1216; --bg-soft: #161b22; --bg-code: #1b2129; --text: #e6edf3; --muted: #8d96a0; --border: #2d333b;
-    --accent: #58a6ff; --sidebar: #12161c;
-    --get: #3fb950; --post: #e3a03b; --patch: #b48ef0; --put: #6cb6ff; --delete: #f47067;
-    --role-public: #12301d; --role-public-t: #56d37f; --role-all: #10253d; --role-all-t: #6cb6ff;
-    --role-superadmin: #3a1614; --role-superadmin-t: #ff8a80; --role-admin: #3a2810; --role-admin-t: #f0b360;
-    --role-tenant: #261c3d; --role-tenant-t: #c3a6ff;
-  }
+:root[data-theme="dark"] {
+  --bg: #0b1020; --surface: #121a2e; --surface-2: #0f1628; --text: #e5e9f5; --muted: #94a0bb; --border: #232e48;
+  --primary: #8b9cff; --primary-soft: #1c2547; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+  --code-bg: #070b16; --code-text: #e2e8f0; --inline-code: #1c2547; --inline-code-text: #b4c0ff;
+  --get: #34d399; --get-soft: #0b2a22; --post: #fb923c; --post-soft: #2e1a0c;
+  --patch: #a78bfa; --patch-soft: #221a3d; --put: #60a5fa; --put-soft: #0f2140; --delete: #fb7185; --delete-soft: #33121c;
+  --r-public: #6ee7b7; --r-public-bg: #0b2a22; --r-all: #93c5fd; --r-all-bg: #0f2140; --r-superadmin: #fda4af; --r-superadmin-bg: #33121c;
+  --r-admin: #fcd34d; --r-admin-bg: #2e220a; --r-tenant: #c4b5fd; --r-tenant-bg: #221a3d;
+  --method-text: #0b1020;
 }
 * { box-sizing: border-box; }
-html { scroll-padding-top: 16px; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-a { color: var(--accent); text-decoration: none; }
+html { scroll-padding-top: 80px; scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.65 "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: var(--primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
-code { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace; font-size: .88em; background: var(--bg-code); padding: .1em .35em; border-radius: 4px; overflow-wrap: break-word; }
-pre { background: var(--bg-code); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; overflow-x: auto; }
-pre code { background: none; padding: 0; font-size: .85em; overflow-wrap: normal; }
-.layout { display: flex; min-height: 100vh; }
-aside { width: 290px; flex-shrink: 0; background: var(--sidebar); border-right: 1px solid var(--border); position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 18px 14px 40px; }
-aside .brand { font-weight: 700; font-size: 18px; margin: 0 6px 4px; }
-aside .meta { color: var(--muted); font-size: 12px; margin: 0 6px 12px; }
-#search { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: 14px; margin-bottom: 10px; }
-aside ul { list-style: none; margin: 0; padding: 0; }
-.nav-folder { margin: 8px 0; }
-.nav-folder-link { display: block; font-weight: 600; color: var(--text); padding: 3px 6px; border-radius: 4px; }
-.nav-folder ul li a { display: flex; gap: 6px; align-items: baseline; padding: 2px 6px 2px 10px; color: var(--muted); font-size: 13.5px; border-radius: 4px; }
-.nav-folder ul li a:hover, .nav-folder-link:hover { background: var(--bg-code); text-decoration: none; color: var(--text); }
-.nav-method { font: 600 10px/1 ui-monospace, Consolas, monospace; width: 34px; flex-shrink: 0; }
-main { flex: 1; min-width: 0; padding: 28px 40px 80px; max-width: 980px; }
-h1 { font-size: 30px; margin: 0 0 4px; }
-h2 { font-size: 23px; margin: 48px 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
-h3 { font-size: 17px; margin: 0; }
-h4 { font-size: 14px; margin: 16px 0 6px; }
-.overview h3 { font-size: 18px; margin: 26px 0 8px; }
+code, pre { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace; }
+code { font-size: .84em; background: var(--inline-code); color: var(--inline-code-text); padding: .12em .4em; border-radius: 5px; overflow-wrap: break-word; }
+pre { background: var(--code-bg); color: var(--code-text); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 8px 0 14px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); }
+pre code { background: none; color: inherit; padding: 0; font-size: 13px; line-height: 1.6; overflow-wrap: normal; }
 .muted { color: var(--muted); font-weight: 400; }
-.table-wrap { overflow-x: auto; }
-table { border-collapse: collapse; margin: 10px 0; font-size: 14px; min-width: 50%; }
-th, td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; vertical-align: top; }
-th { background: var(--bg-soft); }
-blockquote { margin: 12px 0; padding: 4px 14px; border-left: 4px solid var(--accent); background: var(--bg-soft); border-radius: 0 6px 6px 0; }
-.endpoint { border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; margin: 18px 0; background: var(--bg); }
-.endpoint:target { outline: 2px solid var(--accent); }
-.endpoint-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-.endpoint-head h3 a { color: var(--text); }
-.url { display: flex; align-items: center; gap: 10px; margin: 10px 0 4px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; flex-wrap: wrap; }
-.url code { background: none; padding: 0; font-size: 14px; }
-.method { font: 700 12px/1 ui-monospace, Consolas, monospace; padding: 4px 7px; border-radius: 4px; color: #fff; }
-.m-get { background: var(--get); } .m-post { background: var(--post); } .m-patch { background: var(--patch); } .m-put { background: var(--put); } .m-delete { background: var(--delete); }
-.nav-method.m-get, .nav-method.m-post, .nav-method.m-patch, .nav-method.m-put, .nav-method.m-delete { background: none; }
-.nav-method.m-get { color: var(--get); } .nav-method.m-post { color: var(--post); } .nav-method.m-patch { color: var(--patch); } .nav-method.m-delete { color: var(--delete); }
-.auth { color: var(--muted); font-size: 13px; margin: 4px 0 10px; }
-.badges { display: flex; gap: 6px; flex-wrap: wrap; }
-.badge { font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; }
-.role-public { background: var(--role-public); color: var(--role-public-t); }
-.role-all-roles { background: var(--role-all); color: var(--role-all-t); }
-.role-superadmin { background: var(--role-superadmin); color: var(--role-superadmin-t); }
-.role-admin { background: var(--role-admin); color: var(--role-admin-t); }
-.role-tenant { background: var(--role-tenant); color: var(--role-tenant-t); }
-.hidden { display: none !important; }
+
+/* top bar */
+.topbar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 14px; height: 64px; padding: 0 22px; background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 17px; color: var(--text); letter-spacing: -.01em; }
+.logo-mark { width: 32px; height: 32px; border-radius: 9px; background: var(--hero); display: grid; place-items: center; color: #fff; font-size: 15px; font-weight: 800; box-shadow: 0 4px 12px rgba(124,58,237,.35); }
+.logo small { font-weight: 600; color: var(--muted); font-size: 12px; padding: 2px 8px; border: 1px solid var(--border); border-radius: 999px; }
+.search-wrap { flex: 1; max-width: 460px; margin-left: auto; position: relative; }
+.search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+#search { width: 100%; height: 40px; padding: 0 12px 0 38px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); color: var(--text); font: inherit; font-size: 14px; outline: none; transition: border-color .15s, box-shadow .15s; }
+#search:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
+.icon-btn { height: 40px; min-width: 40px; padding: 0 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.icon-btn:hover { border-color: var(--primary); color: var(--primary); }
 #menu-toggle { display: none; }
-@media (max-width: 860px) {
-  .layout { display: block; }
-  aside { position: fixed; z-index: 10; left: 0; top: 0; width: 86vw; max-width: 320px; transform: translateX(-100%); transition: transform .2s; box-shadow: 0 0 24px rgba(0,0,0,.25); }
+
+/* layout */
+.layout { display: flex; align-items: flex-start; }
+aside { width: 300px; flex-shrink: 0; position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto; padding: 18px 14px 40px; background: var(--surface); border-right: 1px solid var(--border); }
+aside ul { list-style: none; margin: 0; padding: 0; }
+.nav-folder { margin: 2px 0 10px; }
+.nav-folder-link { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); padding: 6px 10px; border-radius: 8px; }
+.nav-folder-link:hover { color: var(--text); text-decoration: none; background: var(--surface-2); }
+.count { font-size: 11px; font-weight: 700; color: var(--primary); background: var(--primary-soft); border-radius: 999px; padding: 1px 8px; letter-spacing: 0; }
+.nav-folder ul li a { display: flex; gap: 8px; align-items: center; padding: 5px 10px; color: var(--text); font-size: 14px; border-radius: 8px; border-left: 3px solid transparent; }
+.nav-folder ul li a:hover { background: var(--surface-2); text-decoration: none; }
+.nav-folder ul li a.active { background: var(--primary-soft); color: var(--primary); font-weight: 600; border-left-color: var(--primary); }
+.nav-method { font: 700 10px/1 "JetBrains Mono", Consolas, monospace; width: 40px; flex-shrink: 0; }
+.nav-method.m-get { color: var(--get); } .nav-method.m-post { color: var(--post); } .nav-method.m-patch { color: var(--patch); } .nav-method.m-put { color: var(--put); } .nav-method.m-delete { color: var(--delete); }
+main { flex: 1; min-width: 0; padding: 26px 36px 90px; }
+.content { max-width: 960px; margin: 0 auto; }
+
+/* hero */
+.hero { position: relative; overflow: hidden; background: var(--hero); color: #fff; border-radius: 20px; padding: 34px 34px 28px; box-shadow: 0 18px 40px -18px rgba(124,58,237,.6); }
+.hero::after { content: ""; position: absolute; right: -80px; top: -80px; width: 280px; height: 280px; border-radius: 50%; background: rgba(255,255,255,.12); }
+.hero::before { content: ""; position: absolute; right: 120px; bottom: -120px; width: 220px; height: 220px; border-radius: 50%; background: rgba(255,255,255,.08); }
+.hero h1 { margin: 0 0 6px; font-size: 34px; font-weight: 800; letter-spacing: -.02em; position: relative; }
+.hero p { margin: 0; opacity: .92; position: relative; max-width: 640px; }
+.hero code { background: rgba(255,255,255,.18); color: #fff; }
+.base-url { position: relative; margin-top: 18px; display: inline-flex; align-items: center; gap: 10px; background: rgba(15,23,42,.28); border: 1px solid rgba(255,255,255,.25); border-radius: 12px; padding: 8px 8px 8px 14px; font-size: 14px; }
+.base-url code { background: none; padding: 0; font-size: 14px; }
+.base-url .copy { background: rgba(255,255,255,.2); color: #fff; border-color: transparent; }
+.stats { position: relative; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-top: 22px; }
+.stat { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.2); border-radius: 14px; padding: 12px 14px; }
+.stat b { display: block; font-size: 24px; line-height: 1.2; }
+.stat span { font-size: 12px; opacity: .85; text-transform: uppercase; letter-spacing: .06em; }
+
+/* overview + sections */
+.overview { margin-top: 26px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 8px 30px 22px; box-shadow: var(--shadow); }
+.overview h3 { font-size: 19px; margin: 26px 0 8px; display: flex; align-items: center; gap: 10px; }
+.overview h3::before { content: ""; width: 6px; height: 20px; border-radius: 3px; background: var(--hero); }
+.folder { margin-top: 56px; }
+.folder-title { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.folder-title h2 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.01em; }
+.pill { font-size: 12px; font-weight: 700; color: var(--primary); background: var(--primary-soft); padding: 3px 10px; border-radius: 999px; }
+.folder-desc { color: var(--text); margin: 8px 0 6px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: separate; border-spacing: 0; margin: 10px 0 14px; font-size: 14px; min-width: 50%; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface); }
+th, td { padding: 8px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+tr:last-child td { border-bottom: 0; }
+th { background: var(--surface-2); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+tbody tr:hover td { background: var(--surface-2); }
+blockquote { margin: 14px 0; padding: 6px 16px; border-left: 4px solid var(--primary); background: var(--primary-soft); border-radius: 0 12px 12px 0; }
+
+/* endpoint cards */
+.endpoint { --accent: var(--primary); --accent-soft: var(--primary-soft); position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px 22px 8px; margin: 18px 0; box-shadow: var(--shadow); transition: transform .15s, box-shadow .15s; overflow: hidden; }
+.endpoint::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent); }
+.endpoint:hover { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(15,23,42,.05), 0 12px 28px rgba(15,23,42,.09); }
+.endpoint:target { box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow); }
+.endpoint.m-get { --accent: var(--get); --accent-soft: var(--get-soft); }
+.endpoint.m-post { --accent: var(--post); --accent-soft: var(--post-soft); }
+.endpoint.m-patch { --accent: var(--patch); --accent-soft: var(--patch-soft); }
+.endpoint.m-put { --accent: var(--put); --accent-soft: var(--put-soft); }
+.endpoint.m-delete { --accent: var(--delete); --accent-soft: var(--delete-soft); }
+.endpoint-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.endpoint-head h3 { margin: 0; font-size: 18px; font-weight: 700; }
+.endpoint-head h3 a { color: var(--text); }
+.badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+.role-public { color: var(--r-public); background: var(--r-public-bg); }
+.role-all-roles { color: var(--r-all); background: var(--r-all-bg); }
+.role-superadmin { color: var(--r-superadmin); background: var(--r-superadmin-bg); }
+.role-admin { color: var(--r-admin); background: var(--r-admin-bg); }
+.role-tenant { color: var(--r-tenant); background: var(--r-tenant-bg); }
+.url { display: flex; align-items: center; gap: 10px; margin: 12px 0 6px; background: var(--accent-soft); border-radius: 12px; padding: 7px 7px 7px 8px; }
+.method { font: 800 12px/1 "JetBrains Mono", Consolas, monospace; padding: 7px 10px; border-radius: 8px; color: var(--method-text); background: var(--accent); letter-spacing: .03em; }
+.url-text { flex: 1; min-width: 0; background: none; color: var(--text); padding: 0; font-size: 14px; }
+.copy { flex-shrink: 0; font: 600 12px/1 inherit; font-family: inherit; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; }
+.copy:hover { color: var(--primary); border-color: var(--primary); }
+.copy.done { color: var(--get); border-color: var(--get); }
+.auth { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; margin: 6px 0 4px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot-open { background: var(--get); } .dot-lock { background: var(--post); }
+.endpoint-body h4 { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 16px 0 6px; }
+.block-head { display: flex; align-items: center; justify-content: space-between; }
+.block-head .copy { margin-top: 8px; }
+.hidden { display: none !important; }
+.to-top { position: fixed; right: 22px; bottom: 22px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--hero); color: #fff; font-size: 18px; cursor: pointer; box-shadow: 0 8px 20px rgba(124,58,237,.4); opacity: 0; pointer-events: none; transition: opacity .2s; }
+.to-top.show { opacity: 1; pointer-events: auto; }
+footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 60px; }
+
+@media (max-width: 900px) {
+  #menu-toggle { display: inline-flex; }
+  .search-wrap { max-width: none; }
+  .logo small { display: none; }
+  aside { position: fixed; z-index: 30; left: 0; top: 64px; width: 86vw; max-width: 320px; transform: translateX(-105%); transition: transform .2s; box-shadow: 0 0 40px rgba(15,23,42,.25); }
   aside.open { transform: none; }
-  #menu-toggle { display: inline-block; position: sticky; top: 0; z-index: 5; margin: 0; width: 100%; padding: 10px 16px; border: 0; border-bottom: 1px solid var(--border); background: var(--sidebar); color: var(--text); text-align: left; font-size: 15px; }
-  main { padding: 16px 16px 60px; }
+  main { padding: 16px 16px 80px; }
+  .hero { padding: 26px 20px 22px; border-radius: 16px; }
+  .hero h1 { font-size: 26px; }
+  .overview { padding: 4px 18px 16px; }
+  .endpoint { padding: 16px 16px 6px; }
+  .topbar { padding: 0 12px; gap: 8px; }
+  .logo span.name { display: none; }
 }
 </style>
 </head>
 <body>
-<button id="menu-toggle" type="button">☰ Endpoints</button>
+<header class="topbar">
+  <button id="menu-toggle" class="icon-btn" type="button" aria-label="Endpoints menu">☰</button>
+  <a class="logo" href="#top"><span class="logo-mark">P</span><span class="name">Prafi API</span><small>REST + Socket.IO</small></a>
+  <label class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="search" type="search" placeholder="Search endpoints… press /" aria-label="Search endpoints">
+  </label>
+  <button id="theme-toggle" class="icon-btn" type="button">☾ Dark</button>
+</header>
 <div class="layout">
 <aside id="sidebar">
-  <div class="brand">Prafi API</div>
-  <div class="meta">12 groups · 38 endpoints · generated 2026-10-02</div>
-  <input id="search" type="search" placeholder="Search endpoints… (e.g. product, PATCH, tenant)">
   <ul>
-    <li class="nav-folder"><a class="nav-folder-link" href="#overview">Overview</a></li>
+    <li class="nav-folder"><a class="nav-folder-link" href="#top">Overview</a></li>
     
   <li class="nav-folder" data-folder="health">
-    <a class="nav-folder-link" href="#health">Health</a>
-    <ul><li data-search="health health check (public) get {{baseurl}}/api/health"><a href="#health--health-check"><span class="nav-method m-get">GET</span>Health Check</a></li></ul>
+    <a class="nav-folder-link" href="#health">Health<span class="count">1</span></a>
+    <ul><li data-search="health health check (public) get {{baseurl}}/api/health"><a href="#health--health-check"><span class="nav-method m-get">GET</span><span>Health Check</span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="auth">
-    <a class="nav-folder-link" href="#auth">Auth</a>
-    <ul><li data-search="auth login (public) post {{baseurl}}/api/auth/login"><a href="#auth--login"><span class="nav-method m-post">POST</span>Login</a></li><li data-search="auth logout (all roles) post {{baseurl}}/api/auth/logout"><a href="#auth--logout"><span class="nav-method m-post">POST</span>Logout</a></li><li data-search="auth register admin (superadmin) post {{baseurl}}/api/auth/register/admin"><a href="#auth--register-admin"><span class="nav-method m-post">POST</span>Register Admin</a></li><li data-search="auth register tenant (public) post {{baseurl}}/api/auth/register/tenant"><a href="#auth--register-tenant"><span class="nav-method m-post">POST</span>Register Tenant</a></li><li data-search="auth me (all roles) get {{baseurl}}/api/auth/me"><a href="#auth--me"><span class="nav-method m-get">GET</span>Me</a></li><li data-search="auth update me (all roles) patch {{baseurl}}/api/auth/me"><a href="#auth--update-me"><span class="nav-method m-patch">PATCH</span>Update Me</a></li></ul>
+    <a class="nav-folder-link" href="#auth">Auth<span class="count">6</span></a>
+    <ul><li data-search="auth login (public) post {{baseurl}}/api/auth/login"><a href="#auth--login"><span class="nav-method m-post">POST</span><span>Login</span></a></li><li data-search="auth logout (all roles) post {{baseurl}}/api/auth/logout"><a href="#auth--logout"><span class="nav-method m-post">POST</span><span>Logout</span></a></li><li data-search="auth register admin (superadmin) post {{baseurl}}/api/auth/register/admin"><a href="#auth--register-admin"><span class="nav-method m-post">POST</span><span>Register Admin</span></a></li><li data-search="auth register tenant (public) post {{baseurl}}/api/auth/register/tenant"><a href="#auth--register-tenant"><span class="nav-method m-post">POST</span><span>Register Tenant</span></a></li><li data-search="auth me (all roles) get {{baseurl}}/api/auth/me"><a href="#auth--me"><span class="nav-method m-get">GET</span><span>Me</span></a></li><li data-search="auth update me (all roles) patch {{baseurl}}/api/auth/me"><a href="#auth--update-me"><span class="nav-method m-patch">PATCH</span><span>Update Me</span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="images">
-    <a class="nav-folder-link" href="#images">Images</a>
-    <ul><li data-search="images upload image (all roles) post {{baseurl}}/api/images"><a href="#images--upload-image"><span class="nav-method m-post">POST</span>Upload Image</a></li><li data-search="images open image (public) get {{baseurl}}{{imagepath}}"><a href="#images--open-image"><span class="nav-method m-get">GET</span>Open Image</a></li><li data-search="images delete image (tenant) delete {{baseurl}}/api/images/{{imageid}}"><a href="#images--delete-image"><span class="nav-method m-delete">DEL</span>Delete Image</a></li></ul>
+    <a class="nav-folder-link" href="#images">Images<span class="count">3</span></a>
+    <ul><li data-search="images upload image (all roles) post {{baseurl}}/api/images"><a href="#images--upload-image"><span class="nav-method m-post">POST</span><span>Upload Image</span></a></li><li data-search="images open image (public) get {{baseurl}}{{imagepath}}"><a href="#images--open-image"><span class="nav-method m-get">GET</span><span>Open Image</span></a></li><li data-search="images delete image (tenant) delete {{baseurl}}/api/images/{{imageid}}"><a href="#images--delete-image"><span class="nav-method m-delete">DEL</span><span>Delete Image</span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="users">
-    <a class="nav-folder-link" href="#users">Users</a>
-    <ul><li data-search="users list users (superadmin, admin) get {{baseurl}}/api/users?page=1&amp;limit=20"><a href="#users--list-users"><span class="nav-method m-get">GET</span>List Users</a></li></ul>
+    <a class="nav-folder-link" href="#users">Users<span class="count">1</span></a>
+    <ul><li data-search="users list users (superadmin, admin) get {{baseurl}}/api/users?page=1&amp;limit=20"><a href="#users--list-users"><span class="nav-method m-get">GET</span><span>List Users</span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="approvals">
-    <a class="nav-folder-link" href="#approvals">Approvals</a>
-    <ul><li data-search="approvals activate / deactivate user (superadmin, admin) patch {{baseurl}}/api/approvals/{{userid}}?type=user"><a href="#approvals--activate-deactivate-user"><span class="nav-method m-patch">PATCH</span>Activate / Deactivate User</a></li><li data-search="approvals activate / deactivate product (admin) patch {{baseurl}}/api/approvals/{{productid}}?type=product"><a href="#approvals--activate-deactivate-product"><span class="nav-method m-patch">PATCH</span>Activate / Deactivate Product</a></li></ul>
+    <a class="nav-folder-link" href="#approvals">Approvals<span class="count">2</span></a>
+    <ul><li data-search="approvals activate / deactivate user (superadmin, admin) patch {{baseurl}}/api/approvals/{{userid}}?type=user"><a href="#approvals--activate-deactivate-user"><span class="nav-method m-patch">PATCH</span><span>Activate / Deactivate User</span></a></li><li data-search="approvals activate / deactivate product (admin) patch {{baseurl}}/api/approvals/{{productid}}?type=product"><a href="#approvals--activate-deactivate-product"><span class="nav-method m-patch">PATCH</span><span>Activate / Deactivate Product</span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="products">
-    <a class="nav-folder-link" href="#products">Products</a>
-    <ul><li data-search="products list products (all roles) get {{baseurl}}/api/products?page=1&amp;limit=20"><a href="#products--list-products"><span class="nav-method m-get">GET</span>List Products</a></li><li data-search="products get product (all roles) get {{baseurl}}/api/products/{{productid}}"><a href="#products--get-product"><span class="nav-method m-get">GET</span>Get Product</a></li><li data-search="products create product (tenant) post {{baseurl}}/api/products"><a href="#products--create-product"><span class="nav-method m-post">POST</span>Create Product</a></li><li data-search="products update product (tenant) patch {{baseurl}}/api/products/{{productid}}"><a href="#products--update-product"><span class="nav-method m-patch">PATCH</span>Update Product</a></li><li data-search="products delete product (tenant) delete {{baseurl}}/api/products/{{productid}}"><a href="#products--delete-product"><span class="nav-method m-delete">DEL</span>Delete Product</a></li></ul>
+    <a class="nav-folder-link" href="#products">Products<span class="count">5</span></a>
+    <ul><li data-search="products list products (all roles) get {{baseurl}}/api/products?page=1&amp;limit=20"><a href="#products--list-products"><span class="nav-method m-get">GET</span><span>List Products</span></a></li><li data-search="products get product (all roles) get {{baseurl}}/api/products/{{productid}}"><a href="#products--get-product"><span class="nav-method m-get">GET</span><span>Get Product</span></a></li><li data-search="products create product (tenant) post {{baseurl}}/api/products"><a href="#products--create-product"><span class="nav-method m-post">POST</span><span>Create Product</span></a></li><li data-search="products update product (tenant) patch {{baseurl}}/api/products/{{productid}}"><a href="#products--update-product"><span class="nav-method m-patch">PATCH</span><span>Update Product</span></a></li><li data-search="products delete product (tenant) delete {{baseurl}}/api/products/{{productid}}"><a href="#products--delete-product"><span class="nav-method m-delete">DEL</span><span>Delete Product</span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="landing">
-    <a class="nav-folder-link" href="#landing">Landing</a>
-    <ul><li data-search="landing landing products (public) get {{baseurl}}/api/landing/products?page=1&amp;limit=20"><a href="#landing--landing-products"><span class="nav-method m-get">GET</span>Landing Products</a></li></ul>
+    <a class="nav-folder-link" href="#landing">Landing<span class="count">1</span></a>
+    <ul><li data-search="landing landing products (public) get {{baseurl}}/api/landing/products?page=1&amp;limit=20"><a href="#landing--landing-products"><span class="nav-method m-get">GET</span><span>Landing Products</span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="tenant-categories">
-    <a class="nav-folder-link" href="#tenant-categories">Tenant Categories</a>
-    <ul><li data-search="tenant categories list tenant categories (superadmin, admin) get {{baseurl}}/api/tenant-categories?page=1&amp;limit=20"><a href="#tenant-categories--list-tenant-categories"><span class="nav-method m-get">GET</span>List Tenant Categories</a></li><li data-search="tenant categories get tenant category (superadmin, admin) get {{baseurl}}/api/tenant-categories/{{categoryid}}"><a href="#tenant-categories--get-tenant-category"><span class="nav-method m-get">GET</span>Get Tenant Category</a></li><li data-search="tenant categories create tenant category (superadmin, admin) post {{baseurl}}/api/tenant-categories"><a href="#tenant-categories--create-tenant-category"><span class="nav-method m-post">POST</span>Create Tenant Category</a></li><li data-search="tenant categories update tenant category (superadmin, admin) patch {{baseurl}}/api/tenant-categories/{{categoryid}}"><a href="#tenant-categories--update-tenant-category"><span class="nav-method m-patch">PATCH</span>Update Tenant Category</a></li><li data-search="tenant categories delete tenant category (superadmin, admin) delete {{baseurl}}/api/tenant-categories/{{categoryid}}"><a href="#tenant-categories--delete-tenant-category"><span class="nav-method m-delete">DEL</span>Delete Tenant Category</a></li></ul>
+    <a class="nav-folder-link" href="#tenant-categories">Tenant Categories<span class="count">5</span></a>
+    <ul><li data-search="tenant categories list tenant categories (superadmin, admin) get {{baseurl}}/api/tenant-categories?page=1&amp;limit=20"><a href="#tenant-categories--list-tenant-categories"><span class="nav-method m-get">GET</span><span>List Tenant Categories</span></a></li><li data-search="tenant categories get tenant category (superadmin, admin) get {{baseurl}}/api/tenant-categories/{{categoryid}}"><a href="#tenant-categories--get-tenant-category"><span class="nav-method m-get">GET</span><span>Get Tenant Category</span></a></li><li data-search="tenant categories create tenant category (superadmin, admin) post {{baseurl}}/api/tenant-categories"><a href="#tenant-categories--create-tenant-category"><span class="nav-method m-post">POST</span><span>Create Tenant Category</span></a></li><li data-search="tenant categories update tenant category (superadmin, admin) patch {{baseurl}}/api/tenant-categories/{{categoryid}}"><a href="#tenant-categories--update-tenant-category"><span class="nav-method m-patch">PATCH</span><span>Update Tenant Category</span></a></li><li data-search="tenant categories delete tenant category (superadmin, admin) delete {{baseurl}}/api/tenant-categories/{{categoryid}}"><a href="#tenant-categories--delete-tenant-category"><span class="nav-method m-delete">DEL</span><span>Delete Tenant Category</span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="tenants">
-    <a class="nav-folder-link" href="#tenants">Tenants</a>
-    <ul><li data-search="tenants get my tenant (tenant) get {{baseurl}}/api/tenants/me"><a href="#tenants--get-my-tenant"><span class="nav-method m-get">GET</span>Get My Tenant</a></li><li data-search="tenants create my tenant (tenant) post {{baseurl}}/api/tenants/me"><a href="#tenants--create-my-tenant"><span class="nav-method m-post">POST</span>Create My Tenant</a></li><li data-search="tenants update my tenant (tenant) patch {{baseurl}}/api/tenants/me"><a href="#tenants--update-my-tenant"><span class="nav-method m-patch">PATCH</span>Update My Tenant</a></li><li data-search="tenants delete my tenant (tenant) delete {{baseurl}}/api/tenants/me"><a href="#tenants--delete-my-tenant"><span class="nav-method m-delete">DEL</span>Delete My Tenant</a></li><li data-search="tenants list tenants (superadmin, admin) get {{baseurl}}/api/tenants?page=1&amp;limit=20"><a href="#tenants--list-tenants"><span class="nav-method m-get">GET</span>List Tenants</a></li><li data-search="tenants get tenant (superadmin, admin) get {{baseurl}}/api/tenants/{{tenantprofileid}}"><a href="#tenants--get-tenant"><span class="nav-method m-get">GET</span>Get Tenant</a></li></ul>
+    <a class="nav-folder-link" href="#tenants">Tenants<span class="count">6</span></a>
+    <ul><li data-search="tenants get my tenant (tenant) get {{baseurl}}/api/tenants/me"><a href="#tenants--get-my-tenant"><span class="nav-method m-get">GET</span><span>Get My Tenant</span></a></li><li data-search="tenants create my tenant (tenant) post {{baseurl}}/api/tenants/me"><a href="#tenants--create-my-tenant"><span class="nav-method m-post">POST</span><span>Create My Tenant</span></a></li><li data-search="tenants update my tenant (tenant) patch {{baseurl}}/api/tenants/me"><a href="#tenants--update-my-tenant"><span class="nav-method m-patch">PATCH</span><span>Update My Tenant</span></a></li><li data-search="tenants delete my tenant (tenant) delete {{baseurl}}/api/tenants/me"><a href="#tenants--delete-my-tenant"><span class="nav-method m-delete">DEL</span><span>Delete My Tenant</span></a></li><li data-search="tenants list tenants (superadmin, admin) get {{baseurl}}/api/tenants?page=1&amp;limit=20"><a href="#tenants--list-tenants"><span class="nav-method m-get">GET</span><span>List Tenants</span></a></li><li data-search="tenants get tenant (superadmin, admin) get {{baseurl}}/api/tenants/{{tenantprofileid}}"><a href="#tenants--get-tenant"><span class="nav-method m-get">GET</span><span>Get Tenant</span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="notifications">
-    <a class="nav-folder-link" href="#notifications">Notifications</a>
-    <ul><li data-search="notifications list notifications (all roles) get {{baseurl}}/api/notifications?page=1&amp;limit=20"><a href="#notifications--list-notifications"><span class="nav-method m-get">GET</span>List Notifications</a></li><li data-search="notifications unread count (all roles) get {{baseurl}}/api/notifications/unread-count"><a href="#notifications--unread-count"><span class="nav-method m-get">GET</span>Unread Count</a></li><li data-search="notifications mark notification read (all roles) patch {{baseurl}}/api/notifications/{{notificationid}}/read"><a href="#notifications--mark-notification-read"><span class="nav-method m-patch">PATCH</span>Mark Notification Read</a></li><li data-search="notifications mark all read (all roles) patch {{baseurl}}/api/notifications/read-all"><a href="#notifications--mark-all-read"><span class="nav-method m-patch">PATCH</span>Mark All Read</a></li><li data-search="notifications delete notification (all roles) delete {{baseurl}}/api/notifications/{{notificationid}}"><a href="#notifications--delete-notification"><span class="nav-method m-delete">DEL</span>Delete Notification</a></li></ul>
+    <a class="nav-folder-link" href="#notifications">Notifications<span class="count">5</span></a>
+    <ul><li data-search="notifications list notifications (all roles) get {{baseurl}}/api/notifications?page=1&amp;limit=20"><a href="#notifications--list-notifications"><span class="nav-method m-get">GET</span><span>List Notifications</span></a></li><li data-search="notifications unread count (all roles) get {{baseurl}}/api/notifications/unread-count"><a href="#notifications--unread-count"><span class="nav-method m-get">GET</span><span>Unread Count</span></a></li><li data-search="notifications mark notification read (all roles) patch {{baseurl}}/api/notifications/{{notificationid}}/read"><a href="#notifications--mark-notification-read"><span class="nav-method m-patch">PATCH</span><span>Mark Notification Read</span></a></li><li data-search="notifications mark all read (all roles) patch {{baseurl}}/api/notifications/read-all"><a href="#notifications--mark-all-read"><span class="nav-method m-patch">PATCH</span><span>Mark All Read</span></a></li><li data-search="notifications delete notification (all roles) delete {{baseurl}}/api/notifications/{{notificationid}}"><a href="#notifications--delete-notification"><span class="nav-method m-delete">DEL</span><span>Delete Notification</span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="realtime-websocket">
-    <a class="nav-folder-link" href="#realtime-websocket">Realtime (WebSocket)</a>
-    <ul><li data-search="realtime (websocket) socket.io endpoint reachable (public) get {{baseurl}}/socket.io/?eio=4&amp;transport=polling"><a href="#realtime-websocket--socket-io-endpoint-reachable"><span class="nav-method m-get">GET</span>Socket.IO Endpoint Reachable</a></li></ul>
+    <a class="nav-folder-link" href="#realtime-websocket">Realtime (WebSocket)<span class="count">1</span></a>
+    <ul><li data-search="realtime (websocket) socket.io endpoint reachable (public) get {{baseurl}}/socket.io/?eio=4&amp;transport=polling"><a href="#realtime-websocket--socket-io-endpoint-reachable"><span class="nav-method m-get">GET</span><span>Socket.IO Endpoint Reachable</span></a></li></ul>
   </li>
   <li class="nav-folder" data-folder="examples">
-    <a class="nav-folder-link" href="#examples">Examples</a>
-    <ul><li data-search="examples admin ping (superadmin, admin) get {{baseurl}}/api/admin/ping"><a href="#examples--admin-ping"><span class="nav-method m-get">GET</span>Admin Ping</a></li><li data-search="examples role ping (all roles) get {{baseurl}}/api/tenant/ping"><a href="#examples--role-ping"><span class="nav-method m-get">GET</span>Role Ping</a></li></ul>
+    <a class="nav-folder-link" href="#examples">Examples<span class="count">2</span></a>
+    <ul><li data-search="examples admin ping (superadmin, admin) get {{baseurl}}/api/admin/ping"><a href="#examples--admin-ping"><span class="nav-method m-get">GET</span><span>Admin Ping</span></a></li><li data-search="examples role ping (all roles) get {{baseurl}}/api/tenant/ping"><a href="#examples--role-ping"><span class="nav-method m-get">GET</span><span>Role Ping</span></a></li></ul>
   </li>
   </ul>
 </aside>
-<main>
-  <section class="overview" id="overview">
+<main id="top">
+<div class="content">
+  <section class="hero">
     <h1>Prafi API</h1>
-    <p class="muted">Generated from <code>postman/Prafi-API.postman_collection.json</code> on 2026-10-02. Regenerate with <code>npm run docs</code>.</p>
+    <p>Backend for Prafi: accounts and roles, tenants, products, approvals and realtime notifications. Every request below shows who can call it.</p>
+    <div class="base-url"><span>Base URL</span><code id="base-url">http://localhost:4000</code><button class="copy" id="copy-base" type="button">Copy</button></div>
+    <div class="stats">
+      <div class="stat"><b>38</b><span>endpoints</span></div>
+      <div class="stat"><b>12</b><span>groups</span></div>
+      <div class="stat"><b>3</b><span>roles</span></div>
+      <div class="stat"><b>17 · 8 · 8 · 5</b><span>get · post · patch · delete</span></div>
+    </div>
+  </section>
+  <section class="overview" id="overview">
     <p>Backend API for Prafi (Express + Sequelize + PostgreSQL), with realtime notifications over Socket.IO.</p>
 <h3>Setup (once)</h3>
 <ol><li>Import this collection and <code>Prafi-Local.postman_environment.json</code>, then select <strong>Prafi Local</strong> (environment dropdown, top right).</li><li>In <strong>Prafi Local</strong> set <code>loginEmail</code> / <code>loginPassword</code> (Current value) to the superadmin from <code>.env</code> (<code>SEED_ADMIN_EMAIL</code> / <code>SEED_ADMIN_PASSWORD</code>), then Ctrl+S.</li><li>Start the server (<code>npm run dev</code> or <code>npm run build &amp;&amp; npm start</code>). <code>baseUrl</code> is <code>http://localhost:4000</code>.</li></ol>
@@ -167,87 +254,132 @@ blockquote { margin: 12px 0; padding: 4px 14px; border-left: 4px solid var(--acc
   </section>
   
 <section class="folder" id="health">
-  <h2>Health</h2>
+  <div class="folder-title"><h2>Health</h2><span class="pill">1 endpoint</span></div>
   <div class="folder-desc"><p>Server status. No login needed.</p></div>
   
-<article class="endpoint" id="health--health-check" data-search="health health check (public) get {{baseurl}}/api/health">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="health--health-check" data-search="health health check (public) get {{baseurl}}/api/health">
+  <header class="endpoint-head">
     <h3><a href="#health--health-check">Health Check</a></h3>
-    <div class="badges"><span class="badge role role-public">Public</span></div>
+    <div class="badges"><span class="badge role-public">Public</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/api/health</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/health" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/api/health</code></div>
-  <p class="auth">No authentication</p>
-  <p>Returns <code>{ status: &quot;ok&quot; }</code> when the API is running.</p>
-  
-  
+  <p class="auth"><span class="dot dot-open"></span>No authentication needed</p>
+  <div class="endpoint-body">
+    <p>Returns <code>{ status: &quot;ok&quot; }</code> when the API is running.</p>
+    
+    
+  </div>
 </article>
 </section>
 
 <section class="folder" id="auth">
-  <h2>Auth</h2>
+  <div class="folder-title"><h2>Auth</h2><span class="pill">6 endpoints</span></div>
   <div class="folder-desc"><p>Login, logout, registration and your own account (<code>/api/auth</code>).</p>
 <p><strong>Login</strong> saves the token to <code>{{token}}</code>, which every other request uses. To act as another role, change <code>loginEmail</code> / <code>loginPassword</code> (or the body) and send Login again.</p>
 <p><strong>Registration</strong>: admin accounts are created by a superadmin and start <strong>inactive</strong> (activate them in Approvals). Tenant accounts sign up publicly and are <strong>active</strong> right away.</p></div>
   
-<article class="endpoint" id="auth--login" data-search="auth login (public) post {{baseurl}}/api/auth/login">
-  <div class="endpoint-head">
+<article class="endpoint m-post" id="auth--login" data-search="auth login (public) post {{baseurl}}/api/auth/login">
+  <header class="endpoint-head">
     <h3><a href="#auth--login">Login</a></h3>
-    <div class="badges"><span class="badge role role-public">Public</span></div>
+    <div class="badges"><span class="badge role-public">Public</span></div>
+  </header>
+  <div class="url">
+    <span class="method">POST</span>
+    <code class="url-text">{{baseUrl}}/api/auth/login</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/login" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-post">POST</span><code>{{baseUrl}}/api/auth/login</code></div>
-  <p class="auth">No authentication</p>
-  <p>Logs in and saves the access token as <code>{{token}}</code> (valid for 1 hour), plus <code>{{currentUserId}}</code> and <code>{{currentRole}}</code>.</p>
+  <p class="auth"><span class="dot dot-open"></span>No authentication needed</p>
+  <div class="endpoint-body">
+    <p>Logs in and saves the access token as <code>{{token}}</code> (valid for 1 hour), plus <code>{{currentUserId}}</code> and <code>{{currentRole}}</code>.</p>
 <ul><li>superadmin: the seed account (<code>SEED_ADMIN_EMAIL</code> / <code>SEED_ADMIN_PASSWORD</code> in <code>.env</code>)</li><li>admin / tenant: an account made with the Register requests (password <code>{{newUserPassword}}</code>; the email is saved as <code>{{registeredEmail}}</code>)</li></ul>
 <p>Errors: 401 wrong email/password, 403 <code>USER_NOT_ACTIVATED</code> (account not activated yet).</p>
-  
-  <h4>Body <span class="muted">application/json</span></h4><pre><code class="lang-json">{
+    
+    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+  &quot;email&quot;: &quot;{{loginEmail}}&quot;,
+  &quot;password&quot;: &quot;{{loginPassword}}&quot;
+}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
   &quot;email&quot;: &quot;{{loginEmail}}&quot;,
   &quot;password&quot;: &quot;{{loginPassword}}&quot;
 }</code></pre>
+  </div>
 </article>
 
-<article class="endpoint" id="auth--logout" data-search="auth logout (all roles) post {{baseurl}}/api/auth/logout">
-  <div class="endpoint-head">
+<article class="endpoint m-post" id="auth--logout" data-search="auth logout (all roles) post {{baseurl}}/api/auth/logout">
+  <header class="endpoint-head">
     <h3><a href="#auth--logout">Logout</a></h3>
-    <div class="badges"><span class="badge role role-all-roles">All roles</span></div>
+    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+  </header>
+  <div class="url">
+    <span class="method">POST</span>
+    <code class="url-text">{{baseUrl}}/api/auth/logout</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/logout" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-post">POST</span><code>{{baseUrl}}/api/auth/logout</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Revokes the token used for this request (other sessions stay logged in) and clears <code>{{token}}</code>. Its open WebSocket connections receive <code>session:ended</code> (<code>logged_out</code>).</p>
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Revokes the token used for this request (other sessions stay logged in) and clears <code>{{token}}</code>. Its open WebSocket connections receive <code>session:ended</code> (<code>logged_out</code>).</p>
+    
+    
+  </div>
 </article>
 
-<article class="endpoint" id="auth--register-admin" data-search="auth register admin (superadmin) post {{baseurl}}/api/auth/register/admin">
-  <div class="endpoint-head">
+<article class="endpoint m-post" id="auth--register-admin" data-search="auth register admin (superadmin) post {{baseurl}}/api/auth/register/admin">
+  <header class="endpoint-head">
     <h3><a href="#auth--register-admin">Register Admin</a></h3>
-    <div class="badges"><span class="badge role role-superadmin">superadmin</span></div>
+    <div class="badges"><span class="badge role-superadmin">superadmin</span></div>
+  </header>
+  <div class="url">
+    <span class="method">POST</span>
+    <code class="url-text">{{baseUrl}}/api/auth/register/admin</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/register/admin" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-post">POST</span><code>{{baseUrl}}/api/auth/register/admin</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Creates an <strong>admin</strong> account. It starts inactive (<code>approval.isActive: false</code>) and cannot log in until activated with <em>Approvals → Activate / Deactivate User</em>. Every superadmin gets an <code>ADMIN_PENDING_ACTIVATION</code> notification.</p>
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Creates an <strong>admin</strong> account. It starts inactive (<code>approval.isActive: false</code>) and cannot log in until activated with <em>Approvals → Activate / Deactivate User</em>. Every superadmin gets an <code>ADMIN_PENDING_ACTIVATION</code> notification.</p>
 <p>Saves <code>{{userId}}</code>, <code>{{userRole}}</code> and <code>{{registeredEmail}}</code>. Optional: <code>faceImageId</code> (upload it first).</p>
-  
-  <h4>Body <span class="muted">application/json</span></h4><pre><code class="lang-json">{
+    
+    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+  &quot;firstName&quot;: &quot;Andi&quot;,
+  &quot;lastName&quot;: &quot;Wijaya&quot;,
+  &quot;phoneNumber&quot;: &quot;081234567890&quot;,
+  &quot;email&quot;: &quot;admin{{$timestamp}}@prafi.test&quot;,
+  &quot;password&quot;: &quot;{{newUserPassword}}&quot;
+}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
   &quot;firstName&quot;: &quot;Andi&quot;,
   &quot;lastName&quot;: &quot;Wijaya&quot;,
   &quot;phoneNumber&quot;: &quot;081234567890&quot;,
   &quot;email&quot;: &quot;admin{{$timestamp}}@prafi.test&quot;,
   &quot;password&quot;: &quot;{{newUserPassword}}&quot;
 }</code></pre>
+  </div>
 </article>
 
-<article class="endpoint" id="auth--register-tenant" data-search="auth register tenant (public) post {{baseurl}}/api/auth/register/tenant">
-  <div class="endpoint-head">
+<article class="endpoint m-post" id="auth--register-tenant" data-search="auth register tenant (public) post {{baseurl}}/api/auth/register/tenant">
+  <header class="endpoint-head">
     <h3><a href="#auth--register-tenant">Register Tenant</a></h3>
-    <div class="badges"><span class="badge role role-public">Public</span></div>
+    <div class="badges"><span class="badge role-public">Public</span></div>
+  </header>
+  <div class="url">
+    <span class="method">POST</span>
+    <code class="url-text">{{baseUrl}}/api/auth/register/tenant</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/register/tenant" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-post">POST</span><code>{{baseUrl}}/api/auth/register/tenant</code></div>
-  <p class="auth">No authentication</p>
-  <p>Public sign-up, no token needed. The tenant is <strong>active right away</strong>. <code>tenantName</code> is required. Every admin gets a <code>TENANT_REGISTERED</code> notification.</p>
+  <p class="auth"><span class="dot dot-open"></span>No authentication needed</p>
+  <div class="endpoint-body">
+    <p>Public sign-up, no token needed. The tenant is <strong>active right away</strong>. <code>tenantName</code> is required. Every admin gets a <code>TENANT_REGISTERED</code> notification.</p>
 <p>Saves <code>{{userId}}</code>, <code>{{userRole}}</code> and <code>{{registeredEmail}}</code>.</p>
-  
-  <h4>Body <span class="muted">application/json</span></h4><pre><code class="lang-json">{
+    
+    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+  &quot;firstName&quot;: &quot;Budi&quot;,
+  &quot;lastName&quot;: &quot;Santoso&quot;,
+  &quot;phoneNumber&quot;: &quot;081298765432&quot;,
+  &quot;email&quot;: &quot;tenant{{$timestamp}}@prafi.test&quot;,
+  &quot;password&quot;: &quot;{{newUserPassword}}&quot;,
+  &quot;tenantName&quot;: &quot;Warung Budi&quot;
+}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
   &quot;firstName&quot;: &quot;Budi&quot;,
   &quot;lastName&quot;: &quot;Santoso&quot;,
   &quot;phoneNumber&quot;: &quot;081298765432&quot;,
@@ -255,322 +387,480 @@ blockquote { margin: 12px 0; padding: 4px 14px; border-left: 4px solid var(--acc
   &quot;password&quot;: &quot;{{newUserPassword}}&quot;,
   &quot;tenantName&quot;: &quot;Warung Budi&quot;
 }</code></pre>
+  </div>
 </article>
 
-<article class="endpoint" id="auth--me" data-search="auth me (all roles) get {{baseurl}}/api/auth/me">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="auth--me" data-search="auth me (all roles) get {{baseurl}}/api/auth/me">
+  <header class="endpoint-head">
     <h3><a href="#auth--me">Me</a></h3>
-    <div class="badges"><span class="badge role role-all-roles">All roles</span></div>
+    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/api/auth/me</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/me" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/api/auth/me</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>The logged-in account with its <code>faceImage</code> and account <code>approval</code>.</p>
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>The logged-in account with its <code>faceImage</code> and account <code>approval</code>.</p>
+    
+    
+  </div>
 </article>
 
-<article class="endpoint" id="auth--update-me" data-search="auth update me (all roles) patch {{baseurl}}/api/auth/me">
-  <div class="endpoint-head">
+<article class="endpoint m-patch" id="auth--update-me" data-search="auth update me (all roles) patch {{baseurl}}/api/auth/me">
+  <header class="endpoint-head">
     <h3><a href="#auth--update-me">Update Me</a></h3>
-    <div class="badges"><span class="badge role role-all-roles">All roles</span></div>
+    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+  </header>
+  <div class="url">
+    <span class="method">PATCH</span>
+    <code class="url-text">{{baseUrl}}/api/auth/me</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/auth/me" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-patch">PATCH</span><code>{{baseUrl}}/api/auth/me</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Updates your own account; send only the fields to change: <code>firstName</code>, <code>lastName</code>, <code>phoneNumber</code>, <code>email</code>, <code>faceImageId</code> (or <code>null</code>), <code>tenantName</code> (tenants only), <code>password</code> + <code>currentPassword</code>.</p>
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Updates your own account; send only the fields to change: <code>firstName</code>, <code>lastName</code>, <code>phoneNumber</code>, <code>email</code>, <code>faceImageId</code> (or <code>null</code>), <code>tenantName</code> (tenants only), <code>password</code> + <code>currentPassword</code>.</p>
 <p><code>id</code> and <code>role</code> can never be changed.</p>
-  
-  <h4>Body <span class="muted">application/json</span></h4><pre><code class="lang-json">{
+    
+    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+  &quot;firstName&quot;: &quot;Andi&quot;,
+  &quot;phoneNumber&quot;: &quot;081234567899&quot;
+}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
   &quot;firstName&quot;: &quot;Andi&quot;,
   &quot;phoneNumber&quot;: &quot;081234567899&quot;
 }</code></pre>
+  </div>
 </article>
 </section>
 
 <section class="folder" id="images">
-  <h2>Images</h2>
+  <div class="folder-title"><h2>Images</h2><span class="pill">3 endpoints</span></div>
   <div class="folder-desc"><p>Image upload (max 5 MB; jpg, png, webp, gif). Upload first, then use the returned id as <code>faceImageId</code>, product <code>imageId</code> or tenant <code>logoId</code>. Files are served publicly at <code>imgUrl</code>.</p></div>
   
-<article class="endpoint" id="images--upload-image" data-search="images upload image (all roles) post {{baseurl}}/api/images">
-  <div class="endpoint-head">
+<article class="endpoint m-post" id="images--upload-image" data-search="images upload image (all roles) post {{baseurl}}/api/images">
+  <header class="endpoint-head">
     <h3><a href="#images--upload-image">Upload Image</a></h3>
-    <div class="badges"><span class="badge role role-all-roles">All roles</span></div>
+    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+  </header>
+  <div class="url">
+    <span class="method">POST</span>
+    <code class="url-text">{{baseUrl}}/api/images</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/images" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-post">POST</span><code>{{baseUrl}}/api/images</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>multipart/form-data, field <strong>image</strong> (pick a file in Body → form-data). Saves <code>{{imageId}}</code> and <code>{{imagePath}}</code> (<code>imgUrl</code>; the response also has the full link in <code>url</code>).</p>
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>multipart/form-data, field <strong>image</strong> (pick a file in Body → form-data). Saves <code>{{imageId}}</code> and <code>{{imagePath}}</code> (<code>imgUrl</code>; the response also has the full link in <code>url</code>).</p>
 <p>An image can be used once: as one product image, one tenant logo or one face image.</p>
-  
-  <h4>Body <span class="muted">multipart/form-data</span></h4><div class="table-wrap"><table><thead><tr><th>field</th><th>type</th><th>example</th></tr></thead><tbody><tr><td><code>image</code></td><td>file</td><td>sample-face.png</td></tr><tr><td><code>altText</code></td><td>text</td><td>Sample image</td></tr></tbody></table></div>
+    
+    <h4>Request body <span class="muted">multipart/form-data</span></h4><div class="table-wrap"><table><thead><tr><th>field</th><th>type</th><th>example</th></tr></thead><tbody><tr><td><code>image</code></td><td>file</td><td>sample-face.png</td></tr><tr><td><code>altText</code></td><td>text</td><td>Sample image</td></tr></tbody></table></div>
+  </div>
 </article>
 
-<article class="endpoint" id="images--open-image" data-search="images open image (public) get {{baseurl}}{{imagepath}}">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="images--open-image" data-search="images open image (public) get {{baseurl}}{{imagepath}}">
+  <header class="endpoint-head">
     <h3><a href="#images--open-image">Open Image</a></h3>
-    <div class="badges"><span class="badge role role-public">Public</span></div>
+    <div class="badges"><span class="badge role-public">Public</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}{{imagePath}}</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}{{imagePath}}" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}{{imagePath}}</code></div>
-  <p class="auth">No authentication</p>
-  <p>The public link of the uploaded image (<code>{{baseUrl}}</code> + <code>imgUrl</code>), as the frontend would load it.</p>
-  
-  
+  <p class="auth"><span class="dot dot-open"></span>No authentication needed</p>
+  <div class="endpoint-body">
+    <p>The public link of the uploaded image (<code>{{baseUrl}}</code> + <code>imgUrl</code>), as the frontend would load it.</p>
+    
+    
+  </div>
 </article>
 
-<article class="endpoint" id="images--delete-image" data-search="images delete image (tenant) delete {{baseurl}}/api/images/{{imageid}}">
-  <div class="endpoint-head">
+<article class="endpoint m-delete" id="images--delete-image" data-search="images delete image (tenant) delete {{baseurl}}/api/images/{{imageid}}">
+  <header class="endpoint-head">
     <h3><a href="#images--delete-image">Delete Image</a></h3>
-    <div class="badges"><span class="badge role role-tenant">tenant</span></div>
+    <div class="badges"><span class="badge role-tenant">tenant</span></div>
+  </header>
+  <div class="url">
+    <span class="method">DELETE</span>
+    <code class="url-text">{{baseUrl}}/api/images/{{imageId}}</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/images/{{imageId}}" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-delete">DELETE</span><code>{{baseUrl}}/api/images/{{imageId}}</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Deletes the image record and file. An image still used as a tenant logo cannot be deleted (409 <code>STILL_IN_USE</code>).</p>
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Deletes the image record and file. An image still used as a tenant logo cannot be deleted (409 <code>STILL_IN_USE</code>).</p>
+    
+    
+  </div>
 </article>
 </section>
 
 <section class="folder" id="users">
-  <h2>Users</h2>
+  <div class="folder-title"><h2>Users</h2><span class="pill">1 endpoint</span></div>
   <div class="folder-desc"><p>Account lists. Tenants only have <em>Auth → Me</em>.</p></div>
   
-<article class="endpoint" id="users--list-users" data-search="users list users (superadmin, admin) get {{baseurl}}/api/users?page=1&amp;limit=20">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="users--list-users" data-search="users list users (superadmin, admin) get {{baseurl}}/api/users?page=1&amp;limit=20">
+  <header class="endpoint-head">
     <h3><a href="#users--list-users">List Users</a></h3>
-    <div class="badges"><span class="badge role role-superadmin">superadmin</span><span class="badge role role-admin">admin</span></div>
+    <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/api/users?page=1&amp;limit=20</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/users?page=1&amp;limit=20" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/api/users?page=1&amp;limit=20</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>superadmin sees every account; admin sees tenant accounts only. Optional <code>role</code> filter. Each user includes <code>faceImage</code> and <code>approval</code>.</p>
-  <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td></td></tr><tr><td><code>role</code></td><td><code>tenant</code></td><td>optional</td></tr></tbody></table></div>
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>superadmin sees every account; admin sees tenant accounts only. Optional <code>role</code> filter. Each user includes <code>faceImage</code> and <code>approval</code>.</p>
+    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td>yes</td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td>yes</td></tr><tr><td><code>role</code></td><td><code>tenant</code></td><td><span class="muted">optional</span></td></tr></tbody></table></div>
+    
+  </div>
 </article>
 </section>
 
 <section class="folder" id="approvals">
-  <h2>Approvals</h2>
+  <div class="folder-title"><h2>Approvals</h2><span class="pill">2 endpoints</span></div>
   <div class="folder-desc"><p>Activate / deactivate accounts and products: <code>PATCH /api/approvals/:id?type=user|product</code>. <code>:id</code> is the <strong>user id</strong> or <strong>product id</strong> (not the approval id).</p>
 <div class="table-wrap"><table><thead><tr><th>type</th><th>who can</th><th>what</th></tr></thead><tbody><tr><td><code>user</code></td><td>superadmin → admin and tenant accounts; admin → tenant accounts</td><td>an inactive account cannot log in, and is disconnected from realtime right away</td></tr><tr><td><code>product</code></td><td>admin only</td><td>active products appear on the landing page</td></tr></tbody></table></div>
 <p>Every approval has a <code>type</code> (<code>user</code> = account approval, <code>product</code> = product approval) and a <code>userId</code> (the account, or the tenant who owns the product).</p></div>
   
-<article class="endpoint" id="approvals--activate-deactivate-user" data-search="approvals activate / deactivate user (superadmin, admin) patch {{baseurl}}/api/approvals/{{userid}}?type=user">
-  <div class="endpoint-head">
+<article class="endpoint m-patch" id="approvals--activate-deactivate-user" data-search="approvals activate / deactivate user (superadmin, admin) patch {{baseurl}}/api/approvals/{{userid}}?type=user">
+  <header class="endpoint-head">
     <h3><a href="#approvals--activate-deactivate-user">Activate / Deactivate User</a></h3>
-    <div class="badges"><span class="badge role role-superadmin">superadmin</span><span class="badge role role-admin">admin</span></div>
+    <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
+  </header>
+  <div class="url">
+    <span class="method">PATCH</span>
+    <code class="url-text">{{baseUrl}}/api/approvals/{{userId}}?type=user</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/approvals/{{userId}}?type=user" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-patch">PATCH</span><code>{{baseUrl}}/api/approvals/{{userId}}?type=user</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p><code>isActive</code>: true/false. <code>role</code>: the target account's role, as a confirmation (must match). <code>reason</code>: optional.</p>
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p><code>isActive</code>: true/false. <code>role</code>: the target account's role, as a confirmation (must match). <code>reason</code>: optional.</p>
 <p>Uses <code>{{userId}}</code> / <code>{{userRole}}</code> saved by the Register requests. Deactivating ends the user's sessions (<code>session:ended</code>, reason <code>deactivated</code>).</p>
-  <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th></th></tr></thead><tbody><tr><td><code>type</code></td><td><code>user</code></td><td></td></tr></tbody></table></div>
-  <h4>Body <span class="muted">application/json</span></h4><pre><code class="lang-json">{
+    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>type</code></td><td><code>user</code></td><td>yes</td></tr></tbody></table></div>
+    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+  &quot;isActive&quot;: true,
+  &quot;role&quot;: &quot;{{userRole}}&quot;,
+  &quot;reason&quot;: &quot;Data lengkap&quot;
+}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
   &quot;isActive&quot;: true,
   &quot;role&quot;: &quot;{{userRole}}&quot;,
   &quot;reason&quot;: &quot;Data lengkap&quot;
 }</code></pre>
+  </div>
 </article>
 
-<article class="endpoint" id="approvals--activate-deactivate-product" data-search="approvals activate / deactivate product (admin) patch {{baseurl}}/api/approvals/{{productid}}?type=product">
-  <div class="endpoint-head">
+<article class="endpoint m-patch" id="approvals--activate-deactivate-product" data-search="approvals activate / deactivate product (admin) patch {{baseurl}}/api/approvals/{{productid}}?type=product">
+  <header class="endpoint-head">
     <h3><a href="#approvals--activate-deactivate-product">Activate / Deactivate Product</a></h3>
-    <div class="badges"><span class="badge role role-admin">admin</span></div>
+    <div class="badges"><span class="badge role-admin">admin</span></div>
+  </header>
+  <div class="url">
+    <span class="method">PATCH</span>
+    <code class="url-text">{{baseUrl}}/api/approvals/{{productId}}?type=product</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/approvals/{{productId}}?type=product" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-patch">PATCH</span><code>{{baseUrl}}/api/approvals/{{productId}}?type=product</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Approves a product (shown on the landing page) or takes it down. The owner gets <code>PRODUCT_APPROVED</code>; admins get <code>PRODUCT_PUBLISHED</code>; deactivation notifies superadmins.</p>
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Approves a product (shown on the landing page) or takes it down. The owner gets <code>PRODUCT_APPROVED</code>; admins get <code>PRODUCT_PUBLISHED</code>; deactivation notifies superadmins.</p>
 <p>The response includes who owns it:</p>
 <pre><code class="lang-json">{ &quot;type&quot;: &quot;product&quot;, &quot;id&quot;: &quot;…&quot;, &quot;name&quot;: &quot;…&quot;, &quot;approval&quot;: { &quot;type&quot;: &quot;product&quot;, &quot;userId&quot;: &quot;…&quot;, &quot;isActive&quot;: true, … },
   &quot;user&quot;: { &quot;firstName&quot;: &quot;Budi&quot;, &quot;lastName&quot;: &quot;Santoso&quot;, …, &quot;tenant&quot;: { … } | null, &quot;productId&quot;: &quot;…&quot;, &quot;product&quot;: { … } } }</code></pre>
-  <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th></th></tr></thead><tbody><tr><td><code>type</code></td><td><code>product</code></td><td></td></tr></tbody></table></div>
-  <h4>Body <span class="muted">application/json</span></h4><pre><code class="lang-json">{
+    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>type</code></td><td><code>product</code></td><td>yes</td></tr></tbody></table></div>
+    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+  &quot;isActive&quot;: true
+}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
   &quot;isActive&quot;: true
 }</code></pre>
+  </div>
 </article>
 </section>
 
 <section class="folder" id="products">
-  <h2>Products</h2>
+  <div class="folder-title"><h2>Products</h2><span class="pill">5 endpoints</span></div>
   <div class="folder-desc"><p>Tenants manage their own products; superadmin/admin read all of them. New products start <strong>inactive</strong> and wait for an admin (<em>Approvals → Activate / Deactivate Product</em>).</p></div>
   
-<article class="endpoint" id="products--list-products" data-search="products list products (all roles) get {{baseurl}}/api/products?page=1&amp;limit=20">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="products--list-products" data-search="products list products (all roles) get {{baseurl}}/api/products?page=1&amp;limit=20">
+  <header class="endpoint-head">
     <h3><a href="#products--list-products">List Products</a></h3>
-    <div class="badges"><span class="badge role role-all-roles">All roles</span></div>
+    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/api/products?page=1&amp;limit=20</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/products?page=1&amp;limit=20" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/api/products?page=1&amp;limit=20</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>superadmin/admin: every product. tenant: only their own. Optional <code>isActive</code> filter (e.g. <code>false</code> = waiting for approval).</p>
-  <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td></td></tr><tr><td><code>isActive</code></td><td><code>false</code></td><td>optional</td></tr></tbody></table></div>
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>superadmin/admin: every product. tenant: only their own. Optional <code>isActive</code> filter (e.g. <code>false</code> = waiting for approval).</p>
+    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td>yes</td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td>yes</td></tr><tr><td><code>isActive</code></td><td><code>false</code></td><td><span class="muted">optional</span></td></tr></tbody></table></div>
+    
+  </div>
 </article>
 
-<article class="endpoint" id="products--get-product" data-search="products get product (all roles) get {{baseurl}}/api/products/{{productid}}">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="products--get-product" data-search="products get product (all roles) get {{baseurl}}/api/products/{{productid}}">
+  <header class="endpoint-head">
     <h3><a href="#products--get-product">Get Product</a></h3>
-    <div class="badges"><span class="badge role role-all-roles">All roles</span></div>
+    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/api/products/{{productId}}</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/products/{{productId}}" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/api/products/{{productId}}</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Tenants get 404 for products that are not theirs.</p>
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Tenants get 404 for products that are not theirs.</p>
+    
+    
+  </div>
 </article>
 
-<article class="endpoint" id="products--create-product" data-search="products create product (tenant) post {{baseurl}}/api/products">
-  <div class="endpoint-head">
+<article class="endpoint m-post" id="products--create-product" data-search="products create product (tenant) post {{baseurl}}/api/products">
+  <header class="endpoint-head">
     <h3><a href="#products--create-product">Create Product</a></h3>
-    <div class="badges"><span class="badge role role-tenant">tenant</span></div>
+    <div class="badges"><span class="badge role-tenant">tenant</span></div>
+  </header>
+  <div class="url">
+    <span class="method">POST</span>
+    <code class="url-text">{{baseUrl}}/api/products</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/products" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-post">POST</span><code>{{baseUrl}}/api/products</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Upload the image first (<em>Images → Upload Image</em>); <code>imageId</code> is required. Saves <code>{{productId}}</code>. Superadmins and admins get <code>PRODUCT_SUBMITTED</code>, the tenant gets <code>PRODUCT_UNDER_REVIEW</code>.</p>
-  
-  <h4>Body <span class="muted">application/json</span></h4><pre><code class="lang-json">{
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Upload the image first (<em>Images → Upload Image</em>); <code>imageId</code> is required. Saves <code>{{productId}}</code>. Superadmins and admins get <code>PRODUCT_SUBMITTED</code>, the tenant gets <code>PRODUCT_UNDER_REVIEW</code>.</p>
+    
+    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+  &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
+  &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
+  &quot;details&quot;: &quot;250 ml, es&quot;,
+  &quot;qty&quot;: 10,
+  &quot;imageId&quot;: {{imageId}}
+}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
   &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
   &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
   &quot;details&quot;: &quot;250 ml, es&quot;,
   &quot;qty&quot;: 10,
   &quot;imageId&quot;: {{imageId}}
 }</code></pre>
+  </div>
 </article>
 
-<article class="endpoint" id="products--update-product" data-search="products update product (tenant) patch {{baseurl}}/api/products/{{productid}}">
-  <div class="endpoint-head">
+<article class="endpoint m-patch" id="products--update-product" data-search="products update product (tenant) patch {{baseurl}}/api/products/{{productid}}">
+  <header class="endpoint-head">
     <h3><a href="#products--update-product">Update Product</a></h3>
-    <div class="badges"><span class="badge role role-tenant">tenant</span></div>
+    <div class="badges"><span class="badge role-tenant">tenant</span></div>
+  </header>
+  <div class="url">
+    <span class="method">PATCH</span>
+    <code class="url-text">{{baseUrl}}/api/products/{{productId}}</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/products/{{productId}}" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-patch">PATCH</span><code>{{baseUrl}}/api/products/{{productId}}</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Own products only. Send any of <code>name</code>, <code>description</code>, <code>details</code>, <code>qty</code>, <code>imageId</code>. Activation cannot be changed here.</p>
-  
-  <h4>Body <span class="muted">application/json</span></h4><pre><code class="lang-json">{
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Own products only. Send any of <code>name</code>, <code>description</code>, <code>details</code>, <code>qty</code>, <code>imageId</code>. Activation cannot be changed here.</p>
+    
+    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+  &quot;qty&quot;: 25
+}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
   &quot;qty&quot;: 25
 }</code></pre>
+  </div>
 </article>
 
-<article class="endpoint" id="products--delete-product" data-search="products delete product (tenant) delete {{baseurl}}/api/products/{{productid}}">
-  <div class="endpoint-head">
+<article class="endpoint m-delete" id="products--delete-product" data-search="products delete product (tenant) delete {{baseurl}}/api/products/{{productid}}">
+  <header class="endpoint-head">
     <h3><a href="#products--delete-product">Delete Product</a></h3>
-    <div class="badges"><span class="badge role role-tenant">tenant</span></div>
+    <div class="badges"><span class="badge role-tenant">tenant</span></div>
+  </header>
+  <div class="url">
+    <span class="method">DELETE</span>
+    <code class="url-text">{{baseUrl}}/api/products/{{productId}}</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/products/{{productId}}" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-delete">DELETE</span><code>{{baseUrl}}/api/products/{{productId}}</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Own products only. Also deletes its approval and image.</p>
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Own products only. Also deletes its approval and image.</p>
+    
+    
+  </div>
 </article>
 </section>
 
 <section class="folder" id="landing">
-  <h2>Landing</h2>
+  <div class="folder-title"><h2>Landing</h2><span class="pill">1 endpoint</span></div>
   <div class="folder-desc"><p>Public pages for visitors.</p></div>
   
-<article class="endpoint" id="landing--landing-products" data-search="landing landing products (public) get {{baseurl}}/api/landing/products?page=1&amp;limit=20">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="landing--landing-products" data-search="landing landing products (public) get {{baseurl}}/api/landing/products?page=1&amp;limit=20">
+  <header class="endpoint-head">
     <h3><a href="#landing--landing-products">Landing Products</a></h3>
-    <div class="badges"><span class="badge role role-public">Public</span></div>
+    <div class="badges"><span class="badge role-public">Public</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/api/landing/products?page=1&amp;limit=20</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/landing/products?page=1&amp;limit=20" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/api/landing/products?page=1&amp;limit=20</code></div>
-  <p class="auth">No authentication</p>
-  <p>Active (approved) products only, without private data (no owner email/phone, no approval reason).</p>
-  <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td></td></tr></tbody></table></div>
-  
+  <p class="auth"><span class="dot dot-open"></span>No authentication needed</p>
+  <div class="endpoint-body">
+    <p>Active (approved) products only, without private data (no owner email/phone, no approval reason).</p>
+    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td>yes</td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td>yes</td></tr></tbody></table></div>
+    
+  </div>
 </article>
 </section>
 
 <section class="folder" id="tenant-categories">
-  <h2>Tenant Categories</h2>
+  <div class="folder-title"><h2>Tenant Categories</h2><span class="pill">5 endpoints</span></div>
   <div class="folder-desc"><p>Categories a tenant profile belongs to (e.g. Kuliner, Fashion). Managed by superadmin and admin.</p></div>
   
-<article class="endpoint" id="tenant-categories--list-tenant-categories" data-search="tenant categories list tenant categories (superadmin, admin) get {{baseurl}}/api/tenant-categories?page=1&amp;limit=20">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="tenant-categories--list-tenant-categories" data-search="tenant categories list tenant categories (superadmin, admin) get {{baseurl}}/api/tenant-categories?page=1&amp;limit=20">
+  <header class="endpoint-head">
     <h3><a href="#tenant-categories--list-tenant-categories">List Tenant Categories</a></h3>
-    <div class="badges"><span class="badge role role-superadmin">superadmin</span><span class="badge role role-admin">admin</span></div>
+    <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/api/tenant-categories?page=1&amp;limit=20</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant-categories?page=1&amp;limit=20" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/api/tenant-categories?page=1&amp;limit=20</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Sorted by name.</p>
-  <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td></td></tr></tbody></table></div>
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Sorted by name.</p>
+    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td>yes</td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td>yes</td></tr></tbody></table></div>
+    
+  </div>
 </article>
 
-<article class="endpoint" id="tenant-categories--get-tenant-category" data-search="tenant categories get tenant category (superadmin, admin) get {{baseurl}}/api/tenant-categories/{{categoryid}}">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="tenant-categories--get-tenant-category" data-search="tenant categories get tenant category (superadmin, admin) get {{baseurl}}/api/tenant-categories/{{categoryid}}">
+  <header class="endpoint-head">
     <h3><a href="#tenant-categories--get-tenant-category">Get Tenant Category</a></h3>
-    <div class="badges"><span class="badge role role-superadmin">superadmin</span><span class="badge role role-admin">admin</span></div>
+    <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/api/tenant-categories/{{categoryId}}</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant-categories/{{categoryId}}" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/api/tenant-categories/{{categoryId}}</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    
+    
+    
+  </div>
 </article>
 
-<article class="endpoint" id="tenant-categories--create-tenant-category" data-search="tenant categories create tenant category (superadmin, admin) post {{baseurl}}/api/tenant-categories">
-  <div class="endpoint-head">
+<article class="endpoint m-post" id="tenant-categories--create-tenant-category" data-search="tenant categories create tenant category (superadmin, admin) post {{baseurl}}/api/tenant-categories">
+  <header class="endpoint-head">
     <h3><a href="#tenant-categories--create-tenant-category">Create Tenant Category</a></h3>
-    <div class="badges"><span class="badge role role-superadmin">superadmin</span><span class="badge role role-admin">admin</span></div>
+    <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
+  </header>
+  <div class="url">
+    <span class="method">POST</span>
+    <code class="url-text">{{baseUrl}}/api/tenant-categories</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant-categories" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-post">POST</span><code>{{baseUrl}}/api/tenant-categories</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Names are unique. Saves <code>{{categoryId}}</code>.</p>
-  
-  <h4>Body <span class="muted">application/json</span></h4><pre><code class="lang-json">{
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Names are unique. Saves <code>{{categoryId}}</code>.</p>
+    
+    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+  &quot;name&quot;: &quot;Kuliner {{$timestamp}}&quot;
+}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
   &quot;name&quot;: &quot;Kuliner {{$timestamp}}&quot;
 }</code></pre>
+  </div>
 </article>
 
-<article class="endpoint" id="tenant-categories--update-tenant-category" data-search="tenant categories update tenant category (superadmin, admin) patch {{baseurl}}/api/tenant-categories/{{categoryid}}">
-  <div class="endpoint-head">
+<article class="endpoint m-patch" id="tenant-categories--update-tenant-category" data-search="tenant categories update tenant category (superadmin, admin) patch {{baseurl}}/api/tenant-categories/{{categoryid}}">
+  <header class="endpoint-head">
     <h3><a href="#tenant-categories--update-tenant-category">Update Tenant Category</a></h3>
-    <div class="badges"><span class="badge role role-superadmin">superadmin</span><span class="badge role role-admin">admin</span></div>
+    <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
+  </header>
+  <div class="url">
+    <span class="method">PATCH</span>
+    <code class="url-text">{{baseUrl}}/api/tenant-categories/{{categoryId}}</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant-categories/{{categoryId}}" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-patch">PATCH</span><code>{{baseUrl}}/api/tenant-categories/{{categoryId}}</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  
-  
-  <h4>Body <span class="muted">application/json</span></h4><pre><code class="lang-json">{
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    
+    
+    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+  &quot;name&quot;: &quot;Kuliner &amp; Minuman {{$timestamp}}&quot;
+}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
   &quot;name&quot;: &quot;Kuliner &amp; Minuman {{$timestamp}}&quot;
 }</code></pre>
+  </div>
 </article>
 
-<article class="endpoint" id="tenant-categories--delete-tenant-category" data-search="tenant categories delete tenant category (superadmin, admin) delete {{baseurl}}/api/tenant-categories/{{categoryid}}">
-  <div class="endpoint-head">
+<article class="endpoint m-delete" id="tenant-categories--delete-tenant-category" data-search="tenant categories delete tenant category (superadmin, admin) delete {{baseurl}}/api/tenant-categories/{{categoryid}}">
+  <header class="endpoint-head">
     <h3><a href="#tenant-categories--delete-tenant-category">Delete Tenant Category</a></h3>
-    <div class="badges"><span class="badge role role-superadmin">superadmin</span><span class="badge role role-admin">admin</span></div>
+    <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
+  </header>
+  <div class="url">
+    <span class="method">DELETE</span>
+    <code class="url-text">{{baseUrl}}/api/tenant-categories/{{categoryId}}</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant-categories/{{categoryId}}" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-delete">DELETE</span><code>{{baseUrl}}/api/tenant-categories/{{categoryId}}</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>A category still used by a tenant profile cannot be deleted (409 <code>STILL_IN_USE</code>).</p>
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>A category still used by a tenant profile cannot be deleted (409 <code>STILL_IN_USE</code>).</p>
+    
+    
+  </div>
 </article>
 </section>
 
 <section class="folder" id="tenants">
-  <h2>Tenants</h2>
+  <div class="folder-title"><h2>Tenants</h2><span class="pill">6 endpoints</span></div>
   <div class="folder-desc"><p>Tenant (shop) profiles. A tenant user manages <strong>their own</strong> profile at <code>/api/tenants/me</code>; superadmin/admin read every profile.</p></div>
   
-<article class="endpoint" id="tenants--get-my-tenant" data-search="tenants get my tenant (tenant) get {{baseurl}}/api/tenants/me">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="tenants--get-my-tenant" data-search="tenants get my tenant (tenant) get {{baseurl}}/api/tenants/me">
+  <header class="endpoint-head">
     <h3><a href="#tenants--get-my-tenant">Get My Tenant</a></h3>
-    <div class="badges"><span class="badge role role-tenant">tenant</span></div>
+    <div class="badges"><span class="badge role-tenant">tenant</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/api/tenants/me</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants/me" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/api/tenants/me</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>404 if you have not created your profile yet.</p>
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>404 if you have not created your profile yet.</p>
+    
+    
+  </div>
 </article>
 
-<article class="endpoint" id="tenants--create-my-tenant" data-search="tenants create my tenant (tenant) post {{baseurl}}/api/tenants/me">
-  <div class="endpoint-head">
+<article class="endpoint m-post" id="tenants--create-my-tenant" data-search="tenants create my tenant (tenant) post {{baseurl}}/api/tenants/me">
+  <header class="endpoint-head">
     <h3><a href="#tenants--create-my-tenant">Create My Tenant</a></h3>
-    <div class="badges"><span class="badge role role-tenant">tenant</span></div>
+    <div class="badges"><span class="badge role-tenant">tenant</span></div>
+  </header>
+  <div class="url">
+    <span class="method">POST</span>
+    <code class="url-text">{{baseUrl}}/api/tenants/me</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants/me" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-post">POST</span><code>{{baseUrl}}/api/tenants/me</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>One profile per tenant. Required: every field except <code>name</code> (defaults to your tenantName). <code>logoId</code>: upload the logo first. <code>categoryId</code>: a tenant category (created by superadmin/admin). Saves <code>{{tenantProfileId}}</code>.</p>
-  
-  <h4>Body <span class="muted">application/json</span></h4><pre><code class="lang-json">{
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>One profile per tenant. Required: every field except <code>name</code> (defaults to your tenantName). <code>logoId</code>: upload the logo first. <code>categoryId</code>: a tenant category (created by superadmin/admin). Saves <code>{{tenantProfileId}}</code>.</p>
+    
+    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+  &quot;name&quot;: &quot;Warung Budi&quot;,
+  &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
+  &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
+  &quot;area&quot;: &quot;Bandung&quot;,
+  &quot;operationalHours&quot;: &quot;08:00 - 22:00&quot;,
+  &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
+  &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
+  &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
+  &quot;logoId&quot;: {{imageId}},
+  &quot;categoryId&quot;: {{categoryId}}
+}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
   &quot;name&quot;: &quot;Warung Budi&quot;,
   &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
   &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
@@ -582,61 +872,88 @@ blockquote { margin: 12px 0; padding: 4px 14px; border-left: 4px solid var(--acc
   &quot;logoId&quot;: {{imageId}},
   &quot;categoryId&quot;: {{categoryId}}
 }</code></pre>
+  </div>
 </article>
 
-<article class="endpoint" id="tenants--update-my-tenant" data-search="tenants update my tenant (tenant) patch {{baseurl}}/api/tenants/me">
-  <div class="endpoint-head">
+<article class="endpoint m-patch" id="tenants--update-my-tenant" data-search="tenants update my tenant (tenant) patch {{baseurl}}/api/tenants/me">
+  <header class="endpoint-head">
     <h3><a href="#tenants--update-my-tenant">Update My Tenant</a></h3>
-    <div class="badges"><span class="badge role role-tenant">tenant</span></div>
+    <div class="badges"><span class="badge role-tenant">tenant</span></div>
+  </header>
+  <div class="url">
+    <span class="method">PATCH</span>
+    <code class="url-text">{{baseUrl}}/api/tenants/me</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants/me" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-patch">PATCH</span><code>{{baseUrl}}/api/tenants/me</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Send only the fields to change. Admins get <code>TENANT_PROFILE_UPDATED</code>.</p>
-  
-  <h4>Body <span class="muted">application/json</span></h4><pre><code class="lang-json">{
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Send only the fields to change. Admins get <code>TENANT_PROFILE_UPDATED</code>.</p>
+    
+    <div class="block-head"><h4>Request body <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
+  &quot;operationalHours&quot;: &quot;07:00 - 23:00&quot;
+}" aria-label="Copy">Copy</button></div><pre><code class="lang-json">{
   &quot;operationalHours&quot;: &quot;07:00 - 23:00&quot;
 }</code></pre>
+  </div>
 </article>
 
-<article class="endpoint" id="tenants--delete-my-tenant" data-search="tenants delete my tenant (tenant) delete {{baseurl}}/api/tenants/me">
-  <div class="endpoint-head">
+<article class="endpoint m-delete" id="tenants--delete-my-tenant" data-search="tenants delete my tenant (tenant) delete {{baseurl}}/api/tenants/me">
+  <header class="endpoint-head">
     <h3><a href="#tenants--delete-my-tenant">Delete My Tenant</a></h3>
-    <div class="badges"><span class="badge role role-tenant">tenant</span></div>
+    <div class="badges"><span class="badge role-tenant">tenant</span></div>
+  </header>
+  <div class="url">
+    <span class="method">DELETE</span>
+    <code class="url-text">{{baseUrl}}/api/tenants/me</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants/me" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-delete">DELETE</span><code>{{baseUrl}}/api/tenants/me</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Deletes your tenant profile (your account stays).</p>
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Deletes your tenant profile (your account stays).</p>
+    
+    
+  </div>
 </article>
 
-<article class="endpoint" id="tenants--list-tenants" data-search="tenants list tenants (superadmin, admin) get {{baseurl}}/api/tenants?page=1&amp;limit=20">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="tenants--list-tenants" data-search="tenants list tenants (superadmin, admin) get {{baseurl}}/api/tenants?page=1&amp;limit=20">
+  <header class="endpoint-head">
     <h3><a href="#tenants--list-tenants">List Tenants</a></h3>
-    <div class="badges"><span class="badge role role-superadmin">superadmin</span><span class="badge role role-admin">admin</span></div>
+    <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/api/tenants?page=1&amp;limit=20</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants?page=1&amp;limit=20" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/api/tenants?page=1&amp;limit=20</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Every tenant profile with its owner, logo and category. Optional <code>categoryId</code> filter.</p>
-  <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td></td></tr><tr><td><code>categoryId</code></td><td><code>{{categoryId}}</code></td><td>optional</td></tr></tbody></table></div>
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Every tenant profile with its owner, logo and category. Optional <code>categoryId</code> filter.</p>
+    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td>yes</td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td>yes</td></tr><tr><td><code>categoryId</code></td><td><code>{{categoryId}}</code></td><td><span class="muted">optional</span></td></tr></tbody></table></div>
+    
+  </div>
 </article>
 
-<article class="endpoint" id="tenants--get-tenant" data-search="tenants get tenant (superadmin, admin) get {{baseurl}}/api/tenants/{{tenantprofileid}}">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="tenants--get-tenant" data-search="tenants get tenant (superadmin, admin) get {{baseurl}}/api/tenants/{{tenantprofileid}}">
+  <header class="endpoint-head">
     <h3><a href="#tenants--get-tenant">Get Tenant</a></h3>
-    <div class="badges"><span class="badge role role-superadmin">superadmin</span><span class="badge role role-admin">admin</span></div>
+    <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/api/tenants/{{tenantProfileId}}</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenants/{{tenantProfileId}}" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/api/tenants/{{tenantProfileId}}</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    
+    
+    
+  </div>
 </article>
 </section>
 
 <section class="folder" id="notifications">
-  <h2>Notifications</h2>
+  <div class="folder-title"><h2>Notifications</h2><span class="pill">5 endpoints</span></div>
   <div class="folder-desc"><p>Notifications for every role (<code>/api/notifications</code>, Bearer <code>{{token}}</code>). They are created automatically by actions in the other folders.</p>
 <div class="table-wrap"><table><thead><tr><th>type</th><th>who gets it</th><th>when</th></tr></thead><tbody><tr><td><code>ADMIN_PENDING_ACTIVATION</code></td><td>superadmin</td><td>a new admin is registered (needs activation)</td></tr><tr><td><code>PRODUCT_SUBMITTED</code></td><td>superadmin, admin</td><td>a tenant creates a product</td></tr><tr><td><code>USER_DEACTIVATED</code></td><td>superadmin</td><td>an admin deactivates a user account</td></tr><tr><td><code>PRODUCT_DEACTIVATED</code></td><td>superadmin</td><td>an admin deactivates a product</td></tr><tr><td><code>PRODUCT_PUBLISHED</code></td><td>admin</td><td>an admin activates a product (now on the landing page)</td></tr><tr><td><code>PRODUCT_UPDATED</code></td><td>admin</td><td>a tenant updates a product</td></tr><tr><td><code>TENANT_PROFILE_UPDATED</code></td><td>admin</td><td>a tenant updates their tenant profile</td></tr><tr><td><code>TENANT_REGISTERED</code></td><td>admin</td><td>a new tenant signs up</td></tr><tr><td><code>PRODUCT_UNDER_REVIEW</code></td><td>tenant (owner)</td><td>they create a product</td></tr><tr><td><code>PRODUCT_APPROVED</code></td><td>tenant (owner)</td><td>their product is activated</td></tr></tbody></table></div>
 <p>Each notification: <code>id</code>, <code>type</code> (switch on it in the frontend), <code>name</code> (title), <code>description</code> (message), <code>entityType</code> + <code>entityId</code> (what to open: <code>user</code>, <code>product</code> or <code>tenant</code>), <code>approvalId</code> + <code>approval</code>, <code>isRead</code>, <code>readAt</code>, <code>createdAt</code>.</p>
@@ -646,69 +963,99 @@ blockquote { margin: 12px 0; padding: 4px 14px; border-left: 4px solid var(--acc
 <p><code>approval.isActive</code> is the <strong>current</strong> status (not a copy from when it was sent), so the frontend can show an <em>Activate</em> button only while it is still <code>false</code>. To activate: <code>PATCH /api/approvals/{entityId}?type={entityType}</code> (body <code>{ &quot;isActive&quot;: true, &quot;role&quot;: &quot;admin&quot; }</code> for users, <code>{ &quot;isActive&quot;: true }</code> for products). Other notifications (<code>PRODUCT_UPDATED</code>, <code>TENANT_PROFILE_UPDATED</code>) have <code>approvalId: null</code>, <code>approval: null</code>. If the product is deleted, <code>approval</code> becomes <code>null</code>. Every user only ever sees their own notifications (others → 404).</p>
 <p>Endpoints: <code>GET /api/notifications?page=&amp;limit=&amp;unread=true</code> (newest first, <code>meta.unreadCount</code> for the badge), <code>GET /api/notifications/unread-count</code>, <code>PATCH /api/notifications/:id/read</code>, <code>PATCH /api/notifications/read-all</code>, <code>DELETE /api/notifications/:id</code>. <code>approval.user</code> is whose approval it is (the account owner, or the tenant who owns the product); it never contains the password.</p></div>
   
-<article class="endpoint" id="notifications--list-notifications" data-search="notifications list notifications (all roles) get {{baseurl}}/api/notifications?page=1&amp;limit=20">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="notifications--list-notifications" data-search="notifications list notifications (all roles) get {{baseurl}}/api/notifications?page=1&amp;limit=20">
+  <header class="endpoint-head">
     <h3><a href="#notifications--list-notifications">List Notifications</a></h3>
-    <div class="badges"><span class="badge role role-all-roles">All roles</span></div>
+    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/api/notifications?page=1&amp;limit=20</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/notifications?page=1&amp;limit=20" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/api/notifications?page=1&amp;limit=20</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Your own notifications, newest first. <code>meta.unreadCount</code> for the badge. Saves the newest one as <code>{{notificationId}}</code>.</p>
-  <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td></td></tr><tr><td><code>unread</code></td><td><code>true</code></td><td>optional</td></tr></tbody></table></div>
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Your own notifications, newest first. <code>meta.unreadCount</code> for the badge. Saves the newest one as <code>{{notificationId}}</code>.</p>
+    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td>yes</td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td>yes</td></tr><tr><td><code>unread</code></td><td><code>true</code></td><td><span class="muted">optional</span></td></tr></tbody></table></div>
+    
+  </div>
 </article>
 
-<article class="endpoint" id="notifications--unread-count" data-search="notifications unread count (all roles) get {{baseurl}}/api/notifications/unread-count">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="notifications--unread-count" data-search="notifications unread count (all roles) get {{baseurl}}/api/notifications/unread-count">
+  <header class="endpoint-head">
     <h3><a href="#notifications--unread-count">Unread Count</a></h3>
-    <div class="badges"><span class="badge role role-all-roles">All roles</span></div>
+    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/api/notifications/unread-count</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/notifications/unread-count" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/api/notifications/unread-count</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    
+    
+    
+  </div>
 </article>
 
-<article class="endpoint" id="notifications--mark-notification-read" data-search="notifications mark notification read (all roles) patch {{baseurl}}/api/notifications/{{notificationid}}/read">
-  <div class="endpoint-head">
+<article class="endpoint m-patch" id="notifications--mark-notification-read" data-search="notifications mark notification read (all roles) patch {{baseurl}}/api/notifications/{{notificationid}}/read">
+  <header class="endpoint-head">
     <h3><a href="#notifications--mark-notification-read">Mark Notification Read</a></h3>
-    <div class="badges"><span class="badge role role-all-roles">All roles</span></div>
+    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+  </header>
+  <div class="url">
+    <span class="method">PATCH</span>
+    <code class="url-text">{{baseUrl}}/api/notifications/{{notificationId}}/read</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/notifications/{{notificationId}}/read" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-patch">PATCH</span><code>{{baseUrl}}/api/notifications/{{notificationId}}/read</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    
+    
+    
+  </div>
 </article>
 
-<article class="endpoint" id="notifications--mark-all-read" data-search="notifications mark all read (all roles) patch {{baseurl}}/api/notifications/read-all">
-  <div class="endpoint-head">
+<article class="endpoint m-patch" id="notifications--mark-all-read" data-search="notifications mark all read (all roles) patch {{baseurl}}/api/notifications/read-all">
+  <header class="endpoint-head">
     <h3><a href="#notifications--mark-all-read">Mark All Read</a></h3>
-    <div class="badges"><span class="badge role role-all-roles">All roles</span></div>
+    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+  </header>
+  <div class="url">
+    <span class="method">PATCH</span>
+    <code class="url-text">{{baseUrl}}/api/notifications/read-all</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/notifications/read-all" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-patch">PATCH</span><code>{{baseUrl}}/api/notifications/read-all</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Returns <code>{ updated }</code> (how many were marked).</p>
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Returns <code>{ updated }</code> (how many were marked).</p>
+    
+    
+  </div>
 </article>
 
-<article class="endpoint" id="notifications--delete-notification" data-search="notifications delete notification (all roles) delete {{baseurl}}/api/notifications/{{notificationid}}">
-  <div class="endpoint-head">
+<article class="endpoint m-delete" id="notifications--delete-notification" data-search="notifications delete notification (all roles) delete {{baseurl}}/api/notifications/{{notificationid}}">
+  <header class="endpoint-head">
     <h3><a href="#notifications--delete-notification">Delete Notification</a></h3>
-    <div class="badges"><span class="badge role role-all-roles">All roles</span></div>
+    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+  </header>
+  <div class="url">
+    <span class="method">DELETE</span>
+    <code class="url-text">{{baseUrl}}/api/notifications/{{notificationId}}</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/notifications/{{notificationId}}" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-delete">DELETE</span><code>{{baseUrl}}/api/notifications/{{notificationId}}</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    
+    
+    
+  </div>
 </article>
 </section>
 
 <section class="folder" id="realtime-websocket">
-  <h2>Realtime (WebSocket)</h2>
+  <div class="folder-title"><h2>Realtime (WebSocket)</h2><span class="pill">1 endpoint</span></div>
   <div class="folder-desc"><p>Realtime notifications over <strong>Socket.IO</strong> (same host and port as the API).</p>
 <blockquote><p>Postman collection files cannot contain Socket.IO requests, so create one by hand (once):</p>
 <ol><li><strong>New → Socket.IO</strong>, URL <code>{{baseUrl}}</code> (the client version: <strong>v4</strong>).</li><li><strong>Headers</strong>: <code>Authorization</code> = <code>Bearer {{token}}</code> (or <strong>Settings → Handshake auth</strong>: <code>{ &quot;token&quot;: &quot;{{token}}&quot; }</code>).</li><li><strong>Events</strong> tab: add listeners <code>notification:new</code>, <code>notification:unread-count</code>, <code>session:ended</code> and turn them on.</li><li><strong>Connect</strong>. Then run requests from this collection in another tab (e.g. create a product as a tenant) and watch the events arrive.</li><li>Save it into this collection (Save → Prafi API) so it stays next to the REST requests.</li></ol></blockquote>
@@ -727,70 +1074,70 @@ socket.on('connect_error', (err) =&gt; { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATE
 // after logging in again (new token): socket.disconnect().connect();</code></pre>
 <p>The request below only checks that the Socket.IO endpoint is reachable (engine.io handshake, no events).</p></div>
   
-<article class="endpoint" id="realtime-websocket--socket-io-endpoint-reachable" data-search="realtime (websocket) socket.io endpoint reachable (public) get {{baseurl}}/socket.io/?eio=4&amp;transport=polling">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="realtime-websocket--socket-io-endpoint-reachable" data-search="realtime (websocket) socket.io endpoint reachable (public) get {{baseurl}}/socket.io/?eio=4&amp;transport=polling">
+  <header class="endpoint-head">
     <h3><a href="#realtime-websocket--socket-io-endpoint-reachable">Socket.IO Endpoint Reachable</a></h3>
-    <div class="badges"><span class="badge role role-public">Public</span></div>
+    <div class="badges"><span class="badge role-public">Public</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/socket.io/?EIO=4&amp;transport=polling</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/socket.io/?EIO=4&amp;transport=polling" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/socket.io/?EIO=4&amp;transport=polling</code></div>
-  <p class="auth">No authentication</p>
-  <p>Engine.IO handshake: 200 with a session id means the realtime server is up. To receive events, create a Socket.IO request (see the folder description).</p>
-  <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th></th></tr></thead><tbody><tr><td><code>EIO</code></td><td><code>4</code></td><td></td></tr><tr><td><code>transport</code></td><td><code>polling</code></td><td></td></tr></tbody></table></div>
-  
+  <p class="auth"><span class="dot dot-open"></span>No authentication needed</p>
+  <div class="endpoint-body">
+    <p>Engine.IO handshake: 200 with a session id means the realtime server is up. To receive events, create a Socket.IO request (see the folder description).</p>
+    <h4>Query parameters</h4><div class="table-wrap"><table><thead><tr><th>name</th><th>example</th><th>required</th></tr></thead><tbody><tr><td><code>EIO</code></td><td><code>4</code></td><td>yes</td></tr><tr><td><code>transport</code></td><td><code>polling</code></td><td>yes</td></tr></tbody></table></div>
+    
+  </div>
 </article>
 </section>
 
 <section class="folder" id="examples">
-  <h2>Examples</h2>
+  <div class="folder-title"><h2>Examples</h2><span class="pill">2 endpoints</span></div>
   <div class="folder-desc"><p>Role-protected sample routes, handy to check which role the current <code>{{token}}</code> has.</p></div>
   
-<article class="endpoint" id="examples--admin-ping" data-search="examples admin ping (superadmin, admin) get {{baseurl}}/api/admin/ping">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="examples--admin-ping" data-search="examples admin ping (superadmin, admin) get {{baseurl}}/api/admin/ping">
+  <header class="endpoint-head">
     <h3><a href="#examples--admin-ping">Admin Ping</a></h3>
-    <div class="badges"><span class="badge role role-superadmin">superadmin</span><span class="badge role role-admin">admin</span></div>
+    <div class="badges"><span class="badge role-superadmin">superadmin</span><span class="badge role-admin">admin</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/api/admin/ping</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/admin/ping" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/api/admin/ping</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    
+    
+    
+  </div>
 </article>
 
-<article class="endpoint" id="examples--role-ping" data-search="examples role ping (all roles) get {{baseurl}}/api/tenant/ping">
-  <div class="endpoint-head">
+<article class="endpoint m-get" id="examples--role-ping" data-search="examples role ping (all roles) get {{baseurl}}/api/tenant/ping">
+  <header class="endpoint-head">
     <h3><a href="#examples--role-ping">Role Ping</a></h3>
-    <div class="badges"><span class="badge role role-all-roles">All roles</span></div>
+    <div class="badges"><span class="badge role-all-roles">All roles</span></div>
+  </header>
+  <div class="url">
+    <span class="method">GET</span>
+    <code class="url-text">{{baseUrl}}/api/tenant/ping</code>
+    <button class="copy" type="button" data-copy="{{baseUrl}}/api/tenant/ping" aria-label="Copy">Copy</button>
   </div>
-  <div class="url"><span class="method m-get">GET</span><code>{{baseUrl}}/api/tenant/ping</code></div>
-  <p class="auth">Authorization: <code>Bearer {{token}}</code></p>
-  <p>Answers with your role and email.</p>
-  
-  
+  <p class="auth"><span class="dot dot-lock"></span>Authorization: <code>Bearer {{token}}</code></p>
+  <div class="endpoint-body">
+    <p>Answers with your role and email.</p>
+    
+    
+  </div>
 </article>
 </section>
+  <footer>Generated from <code>postman/Prafi-API.postman_collection.json</code> on 2026-10-02 · regenerate with <code>npm run docs</code></footer>
+</div>
 </main>
 </div>
-<script>
-(function () {
-  var search = document.getElementById('search');
-  var navItems = document.querySelectorAll('aside li[data-search]');
-  var endpoints = document.querySelectorAll('article.endpoint');
-  var folders = document.querySelectorAll('aside .nav-folder[data-folder]');
-  var sections = document.querySelectorAll('section.folder');
-  search.addEventListener('input', function () {
-    var q = search.value.trim().toLowerCase();
-    var words = q.split(/\s+/).filter(Boolean);
-    var match = function (el) { var s = el.getAttribute('data-search'); return words.every(function (w) { return s.indexOf(w) !== -1; }); };
-    navItems.forEach(function (li) { li.classList.toggle('hidden', !!q && !match(li)); });
-    endpoints.forEach(function (a) { a.classList.toggle('hidden', !!q && !match(a)); });
-    folders.forEach(function (f) { f.classList.toggle('hidden', !!q && !f.querySelector('li[data-search]:not(.hidden)')); });
-    sections.forEach(function (s) { s.classList.toggle('hidden', !!q && !s.querySelector('article.endpoint:not(.hidden)')); });
-    document.getElementById('overview').classList.toggle('hidden', !!q);
-  });
-  var sidebar = document.getElementById('sidebar');
-  document.getElementById('menu-toggle').addEventListener('click', function () { sidebar.classList.toggle('open'); });
-  sidebar.addEventListener('click', function (e) { if (e.target.closest('a')) sidebar.classList.remove('open'); });
-})();
-</script>
+<button id="to-top" class="to-top" type="button" aria-label="Back to top">↑</button>
+<script src="docs.js"></script>
 </body>
 </html>
