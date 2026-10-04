@@ -5,7 +5,7 @@ import { HttpError } from '../errors/HttpError';
 import { passwordResetRequested } from '../mail/templates';
 import { Otp, sequelize, User } from '../models';
 import { endUserSessions } from '../realtime/socket';
-import { hash, RESEND_COOLDOWN_SECONDS, sameHash } from './emailVerification.service';
+import { hash, RESEND_COOLDOWN_SECONDS } from './emailVerification.service';
 import { mailIsSimulated, sendMail } from './mail.service';
 
 export const RESET_LINK_VALID_MINUTES = 30;
@@ -37,7 +37,9 @@ export async function requestReset(email: string): Promise<ResetRequestResult> {
 
   const token = randomBytes(32).toString('hex');
   await sequelize.transaction(async (transaction) => {
-    await Otp.destroy({ where: { userId: user.id, purpose: 'reset', usedAt: null }, transaction });
+    // Older links stop working because only the newest one is accepted; they are kept for a day so a
+    // replaced link gets a clear error ("use the newest email") instead of a generic "invalid"
+    await Otp.destroy({ where: { userId: user.id, purpose: 'reset', createdAt: { [Op.lt]: new Date(Date.now() - 86_400_000) } }, transaction });
     await Otp.create(
       { userId: user.id, purpose: 'reset', code: hash(token), expiresAt: new Date(Date.now() + RESET_LINK_VALID_MINUTES * 60_000) },
       { transaction },
@@ -54,14 +56,24 @@ export async function requestReset(email: string): Promise<ResetRequestResult> {
   return mailIsSimulated && !env.isProduction ? { devLink: link } : {};
 }
 
-/** Finds the user's current reset code if `token` matches it and it is still usable. */
+/**
+ * Finds the reset code for `token` and checks it is the user's newest, unused, unexpired one.
+ * Each failure has its own message so the person knows what to do (all use code RESET_LINK_INVALID except expiry).
+ */
 async function findValidReset(userId: string, token: string) {
-  const invalid = () => new HttpError(400, 'Tautan atur ulang kata sandi tidak valid atau sudah digunakan', 'RESET_LINK_INVALID');
+  const invalid = (message: string) => new HttpError(400, message, 'RESET_LINK_INVALID');
   const user = await User.findByPk(userId, { attributes: ['id', 'email', 'mailActive'] });
-  if (!user) throw invalid();
+  if (!user) throw invalid('Tautan atur ulang kata sandi tidak valid: pengguna tidak ditemukan, periksa userId pada tautan');
 
-  const code = await Otp.findOne({ where: { userId, purpose: 'reset', usedAt: null }, order: [['createdAt', 'DESC']] });
-  if (!code || !sameHash(hash(token), code.code)) throw invalid();
+  const code = await Otp.findOne({ where: { userId, purpose: 'reset', code: hash(token) } });
+  if (!code) {
+    throw invalid('Tautan atur ulang kata sandi tidak valid: token tidak cocok, pastikan seluruh tautan dari email disalin');
+  }
+  if (code.usedAt) throw invalid('Tautan atur ulang kata sandi sudah digunakan, silakan minta tautan baru jika perlu');
+  const newer = await Otp.count({ where: { userId, purpose: 'reset', createdAt: { [Op.gt]: code.createdAt } } });
+  if (newer > 0) {
+    throw invalid('Tautan ini sudah diganti oleh tautan yang lebih baru, gunakan tautan dari email atur ulang kata sandi yang terakhir');
+  }
   if (code.expiresAt.getTime() < Date.now()) {
     throw new HttpError(
       400,
@@ -90,7 +102,6 @@ export async function resetPassword(userId: string, token: string, password: str
     // Saved through the instance so the User model's beforeSave hook hashes the password
     const account = await User.scope('withPassword').findByPk(user.id, { transaction });
     await account!.update({ password, mailActive: true, passwordChangedAt: new Date() }, { transaction });
-    await Otp.destroy({ where: { userId: user.id, purpose: 'reset', usedAt: null, id: { [Op.ne]: code.id } }, transaction });
   });
 
   await endUserSessions(user.id, 'password_reset');

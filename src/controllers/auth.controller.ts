@@ -236,6 +236,10 @@ function parseResetBody(body: Record<string, unknown>, needPassword: boolean) {
   const token = typeof body.token === 'string' ? body.token.trim() : '';
   if (!UUID_RE.test(userId)) errors.push({ field: 'userId', message: 'userId harus berupa UUID yang valid' });
   if (!token) errors.push({ field: 'token', message: 'token wajib diisi' });
+  else if (!/^[0-9a-f]{64}$/i.test(token)) {
+    // e.g. an unset Postman variable ("{{resetToken}}") or only part of the link copied
+    errors.push({ field: 'token', message: 'token tidak lengkap: salin seluruh nilai token (64 karakter) dari tautan di email' });
+  }
   const password = body.password;
   if (needPassword && (typeof password !== 'string' || password.length < MIN_PASSWORD_LENGTH)) {
     errors.push({ field: 'password', message: `password minimal ${MIN_PASSWORD_LENGTH} karakter` });
