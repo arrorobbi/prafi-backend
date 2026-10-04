@@ -3,7 +3,7 @@ import { ROLES } from '../constants/roles';
 import { Approval, sequelize, User } from '../models';
 
 async function main() {
-  const email = process.env.SEED_ADMIN_EMAIL ?? 'superadmin@example.com';
+  const email = process.env.SEED_ADMIN_EMAIL ?? 'transmigrasiprafitep@gmail.com';
   const password = process.env.SEED_ADMIN_PASSWORD;
   if (!password) throw new Error('Set SEED_ADMIN_PASSWORD in .env');
 
