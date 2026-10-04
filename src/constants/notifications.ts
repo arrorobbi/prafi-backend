@@ -3,12 +3,15 @@
  * `entityType` + `entityId` say what to open.
  *
  * Recipients:
- *   superadmin — ADMIN_PENDING_ACTIVATION, PRODUCT_SUBMITTED, USER_DEACTIVATED, PRODUCT_DEACTIVATED
- *   admin      — PRODUCT_SUBMITTED, PRODUCT_PUBLISHED, PRODUCT_UPDATED, TENANT_PROFILE_UPDATED, TENANT_REGISTERED
- *   tenant     — PRODUCT_UNDER_REVIEW, PRODUCT_APPROVED
+ *   superadmin    — USER_REGISTERED (every new account), PRODUCT_SUBMITTED, USER_DEACTIVATED, PRODUCT_DEACTIVATED
+ *   disnakertrans — ADMIN_PENDING_ACTIVATION
+ *   admin         — PRODUCT_SUBMITTED, PRODUCT_PUBLISHED, PRODUCT_UPDATED, TENANT_PROFILE_UPDATED, TENANT_REGISTERED
+ *   tenant        — PRODUCT_UNDER_REVIEW, PRODUCT_APPROVED
  */
 export const NOTIFICATION_TYPES = {
-  /** A new admin was registered and waits for a superadmin to activate it. */
+  /** To superadmins: a new account of any role was created. */
+  USER_REGISTERED: 'USER_REGISTERED',
+  /** To disnakertrans: a new admin signed up and waits for a disnakertrans to activate it. */
   ADMIN_PENDING_ACTIVATION: 'ADMIN_PENDING_ACTIVATION',
   /** A tenant created a product that waits for approval. */
   PRODUCT_SUBMITTED: 'PRODUCT_SUBMITTED',

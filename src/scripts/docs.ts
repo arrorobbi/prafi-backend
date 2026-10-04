@@ -6,6 +6,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { ALL_ROLES } from '../constants/roles';
 import { renderFlows } from './docs.flows';
 
 const ROOT = path.resolve(__dirname, '../..');
@@ -361,6 +362,7 @@ const css = `
   --patch: #7c3aed; --patch-soft: #f5f3ff; --put: #2563eb; --put-soft: #eff6ff; --delete: #e11d48; --delete-soft: #fff1f2;
   --r-public: #047857; --r-public-bg: #d1fae5; --r-all: #1d4ed8; --r-all-bg: #dbeafe; --r-superadmin: #be123c; --r-superadmin-bg: #ffe4e6;
   --r-admin: #b45309; --r-admin-bg: #fef3c7; --r-tenant: #6d28d9; --r-tenant-bg: #ede9fe;
+  --r-disnakertrans: #0e7490; --r-disnakertrans-bg: #cffafe;
   --method-text: #ffffff;
 }
 :root[data-theme="dark"] {
@@ -372,6 +374,7 @@ const css = `
   --patch: #a78bfa; --patch-soft: #221a3d; --put: #60a5fa; --put-soft: #0f2140; --delete: #fb7185; --delete-soft: #33121c;
   --r-public: #6ee7b7; --r-public-bg: #0b2a22; --r-all: #93c5fd; --r-all-bg: #0f2140; --r-superadmin: #fda4af; --r-superadmin-bg: #33121c;
   --r-admin: #fcd34d; --r-admin-bg: #2e220a; --r-tenant: #c4b5fd; --r-tenant-bg: #221a3d;
+  --r-disnakertrans: #67e8f9; --r-disnakertrans-bg: #0b2a33;
   --method-text: #0b1020;
 }
 * { box-sizing: border-box; }
@@ -466,6 +469,7 @@ blockquote { margin: 14px 0; padding: 6px 16px; border-left: 4px solid var(--pri
 .role-superadmin { color: var(--r-superadmin); background: var(--r-superadmin-bg); }
 .role-admin { color: var(--r-admin); background: var(--r-admin-bg); }
 .role-tenant { color: var(--r-tenant); background: var(--r-tenant-bg); }
+.role-disnakertrans { color: var(--r-disnakertrans); background: var(--r-disnakertrans-bg); }
 .url { display: flex; align-items: center; gap: 10px; margin: 12px 0 6px; background: var(--accent-soft); border-radius: 12px; padding: 7px 7px 7px 8px; }
 .method { font: 800 12px/1 "JetBrains Mono", Consolas, monospace; padding: 7px 10px; border-radius: 8px; color: var(--method-text); background: var(--accent); letter-spacing: .03em; }
 .url-text { flex: 1; min-width: 0; background: none; color: var(--text); padding: 0; font-size: 14px; }
@@ -713,7 +717,7 @@ const html = `<!doctype html>
     <div class="stats">
       <div class="stat"><b>${requestCount}</b><span>${t(UI.endpoints)}</span></div>
       <div class="stat"><b>${folders.length}</b><span>${t(UI.groups)}</span></div>
-      <div class="stat"><b>3</b><span>${t(UI.roles)}</span></div>
+      <div class="stat"><b>${ALL_ROLES.length}</b><span>${t(UI.roles)}</span></div>
       <div class="stat"><b>${methodCount('GET')} · ${methodCount('POST')} · ${methodCount('PATCH')} · ${methodCount('DELETE')}</b><span>${t(UI.methods)}</span></div>
     </div>
   </section>
@@ -736,6 +740,12 @@ fs.writeFileSync(path.join(OUT_DIR, 'docs.js'), js);
 console.log(`documentation/: ${folders.length} groups, ${requestCount} endpoints, English + Bahasa Indonesia`);
 if (missingFlows.length) {
   console.warn(`No flowchart yet, add to src/scripts/docs.flows.ts:\n  - ${missingFlows.join('\n  - ')}`);
+}
+// Indonesian sections whose folder/request no longer exists (e.g. a request was renamed in Postman)
+const known = new Set(collection.item.flatMap((f) => [`FOLDER ${f.name}`, ...f.item.map((r) => `REQ ${r.name}`)]));
+const orphaned = [...[...id.folders.keys()].map((k) => `FOLDER ${k}`), ...[...id.requests.keys()].map((k) => `REQ ${k}`)].filter((k) => !known.has(k));
+if (orphaned.length) {
+  console.warn(`In docs.id.md but not in the collection (renamed or removed? rename the section):\n  - ${orphaned.join('\n  - ')}`);
 }
 if (missing.length) {
   console.warn(`Not translated yet (shown in English), add to src/scripts/docs.id.md:\n  - ${missing.join('\n  - ')}`);

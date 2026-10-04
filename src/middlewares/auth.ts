@@ -25,7 +25,7 @@ export const authenticate: RequestHandler = async (req, _res, next) => {
 
 /**
  * All checks for an access token, shared by HTTP requests and WebSocket connections:
- * valid signature, not expired, not logged out, user still exists and is activated.
+ * valid signature, not expired, not logged out, user still exists, email verified and activated.
  * Throws HttpError (401/403) otherwise.
  */
 export async function verifyAccess(token: string): Promise<{ user: AuthUser; token: { jti?: string; expiresAt: Date } }> {
@@ -52,10 +52,13 @@ export async function verifyAccess(token: string): Promise<{ user: AuthUser; tok
   }
 
   const user = await User.findByPk(payload.sub, {
-    attributes: ['id', 'email', 'role'],
+    attributes: ['id', 'email', 'role', 'mailActive'],
     include: [{ association: 'approval', attributes: ['isActive'] }],
   });
   if (!user) throw HttpError.unauthorized('Pengguna sudah tidak ada');
+
+  // Only accounts with a verified email may use the API
+  if (!user.mailActive) throw HttpError.emailNotVerified({ userId: user.id });
 
   // Only activated accounts may use the API (no approval yet counts as not activated)
   if (user.approval?.isActive !== true) {

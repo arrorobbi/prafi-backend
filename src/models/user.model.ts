@@ -16,6 +16,7 @@ import type { DbModels } from '.';
 import type { Approval } from './approval.model';
 import type { Image } from './image.model';
 import type { Notification } from './notification.model';
+import type { Otp } from './otp.model';
 import type { Product } from './product.model';
 import type { Tenant } from './tenant.model';
 
@@ -41,6 +42,8 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   declare faceImageId: ForeignKey<Image['id']> | null;
   /** Tenants only: their tenant name. Required for tenants, always null for other roles. */
   declare tenantName: CreationOptional<string | null>;
+  /** The email address is verified (OTP or activation link). false for every new account; the API refuses tokens until true. */
+  declare mailActive: CreationOptional<boolean>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
@@ -52,8 +55,9 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   declare productApprovals?: NonAttribute<Approval[]>;
   /** Tenants only: their tenant profile (tenants table). */
   declare tenant?: NonAttribute<Tenant>;
+  declare otps?: NonAttribute<Otp[]>;
 
-  static associate({ Image, Product, Notification, Approval, Tenant }: DbModels) {
+  static associate({ Image, Product, Notification, Approval, Tenant, Otp }: DbModels) {
     // users.face_image_id - images.id (one-to-one)
     User.belongsTo(Image, { as: 'faceImage', foreignKey: 'faceImageId', onDelete: 'SET NULL' });
     // products.tenant_id > users.id (a tenant user has many products)
@@ -66,6 +70,8 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
     User.hasMany(Approval, { as: 'productApprovals', foreignKey: 'userId', scope: { type: 'product' } });
     // tenants.user_id - users.id (one-to-one: a tenant user has one tenant profile)
     User.hasOne(Tenant, { as: 'tenant', foreignKey: 'userId' });
+    // otps.user_id > users.id (email verification codes/links; deleted with the user)
+    User.hasMany(Otp, { as: 'otps', foreignKey: 'userId' });
   }
 
   comparePassword(plain: string): Promise<boolean> {
@@ -108,6 +114,7 @@ User.init(
     },
     // Nullable in the table because admins/superadmins have no tenant name; required for tenants (see validate below)
     tenantName: { type: DataTypes.STRING, allowNull: true, validate: { notEmpty: true } },
+    mailActive: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },

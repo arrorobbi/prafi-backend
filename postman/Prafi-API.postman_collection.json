@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Prafi API",
-    "description": "Backend API for Prafi (Express + Sequelize + PostgreSQL), with realtime notifications over Socket.IO.\n\n## Setup (once)\n1. Import this collection and `Prafi-Local.postman_environment.json`, then select **Prafi Local** (environment dropdown, top right).\n2. In **Prafi Local** set `loginEmail` / `loginPassword` (Current value) to the superadmin from `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`), then Ctrl+S.\n3. Start the server (`npm run dev` or `npm run build && npm start`). `baseUrl` is `http://localhost:4000`.\n\n## Login and roles\n- Every request uses **Bearer `{{token}}`** (set on the collection; requests inherit it). Public requests have *No Auth*.\n- **Auth → Login** saves the token to `{{token}}` (valid **1 hour**). To switch role, change `loginEmail` / `loginPassword` (or the Login body) and send Login again.\n- The **name of each request says who can call it**: `(All roles)` = superadmin, admin and tenant; `(superadmin, admin)`, `(admin)`, `(tenant)`… = only those roles; `(Public)` = no login. Any other role gets **403**.\n\n| role | created by | starts | can |\n|---|---|---|---|\n| superadmin | seed (`npm run db:seed`) | active | register admins, activate admin/tenant accounts, read everything, manage tenant categories |\n| admin | superadmin (*Register Admin*) | **inactive** until a superadmin activates it | activate tenant accounts **and products**, read users/products/tenants, manage tenant categories |\n| tenant | public sign-up (*Register Tenant*) | active | manage their own products and tenant profile |\n\n## Endpoints\n| folder | endpoint | access |\n|---|---|---|\n| Health | `GET /api/health` | Public |\n| Auth | `POST /api/auth/login` | Public |\n| Auth | `POST /api/auth/logout` | All roles |\n| Auth | `POST /api/auth/register/admin` | superadmin |\n| Auth | `POST /api/auth/register/tenant` | Public |\n| Auth | `GET /api/auth/me` | All roles |\n| Auth | `PATCH /api/auth/me` | All roles |\n| Images | `POST /api/images` | All roles |\n| Images | `GET {{imagePath}}` | Public |\n| Images | `DELETE /api/images/{{imageId}}` | tenant |\n| Users | `GET /api/users` | superadmin, admin |\n| Approvals | `PATCH /api/approvals/{{userId}}` | superadmin, admin |\n| Approvals | `PATCH /api/approvals/{{productId}}` | admin |\n| Products | `GET /api/products` | All roles |\n| Products | `GET /api/products/{{productId}}` | All roles |\n| Products | `POST /api/products` | tenant |\n| Products | `PATCH /api/products/{{productId}}` | tenant |\n| Products | `DELETE /api/products/{{productId}}` | tenant |\n| Landing | `GET /api/landing/products` | Public |\n| Tenant Categories | `GET /api/tenant-categories` | superadmin, admin |\n| Tenant Categories | `GET /api/tenant-categories/{{categoryId}}` | superadmin, admin |\n| Tenant Categories | `POST /api/tenant-categories` | superadmin, admin |\n| Tenant Categories | `PATCH /api/tenant-categories/{{categoryId}}` | superadmin, admin |\n| Tenant Categories | `DELETE /api/tenant-categories/{{categoryId}}` | superadmin, admin |\n| Tenants | `GET /api/tenants/me` | tenant |\n| Tenants | `POST /api/tenants/me` | tenant |\n| Tenants | `PATCH /api/tenants/me` | tenant |\n| Tenants | `DELETE /api/tenants/me` | tenant |\n| Tenants | `GET /api/tenants` | superadmin, admin |\n| Tenants | `GET /api/tenants/{{tenantProfileId}}` | superadmin, admin |\n| Notifications | `GET /api/notifications` | All roles |\n| Notifications | `GET /api/notifications/unread-count` | All roles |\n| Notifications | `PATCH /api/notifications/{{notificationId}}/read` | All roles |\n| Notifications | `PATCH /api/notifications/read-all` | All roles |\n| Notifications | `DELETE /api/notifications/{{notificationId}}` | All roles |\n| Examples | `GET /api/admin/ping` | superadmin, admin |\n| Examples | `GET /api/tenant/ping` | All roles |\n| Realtime (WebSocket) | Socket.IO at `{{baseUrl}}` | All roles (Bearer token) |\n\n## Saved variables\nRequests save what the next ones need: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail` (Register) · `imageId`, `imagePath` (Upload Image) · `productId` · `categoryId` · `tenantProfileId` · `notificationId`. Each save is printed in the Postman Console.\n\n## Example walkthrough\n1. **Login** as superadmin → **Register Admin** → **Activate / Deactivate User** (activates the new admin) → **Create Tenant Category**.\n2. **Register Tenant** → set `loginEmail` = `{{registeredEmail}}`, `loginPassword` = `{{newUserPassword}}` → **Login** (now tenant) → **Upload Image** → **Create My Tenant** → **Upload Image** again → **Create Product**.\n3. **Login** as the admin (`admin…@prafi.test` / `{{newUserPassword}}`) → **List Notifications** → **Activate / Deactivate Product** → **Landing Products** shows it.\n\n## Responses\n- Success: `{ \"success\": true, \"data\": …, \"meta\"?: { page, limit, total, totalPages } }`\n- Error: `{ \"success\": false, \"error\": { \"code\", \"message\", \"details\"? } }`\n- `message` and `details[].message` are in **Bahasa Indonesia** (ready to show in the frontend). `code` and `field` stay in English; frontend logic should switch on `code`.\n\n| status | code (examples) | meaning |\n|---|---|---|\n| 400 | `VALIDATION_ERROR`, `BAD_REQUEST`, `ID_NOT_PROVIDED` | invalid input (`details` lists the fields) |\n| 401 | `UNAUTHORIZED` | no/invalid/expired/logged-out token → log in again |\n| 403 | `FORBIDDEN`, `USER_NOT_ACTIVATED` | wrong role, or the account is not activated |\n| 404 | `NOT_FOUND` | not found, or not yours |\n| 409 | `UNIQUE_CONSTRAINT`, `STILL_IN_USE`, `CONFLICT` | duplicate value, record still in use |\n| 413 | `FILE_TOO_LARGE` | image over 5 MB |\n\n## Notifications and realtime\nEvery role gets notifications for the events that concern them (see **Notifications**); activation notifications include the `approval` with `userId` and the `user`. They arrive live over Socket.IO as `notification:new` (see **Realtime (WebSocket)** for connecting in Postman and in the frontend).",
+    "description": "Backend API for Prafi (Express + Sequelize + PostgreSQL), with realtime notifications over Socket.IO and emails (nodemailer).\n\n## Setup (once)\n1. Import this collection and `Prafi-Local.postman_environment.json`, then select **Prafi Local** (environment dropdown, top right).\n2. In **Prafi Local** set `loginEmail` / `loginPassword` (Current value) to the superadmin from `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`), then Ctrl+S.\n3. Start the server (`npm run dev` or `npm run build && npm start`). `baseUrl` is `http://localhost:4000`.\n4. Email: set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` in `.env` to send real emails. Without `SMTP_HOST` (development) emails are printed in the server log and the OTP / activation token is returned in `meta.verification` and saved as `{{otp}}` / `{{verifyToken}}`.\n\n## Login and roles\n- Every request uses **Bearer `{{token}}`** (set on the collection; requests inherit it). Public requests have *No Auth*.\n- **Auth → Login** saves the token to `{{token}}` (valid **1 hour**). To switch role, change `loginEmail` / `loginPassword` (or the Login body) and send Login again.\n- The **name of each request says who can call it**: `(All roles)` = superadmin, disnakertrans, admin and tenant; `(superadmin, disnakertrans, admin)`, `(admin)`, `(tenant)`… = only those roles; `(Public)` = no login. Any other role gets **403**.\n- Every account must have a **verified email** (`mailActive: true`) and an **active approval** (`approval.isActive: true`) to log in and use the API.\n\n| role | created by | email verification | approval at start | can |\n|---|---|---|---|---|\n| superadmin | seed (`npm run db:seed`) | already verified | active | create disnakertrans accounts; **read-only** for everything else (users, products, tenants, tenant categories); notified of every new account and product |\n| disnakertrans | superadmin (*Register Disnakertrans*) | activation link (24 h) | active | view and activate/deactivate **admin** accounts, view all products and tenants |\n| admin | self sign-up (*Register Admin*) | OTP (15 min) | **inactive** until a disnakertrans activates it | activate tenant accounts **and products**, read users (tenants)/products/tenants, manage tenant categories |\n| tenant | self sign-up (*Register Tenant*) | OTP (15 min) | active | manage their own products and tenant profile |\n\n## Endpoints\n| folder | endpoint | access |\n|---|---|---|\n| Health | `GET /api/health` | Public |\n| Auth | `POST /api/auth/login` | Public |\n| Auth | `POST /api/auth/logout` | All roles |\n| Auth | `POST /api/auth/register/disnakertrans` | superadmin |\n| Auth | `POST /api/auth/register/admin` | Public |\n| Auth | `POST /api/auth/register/tenant` | Public |\n| Auth | `POST /api/auth/verify-otp/{{userId}}` | Public |\n| Auth | `GET /api/auth/verify-email/{{userId}}` | Public |\n| Auth | `POST /api/auth/resend-verification/{{userId}}` | Public |\n| Auth | `GET /api/auth/me` | All roles |\n| Auth | `PATCH /api/auth/me` | All roles |\n| Images | `POST /api/images` | All roles |\n| Images | `GET {{imagePath}}` | Public |\n| Images | `DELETE /api/images/{{imageId}}` | tenant |\n| Users | `GET /api/users` | superadmin, disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{userId}}` | disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{productId}}` | admin |\n| Products | `GET /api/products` | All roles |\n| Products | `GET /api/products/{{productId}}` | All roles |\n| Products | `POST /api/products` | tenant |\n| Products | `PATCH /api/products/{{productId}}` | tenant |\n| Products | `DELETE /api/products/{{productId}}` | tenant |\n| Landing | `GET /api/landing/products` | Public |\n| Tenant Categories | `GET /api/tenant-categories` | superadmin, admin |\n| Tenant Categories | `GET /api/tenant-categories/{{categoryId}}` | superadmin, admin |\n| Tenant Categories | `POST /api/tenant-categories` | admin |\n| Tenant Categories | `PATCH /api/tenant-categories/{{categoryId}}` | admin |\n| Tenant Categories | `DELETE /api/tenant-categories/{{categoryId}}` | admin |\n| Tenants | `GET /api/tenants/me` | tenant |\n| Tenants | `POST /api/tenants/me` | tenant |\n| Tenants | `PATCH /api/tenants/me` | tenant |\n| Tenants | `DELETE /api/tenants/me` | tenant |\n| Tenants | `GET /api/tenants` | superadmin, disnakertrans, admin |\n| Tenants | `GET /api/tenants/{{tenantProfileId}}` | superadmin, disnakertrans, admin |\n| Notifications | `GET /api/notifications` | All roles |\n| Notifications | `GET /api/notifications/unread-count` | All roles |\n| Notifications | `PATCH /api/notifications/{{notificationId}}/read` | All roles |\n| Notifications | `PATCH /api/notifications/read-all` | All roles |\n| Notifications | `DELETE /api/notifications/{{notificationId}}` | All roles |\n| Examples | `GET /api/admin/ping` | superadmin, admin |\n| Examples | `GET /api/tenant/ping` | All roles |\n| Realtime (WebSocket) | Socket.IO at `{{baseUrl}}` | All roles (Bearer token) |\n\n## Saved variables\nRequests save what the next ones need: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `imageId`, `imagePath` (Upload Image) · `productId` · `categoryId` · `tenantProfileId` · `notificationId`. Each save is printed in the Postman Console.\n\n## Example walkthrough\n1. **Login** as superadmin → **Register Disnakertrans** → **Verify Email Link** (or open the link from the email).\n2. **Register Admin** → **Verify OTP** (code from the email, or `{{otp}}` in development).\n3. Set `loginEmail` = the disnakertrans email, `loginPassword` = `{{newUserPassword}}` → **Login** → **Activate / Deactivate User** with `userId` = the admin's id and `userRole` = `admin`.\n4. **Login** as the admin → **Create Tenant Category**.\n5. **Register Tenant** → **Verify OTP** → **Login** as the tenant → **Upload Image** → **Create My Tenant** → **Upload Image** again → **Create Product**.\n6. **Login** as the admin → **List Notifications** → **Activate / Deactivate Product** → **Landing Products** shows it.\n\n## Responses\n- Success: `{ \"success\": true, \"data\": …, \"meta\"?: { page, limit, total, totalPages } | { verification } }`\n- Error: `{ \"success\": false, \"error\": { \"code\", \"message\", \"details\"? } }`\n- `message` and `details[].message` are in **Bahasa Indonesia** (ready to show in the frontend). `code` and `field` stay in English; frontend logic should switch on `code`.\n\n| status | code (examples) | meaning |\n|---|---|---|\n| 400 | `VALIDATION_ERROR`, `BAD_REQUEST`, `ID_NOT_PROVIDED` | invalid input (`details` lists the fields) |\n| 400 | `OTP_INVALID`, `OTP_EXPIRED`, `LINK_INVALID`, `LINK_EXPIRED` | wrong or expired verification code / link |\n| 401 | `UNAUTHORIZED` | no/invalid/expired/logged-out token → log in again |\n| 403 | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `USER_NOT_ACTIVATED` | wrong role, email not verified yet, or account not activated |\n| 404 | `NOT_FOUND` | not found, or not yours |\n| 409 | `UNIQUE_CONSTRAINT`, `STILL_IN_USE`, `CONFLICT`, `EMAIL_ALREADY_VERIFIED` | duplicate value, record still in use, already verified |\n| 413 | `FILE_TOO_LARGE` | image over 5 MB |\n| 429 | `TOO_MANY_REQUESTS` | a new verification code was requested less than 60 seconds ago |\n\n## Notifications and realtime\nEvery role gets notifications for the events that concern them (see **Notifications**); activation notifications include the `approval` with `userId` and the `user`. They arrive live over Socket.IO as `notification:new` (see **Realtime (WebSocket)** for connecting in Postman and in the frontend).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -89,7 +89,7 @@
     },
     {
       "name": "Auth",
-      "description": "Login, logout, registration and your own account (`/api/auth`).\n\n**Login** saves the token to `{{token}}`, which every other request uses. To act as another role, change `loginEmail` / `loginPassword` (or the body) and send Login again.\n\n**Registration**: admin accounts are created by a superadmin and start **inactive** (activate them in Approvals). Tenant accounts sign up publicly and are **active** right away.",
+      "description": "Login, logout, registration, email verification and your own account (`/api/auth`).\n\n**Login** saves the token to `{{token}}`, which every other request uses. To act as another role, change `loginEmail` / `loginPassword` (or the body) and send Login again.\n\n| account | registered by | email verification | approval (`isActive`) |\n|---|---|---|---|\n| disnakertrans | superadmin (*Register Disnakertrans*) | activation **link** in the email (valid 24 h) | active right away |\n| admin | themselves (*Register Admin*, public) | 6-digit **OTP** in the email (valid 15 min) | **inactive** until a disnakertrans activates it |\n| tenant | themselves (*Register Tenant*, public) | 6-digit **OTP** in the email (valid 15 min) | active right away |\n\nEvery new account starts with `mailActive: false`: login and every endpoint that needs a token answer **403 `EMAIL_NOT_VERIFIED`** until the email is verified. Emails are in Bahasa Indonesia.\n\n**Development:** without `SMTP_HOST` in `.env`, emails are not sent but printed in the server log, and the register/resend responses include `meta.verification.devCode` / `devLink`, which the requests save as `{{otp}}` / `{{verifyToken}}`.",
       "item": [
         {
           "name": "Login (Public)",
@@ -112,7 +112,7 @@
                 "login"
               ]
             },
-            "description": "**Access:** public, no token\n\nLogs in and saves the access token as `{{token}}` (valid for 1 hour), plus `{{currentUserId}}` and `{{currentRole}}`.\n\n- superadmin: the seed account (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` in `.env`)\n- admin / tenant: an account made with the Register requests (password `{{newUserPassword}}`; the email is saved as `{{registeredEmail}}`)\n\nErrors: 401 wrong email/password, 403 `USER_NOT_ACTIVATED` (account not activated yet).",
+            "description": "**Access:** public, no token\n\nLogs in and saves the access token as `{{token}}` (valid for 1 hour), plus `{{currentUserId}}` and `{{currentRole}}`.\n\n- superadmin: the seed account (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` in `.env`)\n- disnakertrans / admin / tenant: an account made with the Register requests (password `{{newUserPassword}}`; the email is saved as `{{registeredEmail}}`)\n\nErrors: 401 wrong email/password, 403 `EMAIL_NOT_VERIFIED` (verify the email first; `details` has `userId` and `method`), 403 `USER_NOT_ACTIVATED` (account not activated yet).",
             "auth": {
               "type": "noauth"
             },
@@ -132,8 +132,11 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
+                  "var res = pm.response.json();",
                   "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Token saved to {{token}}', () => pm.expect(pm.environment.get('token')).to.eql(pm.response.json().data.accessToken));"
+                  "if (pm.response.code === 200) pm.test('Token saved to {{token}}', () => pm.expect(pm.environment.get('token')).to.eql(res.data.accessToken));",
+                  "// Email not verified yet: keep the userId so Verify OTP / Resend Verification can be sent next",
+                  "if (res.error && res.error.code === 'EMAIL_NOT_VERIFIED' && res.error.details) { pm.environment.set('userId', res.error.details.userId); console.log('saved {{userId}} = ' + res.error.details.userId + ' (verify the email: ' + res.error.details.method + ')'); }"
                 ]
               }
             }
@@ -155,7 +158,7 @@
                 "logout"
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, admin, tenant)\n\nRevokes the token used for this request (other sessions stay logged in) and clears `{{token}}`. Its open WebSocket connections receive `session:ended` (`logged_out`)."
+            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nRevokes the token used for this request (other sessions stay logged in) and clears `{{token}}`. Its open WebSocket connections receive `session:ended` (`logged_out`)."
           },
           "event": [
             {
@@ -171,7 +174,59 @@
           ]
         },
         {
-          "name": "Register Admin (superadmin)",
+          "name": "Register Disnakertrans (superadmin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register/disnakertrans",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register",
+                "disnakertrans"
+              ]
+            },
+            "description": "**Access:** superadmin\n\nCreates a **disnakertrans** account (the approver of admin accounts). Its approval is active right away (`approval.isActive: true`), but the email must be activated first: an email in Bahasa Indonesia tells the person the account was created and contains the public activation link (*Verify Email Link*, valid 24 hours). The password is the one in the body; give it to the person yourself.\n\nNotifies every superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development, `{{verifyToken}}`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Dewi\",\n  \"lastName\": \"Lestari\",\n  \"phoneNumber\": \"081377788899\",\n  \"email\": \"disnaker{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code < 300) { pm.environment.set('userId', pm.response.json().data.id); console.log('saved {{userId}} = ' + pm.environment.get('userId')); }",
+                  "if (pm.response.code < 300) { pm.environment.set('userRole', pm.response.json().data.role); console.log('saved {{userRole}} = ' + pm.environment.get('userRole')); }",
+                  "if (pm.response.code < 300) { pm.environment.set('registeredEmail', pm.response.json().data.email); console.log('saved {{registeredEmail}} = ' + pm.environment.get('registeredEmail')); }",
+                  "var v = pm.response.code < 300 && pm.response.json().meta && pm.response.json().meta.verification;",
+                  "if (v && v.devCode) { pm.environment.set('otp', v.devCode); console.log('saved {{otp}} = ' + pm.environment.get('otp')); }",
+                  "if (v && v.devLink) { pm.environment.set('verifyToken', v.devLink.split('token=')[1]); console.log('saved {{verifyToken}} = ' + pm.environment.get('verifyToken')); }",
+                  "if (v && !v.devCode && !v.devLink) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}} (or open the link in the email)');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register Admin (Public)",
           "request": {
             "method": "POST",
             "header": [
@@ -192,7 +247,7 @@
                 "admin"
               ]
             },
-            "description": "**Access:** superadmin\n\nCreates an **admin** account. It starts inactive (`approval.isActive: false`) and cannot log in until activated with *Approvals → Activate / Deactivate User*. Every superadmin gets an `ADMIN_PENDING_ACTIVATION` notification.\n\nSaves `{{userId}}`, `{{userRole}}` and `{{registeredEmail}}`. Optional: `faceImageId` (upload it first).",
+            "description": "**Access:** public, no token\n\nPublic sign-up for **admin** accounts, no token needed. Sends a 6-digit OTP to the email (valid 15 minutes); verify it with *Verify OTP*. Even after that, the admin cannot log in until a disnakertrans activates it (*Approvals → Activate / Deactivate User*, `approval.isActive: false` until then).\n\nNotifies every disnakertrans (`ADMIN_PENDING_ACTIVATION`) and superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development, `{{otp}}`.\n\nResponse: `data` = the new user (`mailActive: false`), `meta.verification` = `{ method: \"otp\", sentTo, expiresAt, emailSent }`.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"firstName\": \"Andi\",\n  \"lastName\": \"Wijaya\",\n  \"phoneNumber\": \"081234567890\",\n  \"email\": \"admin{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\"\n}",
@@ -201,6 +256,9 @@
                   "language": "json"
                 }
               }
+            },
+            "auth": {
+              "type": "noauth"
             }
           },
           "event": [
@@ -212,7 +270,11 @@
                   "pm.test('Status 201', () => pm.response.to.have.status(201));",
                   "if (pm.response.code < 300) { pm.environment.set('userId', pm.response.json().data.id); console.log('saved {{userId}} = ' + pm.environment.get('userId')); }",
                   "if (pm.response.code < 300) { pm.environment.set('userRole', pm.response.json().data.role); console.log('saved {{userRole}} = ' + pm.environment.get('userRole')); }",
-                  "if (pm.response.code < 300) { pm.environment.set('registeredEmail', pm.response.json().data.email); console.log('saved {{registeredEmail}} = ' + pm.environment.get('registeredEmail')); }"
+                  "if (pm.response.code < 300) { pm.environment.set('registeredEmail', pm.response.json().data.email); console.log('saved {{registeredEmail}} = ' + pm.environment.get('registeredEmail')); }",
+                  "var v = pm.response.code < 300 && pm.response.json().meta && pm.response.json().meta.verification;",
+                  "if (v && v.devCode) { pm.environment.set('otp', v.devCode); console.log('saved {{otp}} = ' + pm.environment.get('otp')); }",
+                  "if (v && v.devLink) { pm.environment.set('verifyToken', v.devLink.split('token=')[1]); console.log('saved {{verifyToken}} = ' + pm.environment.get('verifyToken')); }",
+                  "if (v && !v.devCode && !v.devLink) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}} (or open the link in the email)');"
                 ]
               }
             }
@@ -240,7 +302,7 @@
                 "tenant"
               ]
             },
-            "description": "**Access:** public, no token\n\nPublic sign-up, no token needed. The tenant is **active right away**. `tenantName` is required. Every admin gets a `TENANT_REGISTERED` notification.\n\nSaves `{{userId}}`, `{{userRole}}` and `{{registeredEmail}}`.",
+            "description": "**Access:** public, no token\n\nPublic sign-up, no token needed. `tenantName` is required. The tenant is **active right away** once the email is verified: a 6-digit OTP is sent to the email (valid 15 minutes), verify it with *Verify OTP*.\n\nNotifies every admin (`TENANT_REGISTERED`) and superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development, `{{otp}}`.",
             "auth": {
               "type": "noauth"
             },
@@ -263,7 +325,143 @@
                   "pm.test('Status 201', () => pm.response.to.have.status(201));",
                   "if (pm.response.code < 300) { pm.environment.set('userId', pm.response.json().data.id); console.log('saved {{userId}} = ' + pm.environment.get('userId')); }",
                   "if (pm.response.code < 300) { pm.environment.set('userRole', pm.response.json().data.role); console.log('saved {{userRole}} = ' + pm.environment.get('userRole')); }",
-                  "if (pm.response.code < 300) { pm.environment.set('registeredEmail', pm.response.json().data.email); console.log('saved {{registeredEmail}} = ' + pm.environment.get('registeredEmail')); }"
+                  "if (pm.response.code < 300) { pm.environment.set('registeredEmail', pm.response.json().data.email); console.log('saved {{registeredEmail}} = ' + pm.environment.get('registeredEmail')); }",
+                  "var v = pm.response.code < 300 && pm.response.json().meta && pm.response.json().meta.verification;",
+                  "if (v && v.devCode) { pm.environment.set('otp', v.devCode); console.log('saved {{otp}} = ' + pm.environment.get('otp')); }",
+                  "if (v && v.devLink) { pm.environment.set('verifyToken', v.devLink.split('token=')[1]); console.log('saved {{verifyToken}} = ' + pm.environment.get('verifyToken')); }",
+                  "if (v && !v.devCode && !v.devLink) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}} (or open the link in the email)');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify OTP (Public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/verify-otp/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "verify-otp",
+                "{{userId}}"
+              ]
+            },
+            "description": "**Access:** public, no token\n\nAdmin and tenant accounts: confirms the email with the 6-digit code from the registration email. `:userId` is the id returned by the registration (or by a 403 `EMAIL_NOT_VERIFIED` login error). Body: `{ \"otp\": \"123456\" }` (`OTP` is accepted too). On success `mailActive` becomes `true` and the user can log in.\n\nErrors: 400 `OTP_INVALID` (wrong code, `details.attemptsLeft`; after 5 wrong tries a new code is needed), 400 `OTP_EXPIRED` (older than 15 minutes), 409 `EMAIL_ALREADY_VERIFIED`, 404 unknown user.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"otp\": \"{{otp}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) pm.test('Email verified', () => pm.expect(pm.response.json().data.user.mailActive).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify Email Link (Public)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/verify-email/{{userId}}?token={{verifyToken}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "verify-email",
+                "{{userId}}"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{verifyToken}}"
+                }
+              ]
+            },
+            "description": "**Access:** public, no token\n\nDisnakertrans accounts: the activation link from the email. Opened in a browser it shows a confirmation page (Bahasa Indonesia); API clients get JSON. On success `mailActive` becomes `true`.\n\nErrors: 400 `LINK_INVALID`, 400 `LINK_EXPIRED` (older than 24 hours), 409 `EMAIL_ALREADY_VERIFIED`.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resend Verification (Public)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/resend-verification/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "resend-verification",
+                "{{userId}}"
+              ]
+            },
+            "description": "**Access:** public, no token\n\nSends a new OTP (admin, tenant) or activation link (disnakertrans); the previous one stops working. At most once per 60 seconds (429 `TOO_MANY_REQUESTS`, `details.retryAfterSeconds`). Saves the new `{{otp}}` / `{{verifyToken}}` in development.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var v = pm.response.code < 300 && pm.response.json().meta && pm.response.json().meta.verification;",
+                  "if (v && v.devCode) { pm.environment.set('otp', v.devCode); console.log('saved {{otp}} = ' + pm.environment.get('otp')); }",
+                  "if (v && v.devLink) { pm.environment.set('verifyToken', v.devLink.split('token=')[1]); console.log('saved {{verifyToken}} = ' + pm.environment.get('verifyToken')); }",
+                  "if (v && !v.devCode && !v.devLink) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}} (or open the link in the email)');"
                 ]
               }
             }
@@ -285,7 +483,7 @@
                 "me"
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, admin, tenant)\n\nThe logged-in account with its `faceImage` and account `approval`."
+            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nThe logged-in account with its `faceImage`, account `approval` and `mailActive`."
           },
           "event": [
             {
@@ -320,7 +518,7 @@
                 "me"
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, admin, tenant)\n\nUpdates your own account; send only the fields to change: `firstName`, `lastName`, `phoneNumber`, `email`, `faceImageId` (or `null`), `tenantName` (tenants only), `password` + `currentPassword`.\n\n`id` and `role` can never be changed. Replacing `faceImageId` (or setting it to `null`) deletes the old image and its file.",
+            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nUpdates your own account; send only the fields to change: `firstName`, `lastName`, `phoneNumber`, `email`, `faceImageId` (or `null`), `tenantName` (tenants only), `password` + `currentPassword`.\n\n`id`, `role` and `mailActive` can never be changed here. Replacing `faceImageId` (or setting it to `null`) deletes the old image and its file.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"firstName\": \"Andi\",\n  \"phoneNumber\": \"081234567899\"\n}",
@@ -364,7 +562,7 @@
                 "images"
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, admin, tenant)\n\nmultipart/form-data, field **image** (pick a file in Body → form-data). Saves `{{imageId}}` and `{{imagePath}}` (`imgUrl`; the response also has the full link in `url`).\n\nAn image can be used once: as one product image, one tenant logo or one face image.",
+            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nmultipart/form-data, field **image** (pick a file in Body → form-data). Saves `{{imageId}}` and `{{imagePath}}` (`imgUrl`; the response also has the full link in `url`).\n\nAn image can be used once: as one product image, one tenant logo or one face image.",
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -461,10 +659,10 @@
     },
     {
       "name": "Users",
-      "description": "Account lists. Tenants only have *Auth → Me*.",
+      "description": "Account lists. superadmin sees every account, disnakertrans sees admin accounts, admin sees tenant accounts. Tenants only have *Auth → Me*.",
       "item": [
         {
-          "name": "List Users (superadmin, admin)",
+          "name": "List Users (superadmin, disnakertrans, admin)",
           "request": {
             "method": "GET",
             "header": [],
@@ -493,7 +691,7 @@
                 }
               ]
             },
-            "description": "**Access:** superadmin, admin\n\nsuperadmin sees every account; admin sees tenant accounts only. Optional `role` filter. Each user includes `faceImage` and `approval`."
+            "description": "**Access:** superadmin, disnakertrans, admin\n\nsuperadmin: every account; disnakertrans: admin accounts only; admin: tenant accounts only. Optional `role` filter. Each user includes `faceImage`, `approval` and `mailActive`."
           },
           "event": [
             {
@@ -511,10 +709,10 @@
     },
     {
       "name": "Approvals",
-      "description": "Activate / deactivate accounts and products: `PATCH /api/approvals/:id?type=user|product`. `:id` is the **user id** or **product id** (not the approval id).\n\n| type | who can | what |\n|---|---|---|\n| `user` | superadmin → admin and tenant accounts; admin → tenant accounts | an inactive account cannot log in, and is disconnected from realtime right away |\n| `product` | admin only | active products appear on the landing page |\n\nEvery approval has a `type` (`user` = account approval, `product` = product approval) and a `userId` (the account, or the tenant who owns the product).",
+      "description": "Activate / deactivate accounts and products: `PATCH /api/approvals/:id?type=user|product`. `:id` is the **user id** or **product id** (not the approval id).\n\n| type | who can | what |\n|---|---|---|\n| `user` | disnakertrans → admin accounts; admin → tenant accounts | an inactive account cannot log in, and is disconnected from realtime right away |\n| `product` | admin only | active products appear on the landing page |\n\nThe superadmin is **read-only** and cannot activate anything (disnakertrans accounts it creates are active right away). Every deactivation of an account notifies the superadmins (`USER_DEACTIVATED`).\n\nEvery approval has a `type` (`user` = account approval, `product` = product approval) and a `userId` (the account, or the tenant who owns the product).",
       "item": [
         {
-          "name": "Activate / Deactivate User (superadmin, admin)",
+          "name": "Activate / Deactivate User (disnakertrans, admin)",
           "request": {
             "method": "PATCH",
             "header": [
@@ -540,7 +738,7 @@
                 }
               ]
             },
-            "description": "**Access:** superadmin, admin\n\n`isActive`: true/false. `role`: the target account's role, as a confirmation (must match). `reason`: optional.\n\nUses `{{userId}}` / `{{userRole}}` saved by the Register requests. Deactivating ends the user's sessions (`session:ended`, reason `deactivated`).",
+            "description": "**Access:** disnakertrans, admin\n\n`isActive`: true/false. `role`: the target account's role, as a confirmation (must match). `reason`: optional.\n\ndisnakertrans activates/deactivates **admin** accounts; admin activates/deactivates **tenant** accounts. Uses `{{userId}}` / `{{userRole}}` saved by the Register requests. Deactivating ends the user's sessions (`session:ended`, reason `deactivated`) and notifies superadmins.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"isActive\": true,\n  \"role\": \"{{userRole}}\",\n  \"reason\": \"Data lengkap\"\n}",
@@ -618,7 +816,7 @@
     },
     {
       "name": "Products",
-      "description": "Tenants manage their own products; superadmin/admin read all of them. New products start **inactive** and wait for an admin (*Approvals → Activate / Deactivate Product*).",
+      "description": "Tenants manage their own products; superadmin, disnakertrans and admin read all of them. New products start **inactive** and wait for an admin (*Approvals → Activate / Deactivate Product*).",
       "item": [
         {
           "name": "List Products (All roles)",
@@ -650,7 +848,7 @@
                 }
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, admin, tenant)\n\nsuperadmin/admin: every product. tenant: only their own. Optional `isActive` filter (e.g. `false` = waiting for approval)."
+            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nsuperadmin/disnakertrans/admin: every product. tenant: only their own. Optional `isActive` filter (e.g. `false` = waiting for approval)."
           },
           "event": [
             {
@@ -680,7 +878,7 @@
                 "{{productId}}"
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, admin, tenant)\n\nTenants get 404 for products that are not theirs."
+            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nTenants get 404 for products that are not theirs."
           },
           "event": [
             {
@@ -865,7 +1063,7 @@
     },
     {
       "name": "Tenant Categories",
-      "description": "Categories a tenant profile belongs to (e.g. Kuliner, Fashion). Managed by superadmin and admin.",
+      "description": "Categories a tenant profile belongs to (e.g. Kuliner, Fashion). Managed by admin; the superadmin can read them (read-only).",
       "item": [
         {
           "name": "List Tenant Categories (superadmin, admin)",
@@ -937,7 +1135,7 @@
           ]
         },
         {
-          "name": "Create Tenant Category (superadmin, admin)",
+          "name": "Create Tenant Category (admin)",
           "request": {
             "method": "POST",
             "header": [
@@ -956,7 +1154,7 @@
                 "tenant-categories"
               ]
             },
-            "description": "**Access:** superadmin, admin\n\nNames are unique. Saves `{{categoryId}}`.",
+            "description": "**Access:** admin\n\nNames are unique. Saves `{{categoryId}}`.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\"\n}",
@@ -981,7 +1179,7 @@
           ]
         },
         {
-          "name": "Update Tenant Category (superadmin, admin)",
+          "name": "Update Tenant Category (admin)",
           "request": {
             "method": "PATCH",
             "header": [
@@ -1001,7 +1199,7 @@
                 "{{categoryId}}"
               ]
             },
-            "description": "**Access:** superadmin, admin",
+            "description": "**Access:** admin",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\"\n}",
@@ -1025,7 +1223,7 @@
           ]
         },
         {
-          "name": "Delete Tenant Category (superadmin, admin)",
+          "name": "Delete Tenant Category (admin)",
           "request": {
             "method": "DELETE",
             "header": [],
@@ -1040,7 +1238,7 @@
                 "{{categoryId}}"
               ]
             },
-            "description": "**Access:** superadmin, admin\n\nA category still used by a tenant profile cannot be deleted (409 `STILL_IN_USE`)."
+            "description": "**Access:** admin\n\nA category still used by a tenant profile cannot be deleted (409 `STILL_IN_USE`)."
           },
           "event": [
             {
@@ -1058,7 +1256,7 @@
     },
     {
       "name": "Tenants",
-      "description": "Tenant (shop) profiles. A tenant user manages **their own** profile at `/api/tenants/me`; superadmin/admin read every profile.",
+      "description": "Tenant (shop) profiles. A tenant user manages **their own** profile at `/api/tenants/me`; superadmin, disnakertrans and admin read every profile.",
       "item": [
         {
           "name": "Get My Tenant (tenant)",
@@ -1111,7 +1309,7 @@
                 "me"
               ]
             },
-            "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName). `logoId`: upload the logo first. `categoryId`: a tenant category (created by superadmin/admin). Saves `{{tenantProfileId}}`.",
+            "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName). `logoId`: upload the logo first. `categoryId`: a tenant category (created by an admin). Saves `{{tenantProfileId}}`.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Warung Budi\",\n  \"description\": \"Kopi dan makanan ringan\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00 - 22:00\",\n  \"fbLink\": \"https://facebook.com/warungbudi\",\n  \"whatsappLink\": \"https://wa.me/6281298765432\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"logoId\": {{imageId}},\n  \"categoryId\": {{categoryId}}\n}",
@@ -1219,7 +1417,7 @@
           ]
         },
         {
-          "name": "List Tenants (superadmin, admin)",
+          "name": "List Tenants (superadmin, disnakertrans, admin)",
           "request": {
             "method": "GET",
             "header": [],
@@ -1248,7 +1446,7 @@
                 }
               ]
             },
-            "description": "**Access:** superadmin, admin\n\nEvery tenant profile with its owner, logo and category. Optional `categoryId` filter."
+            "description": "**Access:** superadmin, disnakertrans, admin\n\nEvery tenant profile with its owner, logo and category. Optional `categoryId` filter."
           },
           "event": [
             {
@@ -1264,7 +1462,7 @@
           ]
         },
         {
-          "name": "Get Tenant (superadmin, admin)",
+          "name": "Get Tenant (superadmin, disnakertrans, admin)",
           "request": {
             "method": "GET",
             "header": [],
@@ -1279,7 +1477,7 @@
                 "{{tenantProfileId}}"
               ]
             },
-            "description": "**Access:** superadmin, admin"
+            "description": "**Access:** superadmin, disnakertrans, admin"
           },
           "event": [
             {
@@ -1297,7 +1495,7 @@
     },
     {
       "name": "Notifications",
-      "description": "Notifications for every role (`/api/notifications`, Bearer `{{token}}`). They are created automatically by actions in the other folders.\n\n| type | who gets it | when |\n|---|---|---|\n| `ADMIN_PENDING_ACTIVATION` | superadmin | a new admin is registered (needs activation) |\n| `PRODUCT_SUBMITTED` | superadmin, admin | a tenant creates a product |\n| `USER_DEACTIVATED` | superadmin | an admin deactivates a user account |\n| `PRODUCT_DEACTIVATED` | superadmin | an admin deactivates a product |\n| `PRODUCT_PUBLISHED` | admin | an admin activates a product (now on the landing page) |\n| `PRODUCT_UPDATED` | admin | a tenant updates a product |\n| `TENANT_PROFILE_UPDATED` | admin | a tenant updates their tenant profile |\n| `TENANT_REGISTERED` | admin | a new tenant signs up |\n| `PRODUCT_UNDER_REVIEW` | tenant (owner) | they create a product |\n| `PRODUCT_APPROVED` | tenant (owner) | their product is activated |\n\nEach notification: `id`, `type` (switch on it in the frontend), `name` (title), `description` (message), `entityType` + `entityId` (what to open: `user`, `product` or `tenant`), `approvalId` + `approval`, `isRead`, `readAt`, `createdAt`.\n\n**Activation notifications** (`ADMIN_PENDING_ACTIVATION`, `TENANT_REGISTERED`, `PRODUCT_SUBMITTED`, `PRODUCT_UNDER_REVIEW`, `PRODUCT_PUBLISHED`, `PRODUCT_APPROVED`, `PRODUCT_DEACTIVATED`, `USER_DEACTIVATED`) include the approval of the user/product they are about:\n```json\n\"approval\": { \"id\": 137, \"type\": \"user\", \"userId\": \"<id>\", \"isActive\": false, \"reason\": \"Waiting for activation by a superadmin\", \"updatedAt\": \"...\",\n  \"user\": { \"id\": \"<id>\", \"firstName\": \"Andi\", \"lastName\": \"Wijaya\", \"email\": \"...\", \"phoneNumber\": \"...\", \"role\": \"admin\", \"tenantName\": null, ... } }\n```\n`approval.isActive` is the **current** status (not a copy from when it was sent), so the frontend can show an *Activate* button only while it is still `false`. To activate: `PATCH /api/approvals/{entityId}?type={entityType}` (body `{ \"isActive\": true, \"role\": \"admin\" }` for users, `{ \"isActive\": true }` for products). Other notifications (`PRODUCT_UPDATED`, `TENANT_PROFILE_UPDATED`) have `approvalId: null`, `approval: null`. If the product is deleted, `approval` becomes `null`. Every user only ever sees their own notifications (others → 404).\n\nEndpoints: `GET /api/notifications?page=&limit=&unread=true` (newest first, `meta.unreadCount` for the badge), `GET /api/notifications/unread-count`, `PATCH /api/notifications/:id/read`, `PATCH /api/notifications/read-all`, `DELETE /api/notifications/:id`. `approval.user` is whose approval it is (the account owner, or the tenant who owns the product); it never contains the password.",
+      "description": "Notifications for every role (`/api/notifications`, Bearer `{{token}}`). They are created automatically by actions in the other folders.\n\n| type | who gets it | when |\n|---|---|---|\n| `USER_REGISTERED` | superadmin | any new account (disnakertrans, admin, tenant) |\n| `ADMIN_PENDING_ACTIVATION` | disnakertrans | a new admin signed up (needs activation) |\n| `PRODUCT_SUBMITTED` | superadmin, admin | a tenant creates a product |\n| `USER_DEACTIVATED` | superadmin | a disnakertrans or admin deactivates a user account |\n| `PRODUCT_DEACTIVATED` | superadmin | an admin deactivates a product |\n| `PRODUCT_PUBLISHED` | admin | an admin activates a product (now on the landing page) |\n| `PRODUCT_UPDATED` | admin | a tenant updates a product |\n| `TENANT_PROFILE_UPDATED` | admin | a tenant updates their tenant profile |\n| `TENANT_REGISTERED` | admin | a new tenant signs up |\n| `PRODUCT_UNDER_REVIEW` | tenant (owner) | they create a product |\n| `PRODUCT_APPROVED` | tenant (owner) | their product is activated |\n\nEach notification: `id`, `type` (switch on it in the frontend), `name` (title), `description` (message), `entityType` + `entityId` (what to open: `user`, `product` or `tenant`), `approvalId` + `approval`, `isRead`, `readAt`, `createdAt`.\n\n**Activation notifications** (`USER_REGISTERED`, `ADMIN_PENDING_ACTIVATION`, `TENANT_REGISTERED`, `PRODUCT_SUBMITTED`, `PRODUCT_UNDER_REVIEW`, `PRODUCT_PUBLISHED`, `PRODUCT_APPROVED`, `PRODUCT_DEACTIVATED`, `USER_DEACTIVATED`) include the approval of the user/product they are about:\n```json\n\"approval\": { \"id\": 137, \"type\": \"user\", \"userId\": \"<id>\", \"isActive\": false, \"reason\": \"Waiting for activation by disnakertrans\", \"updatedAt\": \"...\",\n  \"user\": { \"id\": \"<id>\", \"firstName\": \"Andi\", \"lastName\": \"Wijaya\", \"email\": \"...\", \"phoneNumber\": \"...\", \"role\": \"admin\", \"tenantName\": null, ... } }\n```\n`approval.isActive` is the **current** status (not a copy from when it was sent), so the frontend can show an *Activate* button only while it is still `false`. To activate: `PATCH /api/approvals/{entityId}?type={entityType}` (body `{ \"isActive\": true, \"role\": \"admin\" }` for users, `{ \"isActive\": true }` for products). Other notifications (`PRODUCT_UPDATED`, `TENANT_PROFILE_UPDATED`) have `approvalId: null`, `approval: null`. If the product is deleted, `approval` becomes `null`. Every user only ever sees their own notifications (others → 404).\n\nEndpoints: `GET /api/notifications?page=&limit=&unread=true` (newest first, `meta.unreadCount` for the badge), `GET /api/notifications/unread-count`, `PATCH /api/notifications/:id/read`, `PATCH /api/notifications/read-all`, `DELETE /api/notifications/:id`. `approval.user` is whose approval it is (the account owner, or the tenant who owns the product); it never contains the password.",
       "item": [
         {
           "name": "List Notifications (All roles)",
@@ -1329,7 +1527,7 @@
                 }
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, admin, tenant)\n\nYour own notifications, newest first. `meta.unreadCount` for the badge. Saves the newest one as `{{notificationId}}`."
+            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nYour own notifications, newest first. `meta.unreadCount` for the badge. Saves the newest one as `{{notificationId}}`."
           },
           "event": [
             {
@@ -1360,7 +1558,7 @@
                 "unread-count"
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, admin, tenant)"
+            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)"
           },
           "event": [
             {
@@ -1391,7 +1589,7 @@
                 "read"
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, admin, tenant)"
+            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)"
           },
           "event": [
             {
@@ -1421,7 +1619,7 @@
                 "read-all"
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, admin, tenant)\n\nReturns `{ updated }` (how many were marked)."
+            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nReturns `{ updated }` (how many were marked)."
           },
           "event": [
             {
@@ -1451,7 +1649,7 @@
                 "{{notificationId}}"
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, admin, tenant)"
+            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)"
           },
           "event": [
             {
@@ -1566,7 +1764,7 @@
                 "ping"
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, admin, tenant)\n\nAnswers with your role and email."
+            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nAnswers with your role and email."
           },
           "event": [
             {

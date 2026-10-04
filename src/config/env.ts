@@ -30,6 +30,17 @@ export const env = {
     expiresIn: process.env.JWT_EXPIRES_IN ?? '1h',
   },
 
+  /** Outgoing email (nodemailer). Without SMTP_HOST, emails are not sent but printed in the server log (development). */
+  mail: {
+    host: process.env.SMTP_HOST ?? '',
+    port: Number(process.env.SMTP_PORT ?? 587),
+    /** true for port 465 (TLS from the start); false for 587/25 (STARTTLS) */
+    secure: process.env.SMTP_SECURE === 'true',
+    user: process.env.SMTP_USER ?? '',
+    pass: process.env.SMTP_PASS ?? '',
+    from: process.env.MAIL_FROM ?? 'Prafi <no-reply@prafi.local>',
+  },
+
   corsOrigin: (process.env.CORS_ORIGIN ?? '')
     .split(',')
     .map((origin) => origin.trim())

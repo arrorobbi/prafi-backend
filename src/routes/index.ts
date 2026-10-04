@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { ROLES } from '../constants/roles';
+import { ALL_ROLES, ROLES } from '../constants/roles';
 import { authenticate, authorize } from '../middlewares/auth';
 import approvalRoutes from './approval.routes';
 import authRoutes from './auth.routes';
@@ -31,7 +31,7 @@ router.use('/notifications', notificationRoutes);
 router.get('/admin/ping', authenticate, authorize(ROLES.SUPERADMIN, ROLES.ADMIN), (req, res) => {
   res.json({ success: true, data: { message: `Hello admin ${req.user!.email}` } });
 });
-router.get('/tenant/ping', authenticate, authorize(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.TENANT), (req, res) => {
+router.get('/tenant/ping', authenticate, authorize(...ALL_ROLES), (req, res) => {
   res.json({ success: true, data: { message: `Hello ${req.user!.role} ${req.user!.email}` } });
 });
 

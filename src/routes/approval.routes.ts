@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { ROLES } from '../constants/roles';
+import { PRODUCT_APPROVER_ROLES, USER_APPROVER_ROLES } from '../constants/roles';
 import * as approvalController from '../controllers/approval.controller';
 import { authenticate, authorize } from '../middlewares/auth';
 import { idNotProvided, requireIdParam } from '../middlewares/requireId';
@@ -10,8 +10,10 @@ const router = Router();
 router.param('id', requireIdParam);
 
 // Activate/deactivate a user or product: PATCH /api/approvals/:id?type=user|product
-// Tenants never approve anything; the per-type rules are in approval.service
-router.patch('/:id', authenticate, authorize(ROLES.SUPERADMIN, ROLES.ADMIN), approvalController.setApproval);
+// disnakertrans → admin accounts, admin → tenant accounts and products. The superadmin is read-only and tenants
+// approve nothing; the per-type rules are in approval.service
+const APPROVERS = [...new Set([...USER_APPROVER_ROLES, ...PRODUCT_APPROVER_ROLES])];
+router.patch('/:id', authenticate, authorize(...APPROVERS), approvalController.setApproval);
 router.patch('/', idNotProvided);
 
 export default router;

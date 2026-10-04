@@ -32,6 +32,20 @@ export class HttpError extends Error {
     return new HttpError(403, 'Pengguna belum diaktifkan, hubungi administrator', 'USER_NOT_ACTIVATED');
   }
 
+  /** The account's email is not verified yet (user.mailActive is false): verify with the OTP or activation link. */
+  static emailNotVerified(details?: unknown) {
+    return new HttpError(
+      403,
+      'Email belum diverifikasi, silakan verifikasi email Anda terlebih dahulu',
+      'EMAIL_NOT_VERIFIED',
+      details,
+    );
+  }
+
+  static tooManyRequests(message = 'Terlalu banyak permintaan, silakan coba lagi nanti', details?: unknown) {
+    return new HttpError(429, message, 'TOO_MANY_REQUESTS', details);
+  }
+
   /** An endpoint that needs an :id was called without one (missing, empty, "null" or "undefined"). */
   static idNotProvided() {
     return new HttpError(400, 'ID tidak diberikan', 'ID_NOT_PROVIDED');

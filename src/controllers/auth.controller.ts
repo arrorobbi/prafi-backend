@@ -1,7 +1,9 @@
 import type { RequestHandler } from 'express';
 import { ROLES, type Role } from '../constants/roles';
 import { HttpError } from '../errors/HttpError';
+import { verificationResultPage } from '../mail/templates';
 import * as authService from '../services/auth.service';
+import * as emailVerification from '../services/emailVerification.service';
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -19,8 +21,10 @@ export const login: RequestHandler = async (req, res) => {
 
 /**
  * Registration for one role; the URL decides the role, so the body doesn't need `role`.
- * POST /api/auth/register/admin  — admin starts inactive until a superadmin activates it
- * POST /api/auth/register/tenant — public sign-up (no token), tenant is active right away
+ * POST /api/auth/register/disnakertrans — superadmin only; active right away, verifies the email with a link
+ * POST /api/auth/register/admin  — public sign-up; inactive until a disnakertrans activates it, verifies with an OTP
+ * POST /api/auth/register/tenant — public sign-up; active right away, verifies with an OTP
+ * Every new account has mailActive = false until its email is verified.
  */
 const registerAs =
   (role: Role): RequestHandler =>
@@ -53,8 +57,8 @@ const registerAs =
     }
     if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);
 
-    // No req.user on the public tenant sign-up route
-    const user = await authService.register(req.user ?? null, {
+    // No req.user on the public sign-up routes
+    const { user, verification } = await authService.register(req.user ?? null, {
       firstName: (body.firstName as string).trim(),
       lastName: (body.lastName as string).trim(),
       phoneNumber: (body.phoneNumber as string).trim(),
@@ -64,9 +68,10 @@ const registerAs =
       faceImageId: faceImageId as number | null,
       ...(isTenant && { tenantName: (body.tenantName as string).trim() }),
     });
-    res.status(201).json({ success: true, data: user });
+    res.status(201).json({ success: true, data: user, meta: { verification } });
   };
 
+export const registerDisnakertrans = registerAs(ROLES.DISNAKERTRANS);
 export const registerAdmin = registerAs(ROLES.ADMIN);
 export const registerTenant = registerAs(ROLES.TENANT);
 
@@ -74,7 +79,7 @@ export const registerTenant = registerAs(ROLES.TENANT);
 export const registerMoved: RequestHandler = () => {
   throw new HttpError(
     410,
-    'Endpoint ini telah dipisah: gunakan POST /api/auth/register/admin atau POST /api/auth/register/tenant',
+    'Endpoint ini telah dipisah: gunakan POST /api/auth/register/admin, /register/tenant, atau /register/disnakertrans',
     'ENDPOINT_MOVED',
   );
 };
@@ -95,6 +100,7 @@ const UPDATABLE_FIELDS = [...UPDATABLE_TEXT_FIELDS, 'password', 'currentPassword
 const LOCKED_FIELDS: Record<string, string> = {
   id: 'id tidak dapat diubah',
   role: 'role tidak dapat diubah',
+  mailActive: 'mailActive hanya berubah melalui verifikasi email',
   createdAt: 'createdAt diatur oleh server',
   updatedAt: 'updatedAt diatur oleh server',
 };
@@ -155,4 +161,52 @@ export const updateMe: RequestHandler = async (req, res) => {
 
   const user = await authService.updateProfile(req.user!.id, input);
   res.json({ success: true, data: user });
+};
+
+// ---------- email verification (public: the user can't log in until the email is verified) ----------
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function parseUserId(value: unknown) {
+  const id = String(value);
+  if (!UUID_RE.test(id)) throw HttpError.badRequest('Validasi gagal', [{ field: 'userId', message: 'userId harus berupa UUID yang valid' }]);
+  return id;
+}
+
+/** POST /api/auth/verify-otp/:userId — body { "otp": "123456" } (admin, tenant). */
+export const verifyOtp: RequestHandler = async (req, res) => {
+  const userId = parseUserId(req.params.userId);
+  const body = (req.body ?? {}) as { otp?: unknown; OTP?: unknown };
+  const otp = String(body.otp ?? body.OTP ?? '').trim();
+  if (!/^\d{6}$/.test(otp)) {
+    throw HttpError.badRequest('Validasi gagal', [{ field: 'otp', message: 'otp wajib diisi dengan 6 digit angka' }]);
+  }
+  await emailVerification.verifyOtp(userId, otp);
+  res.json({ success: true, data: { message: 'Email berhasil diverifikasi, silakan login', user: await authService.getProfile(userId) } });
+};
+
+/**
+ * GET /api/auth/verify-email/:userId?token= — the activation link emailed to disnakertrans accounts.
+ * Opened in a browser it answers with a page; API clients (Accept: application/json) get JSON.
+ */
+export const verifyEmailLink: RequestHandler = async (req, res) => {
+  const wantsHtml = req.accepts(['json', 'html']) === 'html';
+  try {
+    const userId = parseUserId(req.params.userId);
+    const token = typeof req.query.token === 'string' ? req.query.token.trim() : '';
+    if (!token) throw HttpError.badRequest('Validasi gagal', [{ field: 'token', message: 'token wajib diisi' }]);
+    await emailVerification.verifyLink(userId, token);
+    const message = 'Email berhasil diaktifkan, silakan login';
+    if (wantsHtml) res.type('html').send(verificationResultPage(true, message));
+    else res.json({ success: true, data: { message, user: await authService.getProfile(userId) } });
+  } catch (err) {
+    if (!wantsHtml || !(err instanceof HttpError)) throw err;
+    res.status(err.statusCode).type('html').send(verificationResultPage(false, err.message));
+  }
+};
+
+/** POST /api/auth/resend-verification/:userId — a new OTP (admin, tenant) or activation link (disnakertrans). */
+export const resendVerification: RequestHandler = async (req, res) => {
+  const verification = await emailVerification.resend(parseUserId(req.params.userId));
+  res.json({ success: true, data: { message: `Kode verifikasi baru telah dikirim ke ${verification.sentTo}` }, meta: { verification } });
 };

@@ -1,10 +1,11 @@
 import bcrypt from 'bcryptjs';
 import { Op } from 'sequelize';
-import { ACTIVE_ON_REGISTRATION, CREATABLE_ROLES, PUBLIC_REGISTRATION_ROLES, ROLES, type Role } from '../constants/roles';
+import { ACTIVE_ON_REGISTRATION, CREATABLE_ROLES, EMAIL_VERIFICATION_METHOD, PUBLIC_REGISTRATION_ROLES, ROLES, type Role } from '../constants/roles';
 import { HttpError } from '../errors/HttpError';
 import { Approval, Image, RevokedToken, sequelize, User } from '../models';
 import type { AuthUser } from '../types/express';
 import { signAccessToken } from '../utils/jwt';
+import * as emailVerification from './emailVerification.service';
 import * as imageService from './image.service';
 import { notify } from './notification.service';
 import { endUserSessions } from '../realtime/socket';
@@ -38,7 +39,11 @@ export async function login(email: string, password: string) {
     throw HttpError.unauthorized('Email atau password salah');
   }
 
-  // Checked only after the password is correct, so activation status isn't revealed to anyone else
+  // Checked only after the password is correct, so these states aren't revealed to anyone else.
+  // Email first: the user can fix that themselves (the userId lets the frontend open the OTP screen).
+  if (!user.mailActive) {
+    throw HttpError.emailNotVerified({ userId: user.id, method: EMAIL_VERIFICATION_METHOD[user.role] });
+  }
   if (user.approval?.isActive !== true) throw HttpError.notActivated();
 
   const accessToken = signAccessToken({ sub: user.id, role: user.role });
@@ -46,10 +51,10 @@ export async function login(email: string, password: string) {
 }
 
 /**
- * Creates a user together with their approval.
- * `creator` is the logged-in user (superadmin → admin, see CREATABLE_ROLES), or null for a public
- * sign-up, which is only allowed for PUBLIC_REGISTRATION_ROLES (tenants).
- * Admins start inactive (activate via PATCH /api/approvals/:id?type=user); tenants start active.
+ * Creates a user together with their approval, then emails the email verification (OTP or activation link).
+ * `creator` is the logged-in user (superadmin → disnakertrans, see CREATABLE_ROLES), or null for a public
+ * sign-up, which is only allowed for PUBLIC_REGISTRATION_ROLES (admin, tenant).
+ * Admins start inactive until a disnakertrans activates them; every new account starts with mailActive = false.
  */
 export async function register(creator: AuthUser | null, input: RegisterInput) {
   if (creator === null) {
@@ -72,7 +77,7 @@ export async function register(creator: AuthUser | null, input: RegisterInput) {
   const isActive = ACTIVE_ON_REGISTRATION[input.role];
   const reason = isActive
     ? `Active on registration (${creator ? `created by ${creator.role}` : 'self-registered'})`
-    : 'Waiting for activation by a superadmin';
+    : 'Waiting for activation by disnakertrans';
 
   // The user and their approval are created together, so a user never exists without one.
   // Duplicate email / already-used faceImageId → UniqueConstraintError → 409 via the error handler
@@ -81,9 +86,12 @@ export async function register(creator: AuthUser | null, input: RegisterInput) {
     return { user: created, approval: await Approval.create({ userId: created.id, isActive, reason }, { transaction }) };
   });
 
+  const verification = await emailVerification.startVerification(user);
+
   if (user.role === ROLES.ADMIN) await notify.adminRegistered(user, approval.id);
   else if (user.role === ROLES.TENANT) await notify.tenantRegistered(user, approval.id);
-  return getProfile(user.id);
+  else if (user.role === ROLES.DISNAKERTRANS) await notify.disnakertransCreated(user, approval.id);
+  return { user: await getProfile(user.id), verification };
 }
 
 export interface UpdateProfileInput {

@@ -91,36 +91,58 @@ async function safely(event: string, send: () => Promise<unknown>) {
 
 const fullName = (u: { firstName: string; lastName: string }) => `${u.firstName} ${u.lastName}`;
 
+interface NewUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: Role;
+}
+
+/** Superadmins hear about every new account, whatever its role. */
+const userRegisteredToSuperadmins = (user: NewUser, approvalId: number) =>
+  toRole(ROLES.SUPERADMIN, {
+    type: T.USER_REGISTERED,
+    name: `New ${user.role} account`,
+    description: `${fullName(user)} (${user.email}) was registered as ${user.role}.`,
+    entityType: 'user',
+    entityId: user.id,
+    approvalId,
+  });
+
 /** The events below are called from the services after their own change has been saved. */
 export const notify = {
-  /** superadmin: a new admin waits for activation */
-  adminRegistered: (admin: { id: string; firstName: string; lastName: string; email: string }, approvalId: number) =>
-    safely('adminRegistered', () =>
-      toRole(ROLES.SUPERADMIN, {
+  /** disnakertrans: a new admin waits for activation; superadmin: a new account was created */
+  adminRegistered: (admin: NewUser, approvalId: number) =>
+    safely('adminRegistered', async () => {
+      await toRole(ROLES.DISNAKERTRANS, {
         type: T.ADMIN_PENDING_ACTIVATION,
         name: 'New admin waiting for activation',
-        description: `${fullName(admin)} (${admin.email}) was registered as admin and needs to be activated.`,
+        description: `${fullName(admin)} (${admin.email}) signed up as admin and needs to be activated.`,
         entityType: 'user',
         entityId: admin.id,
         approvalId,
-      }),
-    ),
+      });
+      await userRegisteredToSuperadmins(admin, approvalId);
+    }),
 
-  /** admin: a new tenant signed up */
-  tenantRegistered: (
-    tenant: { id: string; firstName: string; lastName: string; email: string; tenantName?: string | null },
-    approvalId: number,
-  ) =>
-    safely('tenantRegistered', () =>
-      toRole(ROLES.ADMIN, {
+  /** admin: a new tenant signed up; superadmin: a new account was created */
+  tenantRegistered: (tenant: NewUser & { tenantName?: string | null }, approvalId: number) =>
+    safely('tenantRegistered', async () => {
+      await toRole(ROLES.ADMIN, {
         type: T.TENANT_REGISTERED,
         name: 'New tenant registered',
         description: `${tenant.tenantName ?? fullName(tenant)} (${tenant.email}) just signed up as a tenant.`,
         entityType: 'user',
         entityId: tenant.id,
         approvalId,
-      }),
-    ),
+      });
+      await userRegisteredToSuperadmins(tenant, approvalId);
+    }),
+
+  /** superadmin: a superadmin created a disnakertrans account */
+  disnakertransCreated: (user: NewUser, approvalId: number) =>
+    safely('disnakertransCreated', () => userRegisteredToSuperadmins(user, approvalId)),
 
   /** superadmin + admin: review the new product; tenant: it is under review */
   productSubmitted: (
@@ -209,12 +231,12 @@ export const notify = {
       }
     }),
 
-  /** superadmin: an admin deactivated a user account (only real changes notify) */
+  /** superadmin: a disnakertrans or admin deactivated a user account (only real changes notify) */
   userDeactivatedByAdmin: (actor: AuthUser, user: { id: string; email: string; role: Role }, approvalId: number) =>
     safely('userDeactivatedByAdmin', () =>
       toRole(ROLES.SUPERADMIN, {
         type: T.USER_DEACTIVATED,
-        name: 'User deactivated by an admin',
+        name: `User deactivated by ${actor.role}`,
         description: `${actor.email} deactivated the ${user.role} account ${user.email}.`,
         entityType: 'user',
         entityId: user.id,

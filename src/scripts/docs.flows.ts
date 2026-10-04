@@ -45,10 +45,15 @@ const auth = (roles?: Text): Node[] => [
     { en: 'Bearer token valid? (signed, not expired, not logged out)', id: 'Token Bearer valid? (asli, belum kedaluwarsa, belum logout)' },
     '401 Unauthorized',
   ),
-  check({ en: 'Account still exists and is activated?', id: 'Akun masih ada dan sudah aktif?' }, '401 / 403 USER_NOT_ACTIVATED'),
+  check({ en: 'Account still exists?', id: 'Akun masih ada?' }, '401 Unauthorized'),
+  check({ en: 'Email verified? (`mailActive`)', id: 'Email terverifikasi? (`mailActive`)' }, '403 EMAIL_NOT_VERIFIED'),
+  check({ en: 'Account activated?', id: 'Akun sudah aktif?' }, '403 USER_NOT_ACTIVATED'),
   ...(roles ? [check({ en: `Role is ${pick(roles, 'en')}?`, id: `Role adalah ${pick(roles, 'id')}?` }, '403 Forbidden')] : []),
 ];
 const SA_ADMIN: Text = { en: 'superadmin or admin', id: 'superadmin atau admin' };
+const DK_ADMIN: Text = { en: 'disnakertrans or admin', id: 'disnakertrans atau admin' };
+const READERS: Text = { en: 'superadmin, disnakertrans or admin', id: 'superadmin, disnakertrans atau admin' };
+const SEND_OTP = effect({ en: 'Email (Bahasa Indonesia): account created + 6-digit OTP, valid 15 min', id: 'Email: akun dibuat + OTP 6 digit, berlaku 15 menit' });
 
 // ---------- flows per Postman folder ----------
 
@@ -66,6 +71,7 @@ export const FLOWS: Record<string, Chart[]> = {
       nodes: [
         start('POST /api/auth/login'),
         check({ en: 'Email and password correct?', id: 'Email dan password benar?' }, { en: '401 Wrong email or password', id: '401 Email atau password salah' }),
+        check({ en: 'Email verified? (`mailActive`)', id: 'Email terverifikasi? (`mailActive`)' }, '403 EMAIL_NOT_VERIFIED { userId, method }'),
         check({ en: 'Account activated?', id: 'Akun sudah aktif?' }, '403 USER_NOT_ACTIVATED'),
         step({ en: 'Sign an access token (valid 1 hour)', id: 'Buat access token (berlaku 1 jam)' }),
         end('200 { accessToken, user }'),
@@ -79,26 +85,91 @@ export const FLOWS: Record<string, Chart[]> = {
         check({ en: '`faceImageId` exists? (if sent)', id: '`faceImageId` ada? (jika dikirim)' }, '400'),
         check({ en: 'Email not registered yet?', id: 'Email belum terdaftar?' }, '409 Conflict'),
         step(
-          { en: 'Create user + approval (active)', id: 'Buat user + approval (aktif)' },
-          effect({ en: 'Notify admins: new tenant registered', id: 'Notifikasi ke admin: tenant baru' }),
+          { en: 'Create user (`mailActive: false`) + approval (active)', id: 'Buat user (`mailActive: false`) + approval (aktif)' },
+          SEND_OTP,
+          effect({ en: 'Notify admins (TENANT_REGISTERED) + superadmins (USER_REGISTERED)', id: 'Notifikasi ke admin (TENANT_REGISTERED) + superadmin (USER_REGISTERED)' }),
         ),
-        end({ en: '201 profile, can log in right away', id: '201 profil, bisa langsung login' }),
+        end(
+          { en: '201 profile + meta.verification', id: '201 profil + meta.verification' },
+          note({ en: 'Logs in after Verify OTP', id: 'Bisa login setelah Verifikasi OTP' }),
+        ),
       ],
     },
     {
-      title: { en: 'Register Admin', id: 'Daftarkan Admin' },
+      title: { en: 'Register Admin (public)', id: 'Daftar sebagai Admin (publik)' },
       nodes: [
         start('POST /api/auth/register/admin'),
-        ...auth('superadmin'),
         check({ en: 'Body valid and email free?', id: 'Body valid dan email belum dipakai?' }, '400 / 409'),
         step(
-          { en: 'Create user + approval (inactive)', id: 'Buat user + approval (tidak aktif)' },
-          effect({ en: 'Notify superadmins: activate the new admin', id: 'Notifikasi ke superadmin: aktifkan admin baru' }),
+          { en: 'Create user (`mailActive: false`) + approval (inactive)', id: 'Buat user (`mailActive: false`) + approval (tidak aktif)' },
+          SEND_OTP,
+          effect({ en: 'Notify disnakertrans (ADMIN_PENDING_ACTIVATION) + superadmins (USER_REGISTERED)', id: 'Notifikasi ke disnakertrans (ADMIN_PENDING_ACTIVATION) + superadmin (USER_REGISTERED)' }),
         ),
         end(
-          '201 profile',
-          note({ en: 'Logs in after activation: PATCH /api/approvals/:id?type=user', id: 'Bisa login setelah diaktifkan: PATCH /api/approvals/:id?type=user' }),
+          { en: '201 profile + meta.verification', id: '201 profil + meta.verification' },
+          note({ en: 'Logs in after Verify OTP and activation by a disnakertrans', id: 'Bisa login setelah Verifikasi OTP dan diaktifkan disnakertrans' }),
         ),
+      ],
+    },
+    {
+      title: { en: 'Register Disnakertrans', id: 'Daftarkan Disnakertrans' },
+      nodes: [
+        start('POST /api/auth/register/disnakertrans'),
+        check(
+          { en: 'Bearer token valid, email verified, account active?', id: 'Token Bearer valid, email terverifikasi, akun aktif?' },
+          '401 / 403',
+        ),
+        check({ en: 'Role is superadmin?', id: 'Role adalah superadmin?' }, '403 Forbidden'),
+        check({ en: 'Body valid and email free?', id: 'Body valid dan email belum dipakai?' }, '400 / 409'),
+        step(
+          { en: 'Create user (`mailActive: false`) + approval (active)', id: 'Buat user (`mailActive: false`) + approval (aktif)' },
+          effect({ en: 'Email (Bahasa Indonesia): account created + activation link, valid 24 h', id: 'Email: akun dibuat + link aktivasi, berlaku 24 jam' }),
+          effect({ en: 'Notify superadmins (USER_REGISTERED)', id: 'Notifikasi ke superadmin (USER_REGISTERED)' }),
+        ),
+        end(
+          { en: '201 profile + meta.verification', id: '201 profil + meta.verification' },
+          note({ en: 'Logs in after opening the link', id: 'Bisa login setelah membuka link' }),
+        ),
+      ],
+    },
+    {
+      title: { en: 'Verify OTP (admin, tenant)', id: 'Verifikasi OTP (admin, tenant)' },
+      nodes: [
+        start('POST /api/auth/ verify-otp/:userId { otp }'),
+        check({ en: 'userId a UUID and otp 6 digits?', id: 'userId berupa UUID dan otp 6 digit?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
+        check({ en: 'User exists?', id: 'Pengguna ada?' }, '404'),
+        check({ en: 'Email not verified yet?', id: 'Email belum terverifikasi?' }, '409 EMAIL_ALREADY_VERIFIED'),
+        check({ en: 'Unused code within 15 minutes?', id: 'Kode belum dipakai dan masih dalam 15 menit?' }, '400 OTP_INVALID / OTP_EXPIRED'),
+        check({ en: 'Fewer than 5 wrong tries?', id: 'Kurang dari 5 kali salah?' }, { en: '400 request a new code', id: '400 minta kode baru' }),
+        check({ en: 'Code matches?', id: 'Kode cocok?' }, { en: '400 OTP_INVALID { attemptsLeft }', id: '400 OTP_INVALID { attemptsLeft }' }),
+        step({ en: 'Mark the code used, set `mailActive: true`', id: 'Tandai kode terpakai, set `mailActive: true`' }),
+        end({ en: '200 profile, can log in', id: '200 profil, bisa login' }),
+      ],
+    },
+    {
+      title: { en: 'Verify Email Link (disnakertrans)', id: 'Aktivasi Email lewat Link (disnakertrans)' },
+      nodes: [
+        start('GET /api/auth/ verify-email/:userId?token='),
+        check({ en: 'User exists and email not verified yet?', id: 'Pengguna ada dan email belum terverifikasi?' }, '404 / 409'),
+        check({ en: 'Token matches and not used?', id: 'Token cocok dan belum dipakai?' }, '400 LINK_INVALID'),
+        check({ en: 'Within 24 hours?', id: 'Masih dalam 24 jam?' }, '400 LINK_EXPIRED'),
+        step({ en: 'Set `mailActive: true`', id: 'Set `mailActive: true`' }),
+        end(
+          { en: 'Browser: confirmation page · API: 200 JSON', id: 'Browser: halaman konfirmasi · API: 200 JSON' },
+        ),
+      ],
+    },
+    {
+      title: { en: 'Resend Verification', id: 'Kirim Ulang Verifikasi' },
+      nodes: [
+        start('POST /api/auth/ resend-verification/:userId'),
+        check({ en: 'User exists and email not verified yet?', id: 'Pengguna ada dan email belum terverifikasi?' }, '404 / 409'),
+        check({ en: 'Last code sent over 60 s ago?', id: 'Kode terakhir dikirim lebih dari 60 detik lalu?' }, '429 TOO_MANY_REQUESTS'),
+        step(
+          { en: 'Replace the old code with a new one', id: 'Ganti kode lama dengan yang baru' },
+          effect({ en: 'Email: new OTP (admin, tenant) or new link (disnakertrans)', id: 'Email: OTP baru (admin, tenant) atau link baru (disnakertrans)' }),
+        ),
+        end({ en: '200 + meta.verification', id: '200 + meta.verification' }),
       ],
     },
     {
@@ -126,7 +197,7 @@ export const FLOWS: Record<string, Chart[]> = {
         ),
         check({ en: '`faceImageId` exists and email free?', id: '`faceImageId` ada dan email belum dipakai?' }, '400 / 409'),
         step(
-          { en: 'Save your own account (id and role never change)', id: 'Simpan akun sendiri (id dan role tidak berubah)' },
+          { en: 'Save your own account (id, role and mailActive never change)', id: 'Simpan akun sendiri (id, role dan mailActive tidak berubah)' },
           effect({ en: 'Replaced face image: record + file deleted', id: 'Foto wajah lama: data + file dihapus' }),
         ),
         end({ en: '200 updated profile', id: '200 profil terbaru' }),
@@ -179,6 +250,7 @@ export const FLOWS: Record<string, Chart[]> = {
         step(
           { en: 'Scope by role', id: 'Batasi sesuai role' },
           note({ en: 'superadmin → every role', id: 'superadmin → semua role' }),
+          note({ en: 'disnakertrans → admins only', id: 'disnakertrans → hanya admin' }),
           note({ en: 'admin → tenants only', id: 'admin → hanya tenant' }),
         ),
         end({ en: '200 paginated list', id: '200 daftar berhalaman' }),
@@ -191,17 +263,17 @@ export const FLOWS: Record<string, Chart[]> = {
       title: { en: 'Activate / Deactivate User', id: 'Aktifkan / Nonaktifkan Pengguna' },
       nodes: [
         start('PATCH /api/approvals/:id?type=user'),
-        ...auth(SA_ADMIN),
+        ...auth(DK_ADMIN),
         check({ en: 'type, UUID id, isActive and role valid?', id: 'type, id UUID, isActive dan role valid?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
         check({ en: 'User exists?', id: 'Pengguna ada?' }, '404'),
         check({ en: 'Body role matches the user?', id: 'role di body sesuai pengguna?' }, '400'),
         check(
-          { en: 'Allowed? superadmin → admin, tenant · admin → tenant', id: 'Diizinkan? superadmin → admin, tenant · admin → tenant' },
+          { en: 'Allowed? disnakertrans → admin · admin → tenant', id: 'Diizinkan? disnakertrans → admin · admin → tenant' },
           '403 Forbidden',
         ),
         step(
           { en: 'Save approval (created the first time)', id: 'Simpan approval (dibuat jika belum ada)' },
-          effect({ en: 'Deactivated by an admin → notify superadmins', id: 'Dinonaktifkan admin → notifikasi ke superadmin' }),
+          effect({ en: 'Deactivated → notify superadmins (USER_DEACTIVATED)', id: 'Dinonaktifkan → notifikasi ke superadmin (USER_DEACTIVATED)' }),
           effect({ en: 'Deactivated → user\'s sockets closed (session:ended)', id: 'Dinonaktifkan → socket pengguna ditutup (session:ended)' }),
         ),
         end('200 { type, id, email, role, approval }'),
@@ -211,9 +283,9 @@ export const FLOWS: Record<string, Chart[]> = {
       title: { en: 'Activate / Deactivate Product', id: 'Aktifkan / Nonaktifkan Produk' },
       nodes: [
         start('PATCH /api/approvals/:id?type=product'),
-        ...auth(SA_ADMIN),
+        ...auth(DK_ADMIN),
         check({ en: 'type, UUID id, isActive valid? (no role)', id: 'type, id UUID, isActive valid? (tanpa role)' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
-        check({ en: 'Caller is admin?', id: 'Pemanggil adalah admin?' }, { en: '403 superadmin cannot', id: '403 superadmin tidak bisa' }),
+        check({ en: 'Caller is admin?', id: 'Pemanggil adalah admin?' }, { en: '403 disnakertrans cannot', id: '403 disnakertrans tidak bisa' }),
         check({ en: 'Product exists?', id: 'Produk ada?' }, '404'),
         step(
           { en: 'Save approval (created + linked the first time)', id: 'Simpan approval (dibuat + ditautkan jika belum ada)' },
@@ -236,7 +308,7 @@ export const FLOWS: Record<string, Chart[]> = {
         ...auth(),
         step(
           { en: 'Scope by role', id: 'Batasi sesuai role' },
-          note({ en: 'superadmin, admin → every product', id: 'superadmin, admin → semua produk' }),
+          note({ en: 'superadmin, disnakertrans, admin → every product', id: 'superadmin, disnakertrans, admin → semua produk' }),
           note({ en: 'tenant → own products only', id: 'tenant → hanya produk sendiri' }),
         ),
         check({ en: 'Found? (single product)', id: 'Ditemukan? (satu produk)' }, { en: '404, also for another tenant\'s product', id: '404, juga untuk produk tenant lain' }),
@@ -311,6 +383,7 @@ export const FLOWS: Record<string, Chart[]> = {
       nodes: [
         start('GET · POST · PATCH · DELETE /api/tenant-categories'),
         ...auth(SA_ADMIN),
+        check({ en: 'Changing? (POST, PATCH, DELETE) only admin', id: 'Mengubah? (POST, PATCH, DELETE) hanya admin' }, { en: '403 superadmin is read-only', id: '403 superadmin hanya membaca' }),
         check({ en: 'Category exists? (routes with :id)', id: 'Kategori ada? (route dengan :id)' }, '404'),
         check({ en: 'Name not taken? (POST, PATCH)', id: 'Nama belum dipakai? (POST, PATCH)' }, '409 Conflict'),
         check({ en: 'No tenant uses it? (DELETE)', id: 'Tidak dipakai tenant? (DELETE)' }, '409 STILL_IN_USE'),
@@ -363,7 +436,7 @@ export const FLOWS: Record<string, Chart[]> = {
       title: { en: 'List / Get Tenants', id: 'Daftar / Detail Tenant' },
       nodes: [
         start('GET /api/tenants[/:id]'),
-        ...auth(SA_ADMIN),
+        ...auth(READERS),
         step({ en: 'List: optional ?categoryId filter', id: 'Daftar: filter opsional ?categoryId' }),
         check({ en: 'Tenant exists? (single tenant)', id: 'Tenant ada? (satu tenant)' }, '404'),
         end({ en: '200 tenant(s) with owner, logo, category', id: '200 tenant dengan pemilik, logo, kategori' }),
@@ -410,7 +483,7 @@ export const FLOWS: Record<string, Chart[]> = {
         start('io(API_URL, { auth: { token } })'),
         check({ en: 'Token sent? (auth.token or Bearer header)', id: 'Token dikirim? (auth.token atau header Bearer)' }, 'connect_error 401'),
         check(
-          { en: 'Same checks as REST: valid, not logged out, active?', id: 'Cek sama seperti REST: valid, belum logout, aktif?' },
+          { en: 'Same checks as REST: valid, not logged out, email verified, active?', id: 'Cek sama seperti REST: valid, belum logout, email terverifikasi, aktif?' },
           'connect_error { code, statusCode }',
         ),
         step({ en: 'Join your room user:<id>', id: 'Masuk ke room user:<id>' }),

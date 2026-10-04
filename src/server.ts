@@ -1,5 +1,6 @@
 import { app } from './app';
 import { env } from './config/env';
+import { checkMailConnection } from './services/mail.service';
 import { sequelize } from './models';
 import { closeRealtime, initRealtime } from './realtime/socket';
 
@@ -16,6 +17,7 @@ async function start() {
     console.log(`Server running on http://localhost:${env.port} (${env.nodeEnv})`);
     console.log(`WebSocket (Socket.IO) on ws://localhost:${env.port}`);
     console.log(`API docs on http://localhost:${env.port}/docs`);
+    void checkMailConnection();
   });
   initRealtime(server);
 

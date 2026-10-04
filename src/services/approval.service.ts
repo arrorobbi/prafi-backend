@@ -1,4 +1,4 @@
-import { APPROVABLE_ROLES, PRODUCT_APPROVER_ROLES, ROLES, type Role } from '../constants/roles';
+import { APPROVABLE_ROLES, PRODUCT_APPROVER_ROLES, type Role } from '../constants/roles';
 import { HttpError } from '../errors/HttpError';
 import { Approval, Product, sequelize, User } from '../models';
 import type { AuthUser } from '../types/express';
@@ -29,7 +29,7 @@ export async function setApproval(actor: AuthUser, type: ApprovalType, id: strin
   return type === 'user' ? setUserApproval(actor, id, input.role!, values) : setProductApproval(actor, id, values);
 }
 
-/** superadmin → admin and tenant accounts, admin → tenant accounts (see APPROVABLE_ROLES). */
+/** disnakertrans → admin accounts, admin → tenant accounts; the superadmin is read-only (see APPROVABLE_ROLES). */
 async function setUserApproval(
   actor: AuthUser,
   userId: string,
@@ -58,8 +58,8 @@ async function setUserApproval(
     ? await user.approval.update(values)
     : await Approval.create({ ...values, userId: user.id });
 
-  // Only a real change (active → inactive) made by an admin notifies the superadmins
-  if (wasActive && !values.isActive && actor.role === ROLES.ADMIN) {
+  // Only a real change (active → inactive) notifies the superadmins (they oversee every deactivation)
+  if (wasActive && !values.isActive) {
     await notify.userDeactivatedByAdmin(actor, user, approval.id);
   }
   // A deactivated user is disconnected from realtime right away

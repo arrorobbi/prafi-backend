@@ -16,10 +16,14 @@ async function main() {
       lastName: 'Admin',
       phoneNumber: '0000000000',
       role: ROLES.SUPERADMIN,
+      // Seeded accounts don't go through email verification
+      mailActive: true,
     },
   });
 
   console.log(created ? `Superadmin created: ${user.email}` : `Superadmin already exists: ${user.email}`);
+  if (!user.mailActive) await user.update({ mailActive: true });
+  console.log('Superadmin email: verified');
 
   // The auth middleware only lets activated users through, and the superadmin is the one who activates others
   const [approval] = await Approval.findOrCreate({
