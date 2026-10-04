@@ -30,6 +30,12 @@ export const env = {
     expiresIn: process.env.JWT_EXPIRES_IN ?? '1h',
   },
 
+  /**
+   * The frontend's public URL. Emails that need a page of the frontend link there,
+   * e.g. the forgot-password email: <FRONTEND_URL>/reset-password?userId=…&token=…
+   */
+  frontendUrl: (process.env.FRONTEND_URL ?? 'http://localhost:5173').replace(/\/+$/, ''),
+
   /** Outgoing email (nodemailer). Without SMTP_HOST, emails are not sent but printed in the server log (development). */
   mail: {
     host: process.env.SMTP_HOST ?? '',

@@ -11,9 +11,9 @@ export const REALTIME_EVENTS = {
   NOTIFICATION_UNREAD_COUNT: 'notification:unread-count',
   /**
    * server → client, right before the server disconnects you. Payload: { reason, message }
-   * reason: 'token_expired' | 'logged_out' | 'deactivated' — log in again (or stop) instead of reconnecting with the same token.
+   * reason: 'token_expired' | 'logged_out' | 'deactivated' | 'password_reset' — log in again (or stop) instead of reconnecting with the same token.
    */
   SESSION_ENDED: 'session:ended',
 } as const;
 
-export type SessionEndReason = 'token_expired' | 'logged_out' | 'deactivated';
+export type SessionEndReason = 'token_expired' | 'logged_out' | 'deactivated' | 'password_reset';

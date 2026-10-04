@@ -12,7 +12,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 1. Import koleksi ini dan `Prafi-Local.postman_environment.json`, lalu pilih **Prafi Local** (dropdown environment, kanan atas).
 2. Di **Prafi Local**, isi `loginEmail` / `loginPassword` (kolom Current value) dengan akun superadmin dari `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`), lalu Ctrl+S.
 3. Jalankan server (`npm run dev` atau `npm run build && npm start`). `baseUrl` adalah `http://localhost:4000`.
-4. Email: isi `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` di `.env` agar email benar-benar terkirim. Tanpa `SMTP_HOST` (development), email ditampilkan di log server dan OTP / token aktivasi dikembalikan di `meta.verification` serta disimpan sebagai `{{otp}}` / `{{verifyToken}}`.
+4. Email: isi `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` di `.env` agar email benar-benar terkirim. Isi `FRONTEND_URL` dengan alamat frontend: email lupa kata sandi berisi link ke `<FRONTEND_URL>/reset-password`. Tanpa `SMTP_HOST` (development), email ditampilkan di log server dan OTP / token aktivasi dikembalikan di `meta.verification` serta disimpan sebagai `{{otp}}` / `{{verifyToken}}`.
 
 ## Login dan role
 - Setiap request memakai **Bearer `{{token}}`** (diatur di koleksi; request mewarisinya). Request publik memakai *No Auth*.
@@ -39,6 +39,9 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Auth | `POST /api/auth/verify-otp/{{userId}}` | Publik |
 | Auth | `GET /api/auth/verify-email/{{userId}}` | Publik |
 | Auth | `POST /api/auth/resend-verification/{{userId}}` | Publik |
+| Auth | `POST /api/auth/forgot-password` | Publik |
+| Auth | `POST /api/auth/reset-password/check` | Publik |
+| Auth | `POST /api/auth/reset-password` | Publik |
 | Auth | `GET /api/auth/me` | Semua role |
 | Auth | `PATCH /api/auth/me` | Semua role |
 | Gambar | `POST /api/images` | Semua role |
@@ -74,7 +77,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Realtime (WebSocket) | Socket.IO di `{{baseUrl}}` | Semua role (Bearer token) |
 
 ## Variabel yang disimpan
-Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `imageId`, `imagePath` (Upload Image) · `productId` · `categoryId` · `tenantProfileId` · `notificationId`. Setiap penyimpanan dicetak di Postman Console.
+Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `categoryId` · `tenantProfileId` · `notificationId`. Setiap penyimpanan dicetak di Postman Console.
 
 ## Contoh alur
 1. **Login** sebagai superadmin → **Register Disnakertrans** → **Verify Email Link** (atau buka link dari email).
@@ -92,8 +95,8 @@ Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUse
 | status | code (contoh) | arti |
 |---|---|---|
 | 400 | `VALIDATION_ERROR`, `BAD_REQUEST`, `ID_NOT_PROVIDED` | input tidak valid (`details` berisi daftar field) |
-| 400 | `OTP_INVALID`, `OTP_EXPIRED`, `LINK_INVALID`, `LINK_EXPIRED` | kode / link verifikasi salah atau kedaluwarsa |
-| 401 | `UNAUTHORIZED` | token tidak ada/tidak valid/kedaluwarsa/sudah logout → login lagi |
+| 400 | `OTP_INVALID`, `OTP_EXPIRED`, `LINK_INVALID`, `LINK_EXPIRED`, `RESET_LINK_INVALID`, `RESET_LINK_EXPIRED` | kode / link verifikasi / link atur ulang kata sandi salah atau kedaluwarsa |
+| 401 | `UNAUTHORIZED` | token tidak ada/tidak valid/kedaluwarsa/sudah logout, atau kata sandi telah diatur ulang → login lagi |
 | 403 | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `USER_NOT_ACTIVATED` | role tidak sesuai, email belum diverifikasi, atau akun belum diaktifkan |
 | 404 | `NOT_FOUND` | tidak ditemukan, atau bukan milik Anda |
 | 409 | `UNIQUE_CONSTRAINT`, `STILL_IN_USE`, `CONFLICT`, `EMAIL_ALREADY_VERIFIED` | nilai duplikat, data masih digunakan, sudah terverifikasi |
@@ -110,7 +113,7 @@ Status server. Tidak perlu login.
 Mengembalikan `{ status: "ok" }` saat API berjalan.
 
 === FOLDER Auth => Auth
-Login, logout, pendaftaran, verifikasi email, dan akun Anda sendiri (`/api/auth`).
+Login, logout, pendaftaran, verifikasi email, lupa kata sandi, dan akun Anda sendiri (`/api/auth`).
 
 **Login** menyimpan token ke `{{token}}`, yang dipakai semua request lain. Untuk bertindak sebagai role lain, ubah `loginEmail` / `loginPassword` (atau body) lalu kirim Login lagi.
 
@@ -124,13 +127,15 @@ Setiap akun baru dimulai dengan `mailActive: false`: login dan semua endpoint ya
 
 **Development:** tanpa `SMTP_HOST` di `.env`, email tidak dikirim tetapi ditampilkan di log server, dan respons register/resend menyertakan `meta.verification.devCode` / `devLink`, yang disimpan request sebagai `{{otp}}` / `{{verifyToken}}`.
 
+**Lupa kata sandi:** *Lupa Kata Sandi* mengirim email berisi link ke halaman frontend `<FRONTEND_URL>/reset-password?userId=…&token=…` (berlaku 30 menit, sekali pakai). Halaman tersebut memanggil *Cek Link Atur Ulang*, lalu *Atur Ulang Kata Sandi* dengan kata sandi baru. Pengaturan ulang mengakhiri semua sesi yang ada.
+
 === REQ Login (Public) => Login
 Masuk dan menyimpan access token sebagai `{{token}}` (berlaku 1 jam), serta `{{currentUserId}}` dan `{{currentRole}}`.
 
 - superadmin: akun seed (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` di `.env`)
 - disnakertrans / admin / tenant: akun yang dibuat dengan request Register (password `{{newUserPassword}}`; email disimpan sebagai `{{registeredEmail}}`)
 
-Error: 401 email/password salah, 403 `EMAIL_NOT_VERIFIED` (verifikasi email dulu; `details` berisi `userId` dan `method`), 403 `USER_NOT_ACTIVATED` (akun belum diaktifkan).
+Error: 401 email/password salah, 403 `EMAIL_NOT_VERIFIED` (verifikasi email dulu; `details` berisi `userId` dan `method`), 403 `USER_NOT_ACTIVATED` (akun belum diaktifkan). Lupa kata sandi? Gunakan *Lupa Kata Sandi*.
 
 === REQ Logout (All roles) => Logout
 Mencabut token yang dipakai untuk request ini (sesi lain tetap login) dan mengosongkan `{{token}}`. Koneksi WebSocket yang memakai token ini menerima `session:ended` (`logged_out`).
@@ -164,6 +169,25 @@ Error: 400 `LINK_INVALID`, 400 `LINK_EXPIRED` (lebih dari 24 jam), 409 `EMAIL_AL
 
 === REQ Resend Verification (Public) => Kirim Ulang Verifikasi
 Mengirim OTP baru (admin, tenant) atau link aktivasi baru (disnakertrans); kode sebelumnya tidak berlaku lagi. Paling sering sekali per 60 detik (429 `TOO_MANY_REQUESTS`, `details.retryAfterSeconds`). Menyimpan `{{otp}}` / `{{verifyToken}}` baru saat development.
+
+=== REQ Forgot Password (Public) => Lupa Kata Sandi
+Mengirim email (Bahasa Indonesia) berisi link untuk mengatur ulang kata sandi, berlaku **30 menit** dan sekali pakai. Link membuka halaman **frontend** `<FRONTEND_URL>/reset-password?userId=…&token=…` (`FRONTEND_URL` di `.env`), yang memanggil *Cek Link Atur Ulang* dan *Atur Ulang Kata Sandi*.
+
+Jawabannya selalu pesan 200 yang sama, baik email terdaftar maupun tidak, sehingga tidak bisa dipakai untuk mencari email yang terdaftar. Paling banyak satu email per akun setiap 60 detik (permintaan tambahan mendapat jawaban yang sama tetapi tidak mengirim apa pun).
+
+**Development:** tanpa `SMTP_HOST`, email ditampilkan di log server dan `meta.devLink` dikembalikan; request ini menyimpan `userId` / `token`-nya sebagai `{{userId}}` / `{{resetToken}}`.
+
+=== REQ Check Reset Link (Public) => Cek Link Atur Ulang
+Untuk halaman atur ulang di frontend: apakah link dari email masih bisa dipakai? Menjawab `{ valid: true, email: "a*****i@gmail.com", expiresAt }` (email disamarkan, untuk menunjukkan akun mana yang kata sandinya diatur ulang).
+
+Error: 400 `RESET_LINK_INVALID` (salah, sudah dipakai, atau diganti link yang lebih baru), 400 `RESET_LINK_EXPIRED` (lebih dari 30 menit).
+
+=== REQ Reset Password (Public) => Atur Ulang Kata Sandi
+Menyimpan kata sandi baru (minimal 8 karakter). Link hanya bisa dipakai sekali. Karena link datang lewat email, email juga dianggap terverifikasi (`mailActive: true`).
+
+**Semua sesi diakhiri:** setiap token yang dibuat sebelum pengaturan ulang menjawab 401, dan koneksi WebSocket yang terbuka menerima `session:ended` dengan reason `password_reset`. Login lagi dengan kata sandi baru.
+
+Error: 400 validasi (`password` kurang dari 8 karakter), 400 `RESET_LINK_INVALID`, 400 `RESET_LINK_EXPIRED`.
 
 === REQ Me (All roles) => Akun Saya
 Akun yang sedang login beserta `faceImage`, `approval` akunnya, dan `mailActive`.
@@ -337,7 +361,7 @@ Notifikasi realtime melalui **Socket.IO** (host dan port yang sama dengan API).
 |---|---|---|
 | `notification:unread-count` | `{ count }` | tepat setelah terhubung, dan setelah tandai dibaca / tandai semua / hapus (menyinkronkan semua tab) |
 | `notification:new` | `{ notification, unreadCount }` | notifikasi baru dibuat untuk user ini (bentuknya sama dengan item `GET /api/notifications`) |
-| `session:ended` | `{ reason, message }` | `reason`: `logged_out` (token ini logout), `deactivated` (akun dinonaktifkan), `token_expired` (token 1 jam kedaluwarsa). Server lalu memutus koneksi; frontend sebaiknya me-logout user. |
+| `session:ended` | `{ reason, message }` | `reason`: `logged_out` (token ini logout), `deactivated` (akun dinonaktifkan), `token_expired` (token 1 jam kedaluwarsa), `password_reset` (kata sandi diatur ulang). Server lalu memutus koneksi; frontend sebaiknya me-logout user. |
 
 Setiap user hanya menerima event miliknya; semua tab/perangkat milik user tersebut ikut menerimanya.
 

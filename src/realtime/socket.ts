@@ -67,6 +67,7 @@ const SESSION_MESSAGES: Record<SessionEndReason, string> = {
   token_expired: 'Sesi Anda telah berakhir, silakan login kembali',
   logged_out: 'Anda telah logout',
   deactivated: 'Akun Anda telah dinonaktifkan, hubungi administrator',
+  password_reset: 'Kata sandi Anda telah diubah, silakan login kembali dengan kata sandi baru',
 };
 
 function endSession(socket: Socket, reason: SessionEndReason) {

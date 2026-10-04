@@ -4,6 +4,7 @@ import { HttpError } from '../errors/HttpError';
 import { verificationResultPage } from '../mail/templates';
 import * as authService from '../services/auth.service';
 import * as emailVerification from '../services/emailVerification.service';
+import * as passwordReset from '../services/passwordReset.service';
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -209,4 +210,49 @@ export const verifyEmailLink: RequestHandler = async (req, res) => {
 export const resendVerification: RequestHandler = async (req, res) => {
   const verification = await emailVerification.resend(parseUserId(req.params.userId));
   res.json({ success: true, data: { message: `Kode verifikasi baru telah dikirim ke ${verification.sentTo}` }, meta: { verification } });
+};
+
+// ---------- forgot / reset password (public) ----------
+
+/** POST /api/auth/forgot-password — body { email }. Always the same answer, whether or not the email has an account. */
+export const forgotPassword: RequestHandler = async (req, res) => {
+  const { email } = (req.body ?? {}) as { email?: unknown };
+  if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    throw HttpError.badRequest('Validasi gagal', [{ field: 'email', message: 'email wajib diisi dengan alamat email yang valid' }]);
+  }
+  const { devLink } = await passwordReset.requestReset(email);
+  res.json({
+    success: true,
+    data: {
+      message: `Jika email terdaftar, tautan untuk mengatur ulang kata sandi telah dikirim. Tautan berlaku ${passwordReset.RESET_LINK_VALID_MINUTES} menit.`,
+    },
+    ...(devLink && { meta: { devLink } }),
+  });
+};
+
+function parseResetBody(body: Record<string, unknown>, needPassword: boolean) {
+  const errors: { field: string; message: string }[] = [];
+  const userId = typeof body.userId === 'string' ? body.userId.trim() : '';
+  const token = typeof body.token === 'string' ? body.token.trim() : '';
+  if (!UUID_RE.test(userId)) errors.push({ field: 'userId', message: 'userId harus berupa UUID yang valid' });
+  if (!token) errors.push({ field: 'token', message: 'token wajib diisi' });
+  const password = body.password;
+  if (needPassword && (typeof password !== 'string' || password.length < MIN_PASSWORD_LENGTH)) {
+    errors.push({ field: 'password', message: `password minimal ${MIN_PASSWORD_LENGTH} karakter` });
+  }
+  if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);
+  return { userId, token, password: password as string };
+}
+
+/** POST /api/auth/reset-password/check — body { userId, token }: is this reset link still usable? */
+export const checkResetPassword: RequestHandler = async (req, res) => {
+  const { userId, token } = parseResetBody((req.body ?? {}) as Record<string, unknown>, false);
+  res.json({ success: true, data: await passwordReset.checkReset(userId, token) });
+};
+
+/** POST /api/auth/reset-password — body { userId, token, password }. Logs the account out everywhere. */
+export const resetPassword: RequestHandler = async (req, res) => {
+  const { userId, token, password } = parseResetBody((req.body ?? {}) as Record<string, unknown>, true);
+  await passwordReset.resetPassword(userId, token, password);
+  res.json({ success: true, data: { message: 'Kata sandi berhasil diubah, silakan login dengan kata sandi baru' } });
 };

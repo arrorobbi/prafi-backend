@@ -44,6 +44,8 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   declare tenantName: CreationOptional<string | null>;
   /** The email address is verified (OTP or activation link). false for every new account; the API refuses tokens until true. */
   declare mailActive: CreationOptional<boolean>;
+  /** Set when the password is reset; access tokens issued before this moment are refused (logged out everywhere). */
+  declare passwordChangedAt: CreationOptional<Date | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
@@ -115,6 +117,7 @@ User.init(
     // Nullable in the table because admins/superadmins have no tenant name; required for tenants (see validate below)
     tenantName: { type: DataTypes.STRING, allowNull: true, validate: { notEmpty: true } },
     mailActive: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    passwordChangedAt: { type: DataTypes.DATE, allowNull: true },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },

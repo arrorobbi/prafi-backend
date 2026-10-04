@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Prafi API",
-    "description": "Backend API for Prafi (Express + Sequelize + PostgreSQL), with realtime notifications over Socket.IO and emails (nodemailer).\n\n## Setup (once)\n1. Import this collection and `Prafi-Local.postman_environment.json`, then select **Prafi Local** (environment dropdown, top right).\n2. In **Prafi Local** set `loginEmail` / `loginPassword` (Current value) to the superadmin from `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`), then Ctrl+S.\n3. Start the server (`npm run dev` or `npm run build && npm start`). `baseUrl` is `http://localhost:4000`.\n4. Email: set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` in `.env` to send real emails. Without `SMTP_HOST` (development) emails are printed in the server log and the OTP / activation token is returned in `meta.verification` and saved as `{{otp}}` / `{{verifyToken}}`.\n\n## Login and roles\n- Every request uses **Bearer `{{token}}`** (set on the collection; requests inherit it). Public requests have *No Auth*.\n- **Auth → Login** saves the token to `{{token}}` (valid **1 hour**). To switch role, change `loginEmail` / `loginPassword` (or the Login body) and send Login again.\n- The **name of each request says who can call it**: `(All roles)` = superadmin, disnakertrans, admin and tenant; `(superadmin, disnakertrans, admin)`, `(admin)`, `(tenant)`… = only those roles; `(Public)` = no login. Any other role gets **403**.\n- Every account must have a **verified email** (`mailActive: true`) and an **active approval** (`approval.isActive: true`) to log in and use the API.\n\n| role | created by | email verification | approval at start | can |\n|---|---|---|---|---|\n| superadmin | seed (`npm run db:seed`) | already verified | active | create disnakertrans accounts; **read-only** for everything else (users, products, tenants, tenant categories); notified of every new account and product |\n| disnakertrans | superadmin (*Register Disnakertrans*) | activation link (24 h) | active | view and activate/deactivate **admin** accounts, view all products and tenants |\n| admin | self sign-up (*Register Admin*) | OTP (15 min) | **inactive** until a disnakertrans activates it | activate tenant accounts **and products**, read users (tenants)/products/tenants, manage tenant categories |\n| tenant | self sign-up (*Register Tenant*) | OTP (15 min) | active | manage their own products and tenant profile |\n\n## Endpoints\n| folder | endpoint | access |\n|---|---|---|\n| Health | `GET /api/health` | Public |\n| Auth | `POST /api/auth/login` | Public |\n| Auth | `POST /api/auth/logout` | All roles |\n| Auth | `POST /api/auth/register/disnakertrans` | superadmin |\n| Auth | `POST /api/auth/register/admin` | Public |\n| Auth | `POST /api/auth/register/tenant` | Public |\n| Auth | `POST /api/auth/verify-otp/{{userId}}` | Public |\n| Auth | `GET /api/auth/verify-email/{{userId}}` | Public |\n| Auth | `POST /api/auth/resend-verification/{{userId}}` | Public |\n| Auth | `GET /api/auth/me` | All roles |\n| Auth | `PATCH /api/auth/me` | All roles |\n| Images | `POST /api/images` | All roles |\n| Images | `GET {{imagePath}}` | Public |\n| Images | `DELETE /api/images/{{imageId}}` | tenant |\n| Users | `GET /api/users` | superadmin, disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{userId}}` | disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{productId}}` | admin |\n| Products | `GET /api/products` | All roles |\n| Products | `GET /api/products/{{productId}}` | All roles |\n| Products | `POST /api/products` | tenant |\n| Products | `PATCH /api/products/{{productId}}` | tenant |\n| Products | `DELETE /api/products/{{productId}}` | tenant |\n| Landing | `GET /api/landing/products` | Public |\n| Tenant Categories | `GET /api/tenant-categories` | superadmin, admin |\n| Tenant Categories | `GET /api/tenant-categories/{{categoryId}}` | superadmin, admin |\n| Tenant Categories | `POST /api/tenant-categories` | admin |\n| Tenant Categories | `PATCH /api/tenant-categories/{{categoryId}}` | admin |\n| Tenant Categories | `DELETE /api/tenant-categories/{{categoryId}}` | admin |\n| Tenants | `GET /api/tenants/me` | tenant |\n| Tenants | `POST /api/tenants/me` | tenant |\n| Tenants | `PATCH /api/tenants/me` | tenant |\n| Tenants | `DELETE /api/tenants/me` | tenant |\n| Tenants | `GET /api/tenants` | superadmin, disnakertrans, admin |\n| Tenants | `GET /api/tenants/{{tenantProfileId}}` | superadmin, disnakertrans, admin |\n| Notifications | `GET /api/notifications` | All roles |\n| Notifications | `GET /api/notifications/unread-count` | All roles |\n| Notifications | `PATCH /api/notifications/{{notificationId}}/read` | All roles |\n| Notifications | `PATCH /api/notifications/read-all` | All roles |\n| Notifications | `DELETE /api/notifications/{{notificationId}}` | All roles |\n| Examples | `GET /api/admin/ping` | superadmin, admin |\n| Examples | `GET /api/tenant/ping` | All roles |\n| Realtime (WebSocket) | Socket.IO at `{{baseUrl}}` | All roles (Bearer token) |\n\n## Saved variables\nRequests save what the next ones need: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `imageId`, `imagePath` (Upload Image) · `productId` · `categoryId` · `tenantProfileId` · `notificationId`. Each save is printed in the Postman Console.\n\n## Example walkthrough\n1. **Login** as superadmin → **Register Disnakertrans** → **Verify Email Link** (or open the link from the email).\n2. **Register Admin** → **Verify OTP** (code from the email, or `{{otp}}` in development).\n3. Set `loginEmail` = the disnakertrans email, `loginPassword` = `{{newUserPassword}}` → **Login** → **Activate / Deactivate User** with `userId` = the admin's id and `userRole` = `admin`.\n4. **Login** as the admin → **Create Tenant Category**.\n5. **Register Tenant** → **Verify OTP** → **Login** as the tenant → **Upload Image** → **Create My Tenant** → **Upload Image** again → **Create Product**.\n6. **Login** as the admin → **List Notifications** → **Activate / Deactivate Product** → **Landing Products** shows it.\n\n## Responses\n- Success: `{ \"success\": true, \"data\": …, \"meta\"?: { page, limit, total, totalPages } | { verification } }`\n- Error: `{ \"success\": false, \"error\": { \"code\", \"message\", \"details\"? } }`\n- `message` and `details[].message` are in **Bahasa Indonesia** (ready to show in the frontend). `code` and `field` stay in English; frontend logic should switch on `code`.\n\n| status | code (examples) | meaning |\n|---|---|---|\n| 400 | `VALIDATION_ERROR`, `BAD_REQUEST`, `ID_NOT_PROVIDED` | invalid input (`details` lists the fields) |\n| 400 | `OTP_INVALID`, `OTP_EXPIRED`, `LINK_INVALID`, `LINK_EXPIRED` | wrong or expired verification code / link |\n| 401 | `UNAUTHORIZED` | no/invalid/expired/logged-out token → log in again |\n| 403 | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `USER_NOT_ACTIVATED` | wrong role, email not verified yet, or account not activated |\n| 404 | `NOT_FOUND` | not found, or not yours |\n| 409 | `UNIQUE_CONSTRAINT`, `STILL_IN_USE`, `CONFLICT`, `EMAIL_ALREADY_VERIFIED` | duplicate value, record still in use, already verified |\n| 413 | `FILE_TOO_LARGE` | image over 5 MB |\n| 429 | `TOO_MANY_REQUESTS` | a new verification code was requested less than 60 seconds ago |\n\n## Notifications and realtime\nEvery role gets notifications for the events that concern them (see **Notifications**); activation notifications include the `approval` with `userId` and the `user`. They arrive live over Socket.IO as `notification:new` (see **Realtime (WebSocket)** for connecting in Postman and in the frontend).",
+    "description": "Backend API for Prafi (Express + Sequelize + PostgreSQL), with realtime notifications over Socket.IO and emails (nodemailer).\n\n## Setup (once)\n1. Import this collection and `Prafi-Local.postman_environment.json`, then select **Prafi Local** (environment dropdown, top right).\n2. In **Prafi Local** set `loginEmail` / `loginPassword` (Current value) to the superadmin from `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`), then Ctrl+S.\n3. Start the server (`npm run dev` or `npm run build && npm start`). `baseUrl` is `http://localhost:4000`.\n4. Email: set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` in `.env` to send real emails. Set `FRONTEND_URL` to the frontend's address: the forgot-password email links to `<FRONTEND_URL>/reset-password`. Without `SMTP_HOST` (development) emails are printed in the server log and the OTP / activation token is returned in `meta.verification` and saved as `{{otp}}` / `{{verifyToken}}`.\n\n## Login and roles\n- Every request uses **Bearer `{{token}}`** (set on the collection; requests inherit it). Public requests have *No Auth*.\n- **Auth → Login** saves the token to `{{token}}` (valid **1 hour**). To switch role, change `loginEmail` / `loginPassword` (or the Login body) and send Login again.\n- The **name of each request says who can call it**: `(All roles)` = superadmin, disnakertrans, admin and tenant; `(superadmin, disnakertrans, admin)`, `(admin)`, `(tenant)`… = only those roles; `(Public)` = no login. Any other role gets **403**.\n- Every account must have a **verified email** (`mailActive: true`) and an **active approval** (`approval.isActive: true`) to log in and use the API.\n\n| role | created by | email verification | approval at start | can |\n|---|---|---|---|---|\n| superadmin | seed (`npm run db:seed`) | already verified | active | create disnakertrans accounts; **read-only** for everything else (users, products, tenants, tenant categories); notified of every new account and product |\n| disnakertrans | superadmin (*Register Disnakertrans*) | activation link (24 h) | active | view and activate/deactivate **admin** accounts, view all products and tenants |\n| admin | self sign-up (*Register Admin*) | OTP (15 min) | **inactive** until a disnakertrans activates it | activate tenant accounts **and products**, read users (tenants)/products/tenants, manage tenant categories |\n| tenant | self sign-up (*Register Tenant*) | OTP (15 min) | active | manage their own products and tenant profile |\n\n## Endpoints\n| folder | endpoint | access |\n|---|---|---|\n| Health | `GET /api/health` | Public |\n| Auth | `POST /api/auth/login` | Public |\n| Auth | `POST /api/auth/logout` | All roles |\n| Auth | `POST /api/auth/register/disnakertrans` | superadmin |\n| Auth | `POST /api/auth/register/admin` | Public |\n| Auth | `POST /api/auth/register/tenant` | Public |\n| Auth | `POST /api/auth/verify-otp/{{userId}}` | Public |\n| Auth | `GET /api/auth/verify-email/{{userId}}` | Public |\n| Auth | `POST /api/auth/resend-verification/{{userId}}` | Public |\n| Auth | `POST /api/auth/forgot-password` | Public |\n| Auth | `POST /api/auth/reset-password/check` | Public |\n| Auth | `POST /api/auth/reset-password` | Public |\n| Auth | `GET /api/auth/me` | All roles |\n| Auth | `PATCH /api/auth/me` | All roles |\n| Images | `POST /api/images` | All roles |\n| Images | `GET {{imagePath}}` | Public |\n| Images | `DELETE /api/images/{{imageId}}` | tenant |\n| Users | `GET /api/users` | superadmin, disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{userId}}` | disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{productId}}` | admin |\n| Products | `GET /api/products` | All roles |\n| Products | `GET /api/products/{{productId}}` | All roles |\n| Products | `POST /api/products` | tenant |\n| Products | `PATCH /api/products/{{productId}}` | tenant |\n| Products | `DELETE /api/products/{{productId}}` | tenant |\n| Landing | `GET /api/landing/products` | Public |\n| Tenant Categories | `GET /api/tenant-categories` | superadmin, admin |\n| Tenant Categories | `GET /api/tenant-categories/{{categoryId}}` | superadmin, admin |\n| Tenant Categories | `POST /api/tenant-categories` | admin |\n| Tenant Categories | `PATCH /api/tenant-categories/{{categoryId}}` | admin |\n| Tenant Categories | `DELETE /api/tenant-categories/{{categoryId}}` | admin |\n| Tenants | `GET /api/tenants/me` | tenant |\n| Tenants | `POST /api/tenants/me` | tenant |\n| Tenants | `PATCH /api/tenants/me` | tenant |\n| Tenants | `DELETE /api/tenants/me` | tenant |\n| Tenants | `GET /api/tenants` | superadmin, disnakertrans, admin |\n| Tenants | `GET /api/tenants/{{tenantProfileId}}` | superadmin, disnakertrans, admin |\n| Notifications | `GET /api/notifications` | All roles |\n| Notifications | `GET /api/notifications/unread-count` | All roles |\n| Notifications | `PATCH /api/notifications/{{notificationId}}/read` | All roles |\n| Notifications | `PATCH /api/notifications/read-all` | All roles |\n| Notifications | `DELETE /api/notifications/{{notificationId}}` | All roles |\n| Examples | `GET /api/admin/ping` | superadmin, admin |\n| Examples | `GET /api/tenant/ping` | All roles |\n| Realtime (WebSocket) | Socket.IO at `{{baseUrl}}` | All roles (Bearer token) |\n\n## Saved variables\nRequests save what the next ones need: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `categoryId` · `tenantProfileId` · `notificationId`. Each save is printed in the Postman Console.\n\n## Example walkthrough\n1. **Login** as superadmin → **Register Disnakertrans** → **Verify Email Link** (or open the link from the email).\n2. **Register Admin** → **Verify OTP** (code from the email, or `{{otp}}` in development).\n3. Set `loginEmail` = the disnakertrans email, `loginPassword` = `{{newUserPassword}}` → **Login** → **Activate / Deactivate User** with `userId` = the admin's id and `userRole` = `admin`.\n4. **Login** as the admin → **Create Tenant Category**.\n5. **Register Tenant** → **Verify OTP** → **Login** as the tenant → **Upload Image** → **Create My Tenant** → **Upload Image** again → **Create Product**.\n6. **Login** as the admin → **List Notifications** → **Activate / Deactivate Product** → **Landing Products** shows it.\n\n## Responses\n- Success: `{ \"success\": true, \"data\": …, \"meta\"?: { page, limit, total, totalPages } | { verification } }`\n- Error: `{ \"success\": false, \"error\": { \"code\", \"message\", \"details\"? } }`\n- `message` and `details[].message` are in **Bahasa Indonesia** (ready to show in the frontend). `code` and `field` stay in English; frontend logic should switch on `code`.\n\n| status | code (examples) | meaning |\n|---|---|---|\n| 400 | `VALIDATION_ERROR`, `BAD_REQUEST`, `ID_NOT_PROVIDED` | invalid input (`details` lists the fields) |\n| 400 | `OTP_INVALID`, `OTP_EXPIRED`, `LINK_INVALID`, `LINK_EXPIRED`, `RESET_LINK_INVALID`, `RESET_LINK_EXPIRED` | wrong or expired verification code / link / password reset link |\n| 401 | `UNAUTHORIZED` | no/invalid/expired/logged-out token, or the password was reset → log in again |\n| 403 | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `USER_NOT_ACTIVATED` | wrong role, email not verified yet, or account not activated |\n| 404 | `NOT_FOUND` | not found, or not yours |\n| 409 | `UNIQUE_CONSTRAINT`, `STILL_IN_USE`, `CONFLICT`, `EMAIL_ALREADY_VERIFIED` | duplicate value, record still in use, already verified |\n| 413 | `FILE_TOO_LARGE` | image over 5 MB |\n| 429 | `TOO_MANY_REQUESTS` | a new verification code was requested less than 60 seconds ago |\n\n## Notifications and realtime\nEvery role gets notifications for the events that concern them (see **Notifications**); activation notifications include the `approval` with `userId` and the `user`. They arrive live over Socket.IO as `notification:new` (see **Realtime (WebSocket)** for connecting in Postman and in the frontend).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -89,7 +89,7 @@
     },
     {
       "name": "Auth",
-      "description": "Login, logout, registration, email verification and your own account (`/api/auth`).\n\n**Login** saves the token to `{{token}}`, which every other request uses. To act as another role, change `loginEmail` / `loginPassword` (or the body) and send Login again.\n\n| account | registered by | email verification | approval (`isActive`) |\n|---|---|---|---|\n| disnakertrans | superadmin (*Register Disnakertrans*) | activation **link** in the email (valid 24 h) | active right away |\n| admin | themselves (*Register Admin*, public) | 6-digit **OTP** in the email (valid 15 min) | **inactive** until a disnakertrans activates it |\n| tenant | themselves (*Register Tenant*, public) | 6-digit **OTP** in the email (valid 15 min) | active right away |\n\nEvery new account starts with `mailActive: false`: login and every endpoint that needs a token answer **403 `EMAIL_NOT_VERIFIED`** until the email is verified. Emails are in Bahasa Indonesia.\n\n**Development:** without `SMTP_HOST` in `.env`, emails are not sent but printed in the server log, and the register/resend responses include `meta.verification.devCode` / `devLink`, which the requests save as `{{otp}}` / `{{verifyToken}}`.",
+      "description": "Login, logout, registration, email verification, forgot password and your own account (`/api/auth`).\n\n**Login** saves the token to `{{token}}`, which every other request uses. To act as another role, change `loginEmail` / `loginPassword` (or the body) and send Login again.\n\n| account | registered by | email verification | approval (`isActive`) |\n|---|---|---|---|\n| disnakertrans | superadmin (*Register Disnakertrans*) | activation **link** in the email (valid 24 h) | active right away |\n| admin | themselves (*Register Admin*, public) | 6-digit **OTP** in the email (valid 15 min) | **inactive** until a disnakertrans activates it |\n| tenant | themselves (*Register Tenant*, public) | 6-digit **OTP** in the email (valid 15 min) | active right away |\n\nEvery new account starts with `mailActive: false`: login and every endpoint that needs a token answer **403 `EMAIL_NOT_VERIFIED`** until the email is verified. Emails are in Bahasa Indonesia.\n\n**Development:** without `SMTP_HOST` in `.env`, emails are not sent but printed in the server log, and the register/resend responses include `meta.verification.devCode` / `devLink`, which the requests save as `{{otp}}` / `{{verifyToken}}`.\n\n**Forgot password:** *Forgot Password* emails a link to the frontend page `<FRONTEND_URL>/reset-password?userId=…&token=…` (valid 30 minutes, single use). That page calls *Check Reset Link*, then *Reset Password* with the new password. A reset ends every existing session.",
       "item": [
         {
           "name": "Login (Public)",
@@ -112,7 +112,7 @@
                 "login"
               ]
             },
-            "description": "**Access:** public, no token\n\nLogs in and saves the access token as `{{token}}` (valid for 1 hour), plus `{{currentUserId}}` and `{{currentRole}}`.\n\n- superadmin: the seed account (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` in `.env`)\n- disnakertrans / admin / tenant: an account made with the Register requests (password `{{newUserPassword}}`; the email is saved as `{{registeredEmail}}`)\n\nErrors: 401 wrong email/password, 403 `EMAIL_NOT_VERIFIED` (verify the email first; `details` has `userId` and `method`), 403 `USER_NOT_ACTIVATED` (account not activated yet).",
+            "description": "**Access:** public, no token\n\nLogs in and saves the access token as `{{token}}` (valid for 1 hour), plus `{{currentUserId}}` and `{{currentRole}}`.\n\n- superadmin: the seed account (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` in `.env`)\n- disnakertrans / admin / tenant: an account made with the Register requests (password `{{newUserPassword}}`; the email is saved as `{{registeredEmail}}`)\n\nErrors: 401 wrong email/password, 403 `EMAIL_NOT_VERIFIED` (verify the email first; `details` has `userId` and `method`), 403 `USER_NOT_ACTIVATED` (account not activated yet). Forgot the password? Use *Forgot Password*.",
             "auth": {
               "type": "noauth"
             },
@@ -462,6 +462,152 @@
                   "if (v && v.devCode) { pm.environment.set('otp', v.devCode); console.log('saved {{otp}} = ' + pm.environment.get('otp')); }",
                   "if (v && v.devLink) { pm.environment.set('verifyToken', v.devLink.split('token=')[1]); console.log('saved {{verifyToken}} = ' + pm.environment.get('verifyToken')); }",
                   "if (v && !v.devCode && !v.devLink) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}} (or open the link in the email)');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Forgot Password (Public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "**Access:** public, no token\n\nEmails a link to reset the password (Bahasa Indonesia), valid **30 minutes**, single use. The link opens the **frontend** page `<FRONTEND_URL>/reset-password?userId=…&token=…` (`FRONTEND_URL` in `.env`), which calls *Check Reset Link* and *Reset Password*.\n\nThe answer is always the same 200 message, whether or not the email has an account, so it can't be used to find registered emails. At most one email per account every 60 seconds (extra requests get the same answer but send nothing).\n\n**Development:** without `SMTP_HOST` the email is printed in the server log and `meta.devLink` is returned; this request saves its `userId` / `token` as `{{userId}}` / `{{resetToken}}`.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{registeredEmail}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var link = pm.response.code === 200 && pm.response.json().meta && pm.response.json().meta.devLink;",
+                  "if (link) { var q = {}; link.split('?')[1].split('&').forEach((p) => { var kv = p.split('='); q[kv[0]] = decodeURIComponent(kv[1]); }); pm.environment.set('userId', q.userId); console.log('saved {{userId}} = ' + pm.environment.get('userId')); pm.environment.set('resetToken', q.token); console.log('saved {{resetToken}} = ' + pm.environment.get('resetToken')); }",
+                  "else console.log('Reset link emailed (if the account exists): copy userId and token from the link into {{userId}} / {{resetToken}}');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Check Reset Link (Public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/reset-password/check",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "reset-password",
+                "check"
+              ]
+            },
+            "description": "**Access:** public, no token\n\nFor the frontend's reset page: is the link from the email still usable? Answers `{ valid: true, email: \"a*****i@gmail.com\", expiresAt }` (masked email, to show whose password is being reset).\n\nErrors: 400 `RESET_LINK_INVALID` (wrong, used or replaced by a newer link), 400 `RESET_LINK_EXPIRED` (older than 30 minutes).",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"token\": \"{{resetToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reset Password (Public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "reset-password"
+              ]
+            },
+            "description": "**Access:** public, no token\n\nSets the new password (at least 8 characters). The link can only be used once. Because the link came by email, the email also counts as verified (`mailActive: true`).\n\n**Logs the account out everywhere:** every token issued before the reset answers 401, and open WebSocket connections get `session:ended` with reason `password_reset`. Log in again with the new password.\n\nErrors: 400 validation (`password` under 8 characters), 400 `RESET_LINK_INVALID`, 400 `RESET_LINK_EXPIRED`.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"token\": \"{{resetToken}}\",\n  \"password\": \"PasswordBaru123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) { pm.environment.unset('token'); console.log('Password changed: {{token}} cleared, log in again with the new password'); }"
                 ]
               }
             }
@@ -1667,7 +1813,7 @@
     },
     {
       "name": "Realtime (WebSocket)",
-      "description": "Realtime notifications over **Socket.IO** (same host and port as the API).\n\n> Postman collection files cannot contain Socket.IO requests, so create one by hand (once):\n> 1. **New → Socket.IO**, URL `{{baseUrl}}` (the client version: **v4**).\n> 2. **Headers**: `Authorization` = `Bearer {{token}}` (or **Settings → Handshake auth**: `{ \"token\": \"{{token}}\" }`).\n> 3. **Events** tab: add listeners `notification:new`, `notification:unread-count`, `session:ended` and turn them on.\n> 4. **Connect**. Then run requests from this collection in another tab (e.g. create a product as a tenant) and watch the events arrive.\n> 5. Save it into this collection (Save → Prafi API) so it stays next to the REST requests.\n\n**Auth**: the same access token as the REST API. A missing/invalid/expired/revoked token or a deactivated user is refused with `connect_error` (`err.message`, `err.data.code` e.g. `UNAUTHORIZED`, `USER_NOT_ACTIVATED`).\n\n**Events (server → client)**\n\n| event | payload | when |\n|---|---|---|\n| `notification:unread-count` | `{ count }` | right after connecting, and after mark-read / read-all / delete (syncs every open tab) |\n| `notification:new` | `{ notification, unreadCount }` | a notification is created for this user (same shape as `GET /api/notifications` items) |\n| `session:ended` | `{ reason, message }` | `reason`: `logged_out` (this token logged out), `deactivated` (account deactivated), `token_expired` (1 h token expired). The server then disconnects; the frontend should log the user out. |\n\nEach user only receives their own events; all tabs/devices of a user receive them.\n\n**Frontend (socket.io-client v4)**\n```js\nimport { io } from 'socket.io-client';\n\nconst socket = io(API_URL, { auth: (cb) => cb({ token: localStorage.getItem('token') }) });\nsocket.on('notification:unread-count', ({ count }) => setBadge(count));\nsocket.on('notification:new', ({ notification, unreadCount }) => { addToList(notification); setBadge(unreadCount); toast(notification.name); });\nsocket.on('session:ended', ({ message }) => { logout(); alert(message); });\nsocket.on('connect_error', (err) => { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATED'].includes(err.data?.code)) logout(); });\n// after logging in again (new token): socket.disconnect().connect();\n```\n\nThe request below only checks that the Socket.IO endpoint is reachable (engine.io handshake, no events).",
+      "description": "Realtime notifications over **Socket.IO** (same host and port as the API).\n\n> Postman collection files cannot contain Socket.IO requests, so create one by hand (once):\n> 1. **New → Socket.IO**, URL `{{baseUrl}}` (the client version: **v4**).\n> 2. **Headers**: `Authorization` = `Bearer {{token}}` (or **Settings → Handshake auth**: `{ \"token\": \"{{token}}\" }`).\n> 3. **Events** tab: add listeners `notification:new`, `notification:unread-count`, `session:ended` and turn them on.\n> 4. **Connect**. Then run requests from this collection in another tab (e.g. create a product as a tenant) and watch the events arrive.\n> 5. Save it into this collection (Save → Prafi API) so it stays next to the REST requests.\n\n**Auth**: the same access token as the REST API. A missing/invalid/expired/revoked token or a deactivated user is refused with `connect_error` (`err.message`, `err.data.code` e.g. `UNAUTHORIZED`, `USER_NOT_ACTIVATED`).\n\n**Events (server → client)**\n\n| event | payload | when |\n|---|---|---|\n| `notification:unread-count` | `{ count }` | right after connecting, and after mark-read / read-all / delete (syncs every open tab) |\n| `notification:new` | `{ notification, unreadCount }` | a notification is created for this user (same shape as `GET /api/notifications` items) |\n| `session:ended` | `{ reason, message }` | `reason`: `logged_out` (this token logged out), `deactivated` (account deactivated), `token_expired` (1 h token expired), `password_reset` (the password was reset). The server then disconnects; the frontend should log the user out. |\n\nEach user only receives their own events; all tabs/devices of a user receive them.\n\n**Frontend (socket.io-client v4)**\n```js\nimport { io } from 'socket.io-client';\n\nconst socket = io(API_URL, { auth: (cb) => cb({ token: localStorage.getItem('token') }) });\nsocket.on('notification:unread-count', ({ count }) => setBadge(count));\nsocket.on('notification:new', ({ notification, unreadCount }) => { addToList(notification); setBadge(unreadCount); toast(notification.name); });\nsocket.on('session:ended', ({ message }) => { logout(); alert(message); });\nsocket.on('connect_error', (err) => { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATED'].includes(err.data?.code)) logout(); });\n// after logging in again (new token): socket.disconnect().connect();\n```\n\nThe request below only checks that the Socket.IO endpoint is reachable (engine.io handshake, no events).",
       "item": [
         {
           "name": "Socket.IO Endpoint Reachable (Public)",

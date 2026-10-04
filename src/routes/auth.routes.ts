@@ -28,6 +28,11 @@ router.post('/verify-otp/:userId', authController.verifyOtp);
 router.get('/verify-email/:userId', authController.verifyEmailLink);
 router.post('/resend-verification/:userId', authController.resendVerification);
 
+// Forgot password: public. The email links to the frontend's /reset-password page, which calls these two
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password/check', authController.checkResetPassword);
+router.post('/reset-password', authController.resetPassword);
+
 router.get('/me', authenticate, authController.me);
 // Only your own account: the token decides whose account is updated, there is no id in the URL
 router.patch('/me', authenticate, authController.updateMe);

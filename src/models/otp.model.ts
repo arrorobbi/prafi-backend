@@ -11,13 +11,16 @@ import { sequelize } from '../config/database';
 import type { DbModels } from '.';
 import type { User } from './user.model';
 
-/** 'otp' = 6-digit code typed by the user (admin/tenant), 'link' = activation link token (disnakertrans). */
-export const OTP_PURPOSES = ['otp', 'link'] as const;
+/**
+ * 'otp' = 6-digit email verification code (admin/tenant), 'link' = email activation link token (disnakertrans),
+ * 'reset' = forgot-password link token.
+ */
+export const OTP_PURPOSES = ['otp', 'link', 'reset'] as const;
 export type OtpPurpose = (typeof OTP_PURPOSES)[number];
 
 /**
- * An email verification code. Only a SHA-256 hash of the code is stored, so a leaked table can't be used
- * to verify someone else's email. A code is single-use, expires, and allows a limited number of attempts.
+ * An emailed code or link token (email verification or password reset). Only a SHA-256 hash is stored, so a leaked table can't be used
+ * to verify an email or reset a password. A code is single-use, expires, and allows a limited number of attempts.
  */
 export class Otp extends Model<InferAttributes<Otp>, InferCreationAttributes<Otp>> {
   declare id: CreationOptional<number>;

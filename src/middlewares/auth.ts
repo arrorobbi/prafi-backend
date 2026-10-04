@@ -52,10 +52,16 @@ export async function verifyAccess(token: string): Promise<{ user: AuthUser; tok
   }
 
   const user = await User.findByPk(payload.sub, {
-    attributes: ['id', 'email', 'role', 'mailActive'],
+    attributes: ['id', 'email', 'role', 'mailActive', 'passwordChangedAt'],
     include: [{ association: 'approval', attributes: ['isActive'] }],
   });
   if (!user) throw HttpError.unauthorized('Pengguna sudah tidak ada');
+
+  // The password was reset after this token was issued: every older session is logged out.
+  // `iat` has whole seconds only, so a token from the same second as the reset is refused too
+  if (user.passwordChangedAt && payload.iat <= Math.floor(user.passwordChangedAt.getTime() / 1000)) {
+    throw HttpError.unauthorized('Kata sandi telah diubah, silakan login kembali');
+  }
 
   // Only accounts with a verified email may use the API
   if (!user.mailActive) throw HttpError.emailNotVerified({ userId: user.id });

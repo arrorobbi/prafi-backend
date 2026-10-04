@@ -173,6 +173,30 @@ export const FLOWS: Record<string, Chart[]> = {
       ],
     },
     {
+      title: { en: 'Forgot / Reset Password', id: 'Lupa / Atur Ulang Kata Sandi' },
+      nodes: [
+        start('POST /api/auth/ forgot-password { email }'),
+        check(
+          { en: 'Email has an account and no link sent in the last 60 s?', id: 'Email punya akun dan belum dikirimi link 60 detik terakhir?' },
+          { en: '200 same answer, nothing sent', id: '200 jawaban sama, tidak ada yang dikirim' },
+          'ok',
+        ),
+        step(
+          { en: 'New single-use token (30 min), older reset links stop working', id: 'Token baru sekali pakai (30 menit), link lama tidak berlaku' },
+          effect({ en: 'Email: link to <FRONTEND_URL>/reset-password?userId=…&token=…', id: 'Email: link ke <FRONTEND_URL>/reset-password?userId=…&token=…' }),
+        ),
+        step({ en: 'Frontend page: POST /reset-password/check', id: 'Halaman frontend: POST /reset-password/check' }),
+        check({ en: 'Token matches, unused, within 30 min?', id: 'Token cocok, belum dipakai, masih 30 menit?' }, '400 RESET_LINK_INVALID / EXPIRED'),
+        step({ en: 'POST /reset-password { userId, token, password }', id: 'POST /reset-password { userId, token, password }' }),
+        check({ en: 'Password at least 8 characters?', id: 'Kata sandi minimal 8 karakter?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
+        step(
+          { en: 'Save hashed password, `mailActive: true`, token used', id: 'Simpan kata sandi (hash), `mailActive: true`, token terpakai' },
+          effect({ en: 'Older tokens → 401, sockets get session:ended (password_reset)', id: 'Token lama → 401, socket menerima session:ended (password_reset)' }),
+        ),
+        end({ en: '200, log in with the new password', id: '200, login dengan kata sandi baru' }),
+      ],
+    },
+    {
       title: 'Logout',
       nodes: [
         start('POST /api/auth/logout'),
@@ -491,7 +515,7 @@ export const FLOWS: Record<string, Chart[]> = {
         step({ en: 'Receive notification:new and unread-count', id: 'Terima notification:new dan unread-count' }),
         end(
           { en: 'session:ended, then disconnect', id: 'session:ended, lalu terputus' },
-          note({ en: 'token_expired · logged_out · deactivated: log in again, don\'t reuse the token', id: 'token_expired · logged_out · deactivated: login lagi, jangan pakai token yang sama' }),
+          note({ en: 'token_expired · logged_out · deactivated · password_reset: log in again, don\'t reuse the token', id: 'token_expired · logged_out · deactivated · password_reset: login lagi, jangan pakai token yang sama' }),
         ),
       ],
     },

@@ -15,8 +15,8 @@ export const OTP_MAX_ATTEMPTS = 5;
 /** Minimum wait between two codes for the same user. */
 export const RESEND_COOLDOWN_SECONDS = 60;
 
-const hash = (value: string) => createHash('sha256').update(value).digest('hex');
-const sameHash = (a: string, b: string) => a.length === b.length && timingSafeEqual(Buffer.from(a), Buffer.from(b));
+export const hash = (value: string) => createHash('sha256').update(value).digest('hex');
+export const sameHash = (a: string, b: string) => a.length === b.length && timingSafeEqual(Buffer.from(a), Buffer.from(b));
 
 interface VerifiableUser {
   id: string;
@@ -52,7 +52,7 @@ export async function startVerification(user: VerifiableUser, { resent = false }
   const expiresAt = new Date(Date.now() + ttlMs);
 
   await sequelize.transaction(async (transaction) => {
-    await Otp.destroy({ where: { userId: user.id, usedAt: null }, transaction });
+    await Otp.destroy({ where: { userId: user.id, purpose: method, usedAt: null }, transaction });
     await Otp.create({ userId: user.id, purpose: method, code: hash(secret), expiresAt }, { transaction });
   });
 
@@ -94,7 +94,7 @@ async function complete(user: User, code: Otp) {
   await sequelize.transaction(async (transaction) => {
     await code.update({ usedAt: new Date() }, { transaction });
     await user.update({ mailActive: true }, { transaction });
-    await Otp.destroy({ where: { userId: user.id, usedAt: null, id: { [Op.ne]: code.id } }, transaction });
+    await Otp.destroy({ where: { userId: user.id, purpose: ['otp', 'link'], usedAt: null, id: { [Op.ne]: code.id } }, transaction });
   });
 }
 
@@ -140,7 +140,7 @@ export async function verifyLink(userId: string, token: string) {
 export async function resend(userId: string) {
   const user = await findUnverifiedUser(userId);
 
-  const last = await Otp.findOne({ where: { userId: user.id }, order: [['createdAt', 'DESC']], attributes: ['createdAt'] });
+  const last = await Otp.findOne({ where: { userId: user.id, purpose: ['otp', 'link'] }, order: [['createdAt', 'DESC']], attributes: ['createdAt'] });
   const waitSeconds = last ? Math.ceil(RESEND_COOLDOWN_SECONDS - (Date.now() - last.createdAt.getTime()) / 1000) : 0;
   if (waitSeconds > 0) {
     throw HttpError.tooManyRequests(`Tunggu ${waitSeconds} detik sebelum meminta kode baru`, { retryAfterSeconds: waitSeconds });

@@ -118,6 +118,39 @@ export function accountCreatedOtp(user: Recipient, code: string, validMinutes: n
   return { subject, html, text };
 }
 
+/** Forgot password: a link to the frontend's reset page. */
+export function passwordResetRequested(user: Recipient, link: string, validMinutes: number): Omit<MailMessage, 'to'> {
+  const name = `${user.firstName} ${user.lastName}`;
+  const subject = 'Permintaan atur ulang kata sandi akun Prafi';
+  const html = layout(
+    'Atur ulang kata sandi',
+    `<p>Halo <strong>${escape(name)}</strong>,</p>
+     <p>Kami menerima permintaan untuk mengatur ulang kata sandi akun Prafi Anda dengan email <strong>${escape(user.email)}</strong>.</p>
+     <p>Tekan tombol berikut untuk membuat kata sandi baru:</p>
+     <p style="text-align:center;margin:28px 0;">
+       <a href="${escape(link)}" style="display:inline-block;background:#4f46e5;color:#ffffff;text-decoration:none;font-weight:700;padding:13px 26px;border-radius:10px;">Atur Ulang Kata Sandi</a>
+     </p>
+     <p style="font-size:13px;color:#64748b;">Atau salin tautan ini ke browser Anda:<br><a href="${escape(link)}" style="color:#4f46e5;word-break:break-all;">${escape(link)}</a></p>
+     <p>Tautan ini berlaku selama <strong>${validMinutes} menit</strong> dan hanya dapat digunakan satu kali. Setelah kata sandi diubah, semua sesi login Anda akan diakhiri.</p>
+     <p>Jika Anda tidak meminta pengaturan ulang kata sandi, abaikan email ini. Kata sandi Anda tidak akan berubah.</p>
+     <p>Terima kasih,<br>Tim Prafi</p>`,
+  );
+  const text = [
+    `Halo ${name},`,
+    '',
+    `Kami menerima permintaan untuk mengatur ulang kata sandi akun Prafi Anda dengan email ${user.email}.`,
+    'Buka tautan berikut untuk membuat kata sandi baru:',
+    link,
+    '',
+    `Tautan ini berlaku selama ${validMinutes} menit dan hanya dapat digunakan satu kali. Setelah kata sandi diubah, semua sesi login Anda akan diakhiri.`,
+    'Jika Anda tidak meminta pengaturan ulang kata sandi, abaikan email ini. Kata sandi Anda tidak akan berubah.',
+    '',
+    'Terima kasih,',
+    'Tim Prafi',
+  ].join('\n');
+  return { subject, html, text };
+}
+
 /** Browser page shown after clicking the activation link. */
 export function verificationResultPage(ok: boolean, message: string) {
   return layout(
