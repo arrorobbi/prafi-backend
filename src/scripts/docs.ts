@@ -1,10 +1,12 @@
 /**
  * Builds documentation/ (index.html, docs.js, docs-init.js) from the Postman collection, so the docs always match it.
  * English comes from the collection; Bahasa Indonesia from docs.id.md next to this file (EN / ID switch on the page).
+ * Each folder also gets flowcharts (inline SVG, both languages) from docs.flows.ts.
  * Run: npm run docs. Served by the backend at /docs; documentation/index.html also opens directly in a browser.
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { renderFlows } from './docs.flows';
 
 const ROOT = path.resolve(__dirname, '../..');
 const COLLECTION = path.join(ROOT, 'postman/Prafi-API.postman_collection.json');
@@ -152,6 +154,7 @@ function loadIndonesian() {
 const id = loadIndonesian();
 
 const missing: string[] = [];
+const missingFlows: string[] = [];
 if (!id.overview) missing.push('OVERVIEW');
 for (const f of collection.item) {
   if (!id.folders.has(f.name)) missing.push(`FOLDER ${f.name}`);
@@ -183,6 +186,13 @@ const UI = {
   type: { en: 'type', id: 'tipe' },
   noAuth: { en: 'No authentication needed', id: 'Tanpa autentikasi' },
   authorization: { en: 'Authorization:', id: 'Otorisasi:' },
+  flowchart: { en: 'Flowchart', id: 'Diagram alur' },
+  lgStart: { en: 'Request', id: 'Request' },
+  lgCheck: { en: 'Check', id: 'Pengecekan' },
+  lgError: { en: 'Error response', id: 'Respons error' },
+  lgOk: { en: 'Success', id: 'Berhasil' },
+  lgEffect: { en: 'Side effect', id: 'Efek samping' },
+  lgNote: { en: 'Note', id: 'Catatan' },
   footer: {
     en: 'Generated from <code>postman/Prafi-API.postman_collection.json</code> on {date} · regenerate with <code>npm run docs</code>',
     id: 'Dibuat dari <code>postman/Prafi-API.postman_collection.json</code> pada {date} · buat ulang dengan <code>npm run docs</code>',
@@ -301,12 +311,32 @@ const nav = folders
   )
   .join('');
 
+/** Collapsible flowcharts for a folder (open by default), one SVG set per language. */
+function flowsBlock(f: PmFolder) {
+  const en = renderFlows(f.name, 'en');
+  const idHtml = renderFlows(f.name, 'id');
+  if (!en || !idHtml) return '';
+  const legend = (
+    [['start', UI.lgStart], ['check', UI.lgCheck], ['error', UI.lgError], ['end', UI.lgOk], ['effect', UI.lgEffect], ['note', UI.lgNote]] as const
+  )
+    .map(([kind, label]) => `<span class="lg lg-${kind}">${t(label)}</span>`)
+    .join('');
+  return `<details class="flows" open>
+  <summary>${t(UI.flowchart)}</summary>
+  <div class="legend">${legend}</div>
+  <div class="flow-grid" data-l="en">${en}</div>
+  <div class="flow-grid" data-l="id">${idHtml}</div>
+</details>`;
+}
+for (const f of collection.item) if (!renderFlows(f.name, 'en')) missingFlows.push(f.name);
+
 const sections = folders
   .map(
     (f) => `
 <section class="folder" id="${slug(f.name)}">
   <div class="folder-title"><h2>${t(folderTitle(f))}</h2><span class="pill">${f.item.length} ${t(f.item.length === 1 ? UI.endpoint : UI.endpoints)}</span></div>
   ${block(f.description ?? '', id.folders.get(f.name)?.md || undefined, 'div', 'folder-desc')}
+  ${flowsBlock(f)}
   ${f.item.map((r) => requestBlock(f, r)).join('\n')}
 </section>`,
   )
@@ -322,6 +352,7 @@ const title = collection.info.name;
 
 const css = `
 :root {
+  --fc-line: #94a3b8;
   --bg: #f5f7fb; --surface: #ffffff; --surface-2: #f8fafc; --text: #0f172a; --muted: #64748b; --border: #e4e8f0;
   --primary: #4f46e5; --primary-soft: #eef2ff; --shadow: 0 1px 2px rgba(15,23,42,.04), 0 6px 18px rgba(15,23,42,.06);
   --hero: linear-gradient(120deg, #4338ca 0%, #7c3aed 45%, #db2777 100%);
@@ -333,6 +364,7 @@ const css = `
   --method-text: #ffffff;
 }
 :root[data-theme="dark"] {
+  --fc-line: #55617e;
   --bg: #0b1020; --surface: #121a2e; --surface-2: #0f1628; --text: #e5e9f5; --muted: #94a0bb; --border: #232e48;
   --primary: #8b9cff; --primary-soft: #1c2547; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
   --code-bg: #070b16; --code-text: #e2e8f0; --inline-code: #1c2547; --inline-code-text: #b4c0ff;
@@ -451,6 +483,35 @@ blockquote { margin: 14px 0; padding: 6px 16px; border-left: 4px solid var(--pri
 .to-top.show { opacity: 1; pointer-events: auto; }
 footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 60px; }
 
+/* flowcharts */
+.flows { margin: 16px 0 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 4px 18px 10px; box-shadow: var(--shadow); }
+.flows > summary { cursor: pointer; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); padding: 10px 0; list-style-position: inside; }
+.flows > summary:hover { color: var(--primary); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; font-size: 12px; }
+.lg { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+.lg::before { content: ""; width: 14px; height: 10px; border-radius: 3px; border: 1.5px solid var(--fc-stroke); background: var(--fc-fill); }
+.flow-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr)); gap: 6px 22px; }
+.flow { margin: 10px 0; min-width: 0; }
+.flow figcaption { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+.fc { display: block; width: 100%; max-width: 480px; height: auto; }
+.fc-text { font-size: 12px; fill: var(--text); }
+.fc-code { font-family: "JetBrains Mono", ui-monospace, Consolas, monospace; font-size: 11px; fill: var(--inline-code-text); }
+.fc-label { font-size: 11px; font-weight: 700; fill: var(--muted); }
+.fc-line { stroke: var(--fc-line); stroke-width: 1.5; }
+.fc-line-effect { stroke: var(--patch); stroke-dasharray: 5 4; }
+.fc-line-note { stroke-dasharray: 2 3; }
+.fc-arrowhead { fill: var(--fc-line); }
+.fc-box, .lg { --fc-fill: var(--surface); --fc-stroke: var(--border); }
+.fc-box { fill: var(--fc-fill); stroke: var(--fc-stroke); stroke-width: 1.5; }
+.fc-start, .lg-start { --fc-fill: var(--primary-soft); --fc-stroke: var(--primary); }
+.fc-check, .lg-check { --fc-fill: var(--r-admin-bg); --fc-stroke: var(--r-admin); }
+.fc-error, .lg-error { --fc-fill: var(--delete-soft); --fc-stroke: var(--delete); }
+.fc-end, .fc-ok, .lg-end { --fc-fill: var(--get-soft); --fc-stroke: var(--get); }
+.fc-effect, .lg-effect { --fc-fill: var(--patch-soft); --fc-stroke: var(--patch); }
+.fc-note, .lg-note { --fc-fill: var(--surface-2); --fc-stroke: var(--border); }
+.fc-text-start { font-weight: 700; } .fc-text-end, .fc-text-ok { font-weight: 700; fill: var(--get); }
+.fc-text-error { font-weight: 700; fill: var(--delete); } .fc-text-note { fill: var(--muted); }
+
 @media (max-width: 900px) {
   #menu-toggle { display: inline-flex; }
   .search-wrap { max-width: none; }
@@ -551,7 +612,7 @@ const js = `(function () {
   var endpoints = document.querySelectorAll('article.endpoint');
   var navFolders = document.querySelectorAll('aside .nav-folder[data-folder]');
   var sections = document.querySelectorAll('section.folder');
-  var intro = document.querySelectorAll('.hero, .overview');
+  var intro = document.querySelectorAll('.hero, .overview, .flows');
   search.addEventListener('input', function () {
     var words = search.value.trim().toLowerCase().split(/\\s+/).filter(Boolean);
     var on = words.length > 0;
@@ -673,6 +734,9 @@ fs.writeFileSync(path.join(OUT_DIR, 'index.html'), html);
 fs.writeFileSync(path.join(OUT_DIR, 'docs-init.js'), initJs);
 fs.writeFileSync(path.join(OUT_DIR, 'docs.js'), js);
 console.log(`documentation/: ${folders.length} groups, ${requestCount} endpoints, English + Bahasa Indonesia`);
+if (missingFlows.length) {
+  console.warn(`No flowchart yet, add to src/scripts/docs.flows.ts:\n  - ${missingFlows.join('\n  - ')}`);
+}
 if (missing.length) {
   console.warn(`Not translated yet (shown in English), add to src/scripts/docs.id.md:\n  - ${missing.join('\n  - ')}`);
 }

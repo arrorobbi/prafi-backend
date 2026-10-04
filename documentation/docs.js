@@ -63,7 +63,7 @@
   var endpoints = document.querySelectorAll('article.endpoint');
   var navFolders = document.querySelectorAll('aside .nav-folder[data-folder]');
   var sections = document.querySelectorAll('section.folder');
-  var intro = document.querySelectorAll('.hero, .overview');
+  var intro = document.querySelectorAll('.hero, .overview, .flows');
   search.addEventListener('input', function () {
     var words = search.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
     var on = words.length > 0;
