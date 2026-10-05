@@ -143,9 +143,7 @@ Mencabut token yang dipakai untuk request ini (sesi lain tetap login) dan mengos
 === REQ Register Disnakertrans (superadmin) => Daftarkan Disnakertrans
 Membuat akun **disnakertrans** (pemberi persetujuan akun admin). Approval-nya langsung aktif (`approval.isActive: true`), tetapi emailnya harus diaktifkan dulu: email berbahasa Indonesia memberi tahu bahwa akun telah dibuat dan berisi link aktivasi publik (*Aktivasi Email lewat Link*, berlaku 24 jam). Password adalah yang dikirim di body; berikan sendiri kepada orang tersebut.
 
-Respons juga mengembalikan link aktivasi di `meta.verification.link` (mis. `https://api.transniaga.manokwarikab.go.id/api/auth/verify-email/<userId>?token=…`), sehingga superadmin dapat mengirimkannya sendiri jika email tidak sampai. Hanya endpoint ini yang mengembalikannya; *Kirim Ulang Verifikasi* (publik) tidak.
-
-Memberi tahu setiap superadmin (`USER_REGISTERED`). Menyimpan `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}`, dan `{{verifyToken}}`.
+Memberi tahu setiap superadmin (`USER_REGISTERED`). Menyimpan `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}`, dan saat development `{{verifyToken}}`.
 
 === REQ Register Admin (Public) => Daftar sebagai Admin
 Pendaftaran publik untuk akun **admin**, tanpa token. Mengirim OTP 6 digit ke email (berlaku 15 menit); verifikasi dengan *Verifikasi OTP*. Setelah itu pun admin belum bisa login sampai diaktifkan oleh disnakertrans (*Persetujuan → Aktifkan / Nonaktifkan Pengguna*, `approval.isActive: false` sampai saat itu).
