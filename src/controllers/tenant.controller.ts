@@ -7,7 +7,7 @@ const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
 const TEXT_FIELDS = ['name', 'description', 'address', 'area', 'operationalHours', 'fbLink', 'whatsappLink', 'gmapsLink'] as const;
-const ID_FIELDS = ['logoId', 'categoryId'] as const;
+const ID_FIELDS = ['logoId', 'tenantCategoryId'] as const;
 const FIELDS: string[] = [...TEXT_FIELDS, ...ID_FIELDS];
 /** On create, `name` may be left out: it defaults to the owner's tenantName. */
 const OPTIONAL_ON_CREATE = ['name'];
@@ -83,9 +83,9 @@ export const deleteMine: RequestHandler = async (req, res) => {
 
 // ---------- superadmin / admin: read all ----------
 
-/** GET /api/tenants?page=&limit=&categoryId= */
+/** GET /api/tenants?page=&limit=&tenantCategoryId= */
 export const list: RequestHandler = async (req, res) => {
-  const { page = '1', limit = String(DEFAULT_LIMIT), categoryId } = req.query as Record<string, string | undefined>;
+  const { page = '1', limit = String(DEFAULT_LIMIT), tenantCategoryId } = req.query as Record<string, string | undefined>;
 
   const errors: FieldError[] = [];
   const pageNum = Number(page);
@@ -94,13 +94,13 @@ export const list: RequestHandler = async (req, res) => {
   if (!Number.isInteger(limitNum) || limitNum < 1 || limitNum > MAX_LIMIT) {
     errors.push({ field: 'limit', message: `limit harus berupa bilangan bulat antara 1 dan ${MAX_LIMIT}` });
   }
-  const categoryNum = categoryId === undefined ? undefined : Number(categoryId);
+  const categoryNum = tenantCategoryId === undefined ? undefined : Number(tenantCategoryId);
   if (categoryNum !== undefined && !Number.isInteger(categoryNum)) {
-    errors.push({ field: 'categoryId', message: 'categoryId harus berupa ID (bilangan bulat)' });
+    errors.push({ field: 'tenantCategoryId', message: 'tenantCategoryId harus berupa ID (bilangan bulat)' });
   }
   if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);
 
-  const { tenants, meta } = await tenantService.list({ page: pageNum, limit: limitNum, categoryId: categoryNum });
+  const { tenants, meta } = await tenantService.list({ page: pageNum, limit: limitNum, tenantCategoryId: categoryNum });
   res.json({ success: true, data: tenants, meta });
 };
 

@@ -77,7 +77,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Realtime (WebSocket) | Socket.IO di `{{baseUrl}}` | Semua role (Bearer token) |
 
 ## Variabel yang disimpan
-Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `categoryId` · `tenantProfileId` · `notificationId`. Setiap penyimpanan dicetak di Postman Console.
+Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `tenantCategoryId` · `tenantProfileId` · `notificationId`. Setiap penyimpanan dicetak di Postman Console.
 
 ## Contoh alur
 1. **Login** sebagai superadmin → **Register Disnakertrans** → **Verify Email Link** (atau buka link dari email).
@@ -290,7 +290,7 @@ Profil tenant (toko). User tenant mengelola profil **miliknya sendiri** di `/api
 404 jika Anda belum membuat profil.
 
 === REQ Create My Tenant (tenant) => Buat Profil Tenant Saya
-Satu profil per tenant. Wajib: semua field kecuali `name` (bawaan: tenantName Anda). `logoId`: unggah logo dulu. `categoryId`: kategori tenant (dibuat oleh admin). Menyimpan `{{tenantProfileId}}`.
+Satu profil per tenant. Wajib: semua field kecuali `name` (bawaan: tenantName Anda). `logoId`: unggah logo dulu. `tenantCategoryId` (**wajib**): kategori tenant, dibuat oleh admin (*Kategori Tenant → Buat*). Menyimpan `{{tenantProfileId}}`.
 
 === REQ Update My Tenant (tenant) => Ubah Profil Tenant Saya
 Kirim hanya field yang ingin diubah. Admin menerima `TENANT_PROFILE_UPDATED`. Jika `logoId` diganti, logo lama beserta filenya dihapus.
@@ -299,7 +299,7 @@ Kirim hanya field yang ingin diubah. Admin menerima `TENANT_PROFILE_UPDATED`. Ji
 Menghapus profil tenant Anda (akun Anda tetap ada).
 
 === REQ List Tenants (superadmin, disnakertrans, admin) => Daftar Tenant
-Semua profil tenant beserta pemilik, logo, dan kategorinya. Filter `categoryId` opsional.
+Semua profil tenant beserta pemilik, logo, dan kategorinya. Filter `tenantCategoryId` opsional.
 
 === REQ Get Tenant (superadmin, disnakertrans, admin) => Detail Tenant
 

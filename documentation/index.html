@@ -295,7 +295,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 <h3>Endpoints</h3>
 <div class="table-wrap"><table><thead><tr><th>folder</th><th>endpoint</th><th>access</th></tr></thead><tbody><tr><td>Health</td><td><code>GET /api/health</code></td><td>Public</td></tr><tr><td>Auth</td><td><code>POST /api/auth/login</code></td><td>Public</td></tr><tr><td>Auth</td><td><code>POST /api/auth/logout</code></td><td>All roles</td></tr><tr><td>Auth</td><td><code>POST /api/auth/register/disnakertrans</code></td><td>superadmin</td></tr><tr><td>Auth</td><td><code>POST /api/auth/register/admin</code></td><td>Public</td></tr><tr><td>Auth</td><td><code>POST /api/auth/register/tenant</code></td><td>Public</td></tr><tr><td>Auth</td><td><code>POST /api/auth/verify-otp/{{userId}}</code></td><td>Public</td></tr><tr><td>Auth</td><td><code>GET /api/auth/verify-email/{{userId}}</code></td><td>Public</td></tr><tr><td>Auth</td><td><code>POST /api/auth/resend-verification/{{userId}}</code></td><td>Public</td></tr><tr><td>Auth</td><td><code>POST /api/auth/forgot-password</code></td><td>Public</td></tr><tr><td>Auth</td><td><code>POST /api/auth/reset-password/check</code></td><td>Public</td></tr><tr><td>Auth</td><td><code>POST /api/auth/reset-password</code></td><td>Public</td></tr><tr><td>Auth</td><td><code>GET /api/auth/me</code></td><td>All roles</td></tr><tr><td>Auth</td><td><code>PATCH /api/auth/me</code></td><td>All roles</td></tr><tr><td>Images</td><td><code>POST /api/images</code></td><td>All roles</td></tr><tr><td>Images</td><td><code>GET {{imagePath}}</code></td><td>Public</td></tr><tr><td>Images</td><td><code>DELETE /api/images/{{imageId}}</code></td><td>tenant</td></tr><tr><td>Users</td><td><code>GET /api/users</code></td><td>superadmin, disnakertrans, admin</td></tr><tr><td>Approvals</td><td><code>PATCH /api/approvals/{{userId}}</code></td><td>disnakertrans, admin</td></tr><tr><td>Approvals</td><td><code>PATCH /api/approvals/{{productId}}</code></td><td>admin</td></tr><tr><td>Products</td><td><code>GET /api/products</code></td><td>All roles</td></tr><tr><td>Products</td><td><code>GET /api/products/{{productId}}</code></td><td>All roles</td></tr><tr><td>Products</td><td><code>POST /api/products</code></td><td>tenant</td></tr><tr><td>Products</td><td><code>PATCH /api/products/{{productId}}</code></td><td>tenant</td></tr><tr><td>Products</td><td><code>DELETE /api/products/{{productId}}</code></td><td>tenant</td></tr><tr><td>Landing</td><td><code>GET /api/landing/products</code></td><td>Public</td></tr><tr><td>Tenant Categories</td><td><code>GET /api/tenant-categories</code></td><td>superadmin, admin</td></tr><tr><td>Tenant Categories</td><td><code>GET /api/tenant-categories/{{categoryId}}</code></td><td>superadmin, admin</td></tr><tr><td>Tenant Categories</td><td><code>POST /api/tenant-categories</code></td><td>admin</td></tr><tr><td>Tenant Categories</td><td><code>PATCH /api/tenant-categories/{{categoryId}}</code></td><td>admin</td></tr><tr><td>Tenant Categories</td><td><code>DELETE /api/tenant-categories/{{categoryId}}</code></td><td>admin</td></tr><tr><td>Tenants</td><td><code>GET /api/tenants/me</code></td><td>tenant</td></tr><tr><td>Tenants</td><td><code>POST /api/tenants/me</code></td><td>tenant</td></tr><tr><td>Tenants</td><td><code>PATCH /api/tenants/me</code></td><td>tenant</td></tr><tr><td>Tenants</td><td><code>DELETE /api/tenants/me</code></td><td>tenant</td></tr><tr><td>Tenants</td><td><code>GET /api/tenants</code></td><td>superadmin, disnakertrans, admin</td></tr><tr><td>Tenants</td><td><code>GET /api/tenants/{{tenantProfileId}}</code></td><td>superadmin, disnakertrans, admin</td></tr><tr><td>Notifications</td><td><code>GET /api/notifications</code></td><td>All roles</td></tr><tr><td>Notifications</td><td><code>GET /api/notifications/unread-count</code></td><td>All roles</td></tr><tr><td>Notifications</td><td><code>PATCH /api/notifications/{{notificationId}}/read</code></td><td>All roles</td></tr><tr><td>Notifications</td><td><code>PATCH /api/notifications/read-all</code></td><td>All roles</td></tr><tr><td>Notifications</td><td><code>DELETE /api/notifications/{{notificationId}}</code></td><td>All roles</td></tr><tr><td>Examples</td><td><code>GET /api/admin/ping</code></td><td>superadmin, admin</td></tr><tr><td>Examples</td><td><code>GET /api/tenant/ping</code></td><td>All roles</td></tr><tr><td>Realtime (WebSocket)</td><td>Socket.IO at <code>{{baseUrl}}</code></td><td>All roles (Bearer token)</td></tr></tbody></table></div>
 <h3>Saved variables</h3>
-<p>Requests save what the next ones need: <code>token</code>, <code>currentUserId</code>, <code>currentRole</code> (Login) · <code>userId</code>, <code>userRole</code>, <code>registeredEmail</code>, <code>otp</code> / <code>verifyToken</code> (Register, Resend) · <code>resetToken</code> (Forgot Password) · <code>imageId</code>, <code>imagePath</code> (Upload Image) · <code>productId</code> · <code>categoryId</code> · <code>tenantProfileId</code> · <code>notificationId</code>. Each save is printed in the Postman Console.</p>
+<p>Requests save what the next ones need: <code>token</code>, <code>currentUserId</code>, <code>currentRole</code> (Login) · <code>userId</code>, <code>userRole</code>, <code>registeredEmail</code>, <code>otp</code> / <code>verifyToken</code> (Register, Resend) · <code>resetToken</code> (Forgot Password) · <code>imageId</code>, <code>imagePath</code> (Upload Image) · <code>productId</code> · <code>tenantCategoryId</code> · <code>tenantProfileId</code> · <code>notificationId</code>. Each save is printed in the Postman Console.</p>
 <h3>Example walkthrough</h3>
 <ol><li><strong>Login</strong> as superadmin → <strong>Register Disnakertrans</strong> → <strong>Verify Email Link</strong> (or open the link from the email).</li><li><strong>Register Admin</strong> → <strong>Verify OTP</strong> (code from the email, or <code>{{otp}}</code> in development).</li><li>Set <code>loginEmail</code> = the disnakertrans email, <code>loginPassword</code> = <code>{{newUserPassword}}</code> → <strong>Login</strong> → <strong>Activate / Deactivate User</strong> with <code>userId</code> = the admin's id and <code>userRole</code> = <code>admin</code>.</li><li><strong>Login</strong> as the admin → <strong>Create Tenant Category</strong>.</li><li><strong>Register Tenant</strong> → <strong>Verify OTP</strong> → <strong>Login</strong> as the tenant → <strong>Upload Image</strong> → <strong>Create My Tenant</strong> → <strong>Upload Image</strong> again → <strong>Create Product</strong>.</li><li><strong>Login</strong> as the admin → <strong>List Notifications</strong> → <strong>Activate / Deactivate Product</strong> → <strong>Landing Products</strong> shows it.</li></ol>
 <h3>Responses</h3>
@@ -311,7 +311,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 <h3>Endpoint</h3>
 <div class="table-wrap"><table><thead><tr><th>folder</th><th>endpoint</th><th>akses</th></tr></thead><tbody><tr><td>Health</td><td><code>GET /api/health</code></td><td>Publik</td></tr><tr><td>Auth</td><td><code>POST /api/auth/login</code></td><td>Publik</td></tr><tr><td>Auth</td><td><code>POST /api/auth/logout</code></td><td>Semua role</td></tr><tr><td>Auth</td><td><code>POST /api/auth/register/disnakertrans</code></td><td>superadmin</td></tr><tr><td>Auth</td><td><code>POST /api/auth/register/admin</code></td><td>Publik</td></tr><tr><td>Auth</td><td><code>POST /api/auth/register/tenant</code></td><td>Publik</td></tr><tr><td>Auth</td><td><code>POST /api/auth/verify-otp/{{userId}}</code></td><td>Publik</td></tr><tr><td>Auth</td><td><code>GET /api/auth/verify-email/{{userId}}</code></td><td>Publik</td></tr><tr><td>Auth</td><td><code>POST /api/auth/resend-verification/{{userId}}</code></td><td>Publik</td></tr><tr><td>Auth</td><td><code>POST /api/auth/forgot-password</code></td><td>Publik</td></tr><tr><td>Auth</td><td><code>POST /api/auth/reset-password/check</code></td><td>Publik</td></tr><tr><td>Auth</td><td><code>POST /api/auth/reset-password</code></td><td>Publik</td></tr><tr><td>Auth</td><td><code>GET /api/auth/me</code></td><td>Semua role</td></tr><tr><td>Auth</td><td><code>PATCH /api/auth/me</code></td><td>Semua role</td></tr><tr><td>Gambar</td><td><code>POST /api/images</code></td><td>Semua role</td></tr><tr><td>Gambar</td><td><code>GET {{imagePath}}</code></td><td>Publik</td></tr><tr><td>Gambar</td><td><code>DELETE /api/images/{{imageId}}</code></td><td>tenant</td></tr><tr><td>Pengguna</td><td><code>GET /api/users</code></td><td>superadmin, disnakertrans, admin</td></tr><tr><td>Persetujuan</td><td><code>PATCH /api/approvals/{{userId}}</code></td><td>disnakertrans, admin</td></tr><tr><td>Persetujuan</td><td><code>PATCH /api/approvals/{{productId}}</code></td><td>admin</td></tr><tr><td>Produk</td><td><code>GET /api/products</code></td><td>Semua role</td></tr><tr><td>Produk</td><td><code>GET /api/products/{{productId}}</code></td><td>Semua role</td></tr><tr><td>Produk</td><td><code>POST /api/products</code></td><td>tenant</td></tr><tr><td>Produk</td><td><code>PATCH /api/products/{{productId}}</code></td><td>tenant</td></tr><tr><td>Produk</td><td><code>DELETE /api/products/{{productId}}</code></td><td>tenant</td></tr><tr><td>Landing</td><td><code>GET /api/landing/products</code></td><td>Publik</td></tr><tr><td>Kategori Tenant</td><td><code>GET /api/tenant-categories</code></td><td>superadmin, admin</td></tr><tr><td>Kategori Tenant</td><td><code>GET /api/tenant-categories/{{categoryId}}</code></td><td>superadmin, admin</td></tr><tr><td>Kategori Tenant</td><td><code>POST /api/tenant-categories</code></td><td>admin</td></tr><tr><td>Kategori Tenant</td><td><code>PATCH /api/tenant-categories/{{categoryId}}</code></td><td>admin</td></tr><tr><td>Kategori Tenant</td><td><code>DELETE /api/tenant-categories/{{categoryId}}</code></td><td>admin</td></tr><tr><td>Tenant</td><td><code>GET /api/tenants/me</code></td><td>tenant</td></tr><tr><td>Tenant</td><td><code>POST /api/tenants/me</code></td><td>tenant</td></tr><tr><td>Tenant</td><td><code>PATCH /api/tenants/me</code></td><td>tenant</td></tr><tr><td>Tenant</td><td><code>DELETE /api/tenants/me</code></td><td>tenant</td></tr><tr><td>Tenant</td><td><code>GET /api/tenants</code></td><td>superadmin, disnakertrans, admin</td></tr><tr><td>Tenant</td><td><code>GET /api/tenants/{{tenantProfileId}}</code></td><td>superadmin, disnakertrans, admin</td></tr><tr><td>Notifikasi</td><td><code>GET /api/notifications</code></td><td>Semua role</td></tr><tr><td>Notifikasi</td><td><code>GET /api/notifications/unread-count</code></td><td>Semua role</td></tr><tr><td>Notifikasi</td><td><code>PATCH /api/notifications/{{notificationId}}/read</code></td><td>Semua role</td></tr><tr><td>Notifikasi</td><td><code>PATCH /api/notifications/read-all</code></td><td>Semua role</td></tr><tr><td>Notifikasi</td><td><code>DELETE /api/notifications/{{notificationId}}</code></td><td>Semua role</td></tr><tr><td>Contoh</td><td><code>GET /api/admin/ping</code></td><td>superadmin, admin</td></tr><tr><td>Contoh</td><td><code>GET /api/tenant/ping</code></td><td>Semua role</td></tr><tr><td>Realtime (WebSocket)</td><td>Socket.IO di <code>{{baseUrl}}</code></td><td>Semua role (Bearer token)</td></tr></tbody></table></div>
 <h3>Variabel yang disimpan</h3>
-<p>Request menyimpan nilai yang dibutuhkan request berikutnya: <code>token</code>, <code>currentUserId</code>, <code>currentRole</code> (Login) · <code>userId</code>, <code>userRole</code>, <code>registeredEmail</code>, <code>otp</code> / <code>verifyToken</code> (Register, Resend) · <code>resetToken</code> (Forgot Password) · <code>imageId</code>, <code>imagePath</code> (Upload Image) · <code>productId</code> · <code>categoryId</code> · <code>tenantProfileId</code> · <code>notificationId</code>. Setiap penyimpanan dicetak di Postman Console.</p>
+<p>Request menyimpan nilai yang dibutuhkan request berikutnya: <code>token</code>, <code>currentUserId</code>, <code>currentRole</code> (Login) · <code>userId</code>, <code>userRole</code>, <code>registeredEmail</code>, <code>otp</code> / <code>verifyToken</code> (Register, Resend) · <code>resetToken</code> (Forgot Password) · <code>imageId</code>, <code>imagePath</code> (Upload Image) · <code>productId</code> · <code>tenantCategoryId</code> · <code>tenantProfileId</code> · <code>notificationId</code>. Setiap penyimpanan dicetak di Postman Console.</p>
 <h3>Contoh alur</h3>
 <ol><li><strong>Login</strong> sebagai superadmin → <strong>Register Disnakertrans</strong> → <strong>Verify Email Link</strong> (atau buka link dari email).</li><li><strong>Register Admin</strong> → <strong>Verify OTP</strong> (kode dari email, atau <code>{{otp}}</code> saat development).</li><li>Isi <code>loginEmail</code> = email disnakertrans, <code>loginPassword</code> = <code>{{newUserPassword}}</code> → <strong>Login</strong> → <strong>Activate / Deactivate User</strong> dengan <code>userId</code> = id admin dan <code>userRole</code> = <code>admin</code>.</li><li><strong>Login</strong> sebagai admin → <strong>Create Tenant Category</strong>.</li><li><strong>Register Tenant</strong> → <strong>Verify OTP</strong> → <strong>Login</strong> sebagai tenant → <strong>Upload Image</strong> → <strong>Create My Tenant</strong> → <strong>Upload Image</strong> lagi → <strong>Create Product</strong>.</li><li><strong>Login</strong> sebagai admin → <strong>List Notifications</strong> → <strong>Activate / Deactivate Product</strong> → produk muncul di <strong>Landing Products</strong>.</li></ol>
 <h3>Respons</h3>
@@ -1522,68 +1522,68 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">201 Created</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
+    &quot;id&quot;: &quot;3f4effd7-39e3-4ba2-94bd-325e2d50f98d&quot;,
     &quot;firstName&quot;: &quot;Dewi&quot;,
     &quot;lastName&quot;: &quot;Lestari&quot;,
     &quot;phoneNumber&quot;: &quot;081377788899&quot;,
-    &quot;email&quot;: &quot;dewi.disnaker1791168925841@prafi.test&quot;,
+    &quot;email&quot;: &quot;dewi.disnaker1791170022812@prafi.test&quot;,
     &quot;role&quot;: &quot;disnakertrans&quot;,
     &quot;faceImageId&quot;: null,
     &quot;tenantName&quot;: null,
     &quot;mailActive&quot;: false,
     &quot;passwordChangedAt&quot;: null,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.524Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.524Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:43.502Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:43.502Z&quot;,
     &quot;faceImage&quot;: null,
     &quot;approval&quot;: {
-      &quot;id&quot;: 7,
+      &quot;id&quot;: 15,
       &quot;reason&quot;: &quot;Active on registration (created by superadmin)&quot;,
       &quot;isActive&quot;: true,
       &quot;type&quot;: &quot;user&quot;,
-      &quot;userId&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;
+      &quot;userId&quot;: &quot;3f4effd7-39e3-4ba2-94bd-325e2d50f98d&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:43.755Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:43.755Z&quot;
     }
   },
   &quot;meta&quot;: {
     &quot;verification&quot;: {
       &quot;method&quot;: &quot;link&quot;,
-      &quot;sentTo&quot;: &quot;dewi.disnaker1791168925841@prafi.test&quot;,
-      &quot;expiresAt&quot;: &quot;2026-10-06T02:55:26.780Z&quot;,
+      &quot;sentTo&quot;: &quot;dewi.disnaker1791170022812@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-06T03:13:43.758Z&quot;,
       &quot;emailSent&quot;: true
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
+    &quot;id&quot;: &quot;3f4effd7-39e3-4ba2-94bd-325e2d50f98d&quot;,
     &quot;firstName&quot;: &quot;Dewi&quot;,
     &quot;lastName&quot;: &quot;Lestari&quot;,
     &quot;phoneNumber&quot;: &quot;081377788899&quot;,
-    &quot;email&quot;: &quot;dewi.disnaker1791168925841@prafi.test&quot;,
+    &quot;email&quot;: &quot;dewi.disnaker1791170022812@prafi.test&quot;,
     &quot;role&quot;: &quot;disnakertrans&quot;,
     &quot;faceImageId&quot;: null,
     &quot;tenantName&quot;: null,
     &quot;mailActive&quot;: false,
     &quot;passwordChangedAt&quot;: null,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.524Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.524Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:43.502Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:43.502Z&quot;,
     &quot;faceImage&quot;: null,
     &quot;approval&quot;: {
-      &quot;id&quot;: 7,
+      &quot;id&quot;: 15,
       &quot;reason&quot;: &quot;Active on registration (created by superadmin)&quot;,
       &quot;isActive&quot;: true,
       &quot;type&quot;: &quot;user&quot;,
-      &quot;userId&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;
+      &quot;userId&quot;: &quot;3f4effd7-39e3-4ba2-94bd-325e2d50f98d&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:43.755Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:43.755Z&quot;
     }
   },
   &quot;meta&quot;: {
     &quot;verification&quot;: {
       &quot;method&quot;: &quot;link&quot;,
-      &quot;sentTo&quot;: &quot;dewi.disnaker1791168925841@prafi.test&quot;,
-      &quot;expiresAt&quot;: &quot;2026-10-06T02:55:26.780Z&quot;,
+      &quot;sentTo&quot;: &quot;dewi.disnaker1791170022812@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-06T03:13:43.758Z&quot;,
       &quot;emailSent&quot;: true
     }
   }
@@ -1657,68 +1657,68 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">201 Created</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+    &quot;id&quot;: &quot;b73f9fc7-aa2b-45e8-a44d-868f684362a3&quot;,
     &quot;firstName&quot;: &quot;Andi&quot;,
     &quot;lastName&quot;: &quot;Wijaya&quot;,
     &quot;phoneNumber&quot;: &quot;081234567890&quot;,
-    &quot;email&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+    &quot;email&quot;: &quot;andi.admin1791170022812@prafi.test&quot;,
     &quot;role&quot;: &quot;admin&quot;,
     &quot;faceImageId&quot;: null,
     &quot;tenantName&quot;: null,
     &quot;mailActive&quot;: false,
     &quot;passwordChangedAt&quot;: null,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.082Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.082Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.054Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:44.054Z&quot;,
     &quot;faceImage&quot;: null,
     &quot;approval&quot;: {
-      &quot;id&quot;: 8,
+      &quot;id&quot;: 16,
       &quot;reason&quot;: &quot;Waiting for activation by disnakertrans&quot;,
       &quot;isActive&quot;: false,
       &quot;type&quot;: &quot;user&quot;,
-      &quot;userId&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;
+      &quot;userId&quot;: &quot;b73f9fc7-aa2b-45e8-a44d-868f684362a3&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.316Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:44.316Z&quot;
     }
   },
   &quot;meta&quot;: {
     &quot;verification&quot;: {
       &quot;method&quot;: &quot;otp&quot;,
-      &quot;sentTo&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
-      &quot;expiresAt&quot;: &quot;2026-10-05T03:10:27.330Z&quot;,
+      &quot;sentTo&quot;: &quot;andi.admin1791170022812@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-05T03:28:44.319Z&quot;,
       &quot;emailSent&quot;: true
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+    &quot;id&quot;: &quot;b73f9fc7-aa2b-45e8-a44d-868f684362a3&quot;,
     &quot;firstName&quot;: &quot;Andi&quot;,
     &quot;lastName&quot;: &quot;Wijaya&quot;,
     &quot;phoneNumber&quot;: &quot;081234567890&quot;,
-    &quot;email&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+    &quot;email&quot;: &quot;andi.admin1791170022812@prafi.test&quot;,
     &quot;role&quot;: &quot;admin&quot;,
     &quot;faceImageId&quot;: null,
     &quot;tenantName&quot;: null,
     &quot;mailActive&quot;: false,
     &quot;passwordChangedAt&quot;: null,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.082Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.082Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.054Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:44.054Z&quot;,
     &quot;faceImage&quot;: null,
     &quot;approval&quot;: {
-      &quot;id&quot;: 8,
+      &quot;id&quot;: 16,
       &quot;reason&quot;: &quot;Waiting for activation by disnakertrans&quot;,
       &quot;isActive&quot;: false,
       &quot;type&quot;: &quot;user&quot;,
-      &quot;userId&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;
+      &quot;userId&quot;: &quot;b73f9fc7-aa2b-45e8-a44d-868f684362a3&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.316Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:44.316Z&quot;
     }
   },
   &quot;meta&quot;: {
     &quot;verification&quot;: {
       &quot;method&quot;: &quot;otp&quot;,
-      &quot;sentTo&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
-      &quot;expiresAt&quot;: &quot;2026-10-05T03:10:27.330Z&quot;,
+      &quot;sentTo&quot;: &quot;andi.admin1791170022812@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-05T03:28:44.319Z&quot;,
       &quot;emailSent&quot;: true
     }
   }
@@ -1731,7 +1731,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
       {
         &quot;field&quot;: &quot;email&quot;,
         &quot;message&quot;: &quot;email sudah digunakan&quot;,
-        &quot;value&quot;: &quot;andi.admin1791168925841@prafi.test&quot;
+        &quot;value&quot;: &quot;andi.admin1791170022812@prafi.test&quot;
       }
     ]
   }
@@ -1744,7 +1744,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
       {
         &quot;field&quot;: &quot;email&quot;,
         &quot;message&quot;: &quot;email sudah digunakan&quot;,
-        &quot;value&quot;: &quot;andi.admin1791168925841@prafi.test&quot;
+        &quot;value&quot;: &quot;andi.admin1791170022812@prafi.test&quot;
       }
     ]
   }
@@ -1786,68 +1786,68 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">201 Created</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
     &quot;firstName&quot;: &quot;Budi&quot;,
     &quot;lastName&quot;: &quot;Santoso&quot;,
     &quot;phoneNumber&quot;: &quot;081298765432&quot;,
-    &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+    &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
     &quot;role&quot;: &quot;tenant&quot;,
     &quot;faceImageId&quot;: null,
     &quot;tenantName&quot;: &quot;Warung Budi&quot;,
     &quot;mailActive&quot;: false,
     &quot;passwordChangedAt&quot;: null,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
     &quot;faceImage&quot;: null,
     &quot;approval&quot;: {
-      &quot;id&quot;: 9,
+      &quot;id&quot;: 17,
       &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
       &quot;isActive&quot;: true,
       &quot;type&quot;: &quot;user&quot;,
-      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+      &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;
     }
   },
   &quot;meta&quot;: {
     &quot;verification&quot;: {
       &quot;method&quot;: &quot;otp&quot;,
-      &quot;sentTo&quot;: &quot;budi1791168925841@prafi.test&quot;,
-      &quot;expiresAt&quot;: &quot;2026-10-05T03:10:28.160Z&quot;,
+      &quot;sentTo&quot;: &quot;budi1791170022812@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-05T03:28:45.131Z&quot;,
       &quot;emailSent&quot;: true
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
     &quot;firstName&quot;: &quot;Budi&quot;,
     &quot;lastName&quot;: &quot;Santoso&quot;,
     &quot;phoneNumber&quot;: &quot;081298765432&quot;,
-    &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+    &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
     &quot;role&quot;: &quot;tenant&quot;,
     &quot;faceImageId&quot;: null,
     &quot;tenantName&quot;: &quot;Warung Budi&quot;,
     &quot;mailActive&quot;: false,
     &quot;passwordChangedAt&quot;: null,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
     &quot;faceImage&quot;: null,
     &quot;approval&quot;: {
-      &quot;id&quot;: 9,
+      &quot;id&quot;: 17,
       &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
       &quot;isActive&quot;: true,
       &quot;type&quot;: &quot;user&quot;,
-      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+      &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;
     }
   },
   &quot;meta&quot;: {
     &quot;verification&quot;: {
       &quot;method&quot;: &quot;otp&quot;,
-      &quot;sentTo&quot;: &quot;budi1791168925841@prafi.test&quot;,
-      &quot;expiresAt&quot;: &quot;2026-10-05T03:10:28.160Z&quot;,
+      &quot;sentTo&quot;: &quot;budi1791170022812@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-05T03:28:45.131Z&quot;,
       &quot;emailSent&quot;: true
     }
   }
@@ -1905,27 +1905,27 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;data&quot;: {
     &quot;message&quot;: &quot;Email berhasil diverifikasi, silakan login&quot;,
     &quot;user&quot;: {
-      &quot;id&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+      &quot;id&quot;: &quot;b73f9fc7-aa2b-45e8-a44d-868f684362a3&quot;,
       &quot;firstName&quot;: &quot;Andi&quot;,
       &quot;lastName&quot;: &quot;Wijaya&quot;,
       &quot;phoneNumber&quot;: &quot;081234567890&quot;,
-      &quot;email&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+      &quot;email&quot;: &quot;andi.admin1791170022812@prafi.test&quot;,
       &quot;role&quot;: &quot;admin&quot;,
       &quot;faceImageId&quot;: null,
       &quot;tenantName&quot;: null,
       &quot;mailActive&quot;: true,
       &quot;passwordChangedAt&quot;: null,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.082Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.634Z&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.054Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:44.616Z&quot;,
       &quot;faceImage&quot;: null,
       &quot;approval&quot;: {
-        &quot;id&quot;: 8,
+        &quot;id&quot;: 16,
         &quot;reason&quot;: &quot;Waiting for activation by disnakertrans&quot;,
         &quot;isActive&quot;: false,
         &quot;type&quot;: &quot;user&quot;,
-        &quot;userId&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;
+        &quot;userId&quot;: &quot;b73f9fc7-aa2b-45e8-a44d-868f684362a3&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.316Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:44.316Z&quot;
       }
     }
   }
@@ -1934,27 +1934,27 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;data&quot;: {
     &quot;message&quot;: &quot;Email berhasil diverifikasi, silakan login&quot;,
     &quot;user&quot;: {
-      &quot;id&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+      &quot;id&quot;: &quot;b73f9fc7-aa2b-45e8-a44d-868f684362a3&quot;,
       &quot;firstName&quot;: &quot;Andi&quot;,
       &quot;lastName&quot;: &quot;Wijaya&quot;,
       &quot;phoneNumber&quot;: &quot;081234567890&quot;,
-      &quot;email&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+      &quot;email&quot;: &quot;andi.admin1791170022812@prafi.test&quot;,
       &quot;role&quot;: &quot;admin&quot;,
       &quot;faceImageId&quot;: null,
       &quot;tenantName&quot;: null,
       &quot;mailActive&quot;: true,
       &quot;passwordChangedAt&quot;: null,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.082Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.634Z&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.054Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:44.616Z&quot;,
       &quot;faceImage&quot;: null,
       &quot;approval&quot;: {
-        &quot;id&quot;: 8,
+        &quot;id&quot;: 16,
         &quot;reason&quot;: &quot;Waiting for activation by disnakertrans&quot;,
         &quot;isActive&quot;: false,
         &quot;type&quot;: &quot;user&quot;,
-        &quot;userId&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;
+        &quot;userId&quot;: &quot;b73f9fc7-aa2b-45e8-a44d-868f684362a3&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.316Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:44.316Z&quot;
       }
     }
   }
@@ -2002,27 +2002,27 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;data&quot;: {
     &quot;message&quot;: &quot;Email berhasil diaktifkan, silakan login&quot;,
     &quot;user&quot;: {
-      &quot;id&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
+      &quot;id&quot;: &quot;3f4effd7-39e3-4ba2-94bd-325e2d50f98d&quot;,
       &quot;firstName&quot;: &quot;Dewi&quot;,
       &quot;lastName&quot;: &quot;Lestari&quot;,
       &quot;phoneNumber&quot;: &quot;081377788899&quot;,
-      &quot;email&quot;: &quot;dewi.disnaker1791168925841@prafi.test&quot;,
+      &quot;email&quot;: &quot;dewi.disnaker1791170022812@prafi.test&quot;,
       &quot;role&quot;: &quot;disnakertrans&quot;,
       &quot;faceImageId&quot;: null,
       &quot;tenantName&quot;: null,
       &quot;mailActive&quot;: true,
       &quot;passwordChangedAt&quot;: null,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.524Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.825Z&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:43.502Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:43.799Z&quot;,
       &quot;faceImage&quot;: null,
       &quot;approval&quot;: {
-        &quot;id&quot;: 7,
+        &quot;id&quot;: 15,
         &quot;reason&quot;: &quot;Active on registration (created by superadmin)&quot;,
         &quot;isActive&quot;: true,
         &quot;type&quot;: &quot;user&quot;,
-        &quot;userId&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;
+        &quot;userId&quot;: &quot;3f4effd7-39e3-4ba2-94bd-325e2d50f98d&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:43.755Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:43.755Z&quot;
       }
     }
   }
@@ -2031,27 +2031,27 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;data&quot;: {
     &quot;message&quot;: &quot;Email berhasil diaktifkan, silakan login&quot;,
     &quot;user&quot;: {
-      &quot;id&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
+      &quot;id&quot;: &quot;3f4effd7-39e3-4ba2-94bd-325e2d50f98d&quot;,
       &quot;firstName&quot;: &quot;Dewi&quot;,
       &quot;lastName&quot;: &quot;Lestari&quot;,
       &quot;phoneNumber&quot;: &quot;081377788899&quot;,
-      &quot;email&quot;: &quot;dewi.disnaker1791168925841@prafi.test&quot;,
+      &quot;email&quot;: &quot;dewi.disnaker1791170022812@prafi.test&quot;,
       &quot;role&quot;: &quot;disnakertrans&quot;,
       &quot;faceImageId&quot;: null,
       &quot;tenantName&quot;: null,
       &quot;mailActive&quot;: true,
       &quot;passwordChangedAt&quot;: null,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.524Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.825Z&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:43.502Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:43.799Z&quot;,
       &quot;faceImage&quot;: null,
       &quot;approval&quot;: {
-        &quot;id&quot;: 7,
+        &quot;id&quot;: 15,
         &quot;reason&quot;: &quot;Active on registration (created by superadmin)&quot;,
         &quot;isActive&quot;: true,
         &quot;type&quot;: &quot;user&quot;,
-        &quot;userId&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;
+        &quot;userId&quot;: &quot;3f4effd7-39e3-4ba2-94bd-325e2d50f98d&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:43.755Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:43.755Z&quot;
       }
     }
   }
@@ -2089,26 +2089,26 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;message&quot;: &quot;Kode verifikasi baru telah dikirim ke andi.admin1791168925841@prafi.test&quot;
+    &quot;message&quot;: &quot;Kode verifikasi baru telah dikirim ke andi.admin1791170022812@prafi.test&quot;
   },
   &quot;meta&quot;: {
     &quot;verification&quot;: {
       &quot;method&quot;: &quot;otp&quot;,
-      &quot;sentTo&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
-      &quot;expiresAt&quot;: &quot;2026-10-05T03:10:27.621Z&quot;,
+      &quot;sentTo&quot;: &quot;andi.admin1791170022812@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-05T03:28:44.603Z&quot;,
       &quot;emailSent&quot;: true
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;message&quot;: &quot;Kode verifikasi baru telah dikirim ke andi.admin1791168925841@prafi.test&quot;
+    &quot;message&quot;: &quot;Kode verifikasi baru telah dikirim ke andi.admin1791170022812@prafi.test&quot;
   },
   &quot;meta&quot;: {
     &quot;verification&quot;: {
       &quot;method&quot;: &quot;otp&quot;,
-      &quot;sentTo&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
-      &quot;expiresAt&quot;: &quot;2026-10-05T03:10:27.621Z&quot;,
+      &quot;sentTo&quot;: &quot;andi.admin1791170022812@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-05T03:28:44.603Z&quot;,
       &quot;emailSent&quot;: true
     }
   }
@@ -2222,15 +2222,15 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: {
     &quot;valid&quot;: true,
-    &quot;email&quot;: &quot;b******1@prafi.test&quot;,
-    &quot;expiresAt&quot;: &quot;2026-10-05T03:25:28.773Z&quot;
+    &quot;email&quot;: &quot;b******2@prafi.test&quot;,
+    &quot;expiresAt&quot;: &quot;2026-10-05T03:43:45.732Z&quot;
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
     &quot;valid&quot;: true,
-    &quot;email&quot;: &quot;b******1@prafi.test&quot;,
-    &quot;expiresAt&quot;: &quot;2026-10-05T03:25:28.773Z&quot;
+    &quot;email&quot;: &quot;b******2@prafi.test&quot;,
+    &quot;expiresAt&quot;: &quot;2026-10-05T03:43:45.732Z&quot;
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: false,
@@ -2331,53 +2331,53 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
     &quot;firstName&quot;: &quot;Budi&quot;,
     &quot;lastName&quot;: &quot;Santoso&quot;,
     &quot;phoneNumber&quot;: &quot;081298765432&quot;,
-    &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+    &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
     &quot;role&quot;: &quot;tenant&quot;,
     &quot;faceImageId&quot;: null,
     &quot;tenantName&quot;: &quot;Warung Budi&quot;,
     &quot;mailActive&quot;: true,
     &quot;passwordChangedAt&quot;: null,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.176Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.147Z&quot;,
     &quot;faceImage&quot;: null,
     &quot;approval&quot;: {
-      &quot;id&quot;: 9,
+      &quot;id&quot;: 17,
       &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
       &quot;isActive&quot;: true,
       &quot;type&quot;: &quot;user&quot;,
-      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+      &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
     &quot;firstName&quot;: &quot;Budi&quot;,
     &quot;lastName&quot;: &quot;Santoso&quot;,
     &quot;phoneNumber&quot;: &quot;081298765432&quot;,
-    &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+    &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
     &quot;role&quot;: &quot;tenant&quot;,
     &quot;faceImageId&quot;: null,
     &quot;tenantName&quot;: &quot;Warung Budi&quot;,
     &quot;mailActive&quot;: true,
     &quot;passwordChangedAt&quot;: null,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.176Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.147Z&quot;,
     &quot;faceImage&quot;: null,
     &quot;approval&quot;: {
-      &quot;id&quot;: 9,
+      &quot;id&quot;: 17,
       &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
       &quot;isActive&quot;: true,
       &quot;type&quot;: &quot;user&quot;,
-      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+      &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;
     }
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">401 Unauthorized</span></h4><button class="copy" type="button" data-copy="{
@@ -2422,53 +2422,53 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
     &quot;firstName&quot;: &quot;Budi&quot;,
     &quot;lastName&quot;: &quot;Santoso&quot;,
     &quot;phoneNumber&quot;: &quot;081298765499&quot;,
-    &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+    &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
     &quot;role&quot;: &quot;tenant&quot;,
     &quot;faceImageId&quot;: null,
     &quot;tenantName&quot;: &quot;Warung Budi&quot;,
     &quot;mailActive&quot;: true,
     &quot;passwordChangedAt&quot;: null,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.414Z&quot;,
     &quot;faceImage&quot;: null,
     &quot;approval&quot;: {
-      &quot;id&quot;: 9,
+      &quot;id&quot;: 17,
       &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
       &quot;isActive&quot;: true,
       &quot;type&quot;: &quot;user&quot;,
-      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+      &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
     &quot;firstName&quot;: &quot;Budi&quot;,
     &quot;lastName&quot;: &quot;Santoso&quot;,
     &quot;phoneNumber&quot;: &quot;081298765499&quot;,
-    &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+    &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
     &quot;role&quot;: &quot;tenant&quot;,
     &quot;faceImageId&quot;: null,
     &quot;tenantName&quot;: &quot;Warung Budi&quot;,
     &quot;mailActive&quot;: true,
     &quot;passwordChangedAt&quot;: null,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.414Z&quot;,
     &quot;faceImage&quot;: null,
     &quot;approval&quot;: {
-      &quot;id&quot;: 9,
+      &quot;id&quot;: 17,
       &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
       &quot;isActive&quot;: true,
       &quot;type&quot;: &quot;user&quot;,
-      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+      &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;
     }
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
@@ -2820,24 +2820,24 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">201 Created</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
-    &quot;id&quot;: 1,
+    &quot;url&quot;: &quot;http://localhost:4000/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
+    &quot;id&quot;: 7,
     &quot;name&quot;: &quot;logo-warung.png&quot;,
-    &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+    &quot;imgUrl&quot;: &quot;/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
     &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
-    &quot;id&quot;: 1,
+    &quot;url&quot;: &quot;http://localhost:4000/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
+    &quot;id&quot;: 7,
     &quot;name&quot;: &quot;logo-warung.png&quot;,
-    &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+    &quot;imgUrl&quot;: &quot;/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
     &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: false,
@@ -3077,27 +3077,27 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
       &quot;firstName&quot;: &quot;Budi&quot;,
       &quot;lastName&quot;: &quot;Santoso&quot;,
       &quot;phoneNumber&quot;: &quot;081298765499&quot;,
-      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+      &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
       &quot;role&quot;: &quot;tenant&quot;,
       &quot;faceImageId&quot;: null,
       &quot;tenantName&quot;: &quot;Warung Budi&quot;,
       &quot;mailActive&quot;: true,
       &quot;passwordChangedAt&quot;: null,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.414Z&quot;,
       &quot;faceImage&quot;: null,
       &quot;approval&quot;: {
-        &quot;id&quot;: 9,
+        &quot;id&quot;: 17,
         &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
         &quot;isActive&quot;: true,
         &quot;type&quot;: &quot;user&quot;,
-        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+        &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;
       }
     }
   ],
@@ -3111,27 +3111,27 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
       &quot;firstName&quot;: &quot;Budi&quot;,
       &quot;lastName&quot;: &quot;Santoso&quot;,
       &quot;phoneNumber&quot;: &quot;081298765499&quot;,
-      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+      &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
       &quot;role&quot;: &quot;tenant&quot;,
       &quot;faceImageId&quot;: null,
       &quot;tenantName&quot;: &quot;Warung Budi&quot;,
       &quot;mailActive&quot;: true,
       &quot;passwordChangedAt&quot;: null,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.414Z&quot;,
       &quot;faceImage&quot;: null,
       &quot;approval&quot;: {
-        &quot;id&quot;: 9,
+        &quot;id&quot;: 17,
         &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
         &quot;isActive&quot;: true,
         &quot;type&quot;: &quot;user&quot;,
-        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+        &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.130Z&quot;
       }
     }
   ],
@@ -3559,34 +3559,34 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: {
     &quot;type&quot;: &quot;user&quot;,
-    &quot;id&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
-    &quot;email&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+    &quot;id&quot;: &quot;b73f9fc7-aa2b-45e8-a44d-868f684362a3&quot;,
+    &quot;email&quot;: &quot;andi.admin1791170022812@prafi.test&quot;,
     &quot;role&quot;: &quot;admin&quot;,
     &quot;approval&quot;: {
-      &quot;id&quot;: 8,
+      &quot;id&quot;: 16,
       &quot;reason&quot;: &quot;Data lengkap&quot;,
       &quot;isActive&quot;: true,
       &quot;type&quot;: &quot;user&quot;,
-      &quot;userId&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.646Z&quot;
+      &quot;userId&quot;: &quot;b73f9fc7-aa2b-45e8-a44d-868f684362a3&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.316Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:44.628Z&quot;
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
     &quot;type&quot;: &quot;user&quot;,
-    &quot;id&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
-    &quot;email&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+    &quot;id&quot;: &quot;b73f9fc7-aa2b-45e8-a44d-868f684362a3&quot;,
+    &quot;email&quot;: &quot;andi.admin1791170022812@prafi.test&quot;,
     &quot;role&quot;: &quot;admin&quot;,
     &quot;approval&quot;: {
-      &quot;id&quot;: 8,
+      &quot;id&quot;: 16,
       &quot;reason&quot;: &quot;Data lengkap&quot;,
       &quot;isActive&quot;: true,
       &quot;type&quot;: &quot;user&quot;,
-      &quot;userId&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.646Z&quot;
+      &quot;userId&quot;: &quot;b73f9fc7-aa2b-45e8-a44d-868f684362a3&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.316Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:44.628Z&quot;
     }
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">403 Forbidden</span></h4><button class="copy" type="button" data-copy="{
@@ -3634,26 +3634,26 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: {
     &quot;type&quot;: &quot;product&quot;,
-    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;id&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
     &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
     &quot;approval&quot;: {
-      &quot;id&quot;: 10,
+      &quot;id&quot;: 18,
       &quot;reason&quot;: &quot;Activated by admin&quot;,
       &quot;isActive&quot;: true,
       &quot;type&quot;: &quot;product&quot;,
-      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;
+      &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.591Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.654Z&quot;
     },
     &quot;user&quot;: {
-      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
       &quot;firstName&quot;: &quot;Budi&quot;,
       &quot;lastName&quot;: &quot;Santoso&quot;,
-      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+      &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
       &quot;phoneNumber&quot;: &quot;081298765499&quot;,
       &quot;tenantName&quot;: &quot;Warung Budi&quot;,
       &quot;tenant&quot;: {
-        &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+        &quot;id&quot;: &quot;b2cf2c70-8d8f-4ab1-a4f9-50cc8a8cb38d&quot;,
         &quot;name&quot;: &quot;Warung Budi&quot;,
         &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
         &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
@@ -3662,47 +3662,47 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
         &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
         &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
         &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-        &quot;logoId&quot;: 1,
-        &quot;categoryId&quot;: 1,
-        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+        &quot;logoId&quot;: 7,
+        &quot;tenantCategoryId&quot;: 3,
+        &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.536Z&quot;,
         &quot;category&quot;: {
-          &quot;id&quot;: 1,
-          &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;,
-          &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
-          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.500Z&quot;
+          &quot;id&quot;: 3,
+          &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791170022812&quot;,
+          &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.472Z&quot;
         },
         &quot;logo&quot;: {
-          &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
-          &quot;id&quot;: 1,
+          &quot;url&quot;: &quot;http://localhost:4000/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
+          &quot;id&quot;: 7,
           &quot;name&quot;: &quot;logo-warung.png&quot;,
-          &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+          &quot;imgUrl&quot;: &quot;/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
           &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-          &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
-          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+          &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;
         }
       },
-      &quot;productId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;productId&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
       &quot;product&quot;: {
-        &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+        &quot;id&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
         &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
         &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
         &quot;details&quot;: &quot;250 ml, es&quot;,
         &quot;qty&quot;: 25,
-        &quot;imageId&quot;: 2,
-        &quot;approvalId&quot;: 10,
-        &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.666Z&quot;,
+        &quot;imageId&quot;: 8,
+        &quot;approvalId&quot;: 18,
+        &quot;tenantId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.638Z&quot;,
         &quot;image&quot;: {
-          &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
-          &quot;id&quot;: 2,
+          &quot;url&quot;: &quot;http://localhost:4000/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
+          &quot;id&quot;: 8,
           &quot;name&quot;: &quot;logo-warung.png&quot;,
-          &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+          &quot;imgUrl&quot;: &quot;/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
           &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-          &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
-          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+          &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;
         }
       }
     }
@@ -3711,26 +3711,26 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: {
     &quot;type&quot;: &quot;product&quot;,
-    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;id&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
     &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
     &quot;approval&quot;: {
-      &quot;id&quot;: 10,
+      &quot;id&quot;: 18,
       &quot;reason&quot;: &quot;Activated by admin&quot;,
       &quot;isActive&quot;: true,
       &quot;type&quot;: &quot;product&quot;,
-      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;
+      &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.591Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.654Z&quot;
     },
     &quot;user&quot;: {
-      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
       &quot;firstName&quot;: &quot;Budi&quot;,
       &quot;lastName&quot;: &quot;Santoso&quot;,
-      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+      &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
       &quot;phoneNumber&quot;: &quot;081298765499&quot;,
       &quot;tenantName&quot;: &quot;Warung Budi&quot;,
       &quot;tenant&quot;: {
-        &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+        &quot;id&quot;: &quot;b2cf2c70-8d8f-4ab1-a4f9-50cc8a8cb38d&quot;,
         &quot;name&quot;: &quot;Warung Budi&quot;,
         &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
         &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
@@ -3739,47 +3739,47 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
         &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
         &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
         &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-        &quot;logoId&quot;: 1,
-        &quot;categoryId&quot;: 1,
-        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+        &quot;logoId&quot;: 7,
+        &quot;tenantCategoryId&quot;: 3,
+        &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.536Z&quot;,
         &quot;category&quot;: {
-          &quot;id&quot;: 1,
-          &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;,
-          &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
-          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.500Z&quot;
+          &quot;id&quot;: 3,
+          &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791170022812&quot;,
+          &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.472Z&quot;
         },
         &quot;logo&quot;: {
-          &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
-          &quot;id&quot;: 1,
+          &quot;url&quot;: &quot;http://localhost:4000/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
+          &quot;id&quot;: 7,
           &quot;name&quot;: &quot;logo-warung.png&quot;,
-          &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+          &quot;imgUrl&quot;: &quot;/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
           &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-          &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
-          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+          &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;
         }
       },
-      &quot;productId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;productId&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
       &quot;product&quot;: {
-        &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+        &quot;id&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
         &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
         &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
         &quot;details&quot;: &quot;250 ml, es&quot;,
         &quot;qty&quot;: 25,
-        &quot;imageId&quot;: 2,
-        &quot;approvalId&quot;: 10,
-        &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.666Z&quot;,
+        &quot;imageId&quot;: 8,
+        &quot;approvalId&quot;: 18,
+        &quot;tenantId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.638Z&quot;,
         &quot;image&quot;: {
-          &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
-          &quot;id&quot;: 2,
+          &quot;url&quot;: &quot;http://localhost:4000/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
+          &quot;id&quot;: 8,
           &quot;name&quot;: &quot;logo-warung.png&quot;,
-          &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+          &quot;imgUrl&quot;: &quot;/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
           &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-          &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
-          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+          &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;
         }
       }
     }
@@ -4404,37 +4404,37 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;id&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
       &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
       &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
       &quot;details&quot;: &quot;250 ml, es&quot;,
       &quot;qty&quot;: 10,
-      &quot;imageId&quot;: 2,
-      &quot;approvalId&quot;: 10,
-      &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+      &quot;imageId&quot;: 8,
+      &quot;approvalId&quot;: 18,
+      &quot;tenantId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
       &quot;image&quot;: {
-        &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
-        &quot;id&quot;: 2,
+        &quot;url&quot;: &quot;http://localhost:4000/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
+        &quot;id&quot;: 8,
         &quot;name&quot;: &quot;logo-warung.png&quot;,
-        &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+        &quot;imgUrl&quot;: &quot;/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
         &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;
       },
       &quot;approval&quot;: {
-        &quot;id&quot;: 10,
+        &quot;id&quot;: 18,
         &quot;isActive&quot;: false,
         &quot;reason&quot;: &quot;Waiting for approval&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.591Z&quot;
       },
       &quot;tenant&quot;: {
-        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
         &quot;tenantName&quot;: &quot;Warung Budi&quot;,
         &quot;firstName&quot;: &quot;Budi&quot;,
         &quot;lastName&quot;: &quot;Santoso&quot;,
-        &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+        &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;
       }
     }
   ],
@@ -4448,37 +4448,37 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;id&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
       &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
       &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
       &quot;details&quot;: &quot;250 ml, es&quot;,
       &quot;qty&quot;: 10,
-      &quot;imageId&quot;: 2,
-      &quot;approvalId&quot;: 10,
-      &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+      &quot;imageId&quot;: 8,
+      &quot;approvalId&quot;: 18,
+      &quot;tenantId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
       &quot;image&quot;: {
-        &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
-        &quot;id&quot;: 2,
+        &quot;url&quot;: &quot;http://localhost:4000/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
+        &quot;id&quot;: 8,
         &quot;name&quot;: &quot;logo-warung.png&quot;,
-        &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+        &quot;imgUrl&quot;: &quot;/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
         &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;
       },
       &quot;approval&quot;: {
-        &quot;id&quot;: 10,
+        &quot;id&quot;: 18,
         &quot;isActive&quot;: false,
         &quot;reason&quot;: &quot;Waiting for approval&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.591Z&quot;
       },
       &quot;tenant&quot;: {
-        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
         &quot;tenantName&quot;: &quot;Warung Budi&quot;,
         &quot;firstName&quot;: &quot;Budi&quot;,
         &quot;lastName&quot;: &quot;Santoso&quot;,
-        &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+        &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;
       }
     }
   ],
@@ -4534,73 +4534,73 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;id&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
     &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
     &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
     &quot;details&quot;: &quot;250 ml, es&quot;,
     &quot;qty&quot;: 10,
-    &quot;imageId&quot;: 2,
-    &quot;approvalId&quot;: 10,
-    &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+    &quot;imageId&quot;: 8,
+    &quot;approvalId&quot;: 18,
+    &quot;tenantId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
     &quot;image&quot;: {
-      &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
-      &quot;id&quot;: 2,
+      &quot;url&quot;: &quot;http://localhost:4000/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
+      &quot;id&quot;: 8,
       &quot;name&quot;: &quot;logo-warung.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
       &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;
     },
     &quot;approval&quot;: {
-      &quot;id&quot;: 10,
+      &quot;id&quot;: 18,
       &quot;isActive&quot;: false,
       &quot;reason&quot;: &quot;Waiting for approval&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.591Z&quot;
     },
     &quot;tenant&quot;: {
-      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
       &quot;tenantName&quot;: &quot;Warung Budi&quot;,
       &quot;firstName&quot;: &quot;Budi&quot;,
       &quot;lastName&quot;: &quot;Santoso&quot;,
-      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+      &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;id&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
     &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
     &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
     &quot;details&quot;: &quot;250 ml, es&quot;,
     &quot;qty&quot;: 10,
-    &quot;imageId&quot;: 2,
-    &quot;approvalId&quot;: 10,
-    &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+    &quot;imageId&quot;: 8,
+    &quot;approvalId&quot;: 18,
+    &quot;tenantId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
     &quot;image&quot;: {
-      &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
-      &quot;id&quot;: 2,
+      &quot;url&quot;: &quot;http://localhost:4000/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
+      &quot;id&quot;: 8,
       &quot;name&quot;: &quot;logo-warung.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
       &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;
     },
     &quot;approval&quot;: {
-      &quot;id&quot;: 10,
+      &quot;id&quot;: 18,
       &quot;isActive&quot;: false,
       &quot;reason&quot;: &quot;Waiting for approval&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.591Z&quot;
     },
     &quot;tenant&quot;: {
-      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
       &quot;tenantName&quot;: &quot;Warung Budi&quot;,
       &quot;firstName&quot;: &quot;Budi&quot;,
       &quot;lastName&quot;: &quot;Santoso&quot;,
-      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+      &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;
     }
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
@@ -4649,73 +4649,73 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">201 Created</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;id&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
     &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
     &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
     &quot;details&quot;: &quot;250 ml, es&quot;,
     &quot;qty&quot;: 10,
-    &quot;imageId&quot;: 2,
-    &quot;approvalId&quot;: 10,
-    &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+    &quot;imageId&quot;: 8,
+    &quot;approvalId&quot;: 18,
+    &quot;tenantId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
     &quot;image&quot;: {
-      &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
-      &quot;id&quot;: 2,
+      &quot;url&quot;: &quot;http://localhost:4000/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
+      &quot;id&quot;: 8,
       &quot;name&quot;: &quot;logo-warung.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
       &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;
     },
     &quot;approval&quot;: {
-      &quot;id&quot;: 10,
+      &quot;id&quot;: 18,
       &quot;isActive&quot;: false,
       &quot;reason&quot;: &quot;Waiting for approval&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.591Z&quot;
     },
     &quot;tenant&quot;: {
-      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
       &quot;tenantName&quot;: &quot;Warung Budi&quot;,
       &quot;firstName&quot;: &quot;Budi&quot;,
       &quot;lastName&quot;: &quot;Santoso&quot;,
-      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+      &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;id&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
     &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
     &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
     &quot;details&quot;: &quot;250 ml, es&quot;,
     &quot;qty&quot;: 10,
-    &quot;imageId&quot;: 2,
-    &quot;approvalId&quot;: 10,
-    &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+    &quot;imageId&quot;: 8,
+    &quot;approvalId&quot;: 18,
+    &quot;tenantId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
     &quot;image&quot;: {
-      &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
-      &quot;id&quot;: 2,
+      &quot;url&quot;: &quot;http://localhost:4000/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
+      &quot;id&quot;: 8,
       &quot;name&quot;: &quot;logo-warung.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
       &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;
     },
     &quot;approval&quot;: {
-      &quot;id&quot;: 10,
+      &quot;id&quot;: 18,
       &quot;isActive&quot;: false,
       &quot;reason&quot;: &quot;Waiting for approval&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.591Z&quot;
     },
     &quot;tenant&quot;: {
-      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
       &quot;tenantName&quot;: &quot;Warung Budi&quot;,
       &quot;firstName&quot;: &quot;Budi&quot;,
       &quot;lastName&quot;: &quot;Santoso&quot;,
-      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+      &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;
     }
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
@@ -4768,73 +4768,73 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;id&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
     &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
     &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
     &quot;details&quot;: &quot;250 ml, es&quot;,
     &quot;qty&quot;: 25,
-    &quot;imageId&quot;: 2,
-    &quot;approvalId&quot;: 10,
-    &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.666Z&quot;,
+    &quot;imageId&quot;: 8,
+    &quot;approvalId&quot;: 18,
+    &quot;tenantId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.638Z&quot;,
     &quot;image&quot;: {
-      &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
-      &quot;id&quot;: 2,
+      &quot;url&quot;: &quot;http://localhost:4000/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
+      &quot;id&quot;: 8,
       &quot;name&quot;: &quot;logo-warung.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
       &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;
     },
     &quot;approval&quot;: {
-      &quot;id&quot;: 10,
+      &quot;id&quot;: 18,
       &quot;isActive&quot;: false,
       &quot;reason&quot;: &quot;Waiting for approval&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.591Z&quot;
     },
     &quot;tenant&quot;: {
-      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
       &quot;tenantName&quot;: &quot;Warung Budi&quot;,
       &quot;firstName&quot;: &quot;Budi&quot;,
       &quot;lastName&quot;: &quot;Santoso&quot;,
-      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+      &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;id&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
     &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
     &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
     &quot;details&quot;: &quot;250 ml, es&quot;,
     &quot;qty&quot;: 25,
-    &quot;imageId&quot;: 2,
-    &quot;approvalId&quot;: 10,
-    &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.666Z&quot;,
+    &quot;imageId&quot;: 8,
+    &quot;approvalId&quot;: 18,
+    &quot;tenantId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.638Z&quot;,
     &quot;image&quot;: {
-      &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
-      &quot;id&quot;: 2,
+      &quot;url&quot;: &quot;http://localhost:4000/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
+      &quot;id&quot;: 8,
       &quot;name&quot;: &quot;logo-warung.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
       &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.581Z&quot;
     },
     &quot;approval&quot;: {
-      &quot;id&quot;: 10,
+      &quot;id&quot;: 18,
       &quot;isActive&quot;: false,
       &quot;reason&quot;: &quot;Waiting for approval&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.591Z&quot;
     },
     &quot;tenant&quot;: {
-      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
       &quot;tenantName&quot;: &quot;Warung Budi&quot;,
       &quot;firstName&quot;: &quot;Budi&quot;,
       &quot;lastName&quot;: &quot;Santoso&quot;,
-      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+      &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;
     }
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
@@ -4970,23 +4970,23 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;id&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
       &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
       &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
       &quot;details&quot;: &quot;250 ml, es&quot;,
       &quot;qty&quot;: 25,
-      &quot;imageId&quot;: 2,
-      &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.666Z&quot;,
+      &quot;imageId&quot;: 8,
+      &quot;tenantId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.638Z&quot;,
       &quot;image&quot;: {
-        &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
-        &quot;id&quot;: 2,
-        &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+        &quot;url&quot;: &quot;http://localhost:4000/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
+        &quot;id&quot;: 8,
+        &quot;imgUrl&quot;: &quot;/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
         &quot;altText&quot;: &quot;Logo Warung Budi&quot;
       },
       &quot;tenant&quot;: {
-        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
         &quot;tenantName&quot;: &quot;Warung Budi&quot;,
         &quot;firstName&quot;: &quot;Budi&quot;,
         &quot;lastName&quot;: &quot;Santoso&quot;
@@ -5003,23 +5003,23 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;id&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
       &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
       &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
       &quot;details&quot;: &quot;250 ml, es&quot;,
       &quot;qty&quot;: 25,
-      &quot;imageId&quot;: 2,
-      &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.666Z&quot;,
+      &quot;imageId&quot;: 8,
+      &quot;tenantId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.592Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.638Z&quot;,
       &quot;image&quot;: {
-        &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
-        &quot;id&quot;: 2,
-        &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+        &quot;url&quot;: &quot;http://localhost:4000/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
+        &quot;id&quot;: 8,
+        &quot;imgUrl&quot;: &quot;/images/488243c2-519f-4962-b356-dc91b67be410.png&quot;,
         &quot;altText&quot;: &quot;Logo Warung Budi&quot;
       },
       &quot;tenant&quot;: {
-        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
         &quot;tenantName&quot;: &quot;Warung Budi&quot;,
         &quot;firstName&quot;: &quot;Budi&quot;,
         &quot;lastName&quot;: &quot;Santoso&quot;
@@ -5254,10 +5254,10 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: 1,
-      &quot;name&quot;: &quot;Kuliner 1791168925841&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;
+      &quot;id&quot;: 3,
+      &quot;name&quot;: &quot;Kuliner 1791170022812&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;
     }
   ],
   &quot;meta&quot;: {
@@ -5270,10 +5270,10 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: 1,
-      &quot;name&quot;: &quot;Kuliner 1791168925841&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;
+      &quot;id&quot;: 3,
+      &quot;name&quot;: &quot;Kuliner 1791170022812&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;
     }
   ],
   &quot;meta&quot;: {
@@ -5316,18 +5316,18 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: 1,
-    &quot;name&quot;: &quot;Kuliner 1791168925841&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;
+    &quot;id&quot;: 3,
+    &quot;name&quot;: &quot;Kuliner 1791170022812&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: 1,
-    &quot;name&quot;: &quot;Kuliner 1791168925841&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;
+    &quot;id&quot;: 3,
+    &quot;name&quot;: &quot;Kuliner 1791170022812&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: false,
@@ -5367,18 +5367,18 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">201 Created</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: 1,
-    &quot;name&quot;: &quot;Kuliner 1791168925841&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;
+    &quot;id&quot;: 3,
+    &quot;name&quot;: &quot;Kuliner 1791170022812&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: 1,
-    &quot;name&quot;: &quot;Kuliner 1791168925841&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;
+    &quot;id&quot;: 3,
+    &quot;name&quot;: &quot;Kuliner 1791170022812&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">403 Forbidden</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: false,
@@ -5418,18 +5418,18 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: 1,
-    &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.500Z&quot;
+    &quot;id&quot;: 3,
+    &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791170022812&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.472Z&quot;
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: 1,
-    &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.500Z&quot;
+    &quot;id&quot;: 3,
+    &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791170022812&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.438Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.472Z&quot;
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: false,
@@ -5505,7 +5505,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   <div class="legend"><span class="lg lg-start">Request</span><span class="lg lg-check"><span data-l="en">Check</span><span data-l="id">Pengecekan</span></span><span class="lg lg-error"><span data-l="en">Error response</span><span data-l="id">Respons error</span></span><span class="lg lg-end"><span data-l="en">Success</span><span data-l="id">Berhasil</span></span><span class="lg lg-effect"><span data-l="en">Side effect</span><span data-l="id">Efek samping</span></span><span class="lg lg-note"><span data-l="en">Note</span><span data-l="id">Catatan</span></span></div>
   <div class="flow-grid" data-l="en"><figure class="flow">
   <figcaption>Create My Tenant</figcaption>
-  <svg class="fc" viewBox="0 0 480 654" width="480" height="654" role="img" aria-label="Create My Tenant">
+  <svg class="fc" viewBox="0 0 480 670" width="480" height="670" role="img" aria-label="Create My Tenant">
     <defs><marker id="fc-arrow-78" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
     <rect class="fc-box fc-start" x="8" y="8" width="224" height="32" rx="16"/>
     <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">POST /api/tenants/me</text>
@@ -5558,19 +5558,19 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <text class="fc-text fc-text-error" x="374" y="417" text-anchor="middle">409 already exists, use</text><text class="fc-text fc-text-error" x="374" y="433" text-anchor="middle">PATCH</text>
     <line class="fc-line" x1="120" y1="436" x2="120" y2="473" marker-end="url(#fc-arrow-78)"/>
     <text class="fc-label" x="126" y="459">yes</text>
-    <polygon class="fc-box fc-check" points="20,474 220,474 232,490 220,506 20,506 8,490"/>
-    <text class="fc-text fc-text-check" x="120" y="495" text-anchor="middle"><tspan class="fc-code">logoId</tspan> and <tspan class="fc-code">categoryId</tspan> exist?</text>
-    <path class="fc-line fc-line-error" d="M232,490 H275" fill="none" marker-end="url(#fc-arrow-78)"/>
-    <text class="fc-label" x="237" y="485">no</text>
-    <rect class="fc-box fc-error" x="276" y="474" width="196" height="32" rx="8"/>
-    <text class="fc-text fc-text-error" x="374" y="495" text-anchor="middle">400</text>
-    <line class="fc-line" x1="120" y1="506" x2="120" y2="535" marker-end="url(#fc-arrow-78)"/>
-    <text class="fc-label" x="126" y="525">yes</text>
-    <rect class="fc-box fc-step" x="8" y="536" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="557" text-anchor="middle">Create profile (name defaults to</text><text class="fc-text fc-text-step" x="120" y="573" text-anchor="middle">your tenantName)</text>
-    <line class="fc-line" x1="120" y1="584" x2="120" y2="613" marker-end="url(#fc-arrow-78)"/>
-    <rect class="fc-box fc-end" x="8" y="614" width="224" height="32" rx="16"/>
-    <text class="fc-text fc-text-end" x="120" y="635" text-anchor="middle">201 profile</text>
+    <polygon class="fc-box fc-check" points="20,474 220,474 232,498 220,522 20,522 8,498"/>
+    <text class="fc-text fc-text-check" x="120" y="495" text-anchor="middle"><tspan class="fc-code">logoId</tspan> and <tspan class="fc-code">tenantCategoryId</tspan></text><text class="fc-text fc-text-check" x="120" y="511" text-anchor="middle">exist?</text>
+    <path class="fc-line fc-line-error" d="M232,498 H275" fill="none" marker-end="url(#fc-arrow-78)"/>
+    <text class="fc-label" x="237" y="493">no</text>
+    <rect class="fc-box fc-error" x="276" y="482" width="196" height="32" rx="8"/>
+    <text class="fc-text fc-text-error" x="374" y="503" text-anchor="middle">400</text>
+    <line class="fc-line" x1="120" y1="522" x2="120" y2="551" marker-end="url(#fc-arrow-78)"/>
+    <text class="fc-label" x="126" y="541">yes</text>
+    <rect class="fc-box fc-step" x="8" y="552" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="573" text-anchor="middle">Create profile (name defaults to</text><text class="fc-text fc-text-step" x="120" y="589" text-anchor="middle">your tenantName)</text>
+    <line class="fc-line" x1="120" y1="600" x2="120" y2="629" marker-end="url(#fc-arrow-78)"/>
+    <rect class="fc-box fc-end" x="8" y="630" width="224" height="32" rx="16"/>
+    <text class="fc-text fc-text-end" x="120" y="651" text-anchor="middle">201 profile</text>
   </svg>
 </figure>
 <figure class="flow">
@@ -5716,7 +5716,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 </figure>
 <figure class="flow">
   <figcaption>List / Get Tenants</figcaption>
-  <svg class="fc" viewBox="0 0 480 592" width="480" height="592" role="img" aria-label="List / Get Tenants">
+  <svg class="fc" viewBox="0 0 480 608" width="480" height="608" role="img" aria-label="List / Get Tenants">
     <defs><marker id="fc-arrow-81" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
     <rect class="fc-box fc-start" x="8" y="8" width="224" height="32" rx="16"/>
     <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">GET /api/tenants[/:id]</text>
@@ -5761,24 +5761,24 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <text class="fc-text fc-text-error" x="374" y="363" text-anchor="middle">403 Forbidden</text>
     <line class="fc-line" x1="120" y1="382" x2="120" y2="411" marker-end="url(#fc-arrow-81)"/>
     <text class="fc-label" x="126" y="401">yes</text>
-    <rect class="fc-box fc-step" x="8" y="412" width="224" height="32" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="433" text-anchor="middle">List: optional ?categoryId filter</text>
-    <line class="fc-line" x1="120" y1="444" x2="120" y2="473" marker-end="url(#fc-arrow-81)"/>
-    <polygon class="fc-box fc-check" points="20,474 220,474 232,490 220,506 20,506 8,490"/>
-    <text class="fc-text fc-text-check" x="120" y="495" text-anchor="middle">Tenant exists? (single tenant)</text>
-    <path class="fc-line fc-line-error" d="M232,490 H275" fill="none" marker-end="url(#fc-arrow-81)"/>
-    <text class="fc-label" x="237" y="485">no</text>
-    <rect class="fc-box fc-error" x="276" y="474" width="196" height="32" rx="8"/>
-    <text class="fc-text fc-text-error" x="374" y="495" text-anchor="middle">404</text>
-    <line class="fc-line" x1="120" y1="506" x2="120" y2="535" marker-end="url(#fc-arrow-81)"/>
-    <text class="fc-label" x="126" y="525">yes</text>
-    <rect class="fc-box fc-end" x="8" y="536" width="224" height="48" rx="18"/>
-    <text class="fc-text fc-text-end" x="120" y="557" text-anchor="middle">200 tenant(s) with owner, logo,</text><text class="fc-text fc-text-end" x="120" y="573" text-anchor="middle">category</text>
+    <rect class="fc-box fc-step" x="8" y="412" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="433" text-anchor="middle">List: optional ?tenantCategoryId</text><text class="fc-text fc-text-step" x="120" y="449" text-anchor="middle">filter</text>
+    <line class="fc-line" x1="120" y1="460" x2="120" y2="489" marker-end="url(#fc-arrow-81)"/>
+    <polygon class="fc-box fc-check" points="20,490 220,490 232,506 220,522 20,522 8,506"/>
+    <text class="fc-text fc-text-check" x="120" y="511" text-anchor="middle">Tenant exists? (single tenant)</text>
+    <path class="fc-line fc-line-error" d="M232,506 H275" fill="none" marker-end="url(#fc-arrow-81)"/>
+    <text class="fc-label" x="237" y="501">no</text>
+    <rect class="fc-box fc-error" x="276" y="490" width="196" height="32" rx="8"/>
+    <text class="fc-text fc-text-error" x="374" y="511" text-anchor="middle">404</text>
+    <line class="fc-line" x1="120" y1="522" x2="120" y2="551" marker-end="url(#fc-arrow-81)"/>
+    <text class="fc-label" x="126" y="541">yes</text>
+    <rect class="fc-box fc-end" x="8" y="552" width="224" height="48" rx="18"/>
+    <text class="fc-text fc-text-end" x="120" y="573" text-anchor="middle">200 tenant(s) with owner, logo,</text><text class="fc-text fc-text-end" x="120" y="589" text-anchor="middle">category</text>
   </svg>
 </figure></div>
   <div class="flow-grid" data-l="id"><figure class="flow">
   <figcaption>Buat Profil Tenant Saya</figcaption>
-  <svg class="fc" viewBox="0 0 480 654" width="480" height="654" role="img" aria-label="Buat Profil Tenant Saya">
+  <svg class="fc" viewBox="0 0 480 670" width="480" height="670" role="img" aria-label="Buat Profil Tenant Saya">
     <defs><marker id="fc-arrow-82" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
     <rect class="fc-box fc-start" x="8" y="8" width="224" height="32" rx="16"/>
     <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">POST /api/tenants/me</text>
@@ -5831,19 +5831,19 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <text class="fc-text fc-text-error" x="374" y="433" text-anchor="middle">409 sudah ada, pakai PATCH</text>
     <line class="fc-line" x1="120" y1="444" x2="120" y2="473" marker-end="url(#fc-arrow-82)"/>
     <text class="fc-label" x="126" y="463">ya</text>
-    <polygon class="fc-box fc-check" points="20,474 220,474 232,490 220,506 20,506 8,490"/>
-    <text class="fc-text fc-text-check" x="120" y="495" text-anchor="middle"><tspan class="fc-code">logoId</tspan> dan <tspan class="fc-code">categoryId</tspan> ada?</text>
-    <path class="fc-line fc-line-error" d="M232,490 H275" fill="none" marker-end="url(#fc-arrow-82)"/>
-    <text class="fc-label" x="237" y="485">tidak</text>
-    <rect class="fc-box fc-error" x="276" y="474" width="196" height="32" rx="8"/>
-    <text class="fc-text fc-text-error" x="374" y="495" text-anchor="middle">400</text>
-    <line class="fc-line" x1="120" y1="506" x2="120" y2="535" marker-end="url(#fc-arrow-82)"/>
-    <text class="fc-label" x="126" y="525">ya</text>
-    <rect class="fc-box fc-step" x="8" y="536" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="557" text-anchor="middle">Buat profil (name default:</text><text class="fc-text fc-text-step" x="120" y="573" text-anchor="middle">tenantName Anda)</text>
-    <line class="fc-line" x1="120" y1="584" x2="120" y2="613" marker-end="url(#fc-arrow-82)"/>
-    <rect class="fc-box fc-end" x="8" y="614" width="224" height="32" rx="16"/>
-    <text class="fc-text fc-text-end" x="120" y="635" text-anchor="middle">201 profil</text>
+    <polygon class="fc-box fc-check" points="20,474 220,474 232,498 220,522 20,522 8,498"/>
+    <text class="fc-text fc-text-check" x="120" y="495" text-anchor="middle"><tspan class="fc-code">logoId</tspan> dan <tspan class="fc-code">tenantCategoryId</tspan></text><text class="fc-text fc-text-check" x="120" y="511" text-anchor="middle">ada?</text>
+    <path class="fc-line fc-line-error" d="M232,498 H275" fill="none" marker-end="url(#fc-arrow-82)"/>
+    <text class="fc-label" x="237" y="493">tidak</text>
+    <rect class="fc-box fc-error" x="276" y="482" width="196" height="32" rx="8"/>
+    <text class="fc-text fc-text-error" x="374" y="503" text-anchor="middle">400</text>
+    <line class="fc-line" x1="120" y1="522" x2="120" y2="551" marker-end="url(#fc-arrow-82)"/>
+    <text class="fc-label" x="126" y="541">ya</text>
+    <rect class="fc-box fc-step" x="8" y="552" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="573" text-anchor="middle">Buat profil (name default:</text><text class="fc-text fc-text-step" x="120" y="589" text-anchor="middle">tenantName Anda)</text>
+    <line class="fc-line" x1="120" y1="600" x2="120" y2="629" marker-end="url(#fc-arrow-82)"/>
+    <rect class="fc-box fc-end" x="8" y="630" width="224" height="32" rx="16"/>
+    <text class="fc-text fc-text-end" x="120" y="651" text-anchor="middle">201 profil</text>
   </svg>
 </figure>
 <figure class="flow">
@@ -5989,7 +5989,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 </figure>
 <figure class="flow">
   <figcaption>Daftar / Detail Tenant</figcaption>
-  <svg class="fc" viewBox="0 0 480 608" width="480" height="608" role="img" aria-label="Daftar / Detail Tenant">
+  <svg class="fc" viewBox="0 0 480 624" width="480" height="624" role="img" aria-label="Daftar / Detail Tenant">
     <defs><marker id="fc-arrow-85" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
     <rect class="fc-box fc-start" x="8" y="8" width="224" height="32" rx="16"/>
     <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">GET /api/tenants[/:id]</text>
@@ -6034,19 +6034,19 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <text class="fc-text fc-text-error" x="374" y="379" text-anchor="middle">403 Forbidden</text>
     <line class="fc-line" x1="120" y1="398" x2="120" y2="427" marker-end="url(#fc-arrow-85)"/>
     <text class="fc-label" x="126" y="417">ya</text>
-    <rect class="fc-box fc-step" x="8" y="428" width="224" height="32" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="449" text-anchor="middle">Daftar: filter opsional ?categoryId</text>
-    <line class="fc-line" x1="120" y1="460" x2="120" y2="489" marker-end="url(#fc-arrow-85)"/>
-    <polygon class="fc-box fc-check" points="20,490 220,490 232,506 220,522 20,522 8,506"/>
-    <text class="fc-text fc-text-check" x="120" y="511" text-anchor="middle">Tenant ada? (satu tenant)</text>
-    <path class="fc-line fc-line-error" d="M232,506 H275" fill="none" marker-end="url(#fc-arrow-85)"/>
-    <text class="fc-label" x="237" y="501">tidak</text>
-    <rect class="fc-box fc-error" x="276" y="490" width="196" height="32" rx="8"/>
-    <text class="fc-text fc-text-error" x="374" y="511" text-anchor="middle">404</text>
-    <line class="fc-line" x1="120" y1="522" x2="120" y2="551" marker-end="url(#fc-arrow-85)"/>
-    <text class="fc-label" x="126" y="541">ya</text>
-    <rect class="fc-box fc-end" x="8" y="552" width="224" height="48" rx="18"/>
-    <text class="fc-text fc-text-end" x="120" y="573" text-anchor="middle">200 tenant dengan pemilik, logo,</text><text class="fc-text fc-text-end" x="120" y="589" text-anchor="middle">kategori</text>
+    <rect class="fc-box fc-step" x="8" y="428" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="449" text-anchor="middle">Daftar: filter opsional</text><text class="fc-text fc-text-step" x="120" y="465" text-anchor="middle">?tenantCategoryId</text>
+    <line class="fc-line" x1="120" y1="476" x2="120" y2="505" marker-end="url(#fc-arrow-85)"/>
+    <polygon class="fc-box fc-check" points="20,506 220,506 232,522 220,538 20,538 8,522"/>
+    <text class="fc-text fc-text-check" x="120" y="527" text-anchor="middle">Tenant ada? (satu tenant)</text>
+    <path class="fc-line fc-line-error" d="M232,522 H275" fill="none" marker-end="url(#fc-arrow-85)"/>
+    <text class="fc-label" x="237" y="517">tidak</text>
+    <rect class="fc-box fc-error" x="276" y="506" width="196" height="32" rx="8"/>
+    <text class="fc-text fc-text-error" x="374" y="527" text-anchor="middle">404</text>
+    <line class="fc-line" x1="120" y1="538" x2="120" y2="567" marker-end="url(#fc-arrow-85)"/>
+    <text class="fc-label" x="126" y="557">ya</text>
+    <rect class="fc-box fc-end" x="8" y="568" width="224" height="48" rx="18"/>
+    <text class="fc-text fc-text-end" x="120" y="589" text-anchor="middle">200 tenant dengan pemilik, logo,</text><text class="fc-text fc-text-end" x="120" y="605" text-anchor="middle">kategori</text>
   </svg>
 </figure></div>
 </details>
@@ -6069,7 +6069,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;id&quot;: &quot;b2cf2c70-8d8f-4ab1-a4f9-50cc8a8cb38d&quot;,
     &quot;name&quot;: &quot;Warung Budi&quot;,
     &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
     &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
@@ -6078,29 +6078,29 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
     &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
     &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-    &quot;logoId&quot;: 1,
-    &quot;categoryId&quot;: 1,
-    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;logoId&quot;: 7,
+    &quot;tenantCategoryId&quot;: 3,
+    &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
-      &quot;id&quot;: 1,
+      &quot;url&quot;: &quot;http://localhost:4000/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
+      &quot;id&quot;: 7,
       &quot;name&quot;: &quot;logo-warung.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
       &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;
     },
     &quot;category&quot;: {
-      &quot;id&quot;: 1,
-      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+      &quot;id&quot;: 3,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791170022812&quot;
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;id&quot;: &quot;b2cf2c70-8d8f-4ab1-a4f9-50cc8a8cb38d&quot;,
     &quot;name&quot;: &quot;Warung Budi&quot;,
     &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
     &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
@@ -6109,23 +6109,23 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
     &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
     &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-    &quot;logoId&quot;: 1,
-    &quot;categoryId&quot;: 1,
-    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;logoId&quot;: 7,
+    &quot;tenantCategoryId&quot;: 3,
+    &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
-      &quot;id&quot;: 1,
+      &quot;url&quot;: &quot;http://localhost:4000/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
+      &quot;id&quot;: 7,
       &quot;name&quot;: &quot;logo-warung.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
       &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;
     },
     &quot;category&quot;: {
-      &quot;id&quot;: 1,
-      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+      &quot;id&quot;: 3,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791170022812&quot;
     }
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
@@ -6156,7 +6156,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   </div>
   <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <div data-l="en"><p>One profile per tenant. Required: every field except <code>name</code> (defaults to your tenantName). <code>logoId</code>: upload the logo first. <code>categoryId</code>: a tenant category (created by an admin). Saves <code>{{tenantProfileId}}</code>.</p></div><div data-l="id"><p>Satu profil per tenant. Wajib: semua field kecuali <code>name</code> (bawaan: tenantName Anda). <code>logoId</code>: unggah logo dulu. <code>categoryId</code>: kategori tenant (dibuat oleh admin). Menyimpan <code>{{tenantProfileId}}</code>.</p></div>
+    <div data-l="en"><p>One profile per tenant. Required: every field except <code>name</code> (defaults to your tenantName). <code>logoId</code>: upload the logo first. <code>tenantCategoryId</code> (<strong>required</strong>): a tenant category, created by an admin (<em>Tenant Categories → Create</em>). Saves <code>{{tenantProfileId}}</code>.</p></div><div data-l="id"><p>Satu profil per tenant. Wajib: semua field kecuali <code>name</code> (bawaan: tenantName Anda). <code>logoId</code>: unggah logo dulu. <code>tenantCategoryId</code> (<strong>wajib</strong>): kategori tenant, dibuat oleh admin (<em>Kategori Tenant → Buat</em>). Menyimpan <code>{{tenantProfileId}}</code>.</p></div>
     
     <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;name&quot;: &quot;Warung Budi&quot;,
@@ -6168,7 +6168,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
   &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
   &quot;logoId&quot;: {{imageId}},
-  &quot;categoryId&quot;: {{categoryId}}
+  &quot;tenantCategoryId&quot;: {{categoryId}}
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;name&quot;: &quot;Warung Budi&quot;,
   &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
@@ -6179,12 +6179,12 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
   &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
   &quot;logoId&quot;: {{imageId}},
-  &quot;categoryId&quot;: {{categoryId}}
+  &quot;tenantCategoryId&quot;: {{categoryId}}
 }</code></pre>
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">201 Created</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;id&quot;: &quot;b2cf2c70-8d8f-4ab1-a4f9-50cc8a8cb38d&quot;,
     &quot;name&quot;: &quot;Warung Budi&quot;,
     &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
     &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
@@ -6193,29 +6193,29 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
     &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
     &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-    &quot;logoId&quot;: 1,
-    &quot;categoryId&quot;: 1,
-    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;logoId&quot;: 7,
+    &quot;tenantCategoryId&quot;: 3,
+    &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
-      &quot;id&quot;: 1,
+      &quot;url&quot;: &quot;http://localhost:4000/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
+      &quot;id&quot;: 7,
       &quot;name&quot;: &quot;logo-warung.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
       &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;
     },
     &quot;category&quot;: {
-      &quot;id&quot;: 1,
-      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+      &quot;id&quot;: 3,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791170022812&quot;
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;id&quot;: &quot;b2cf2c70-8d8f-4ab1-a4f9-50cc8a8cb38d&quot;,
     &quot;name&quot;: &quot;Warung Budi&quot;,
     &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
     &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
@@ -6224,36 +6224,48 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
     &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
     &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-    &quot;logoId&quot;: 1,
-    &quot;categoryId&quot;: 1,
-    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;logoId&quot;: 7,
+    &quot;tenantCategoryId&quot;: 3,
+    &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
-      &quot;id&quot;: 1,
+      &quot;url&quot;: &quot;http://localhost:4000/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
+      &quot;id&quot;: 7,
       &quot;name&quot;: &quot;logo-warung.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
       &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;
     },
     &quot;category&quot;: {
-      &quot;id&quot;: 1,
-      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+      &quot;id&quot;: 3,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791170022812&quot;
     }
   }
-}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">409 Conflict</span></h4><button class="copy" type="button" data-copy="{
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: false,
   &quot;error&quot;: {
-    &quot;code&quot;: &quot;CONFLICT&quot;,
-    &quot;message&quot;: &quot;Anda sudah memiliki profil tenant, ubah melalui PATCH /api/tenants/me&quot;
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;tenantCategoryId&quot;,
+        &quot;message&quot;: &quot;tenantCategoryId wajib diisi&quot;
+      }
+    ]
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: false,
   &quot;error&quot;: {
-    &quot;code&quot;: &quot;CONFLICT&quot;,
-    &quot;message&quot;: &quot;Anda sudah memiliki profil tenant, ubah melalui PATCH /api/tenants/me&quot;
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;tenantCategoryId&quot;,
+        &quot;message&quot;: &quot;tenantCategoryId wajib diisi&quot;
+      }
+    ]
   }
 }</code></pre>
   </div>
@@ -6281,7 +6293,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;id&quot;: &quot;b2cf2c70-8d8f-4ab1-a4f9-50cc8a8cb38d&quot;,
     &quot;name&quot;: &quot;Warung Budi&quot;,
     &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
     &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
@@ -6290,29 +6302,29 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
     &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
     &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-    &quot;logoId&quot;: 1,
-    &quot;categoryId&quot;: 1,
-    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+    &quot;logoId&quot;: 7,
+    &quot;tenantCategoryId&quot;: 3,
+    &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.536Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
-      &quot;id&quot;: 1,
+      &quot;url&quot;: &quot;http://localhost:4000/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
+      &quot;id&quot;: 7,
       &quot;name&quot;: &quot;logo-warung.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
       &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;
     },
     &quot;category&quot;: {
-      &quot;id&quot;: 1,
-      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+      &quot;id&quot;: 3,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791170022812&quot;
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;id&quot;: &quot;b2cf2c70-8d8f-4ab1-a4f9-50cc8a8cb38d&quot;,
     &quot;name&quot;: &quot;Warung Budi&quot;,
     &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
     &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
@@ -6321,23 +6333,23 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
     &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
     &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-    &quot;logoId&quot;: 1,
-    &quot;categoryId&quot;: 1,
-    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+    &quot;logoId&quot;: 7,
+    &quot;tenantCategoryId&quot;: 3,
+    &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.536Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
-      &quot;id&quot;: 1,
+      &quot;url&quot;: &quot;http://localhost:4000/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
+      &quot;id&quot;: 7,
       &quot;name&quot;: &quot;logo-warung.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
       &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;
     },
     &quot;category&quot;: {
-      &quot;id&quot;: 1,
-      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+      &quot;id&quot;: 3,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791170022812&quot;
     }
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
@@ -6417,14 +6429,14 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   </div>
   <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <div data-l="en"><p>Every tenant profile with its owner, logo and category. Optional <code>categoryId</code> filter.</p></div><div data-l="id"><p>Semua profil tenant beserta pemilik, logo, dan kategorinya. Filter <code>categoryId</code> opsional.</p></div>
-    <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>categoryId</code></td><td><code>{{categoryId}}</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr></tbody></table></div>
+    <div data-l="en"><p>Every tenant profile with its owner, logo and category. Optional <code>tenantCategoryId</code> filter.</p></div><div data-l="id"><p>Semua profil tenant beserta pemilik, logo, dan kategorinya. Filter <code>tenantCategoryId</code> opsional.</p></div>
+    <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>tenantCategoryId</code></td><td><code>{{categoryId}}</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr></tbody></table></div>
     
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+      &quot;id&quot;: &quot;b2cf2c70-8d8f-4ab1-a4f9-50cc8a8cb38d&quot;,
       &quot;name&quot;: &quot;Warung Budi&quot;,
       &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
       &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
@@ -6433,29 +6445,29 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
       &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
       &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
       &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-      &quot;logoId&quot;: 1,
-      &quot;categoryId&quot;: 1,
-      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+      &quot;logoId&quot;: 7,
+      &quot;tenantCategoryId&quot;: 3,
+      &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.536Z&quot;,
       &quot;logo&quot;: {
-        &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
-        &quot;id&quot;: 1,
+        &quot;url&quot;: &quot;http://localhost:4000/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
+        &quot;id&quot;: 7,
         &quot;name&quot;: &quot;logo-warung.png&quot;,
-        &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+        &quot;imgUrl&quot;: &quot;/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
         &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;
       },
       &quot;category&quot;: {
-        &quot;id&quot;: 1,
-        &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+        &quot;id&quot;: 3,
+        &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791170022812&quot;
       },
       &quot;owner&quot;: {
-        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
         &quot;firstName&quot;: &quot;Budi&quot;,
         &quot;lastName&quot;: &quot;Santoso&quot;,
-        &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+        &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
         &quot;tenantName&quot;: &quot;Warung Budi&quot;
       }
     }
@@ -6470,7 +6482,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+      &quot;id&quot;: &quot;b2cf2c70-8d8f-4ab1-a4f9-50cc8a8cb38d&quot;,
       &quot;name&quot;: &quot;Warung Budi&quot;,
       &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
       &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
@@ -6479,29 +6491,29 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
       &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
       &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
       &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-      &quot;logoId&quot;: 1,
-      &quot;categoryId&quot;: 1,
-      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+      &quot;logoId&quot;: 7,
+      &quot;tenantCategoryId&quot;: 3,
+      &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.536Z&quot;,
       &quot;logo&quot;: {
-        &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
-        &quot;id&quot;: 1,
+        &quot;url&quot;: &quot;http://localhost:4000/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
+        &quot;id&quot;: 7,
         &quot;name&quot;: &quot;logo-warung.png&quot;,
-        &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+        &quot;imgUrl&quot;: &quot;/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
         &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;
       },
       &quot;category&quot;: {
-        &quot;id&quot;: 1,
-        &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+        &quot;id&quot;: 3,
+        &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791170022812&quot;
       },
       &quot;owner&quot;: {
-        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
         &quot;firstName&quot;: &quot;Budi&quot;,
         &quot;lastName&quot;: &quot;Santoso&quot;,
-        &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+        &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
         &quot;tenantName&quot;: &quot;Warung Budi&quot;
       }
     }
@@ -6546,7 +6558,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;id&quot;: &quot;b2cf2c70-8d8f-4ab1-a4f9-50cc8a8cb38d&quot;,
     &quot;name&quot;: &quot;Warung Budi&quot;,
     &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
     &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
@@ -6555,36 +6567,36 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
     &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
     &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-    &quot;logoId&quot;: 1,
-    &quot;categoryId&quot;: 1,
-    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+    &quot;logoId&quot;: 7,
+    &quot;tenantCategoryId&quot;: 3,
+    &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.536Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
-      &quot;id&quot;: 1,
+      &quot;url&quot;: &quot;http://localhost:4000/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
+      &quot;id&quot;: 7,
       &quot;name&quot;: &quot;logo-warung.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
       &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;
     },
     &quot;category&quot;: {
-      &quot;id&quot;: 1,
-      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+      &quot;id&quot;: 3,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791170022812&quot;
     },
     &quot;owner&quot;: {
-      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
       &quot;firstName&quot;: &quot;Budi&quot;,
       &quot;lastName&quot;: &quot;Santoso&quot;,
-      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+      &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
       &quot;tenantName&quot;: &quot;Warung Budi&quot;
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;id&quot;: &quot;b2cf2c70-8d8f-4ab1-a4f9-50cc8a8cb38d&quot;,
     &quot;name&quot;: &quot;Warung Budi&quot;,
     &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
     &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
@@ -6593,29 +6605,29 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
     &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
     &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-    &quot;logoId&quot;: 1,
-    &quot;categoryId&quot;: 1,
-    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+    &quot;logoId&quot;: 7,
+    &quot;tenantCategoryId&quot;: 3,
+    &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.525Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.536Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
-      &quot;id&quot;: 1,
+      &quot;url&quot;: &quot;http://localhost:4000/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
+      &quot;id&quot;: 7,
       &quot;name&quot;: &quot;logo-warung.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/106aaf64-5751-4678-bd2b-1002f883bc58.png&quot;,
       &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.500Z&quot;
     },
     &quot;category&quot;: {
-      &quot;id&quot;: 1,
-      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+      &quot;id&quot;: 3,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791170022812&quot;
     },
     &quot;owner&quot;: {
-      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
       &quot;firstName&quot;: &quot;Budi&quot;,
       &quot;lastName&quot;: &quot;Santoso&quot;,
-      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+      &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
       &quot;tenantName&quot;: &quot;Warung Budi&quot;
     }
   }
@@ -6844,71 +6856,71 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;data&quot;: [
     {
       &quot;isRead&quot;: false,
-      &quot;id&quot;: 26,
+      &quot;id&quot;: 62,
       &quot;type&quot;: &quot;PRODUCT_APPROVED&quot;,
       &quot;name&quot;: &quot;Product approved&quot;,
       &quot;description&quot;: &quot;\&quot;Kopi Susu Gula Aren\&quot; was approved and is now visible on the landing page.&quot;,
-      &quot;approvalId&quot;: 10,
+      &quot;approvalId&quot;: 18,
       &quot;entityType&quot;: &quot;product&quot;,
-      &quot;entityId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;entityId&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
       &quot;readAt&quot;: null,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.688Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.688Z&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.660Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.660Z&quot;,
       &quot;approval&quot;: {
-        &quot;id&quot;: 10,
+        &quot;id&quot;: 18,
         &quot;type&quot;: &quot;product&quot;,
-        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
         &quot;isActive&quot;: true,
         &quot;reason&quot;: &quot;Activated by admin&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.654Z&quot;,
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+          &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
           &quot;firstName&quot;: &quot;Budi&quot;,
           &quot;lastName&quot;: &quot;Santoso&quot;,
           &quot;phoneNumber&quot;: &quot;081298765499&quot;,
-          &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+          &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
           &quot;role&quot;: &quot;tenant&quot;,
           &quot;faceImageId&quot;: null,
           &quot;tenantName&quot;: &quot;Warung Budi&quot;,
           &quot;mailActive&quot;: true,
           &quot;passwordChangedAt&quot;: null,
-          &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
-          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;
+          &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.414Z&quot;
         }
       }
     },
     {
       &quot;isRead&quot;: false,
-      &quot;id&quot;: 21,
+      &quot;id&quot;: 57,
       &quot;type&quot;: &quot;PRODUCT_UNDER_REVIEW&quot;,
       &quot;name&quot;: &quot;Product under review&quot;,
       &quot;description&quot;: &quot;\&quot;Kopi Susu Gula Aren\&quot; was created and is under review. You will be notified when it is approved.&quot;,
-      &quot;approvalId&quot;: 10,
+      &quot;approvalId&quot;: 18,
       &quot;entityType&quot;: &quot;product&quot;,
-      &quot;entityId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;entityId&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
       &quot;readAt&quot;: null,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.638Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.638Z&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.610Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.610Z&quot;,
       &quot;approval&quot;: {
-        &quot;id&quot;: 10,
+        &quot;id&quot;: 18,
         &quot;type&quot;: &quot;product&quot;,
-        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
         &quot;isActive&quot;: true,
         &quot;reason&quot;: &quot;Activated by admin&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.654Z&quot;,
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+          &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
           &quot;firstName&quot;: &quot;Budi&quot;,
           &quot;lastName&quot;: &quot;Santoso&quot;,
           &quot;phoneNumber&quot;: &quot;081298765499&quot;,
-          &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+          &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
           &quot;role&quot;: &quot;tenant&quot;,
           &quot;faceImageId&quot;: null,
           &quot;tenantName&quot;: &quot;Warung Budi&quot;,
           &quot;mailActive&quot;: true,
           &quot;passwordChangedAt&quot;: null,
-          &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
-          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;
+          &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.414Z&quot;
         }
       }
     }
@@ -6925,71 +6937,71 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;data&quot;: [
     {
       &quot;isRead&quot;: false,
-      &quot;id&quot;: 26,
+      &quot;id&quot;: 62,
       &quot;type&quot;: &quot;PRODUCT_APPROVED&quot;,
       &quot;name&quot;: &quot;Product approved&quot;,
       &quot;description&quot;: &quot;\&quot;Kopi Susu Gula Aren\&quot; was approved and is now visible on the landing page.&quot;,
-      &quot;approvalId&quot;: 10,
+      &quot;approvalId&quot;: 18,
       &quot;entityType&quot;: &quot;product&quot;,
-      &quot;entityId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;entityId&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
       &quot;readAt&quot;: null,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.688Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.688Z&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.660Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.660Z&quot;,
       &quot;approval&quot;: {
-        &quot;id&quot;: 10,
+        &quot;id&quot;: 18,
         &quot;type&quot;: &quot;product&quot;,
-        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
         &quot;isActive&quot;: true,
         &quot;reason&quot;: &quot;Activated by admin&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.654Z&quot;,
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+          &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
           &quot;firstName&quot;: &quot;Budi&quot;,
           &quot;lastName&quot;: &quot;Santoso&quot;,
           &quot;phoneNumber&quot;: &quot;081298765499&quot;,
-          &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+          &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
           &quot;role&quot;: &quot;tenant&quot;,
           &quot;faceImageId&quot;: null,
           &quot;tenantName&quot;: &quot;Warung Budi&quot;,
           &quot;mailActive&quot;: true,
           &quot;passwordChangedAt&quot;: null,
-          &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
-          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;
+          &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.414Z&quot;
         }
       }
     },
     {
       &quot;isRead&quot;: false,
-      &quot;id&quot;: 21,
+      &quot;id&quot;: 57,
       &quot;type&quot;: &quot;PRODUCT_UNDER_REVIEW&quot;,
       &quot;name&quot;: &quot;Product under review&quot;,
       &quot;description&quot;: &quot;\&quot;Kopi Susu Gula Aren\&quot; was created and is under review. You will be notified when it is approved.&quot;,
-      &quot;approvalId&quot;: 10,
+      &quot;approvalId&quot;: 18,
       &quot;entityType&quot;: &quot;product&quot;,
-      &quot;entityId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;entityId&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
       &quot;readAt&quot;: null,
-      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.638Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.638Z&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.610Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.610Z&quot;,
       &quot;approval&quot;: {
-        &quot;id&quot;: 10,
+        &quot;id&quot;: 18,
         &quot;type&quot;: &quot;product&quot;,
-        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
         &quot;isActive&quot;: true,
         &quot;reason&quot;: &quot;Activated by admin&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.654Z&quot;,
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+          &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
           &quot;firstName&quot;: &quot;Budi&quot;,
           &quot;lastName&quot;: &quot;Santoso&quot;,
           &quot;phoneNumber&quot;: &quot;081298765499&quot;,
-          &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+          &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
           &quot;role&quot;: &quot;tenant&quot;,
           &quot;faceImageId&quot;: null,
           &quot;tenantName&quot;: &quot;Warung Budi&quot;,
           &quot;mailActive&quot;: true,
           &quot;passwordChangedAt&quot;: null,
-          &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
-          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;
+          &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.414Z&quot;
         }
       }
     }
@@ -7089,36 +7101,36 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: {
     &quot;isRead&quot;: true,
-    &quot;id&quot;: 26,
+    &quot;id&quot;: 62,
     &quot;type&quot;: &quot;PRODUCT_APPROVED&quot;,
     &quot;name&quot;: &quot;Product approved&quot;,
     &quot;description&quot;: &quot;\&quot;Kopi Susu Gula Aren\&quot; was approved and is now visible on the landing page.&quot;,
-    &quot;approvalId&quot;: 10,
+    &quot;approvalId&quot;: 18,
     &quot;entityType&quot;: &quot;product&quot;,
-    &quot;entityId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
-    &quot;readAt&quot;: &quot;2026-10-05T02:55:28.728Z&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.688Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.728Z&quot;,
+    &quot;entityId&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
+    &quot;readAt&quot;: &quot;2026-10-05T03:13:45.689Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.660Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.689Z&quot;,
     &quot;approval&quot;: {
-      &quot;id&quot;: 10,
+      &quot;id&quot;: 18,
       &quot;type&quot;: &quot;product&quot;,
-      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
       &quot;isActive&quot;: true,
       &quot;reason&quot;: &quot;Activated by admin&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.654Z&quot;,
       &quot;user&quot;: {
-        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
         &quot;firstName&quot;: &quot;Budi&quot;,
         &quot;lastName&quot;: &quot;Santoso&quot;,
         &quot;phoneNumber&quot;: &quot;081298765499&quot;,
-        &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+        &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
         &quot;role&quot;: &quot;tenant&quot;,
         &quot;faceImageId&quot;: null,
         &quot;tenantName&quot;: &quot;Warung Budi&quot;,
         &quot;mailActive&quot;: true,
         &quot;passwordChangedAt&quot;: null,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.414Z&quot;
       }
     }
   }
@@ -7126,36 +7138,36 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: {
     &quot;isRead&quot;: true,
-    &quot;id&quot;: 26,
+    &quot;id&quot;: 62,
     &quot;type&quot;: &quot;PRODUCT_APPROVED&quot;,
     &quot;name&quot;: &quot;Product approved&quot;,
     &quot;description&quot;: &quot;\&quot;Kopi Susu Gula Aren\&quot; was approved and is now visible on the landing page.&quot;,
-    &quot;approvalId&quot;: 10,
+    &quot;approvalId&quot;: 18,
     &quot;entityType&quot;: &quot;product&quot;,
-    &quot;entityId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
-    &quot;readAt&quot;: &quot;2026-10-05T02:55:28.728Z&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.688Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.728Z&quot;,
+    &quot;entityId&quot;: &quot;6848fd5d-98bb-42b2-8272-6bc38a52959f&quot;,
+    &quot;readAt&quot;: &quot;2026-10-05T03:13:45.689Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T03:13:45.660Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.689Z&quot;,
     &quot;approval&quot;: {
-      &quot;id&quot;: 10,
+      &quot;id&quot;: 18,
       &quot;type&quot;: &quot;product&quot;,
-      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;userId&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
       &quot;isActive&quot;: true,
       &quot;reason&quot;: &quot;Activated by admin&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.654Z&quot;,
       &quot;user&quot;: {
-        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;id&quot;: &quot;aeb020ef-91b4-41cf-b5f4-2e4de3691139&quot;,
         &quot;firstName&quot;: &quot;Budi&quot;,
         &quot;lastName&quot;: &quot;Santoso&quot;,
         &quot;phoneNumber&quot;: &quot;081298765499&quot;,
-        &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+        &quot;email&quot;: &quot;budi1791170022812@prafi.test&quot;,
         &quot;role&quot;: &quot;tenant&quot;,
         &quot;faceImageId&quot;: null,
         &quot;tenantName&quot;: &quot;Warung Budi&quot;,
         &quot;mailActive&quot;: true,
         &quot;passwordChangedAt&quot;: null,
-        &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;
+        &quot;createdAt&quot;: &quot;2026-10-05T03:13:44.883Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T03:13:45.414Z&quot;
       }
     }
   }
@@ -7387,7 +7399,7 @@ socket.on('connect_error', (err) =&gt; { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATE
     <div data-l="en"><p>Engine.IO handshake: 200 with a session id means the realtime server is up. To receive events, create a Socket.IO request (see the folder description).</p></div><div data-l="id"><p>Handshake Engine.IO: 200 dengan session id berarti server realtime berjalan. Untuk menerima event, buat request Socket.IO (lihat deskripsi folder).</p></div>
     <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>EIO</code></td><td><code>4</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>transport</code></td><td><code>polling</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr></tbody></table></div>
     
-    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="0{&quot;sid&quot;:&quot;pQcFPuw426gZO0U2AAAA&quot;,&quot;upgrades&quot;:[&quot;websocket&quot;],&quot;pingInterval&quot;:25000,&quot;pingTimeout&quot;:20000,&quot;maxPayload&quot;:1000000}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-text">0{&quot;sid&quot;:&quot;pQcFPuw426gZO0U2AAAA&quot;,&quot;upgrades&quot;:[&quot;websocket&quot;],&quot;pingInterval&quot;:25000,&quot;pingTimeout&quot;:20000,&quot;maxPayload&quot;:1000000}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="0{&quot;sid&quot;:&quot;aA6GQwriCFvUhwWUAAAA&quot;,&quot;upgrades&quot;:[&quot;websocket&quot;],&quot;pingInterval&quot;:25000,&quot;pingTimeout&quot;:20000,&quot;maxPayload&quot;:1000000}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-text">0{&quot;sid&quot;:&quot;aA6GQwriCFvUhwWUAAAA&quot;,&quot;upgrades&quot;:[&quot;websocket&quot;],&quot;pingInterval&quot;:25000,&quot;pingTimeout&quot;:20000,&quot;maxPayload&quot;:1000000}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
   &quot;code&quot;: 0,
   &quot;message&quot;: &quot;Transport unknown&quot;
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
@@ -7526,12 +7538,12 @@ socket.on('connect_error', (err) =&gt; { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATE
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;message&quot;: &quot;Hello admin andi.admin1791168925841@prafi.test&quot;
+    &quot;message&quot;: &quot;Hello admin andi.admin1791170022812@prafi.test&quot;
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;message&quot;: &quot;Hello admin andi.admin1791168925841@prafi.test&quot;
+    &quot;message&quot;: &quot;Hello admin andi.admin1791170022812@prafi.test&quot;
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">403 Forbidden</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: false,
@@ -7567,12 +7579,12 @@ socket.on('connect_error', (err) =&gt; { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATE
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;message&quot;: &quot;Hello tenant budi1791168925841@prafi.test&quot;
+    &quot;message&quot;: &quot;Hello tenant budi1791170022812@prafi.test&quot;
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;message&quot;: &quot;Hello tenant budi1791168925841@prafi.test&quot;
+    &quot;message&quot;: &quot;Hello tenant budi1791170022812@prafi.test&quot;
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">401 Unauthorized</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: false,

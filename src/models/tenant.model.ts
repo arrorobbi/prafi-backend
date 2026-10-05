@@ -26,7 +26,8 @@ export class Tenant extends Model<InferAttributes<Tenant>, InferCreationAttribut
   declare gmapsLink: string;
   /** Required: upload the logo first via POST /api/images. */
   declare logoId: ForeignKey<Image['id']>;
-  declare categoryId: ForeignKey<TenantCategory['id']>;
+  /** Required: the tenant category (created by an admin). */
+  declare tenantCategoryId: ForeignKey<TenantCategory['id']>;
   declare userId: ForeignKey<User['id']>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -39,8 +40,8 @@ export class Tenant extends Model<InferAttributes<Tenant>, InferCreationAttribut
   static associate({ Image, TenantCategory, User }: DbModels) {
     // tenants.logo_id - images.id (one-to-one; the logo is required, so an image in use as a logo can't be deleted)
     Tenant.belongsTo(Image, { as: 'logo', foreignKey: 'logoId', onDelete: 'RESTRICT' });
-    // tenants.category_id > tenant_categories.id (many tenants per category; a category in use can't be deleted)
-    Tenant.belongsTo(TenantCategory, { as: 'category', foreignKey: 'categoryId', onDelete: 'RESTRICT' });
+    // tenants.tenant_category_id > tenant_categories.id (many tenants per category; a category in use can't be deleted)
+    Tenant.belongsTo(TenantCategory, { as: 'category', foreignKey: 'tenantCategoryId', onDelete: 'RESTRICT' });
     // tenants.user_id - users.id (one-to-one; deleting the user deletes the tenant)
     Tenant.belongsTo(User, { as: 'owner', foreignKey: 'userId', onDelete: 'CASCADE' });
   }
@@ -63,7 +64,7 @@ Tenant.init(
       unique: true,
       references: { model: 'images', key: 'id' },
     },
-    categoryId: {
+    tenantCategoryId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: { model: 'tenant_categories', key: 'id' },

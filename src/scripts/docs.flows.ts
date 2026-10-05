@@ -423,7 +423,7 @@ export const FLOWS: Record<string, Chart[]> = {
         start('POST /api/tenants/me'),
         ...auth('tenant'),
         check({ en: 'No profile yet?', id: 'Belum punya profil?' }, { en: '409 already exists, use PATCH', id: '409 sudah ada, pakai PATCH' }),
-        check({ en: '`logoId` and `categoryId` exist?', id: '`logoId` dan `categoryId` ada?' }, '400'),
+        check({ en: '`logoId` and `tenantCategoryId` exist?', id: '`logoId` dan `tenantCategoryId` ada?' }, '400'),
         step({ en: 'Create profile (name defaults to your tenantName)', id: 'Buat profil (name default: tenantName Anda)' }),
         end({ en: '201 profile', id: '201 profil' }),
       ],
@@ -461,7 +461,7 @@ export const FLOWS: Record<string, Chart[]> = {
       nodes: [
         start('GET /api/tenants[/:id]'),
         ...auth(READERS),
-        step({ en: 'List: optional ?categoryId filter', id: 'Daftar: filter opsional ?categoryId' }),
+        step({ en: 'List: optional ?tenantCategoryId filter', id: 'Daftar: filter opsional ?tenantCategoryId' }),
         check({ en: 'Tenant exists? (single tenant)', id: 'Tenant ada? (satu tenant)' }, '404'),
         end({ en: '200 tenant(s) with owner, logo, category', id: '200 tenant dengan pemilik, logo, kategori' }),
       ],

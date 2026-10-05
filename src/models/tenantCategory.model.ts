@@ -23,8 +23,8 @@ export class TenantCategory extends Model<
   declare tenants?: NonAttribute<Tenant[]>;
 
   static associate({ Tenant }: DbModels) {
-    // tenants.category_id > tenant_categories.id (one category has many tenants)
-    TenantCategory.hasMany(Tenant, { as: 'tenants', foreignKey: 'categoryId' });
+    // tenants.tenant_category_id > tenant_categories.id (one category has many tenants)
+    TenantCategory.hasMany(Tenant, { as: 'tenants', foreignKey: 'tenantCategoryId' });
   }
 }
 
