@@ -35,6 +35,8 @@ export interface VerificationInfo {
   /** Development only (no SMTP configured): the OTP / link, so it can be tested without an inbox. */
   devCode?: string;
   devLink?: string;
+  /** The activation link, only when the caller asked for it (register disnakertrans: the superadmin creating the account). */
+  link?: string;
 }
 
 /** The public activation link sent to disnakertrans accounts. */
@@ -45,7 +47,7 @@ export const activationLink = (userId: string, token: string) => `${env.appUrl}/
  * an activation link for disnakertrans, a 6-digit OTP for admin/tenant.
  * A failed email does not throw: the account still exists and the user can ask for a new code.
  */
-export async function startVerification(user: VerifiableUser, { resent = false } = {}): Promise<VerificationInfo> {
+export async function startVerification(user: VerifiableUser, { resent = false, includeLink = false } = {}): Promise<VerificationInfo> {
   const method = EMAIL_VERIFICATION_METHOD[user.role];
   const secret = method === 'otp' ? String(randomInt(0, 1_000_000)).padStart(6, '0') : randomBytes(32).toString('hex');
   const ttlMs = method === 'otp' ? OTP_VALID_MINUTES * 60_000 : LINK_VALID_HOURS * 3_600_000;
@@ -76,6 +78,7 @@ export async function startVerification(user: VerifiableUser, { resent = false }
     emailSent,
     ...(dev && method === 'otp' && { devCode: secret }),
     ...(dev && method === 'link' && { devLink: link }),
+    ...(includeLink && link && { link }),
   };
 }
 

@@ -195,7 +195,7 @@
                 "disnakertrans"
               ]
             },
-            "description": "**Access:** superadmin\n\nCreates a **disnakertrans** account (the approver of admin accounts). Its approval is active right away (`approval.isActive: true`), but the email must be activated first: an email in Bahasa Indonesia tells the person the account was created and contains the public activation link (*Verify Email Link*, valid 24 hours). The password is the one in the body; give it to the person yourself.\n\nNotifies every superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development, `{{verifyToken}}`.",
+            "description": "**Access:** superadmin\n\nCreates a **disnakertrans** account (the approver of admin accounts). Its approval is active right away (`approval.isActive: true`), but the email must be activated first: an email in Bahasa Indonesia tells the person the account was created and contains the public activation link (*Verify Email Link*, valid 24 hours). The password is the one in the body; give it to the person yourself.\n\nThe response also returns the activation link in `meta.verification.link` (e.g. `https://api.transniaga.manokwarikab.go.id/api/auth/verify-email/<userId>?token=…`), so the superadmin can send it to the person if the email does not arrive. Only this endpoint returns it; *Resend Verification* (public) does not.\n\nNotifies every superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and `{{verifyToken}}`.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"firstName\": \"Dewi\",\n  \"lastName\": \"Lestari\",\n  \"phoneNumber\": \"081377788899\",\n  \"email\": \"disnaker{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\"\n}",
@@ -218,8 +218,8 @@
                   "if (pm.response.code < 300) { pm.environment.set('registeredEmail', pm.response.json().data.email); console.log('saved {{registeredEmail}} = ' + pm.environment.get('registeredEmail')); }",
                   "var v = pm.response.code < 300 && pm.response.json().meta && pm.response.json().meta.verification;",
                   "if (v && v.devCode) { pm.environment.set('otp', v.devCode); console.log('saved {{otp}} = ' + pm.environment.get('otp')); }",
-                  "if (v && v.devLink) { pm.environment.set('verifyToken', v.devLink.split('token=')[1]); console.log('saved {{verifyToken}} = ' + pm.environment.get('verifyToken')); }",
-                  "if (v && !v.devCode && !v.devLink) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}} (or open the link in the email)');"
+                  "if (v && (v.link || v.devLink)) { pm.environment.set('verifyToken', (v.link || v.devLink).split('token=')[1]); console.log('saved {{verifyToken}} = ' + pm.environment.get('verifyToken')); }",
+                  "if (v && !v.devCode && !v.devLink && !v.link) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}} (or open the link in the email)');"
                 ]
               }
             }

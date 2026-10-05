@@ -1406,8 +1406,10 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
     <div data-l="en"><p>Creates a <strong>disnakertrans</strong> account (the approver of admin accounts). Its approval is active right away (<code>approval.isActive: true</code>), but the email must be activated first: an email in Bahasa Indonesia tells the person the account was created and contains the public activation link (<em>Verify Email Link</em>, valid 24 hours). The password is the one in the body; give it to the person yourself.</p>
-<p>Notifies every superadmin (<code>USER_REGISTERED</code>). Saves <code>{{userId}}</code>, <code>{{userRole}}</code>, <code>{{registeredEmail}}</code> and, in development, <code>{{verifyToken}}</code>.</p></div><div data-l="id"><p>Membuat akun <strong>disnakertrans</strong> (pemberi persetujuan akun admin). Approval-nya langsung aktif (<code>approval.isActive: true</code>), tetapi emailnya harus diaktifkan dulu: email berbahasa Indonesia memberi tahu bahwa akun telah dibuat dan berisi link aktivasi publik (<em>Aktivasi Email lewat Link</em>, berlaku 24 jam). Password adalah yang dikirim di body; berikan sendiri kepada orang tersebut.</p>
-<p>Memberi tahu setiap superadmin (<code>USER_REGISTERED</code>). Menyimpan <code>{{userId}}</code>, <code>{{userRole}}</code>, <code>{{registeredEmail}}</code>, dan saat development <code>{{verifyToken}}</code>.</p></div>
+<p>The response also returns the activation link in <code>meta.verification.link</code> (e.g. <code>https://api.transniaga.manokwarikab.go.id/api/auth/verify-email/&lt;userId&gt;?token=…</code>), so the superadmin can send it to the person if the email does not arrive. Only this endpoint returns it; <em>Resend Verification</em> (public) does not.</p>
+<p>Notifies every superadmin (<code>USER_REGISTERED</code>). Saves <code>{{userId}}</code>, <code>{{userRole}}</code>, <code>{{registeredEmail}}</code> and <code>{{verifyToken}}</code>.</p></div><div data-l="id"><p>Membuat akun <strong>disnakertrans</strong> (pemberi persetujuan akun admin). Approval-nya langsung aktif (<code>approval.isActive: true</code>), tetapi emailnya harus diaktifkan dulu: email berbahasa Indonesia memberi tahu bahwa akun telah dibuat dan berisi link aktivasi publik (<em>Aktivasi Email lewat Link</em>, berlaku 24 jam). Password adalah yang dikirim di body; berikan sendiri kepada orang tersebut.</p>
+<p>Respons juga mengembalikan link aktivasi di <code>meta.verification.link</code> (mis. <code>https://api.transniaga.manokwarikab.go.id/api/auth/verify-email/&lt;userId&gt;?token=…</code>), sehingga superadmin dapat mengirimkannya sendiri jika email tidak sampai. Hanya endpoint ini yang mengembalikannya; <em>Kirim Ulang Verifikasi</em> (publik) tidak.</p>
+<p>Memberi tahu setiap superadmin (<code>USER_REGISTERED</code>). Menyimpan <code>{{userId}}</code>, <code>{{userRole}}</code>, <code>{{registeredEmail}}</code>, dan <code>{{verifyToken}}</code>.</p></div>
     
     <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;firstName&quot;: &quot;Dewi&quot;,
@@ -4903,7 +4905,7 @@ socket.on('connect_error', (err) =&gt; { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATE
   </div>
 </article>
 </section>
-  <footer><span data-l="en">Generated from <code>postman/Prafi-API.postman_collection.json</code> on 2026-10-04 · regenerate with <code>npm run docs</code></span><span data-l="id">Dibuat dari <code>postman/Prafi-API.postman_collection.json</code> pada 2026-10-04 · buat ulang dengan <code>npm run docs</code></span></footer>
+  <footer><span data-l="en">Generated from <code>postman/Prafi-API.postman_collection.json</code> on 2026-10-05 · regenerate with <code>npm run docs</code></span><span data-l="id">Dibuat dari <code>postman/Prafi-API.postman_collection.json</code> pada 2026-10-05 · buat ulang dengan <code>npm run docs</code></span></footer>
 </div>
 </main>
 </div>

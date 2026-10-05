@@ -86,7 +86,8 @@ export async function register(creator: AuthUser | null, input: RegisterInput) {
     return { user: created, approval: await Approval.create({ userId: created.id, isActive, reason }, { transaction }) };
   });
 
-  const verification = await emailVerification.startVerification(user);
+  // Only the superadmin creates link-verified (disnakertrans) accounts, so it may see the link; the public resend never returns it
+  const verification = await emailVerification.startVerification(user, { includeLink: true });
 
   if (user.role === ROLES.ADMIN) await notify.adminRegistered(user, approval.id);
   else if (user.role === ROLES.TENANT) await notify.tenantRegistered(user, approval.id);
