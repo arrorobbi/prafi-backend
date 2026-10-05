@@ -139,6 +139,10 @@ blockquote { margin: 14px 0; padding: 6px 16px; border-left: 4px solid var(--pri
 .dot-open { background: var(--get); } .dot-lock { background: var(--post); }
 .endpoint-body h4 { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 16px 0 6px; }
 .block-head { display: flex; align-items: center; justify-content: space-between; }
+.status { font: 700 11px/1 "JetBrains Mono", Consolas, monospace; padding: 4px 8px; border-radius: 6px; margin-left: 6px; letter-spacing: 0; text-transform: none; vertical-align: 1px; }
+.status-ok { color: var(--get); background: var(--get-soft); }
+.status-err { color: var(--delete); background: var(--delete-soft); }
+pre.example { max-height: 420px; overflow: auto; }
 .block-head .copy { margin-top: 8px; }
 .hidden { display: none !important; }
 .to-top { position: fixed; right: 22px; bottom: 22px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--hero); color: #fff; font-size: 18px; cursor: pointer; box-shadow: 0 8px 20px rgba(124,58,237,.4); opacity: 0; pointer-events: none; transition: opacity .2s; }
@@ -367,6 +371,17 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>Returns <code>{ status: &quot;ok&quot; }</code> when the API is running.</p></div><div data-l="id"><p>Mengembalikan <code>{ status: &quot;ok&quot; }</code> saat API berjalan.</p></div>
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;status&quot;: &quot;ok&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;status&quot;: &quot;ok&quot;
+  }
+}</code></pre>
   </div>
 </article>
 </section>
@@ -1372,6 +1387,65 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;email&quot;: &quot;{{loginEmail}}&quot;,
   &quot;password&quot;: &quot;{{loginPassword}}&quot;
 }</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;accessToken&quot;: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI…In0.…&quot;,
+    &quot;tokenType&quot;: &quot;Bearer&quot;,
+    &quot;user&quot;: {
+      &quot;id&quot;: &quot;eb078e4e-e068-43d9-a2dd-e14d1bab107e&quot;,
+      &quot;firstName&quot;: &quot;Super&quot;,
+      &quot;lastName&quot;: &quot;Admin&quot;,
+      &quot;phoneNumber&quot;: &quot;0000000000&quot;,
+      &quot;email&quot;: &quot;superadmin@example.com&quot;,
+      &quot;role&quot;: &quot;superadmin&quot;,
+      &quot;faceImageId&quot;: null,
+      &quot;tenantName&quot;: null,
+      &quot;mailActive&quot;: true,
+      &quot;passwordChangedAt&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-04T13:19:17.557Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-04T13:19:17.557Z&quot;,
+      &quot;approval&quot;: {
+        &quot;isActive&quot;: true
+      }
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;accessToken&quot;: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI…In0.…&quot;,
+    &quot;tokenType&quot;: &quot;Bearer&quot;,
+    &quot;user&quot;: {
+      &quot;id&quot;: &quot;eb078e4e-e068-43d9-a2dd-e14d1bab107e&quot;,
+      &quot;firstName&quot;: &quot;Super&quot;,
+      &quot;lastName&quot;: &quot;Admin&quot;,
+      &quot;phoneNumber&quot;: &quot;0000000000&quot;,
+      &quot;email&quot;: &quot;superadmin@example.com&quot;,
+      &quot;role&quot;: &quot;superadmin&quot;,
+      &quot;faceImageId&quot;: null,
+      &quot;tenantName&quot;: null,
+      &quot;mailActive&quot;: true,
+      &quot;passwordChangedAt&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-04T13:19:17.557Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-04T13:19:17.557Z&quot;,
+      &quot;approval&quot;: {
+        &quot;isActive&quot;: true
+      }
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">401 Unauthorized</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;UNAUTHORIZED&quot;,
+    &quot;message&quot;: &quot;Email atau password salah&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;UNAUTHORIZED&quot;,
+    &quot;message&quot;: &quot;Email atau password salah&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -1390,6 +1464,29 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>Revokes the token used for this request (other sessions stay logged in) and clears <code>{{token}}</code>. Its open WebSocket connections receive <code>session:ended</code> (<code>logged_out</code>).</p></div><div data-l="id"><p>Mencabut token yang dipakai untuk request ini (sesi lain tetap login) dan mengosongkan <code>{{token}}</code>. Koneksi WebSocket yang memakai token ini menerima <code>session:ended</code> (<code>logged_out</code>).</p></div>
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Berhasil logout, token ini tidak dapat digunakan lagi&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Berhasil logout, token ini tidak dapat digunakan lagi&quot;
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">401 Unauthorized</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;UNAUTHORIZED&quot;,
+    &quot;message&quot;: &quot;Token sudah tidak berlaku (sudah logout), silakan login kembali&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;UNAUTHORIZED&quot;,
+    &quot;message&quot;: &quot;Token sudah tidak berlaku (sudah logout), silakan login kembali&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -1421,6 +1518,107 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;phoneNumber&quot;: &quot;081377788899&quot;,
   &quot;email&quot;: &quot;disnaker{{$timestamp}}@prafi.test&quot;,
   &quot;password&quot;: &quot;{{newUserPassword}}&quot;
+}</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">201 Created</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
+    &quot;firstName&quot;: &quot;Dewi&quot;,
+    &quot;lastName&quot;: &quot;Lestari&quot;,
+    &quot;phoneNumber&quot;: &quot;081377788899&quot;,
+    &quot;email&quot;: &quot;dewi.disnaker1791168925841@prafi.test&quot;,
+    &quot;role&quot;: &quot;disnakertrans&quot;,
+    &quot;faceImageId&quot;: null,
+    &quot;tenantName&quot;: null,
+    &quot;mailActive&quot;: false,
+    &quot;passwordChangedAt&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.524Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.524Z&quot;,
+    &quot;faceImage&quot;: null,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 7,
+      &quot;reason&quot;: &quot;Active on registration (created by superadmin)&quot;,
+      &quot;isActive&quot;: true,
+      &quot;type&quot;: &quot;user&quot;,
+      &quot;userId&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;
+    }
+  },
+  &quot;meta&quot;: {
+    &quot;verification&quot;: {
+      &quot;method&quot;: &quot;link&quot;,
+      &quot;sentTo&quot;: &quot;dewi.disnaker1791168925841@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-06T02:55:26.780Z&quot;,
+      &quot;emailSent&quot;: true
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
+    &quot;firstName&quot;: &quot;Dewi&quot;,
+    &quot;lastName&quot;: &quot;Lestari&quot;,
+    &quot;phoneNumber&quot;: &quot;081377788899&quot;,
+    &quot;email&quot;: &quot;dewi.disnaker1791168925841@prafi.test&quot;,
+    &quot;role&quot;: &quot;disnakertrans&quot;,
+    &quot;faceImageId&quot;: null,
+    &quot;tenantName&quot;: null,
+    &quot;mailActive&quot;: false,
+    &quot;passwordChangedAt&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.524Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.524Z&quot;,
+    &quot;faceImage&quot;: null,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 7,
+      &quot;reason&quot;: &quot;Active on registration (created by superadmin)&quot;,
+      &quot;isActive&quot;: true,
+      &quot;type&quot;: &quot;user&quot;,
+      &quot;userId&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;
+    }
+  },
+  &quot;meta&quot;: {
+    &quot;verification&quot;: {
+      &quot;method&quot;: &quot;link&quot;,
+      &quot;sentTo&quot;: &quot;dewi.disnaker1791168925841@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-06T02:55:26.780Z&quot;,
+      &quot;emailSent&quot;: true
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;email&quot;,
+        &quot;message&quot;: &quot;email wajib diisi&quot;
+      },
+      {
+        &quot;field&quot;: &quot;password&quot;,
+        &quot;message&quot;: &quot;password minimal 8 karakter&quot;
+      }
+    ]
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;email&quot;,
+        &quot;message&quot;: &quot;email wajib diisi&quot;
+      },
+      {
+        &quot;field&quot;: &quot;password&quot;,
+        &quot;message&quot;: &quot;password minimal 8 karakter&quot;
+      }
+    ]
+  }
 }</code></pre>
   </div>
 </article>
@@ -1456,6 +1654,101 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;email&quot;: &quot;admin{{$timestamp}}@prafi.test&quot;,
   &quot;password&quot;: &quot;{{newUserPassword}}&quot;
 }</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">201 Created</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+    &quot;firstName&quot;: &quot;Andi&quot;,
+    &quot;lastName&quot;: &quot;Wijaya&quot;,
+    &quot;phoneNumber&quot;: &quot;081234567890&quot;,
+    &quot;email&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+    &quot;role&quot;: &quot;admin&quot;,
+    &quot;faceImageId&quot;: null,
+    &quot;tenantName&quot;: null,
+    &quot;mailActive&quot;: false,
+    &quot;passwordChangedAt&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.082Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.082Z&quot;,
+    &quot;faceImage&quot;: null,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 8,
+      &quot;reason&quot;: &quot;Waiting for activation by disnakertrans&quot;,
+      &quot;isActive&quot;: false,
+      &quot;type&quot;: &quot;user&quot;,
+      &quot;userId&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;
+    }
+  },
+  &quot;meta&quot;: {
+    &quot;verification&quot;: {
+      &quot;method&quot;: &quot;otp&quot;,
+      &quot;sentTo&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-05T03:10:27.330Z&quot;,
+      &quot;emailSent&quot;: true
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+    &quot;firstName&quot;: &quot;Andi&quot;,
+    &quot;lastName&quot;: &quot;Wijaya&quot;,
+    &quot;phoneNumber&quot;: &quot;081234567890&quot;,
+    &quot;email&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+    &quot;role&quot;: &quot;admin&quot;,
+    &quot;faceImageId&quot;: null,
+    &quot;tenantName&quot;: null,
+    &quot;mailActive&quot;: false,
+    &quot;passwordChangedAt&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.082Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.082Z&quot;,
+    &quot;faceImage&quot;: null,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 8,
+      &quot;reason&quot;: &quot;Waiting for activation by disnakertrans&quot;,
+      &quot;isActive&quot;: false,
+      &quot;type&quot;: &quot;user&quot;,
+      &quot;userId&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;
+    }
+  },
+  &quot;meta&quot;: {
+    &quot;verification&quot;: {
+      &quot;method&quot;: &quot;otp&quot;,
+      &quot;sentTo&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-05T03:10:27.330Z&quot;,
+      &quot;emailSent&quot;: true
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">409 Conflict</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;UNIQUE_CONSTRAINT&quot;,
+    &quot;message&quot;: &quot;email sudah digunakan&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;email&quot;,
+        &quot;message&quot;: &quot;email sudah digunakan&quot;,
+        &quot;value&quot;: &quot;andi.admin1791168925841@prafi.test&quot;
+      }
+    ]
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;UNIQUE_CONSTRAINT&quot;,
+    &quot;message&quot;: &quot;email sudah digunakan&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;email&quot;,
+        &quot;message&quot;: &quot;email sudah digunakan&quot;,
+        &quot;value&quot;: &quot;andi.admin1791168925841@prafi.test&quot;
+      }
+    ]
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -1490,6 +1783,99 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;password&quot;: &quot;{{newUserPassword}}&quot;,
   &quot;tenantName&quot;: &quot;Warung Budi&quot;
 }</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">201 Created</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;firstName&quot;: &quot;Budi&quot;,
+    &quot;lastName&quot;: &quot;Santoso&quot;,
+    &quot;phoneNumber&quot;: &quot;081298765432&quot;,
+    &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+    &quot;role&quot;: &quot;tenant&quot;,
+    &quot;faceImageId&quot;: null,
+    &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+    &quot;mailActive&quot;: false,
+    &quot;passwordChangedAt&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+    &quot;faceImage&quot;: null,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 9,
+      &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
+      &quot;isActive&quot;: true,
+      &quot;type&quot;: &quot;user&quot;,
+      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+    }
+  },
+  &quot;meta&quot;: {
+    &quot;verification&quot;: {
+      &quot;method&quot;: &quot;otp&quot;,
+      &quot;sentTo&quot;: &quot;budi1791168925841@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-05T03:10:28.160Z&quot;,
+      &quot;emailSent&quot;: true
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;firstName&quot;: &quot;Budi&quot;,
+    &quot;lastName&quot;: &quot;Santoso&quot;,
+    &quot;phoneNumber&quot;: &quot;081298765432&quot;,
+    &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+    &quot;role&quot;: &quot;tenant&quot;,
+    &quot;faceImageId&quot;: null,
+    &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+    &quot;mailActive&quot;: false,
+    &quot;passwordChangedAt&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+    &quot;faceImage&quot;: null,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 9,
+      &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
+      &quot;isActive&quot;: true,
+      &quot;type&quot;: &quot;user&quot;,
+      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+    }
+  },
+  &quot;meta&quot;: {
+    &quot;verification&quot;: {
+      &quot;method&quot;: &quot;otp&quot;,
+      &quot;sentTo&quot;: &quot;budi1791168925841@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-05T03:10:28.160Z&quot;,
+      &quot;emailSent&quot;: true
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;tenantName&quot;,
+        &quot;message&quot;: &quot;tenantName wajib diisi untuk akun tenant&quot;
+      }
+    ]
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;tenantName&quot;,
+        &quot;message&quot;: &quot;tenantName wajib diisi untuk akun tenant&quot;
+      }
+    ]
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -1514,6 +1900,83 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;otp&quot;: &quot;{{otp}}&quot;
 }</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Email berhasil diverifikasi, silakan login&quot;,
+    &quot;user&quot;: {
+      &quot;id&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+      &quot;firstName&quot;: &quot;Andi&quot;,
+      &quot;lastName&quot;: &quot;Wijaya&quot;,
+      &quot;phoneNumber&quot;: &quot;081234567890&quot;,
+      &quot;email&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+      &quot;role&quot;: &quot;admin&quot;,
+      &quot;faceImageId&quot;: null,
+      &quot;tenantName&quot;: null,
+      &quot;mailActive&quot;: true,
+      &quot;passwordChangedAt&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.082Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.634Z&quot;,
+      &quot;faceImage&quot;: null,
+      &quot;approval&quot;: {
+        &quot;id&quot;: 8,
+        &quot;reason&quot;: &quot;Waiting for activation by disnakertrans&quot;,
+        &quot;isActive&quot;: false,
+        &quot;type&quot;: &quot;user&quot;,
+        &quot;userId&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;
+      }
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Email berhasil diverifikasi, silakan login&quot;,
+    &quot;user&quot;: {
+      &quot;id&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+      &quot;firstName&quot;: &quot;Andi&quot;,
+      &quot;lastName&quot;: &quot;Wijaya&quot;,
+      &quot;phoneNumber&quot;: &quot;081234567890&quot;,
+      &quot;email&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+      &quot;role&quot;: &quot;admin&quot;,
+      &quot;faceImageId&quot;: null,
+      &quot;tenantName&quot;: null,
+      &quot;mailActive&quot;: true,
+      &quot;passwordChangedAt&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.082Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.634Z&quot;,
+      &quot;faceImage&quot;: null,
+      &quot;approval&quot;: {
+        &quot;id&quot;: 8,
+        &quot;reason&quot;: &quot;Waiting for activation by disnakertrans&quot;,
+        &quot;isActive&quot;: false,
+        &quot;type&quot;: &quot;user&quot;,
+        &quot;userId&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;
+      }
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;OTP_INVALID&quot;,
+    &quot;message&quot;: &quot;Kode OTP salah&quot;,
+    &quot;details&quot;: {
+      &quot;attemptsLeft&quot;: 4
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;OTP_INVALID&quot;,
+    &quot;message&quot;: &quot;Kode OTP salah&quot;,
+    &quot;details&quot;: {
+      &quot;attemptsLeft&quot;: 4
+    }
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -1534,6 +1997,77 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 <p>Error: 400 <code>LINK_INVALID</code>, 400 <code>LINK_EXPIRED</code> (lebih dari 24 jam), 409 <code>EMAIL_ALREADY_VERIFIED</code>.</p></div>
     <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>token</code></td><td><code>{{verifyToken}}</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr></tbody></table></div>
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Email berhasil diaktifkan, silakan login&quot;,
+    &quot;user&quot;: {
+      &quot;id&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
+      &quot;firstName&quot;: &quot;Dewi&quot;,
+      &quot;lastName&quot;: &quot;Lestari&quot;,
+      &quot;phoneNumber&quot;: &quot;081377788899&quot;,
+      &quot;email&quot;: &quot;dewi.disnaker1791168925841@prafi.test&quot;,
+      &quot;role&quot;: &quot;disnakertrans&quot;,
+      &quot;faceImageId&quot;: null,
+      &quot;tenantName&quot;: null,
+      &quot;mailActive&quot;: true,
+      &quot;passwordChangedAt&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.524Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.825Z&quot;,
+      &quot;faceImage&quot;: null,
+      &quot;approval&quot;: {
+        &quot;id&quot;: 7,
+        &quot;reason&quot;: &quot;Active on registration (created by superadmin)&quot;,
+        &quot;isActive&quot;: true,
+        &quot;type&quot;: &quot;user&quot;,
+        &quot;userId&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;
+      }
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Email berhasil diaktifkan, silakan login&quot;,
+    &quot;user&quot;: {
+      &quot;id&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
+      &quot;firstName&quot;: &quot;Dewi&quot;,
+      &quot;lastName&quot;: &quot;Lestari&quot;,
+      &quot;phoneNumber&quot;: &quot;081377788899&quot;,
+      &quot;email&quot;: &quot;dewi.disnaker1791168925841@prafi.test&quot;,
+      &quot;role&quot;: &quot;disnakertrans&quot;,
+      &quot;faceImageId&quot;: null,
+      &quot;tenantName&quot;: null,
+      &quot;mailActive&quot;: true,
+      &quot;passwordChangedAt&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.524Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.825Z&quot;,
+      &quot;faceImage&quot;: null,
+      &quot;approval&quot;: {
+        &quot;id&quot;: 7,
+        &quot;reason&quot;: &quot;Active on registration (created by superadmin)&quot;,
+        &quot;isActive&quot;: true,
+        &quot;type&quot;: &quot;user&quot;,
+        &quot;userId&quot;: &quot;b58e34d3-86ed-434a-846f-e3362745355b&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:26.775Z&quot;
+      }
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;LINK_INVALID&quot;,
+    &quot;message&quot;: &quot;Tautan aktivasi tidak valid atau sudah tidak berlaku&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;LINK_INVALID&quot;,
+    &quot;message&quot;: &quot;Tautan aktivasi tidak valid atau sudah tidak berlaku&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -1552,6 +2086,51 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>Sends a new OTP (admin, tenant) or activation link (disnakertrans); the previous one stops working. At most once per 60 seconds (429 <code>TOO_MANY_REQUESTS</code>, <code>details.retryAfterSeconds</code>). Saves the new <code>{{otp}}</code> / <code>{{verifyToken}}</code> in development.</p></div><div data-l="id"><p>Mengirim OTP baru (admin, tenant) atau link aktivasi baru (disnakertrans); kode sebelumnya tidak berlaku lagi. Paling sering sekali per 60 detik (429 <code>TOO_MANY_REQUESTS</code>, <code>details.retryAfterSeconds</code>). Menyimpan <code>{{otp}}</code> / <code>{{verifyToken}}</code> baru saat development.</p></div>
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Kode verifikasi baru telah dikirim ke andi.admin1791168925841@prafi.test&quot;
+  },
+  &quot;meta&quot;: {
+    &quot;verification&quot;: {
+      &quot;method&quot;: &quot;otp&quot;,
+      &quot;sentTo&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-05T03:10:27.621Z&quot;,
+      &quot;emailSent&quot;: true
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Kode verifikasi baru telah dikirim ke andi.admin1791168925841@prafi.test&quot;
+  },
+  &quot;meta&quot;: {
+    &quot;verification&quot;: {
+      &quot;method&quot;: &quot;otp&quot;,
+      &quot;sentTo&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+      &quot;expiresAt&quot;: &quot;2026-10-05T03:10:27.621Z&quot;,
+      &quot;emailSent&quot;: true
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">429 Too Many Requests</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;TOO_MANY_REQUESTS&quot;,
+    &quot;message&quot;: &quot;Tunggu 60 detik sebelum meminta kode baru&quot;,
+    &quot;details&quot;: {
+      &quot;retryAfterSeconds&quot;: 60
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;TOO_MANY_REQUESTS&quot;,
+    &quot;message&quot;: &quot;Tunggu 60 detik sebelum meminta kode baru&quot;,
+    &quot;details&quot;: {
+      &quot;retryAfterSeconds&quot;: 60
+    }
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -1578,6 +2157,41 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;email&quot;: &quot;{{registeredEmail}}&quot;
 }</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Jika email terdaftar, tautan untuk mengatur ulang kata sandi telah dikirim. Tautan berlaku 30 menit.&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Jika email terdaftar, tautan untuk mengatur ulang kata sandi telah dikirim. Tautan berlaku 30 menit.&quot;
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;email&quot;,
+        &quot;message&quot;: &quot;email wajib diisi dengan alamat email yang valid&quot;
+      }
+    ]
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;email&quot;,
+        &quot;message&quot;: &quot;email wajib diisi dengan alamat email yang valid&quot;
+      }
+    ]
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -1603,6 +2217,33 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;userId&quot;: &quot;{{userId}}&quot;,
   &quot;token&quot;: &quot;{{resetToken}}&quot;
+}</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;valid&quot;: true,
+    &quot;email&quot;: &quot;b******1@prafi.test&quot;,
+    &quot;expiresAt&quot;: &quot;2026-10-05T03:25:28.773Z&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;valid&quot;: true,
+    &quot;email&quot;: &quot;b******1@prafi.test&quot;,
+    &quot;expiresAt&quot;: &quot;2026-10-05T03:25:28.773Z&quot;
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;RESET_LINK_INVALID&quot;,
+    &quot;message&quot;: &quot;Tautan atur ulang kata sandi tidak valid: token tidak cocok, pastikan seluruh tautan dari email disalin&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;RESET_LINK_INVALID&quot;,
+    &quot;message&quot;: &quot;Tautan atur ulang kata sandi tidak valid: token tidak cocok, pastikan seluruh tautan dari email disalin&quot;
+  }
 }</code></pre>
   </div>
 </article>
@@ -1634,6 +2275,41 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;token&quot;: &quot;{{resetToken}}&quot;,
   &quot;password&quot;: &quot;PasswordBaru123!&quot;
 }</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Kata sandi berhasil diubah, silakan login dengan kata sandi baru&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Kata sandi berhasil diubah, silakan login dengan kata sandi baru&quot;
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;password&quot;,
+        &quot;message&quot;: &quot;password minimal 8 karakter&quot;
+      }
+    ]
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;password&quot;,
+        &quot;message&quot;: &quot;password minimal 8 karakter&quot;
+      }
+    ]
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -1652,6 +2328,71 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>The logged-in account with its <code>faceImage</code>, account <code>approval</code> and <code>mailActive</code>.</p></div><div data-l="id"><p>Akun yang sedang login beserta <code>faceImage</code>, <code>approval</code> akunnya, dan <code>mailActive</code>.</p></div>
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;firstName&quot;: &quot;Budi&quot;,
+    &quot;lastName&quot;: &quot;Santoso&quot;,
+    &quot;phoneNumber&quot;: &quot;081298765432&quot;,
+    &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+    &quot;role&quot;: &quot;tenant&quot;,
+    &quot;faceImageId&quot;: null,
+    &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+    &quot;mailActive&quot;: true,
+    &quot;passwordChangedAt&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.176Z&quot;,
+    &quot;faceImage&quot;: null,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 9,
+      &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
+      &quot;isActive&quot;: true,
+      &quot;type&quot;: &quot;user&quot;,
+      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;firstName&quot;: &quot;Budi&quot;,
+    &quot;lastName&quot;: &quot;Santoso&quot;,
+    &quot;phoneNumber&quot;: &quot;081298765432&quot;,
+    &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+    &quot;role&quot;: &quot;tenant&quot;,
+    &quot;faceImageId&quot;: null,
+    &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+    &quot;mailActive&quot;: true,
+    &quot;passwordChangedAt&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.176Z&quot;,
+    &quot;faceImage&quot;: null,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 9,
+      &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
+      &quot;isActive&quot;: true,
+      &quot;type&quot;: &quot;user&quot;,
+      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">401 Unauthorized</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;UNAUTHORIZED&quot;,
+    &quot;message&quot;: &quot;Header Authorization tidak ada atau formatnya salah (gunakan: Bearer &lt;token&gt;)&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;UNAUTHORIZED&quot;,
+    &quot;message&quot;: &quot;Header Authorization tidak ada atau formatnya salah (gunakan: Bearer &lt;token&gt;)&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -1677,6 +2418,83 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;firstName&quot;: &quot;Andi&quot;,
   &quot;phoneNumber&quot;: &quot;081234567899&quot;
+}</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;firstName&quot;: &quot;Budi&quot;,
+    &quot;lastName&quot;: &quot;Santoso&quot;,
+    &quot;phoneNumber&quot;: &quot;081298765499&quot;,
+    &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+    &quot;role&quot;: &quot;tenant&quot;,
+    &quot;faceImageId&quot;: null,
+    &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+    &quot;mailActive&quot;: true,
+    &quot;passwordChangedAt&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;,
+    &quot;faceImage&quot;: null,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 9,
+      &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
+      &quot;isActive&quot;: true,
+      &quot;type&quot;: &quot;user&quot;,
+      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;firstName&quot;: &quot;Budi&quot;,
+    &quot;lastName&quot;: &quot;Santoso&quot;,
+    &quot;phoneNumber&quot;: &quot;081298765499&quot;,
+    &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+    &quot;role&quot;: &quot;tenant&quot;,
+    &quot;faceImageId&quot;: null,
+    &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+    &quot;mailActive&quot;: true,
+    &quot;passwordChangedAt&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;,
+    &quot;faceImage&quot;: null,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 9,
+      &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
+      &quot;isActive&quot;: true,
+      &quot;type&quot;: &quot;user&quot;,
+      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;role&quot;,
+        &quot;message&quot;: &quot;role tidak dapat diubah&quot;
+      }
+    ]
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;role&quot;,
+        &quot;message&quot;: &quot;role tidak dapat diubah&quot;
+      }
+    ]
+  }
 }</code></pre>
   </div>
 </article>
@@ -1999,6 +2817,41 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 <p>Satu gambar hanya bisa dipakai sekali: sebagai satu gambar produk, satu logo tenant, atau satu foto wajah.</p></div>
     
     <h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">multipart/form-data</span></h4><div class="table-wrap"><table><thead><tr><th>field</th><th><span data-l="en">type</span><span data-l="id">tipe</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th></tr></thead><tbody><tr><td><code>image</code></td><td>file</td><td>sample-face.png</td></tr><tr><td><code>altText</code></td><td>text</td><td>Sample image</td></tr></tbody></table></div>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">201 Created</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+    &quot;id&quot;: 1,
+    &quot;name&quot;: &quot;logo-warung.png&quot;,
+    &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+    &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+    &quot;id&quot;: 1,
+    &quot;name&quot;: &quot;logo-warung.png&quot;,
+    &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+    &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;File gambar wajib diunggah (field multipart \&quot;image\&quot;)&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;File gambar wajib diunggah (field multipart \&quot;image\&quot;)&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -2017,6 +2870,19 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>The public link of the uploaded image (<code>{{baseUrl}}</code> + <code>imgUrl</code>), as the frontend would load it.</p></div><div data-l="id"><p>Link publik gambar yang diunggah (<code>{{baseUrl}}</code> + <code>imgUrl</code>), seperti yang dimuat oleh frontend.</p></div>
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="&lt;binary image/png&gt;"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-text">&lt;binary image/png&gt;</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Rute GET /images/tidak-ada.png tidak ditemukan&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Rute GET /images/tidak-ada.png tidak ditemukan&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -2035,6 +2901,25 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>Deletes the image record and file. An image still used as a tenant logo cannot be deleted (409 <code>STILL_IN_USE</code>).</p></div><div data-l="id"><p>Menghapus data dan file gambar. Gambar yang masih dipakai sebagai logo tenant tidak bisa dihapus (409 <code>STILL_IN_USE</code>).</p></div>
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: null
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: null
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Gambar tidak ditemukan&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Gambar tidak ditemukan&quot;
+  }
+}</code></pre>
   </div>
 </article>
 </section>
@@ -2188,6 +3073,87 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>superadmin: every account; disnakertrans: admin accounts only; admin: tenant accounts only. Optional <code>role</code> filter. Each user includes <code>faceImage</code>, <code>approval</code> and <code>mailActive</code>.</p></div><div data-l="id"><p>superadmin: semua akun; disnakertrans: hanya akun admin; admin: hanya akun tenant. Filter <code>role</code> opsional. Setiap user menyertakan <code>faceImage</code>, <code>approval</code>, dan <code>mailActive</code>.</p></div>
     <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>role</code></td><td><code>tenant</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr></tbody></table></div>
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;firstName&quot;: &quot;Budi&quot;,
+      &quot;lastName&quot;: &quot;Santoso&quot;,
+      &quot;phoneNumber&quot;: &quot;081298765499&quot;,
+      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+      &quot;role&quot;: &quot;tenant&quot;,
+      &quot;faceImageId&quot;: null,
+      &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+      &quot;mailActive&quot;: true,
+      &quot;passwordChangedAt&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;,
+      &quot;faceImage&quot;: null,
+      &quot;approval&quot;: {
+        &quot;id&quot;: 9,
+        &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
+        &quot;isActive&quot;: true,
+        &quot;type&quot;: &quot;user&quot;,
+        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+      }
+    }
+  ],
+  &quot;meta&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 20,
+    &quot;total&quot;: 1,
+    &quot;totalPages&quot;: 1
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;firstName&quot;: &quot;Budi&quot;,
+      &quot;lastName&quot;: &quot;Santoso&quot;,
+      &quot;phoneNumber&quot;: &quot;081298765499&quot;,
+      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+      &quot;role&quot;: &quot;tenant&quot;,
+      &quot;faceImageId&quot;: null,
+      &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+      &quot;mailActive&quot;: true,
+      &quot;passwordChangedAt&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;,
+      &quot;faceImage&quot;: null,
+      &quot;approval&quot;: {
+        &quot;id&quot;: 9,
+        &quot;reason&quot;: &quot;Active on registration (self-registered)&quot;,
+        &quot;isActive&quot;: true,
+        &quot;type&quot;: &quot;user&quot;,
+        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.157Z&quot;
+      }
+    }
+  ],
+  &quot;meta&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 20,
+    &quot;total&quot;: 1,
+    &quot;totalPages&quot;: 1
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">403 Forbidden</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;FORBIDDEN&quot;,
+    &quot;message&quot;: &quot;Anda tidak memiliki izin untuk melihat akun lain, gunakan /api/auth/me&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;FORBIDDEN&quot;,
+    &quot;message&quot;: &quot;Anda tidak memiliki izin untuk melihat akun lain, gunakan /api/auth/me&quot;
+  }
+}</code></pre>
   </div>
 </article>
 </section>
@@ -2589,6 +3555,53 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;role&quot;: &quot;{{userRole}}&quot;,
   &quot;reason&quot;: &quot;Data lengkap&quot;
 }</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;type&quot;: &quot;user&quot;,
+    &quot;id&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+    &quot;email&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+    &quot;role&quot;: &quot;admin&quot;,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 8,
+      &quot;reason&quot;: &quot;Data lengkap&quot;,
+      &quot;isActive&quot;: true,
+      &quot;type&quot;: &quot;user&quot;,
+      &quot;userId&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.646Z&quot;
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;type&quot;: &quot;user&quot;,
+    &quot;id&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+    &quot;email&quot;: &quot;andi.admin1791168925841@prafi.test&quot;,
+    &quot;role&quot;: &quot;admin&quot;,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 8,
+      &quot;reason&quot;: &quot;Data lengkap&quot;,
+      &quot;isActive&quot;: true,
+      &quot;type&quot;: &quot;user&quot;,
+      &quot;userId&quot;: &quot;cc1f555b-b7f7-421a-b294-471686d85b40&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.327Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:27.646Z&quot;
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">403 Forbidden</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;FORBIDDEN&quot;,
+    &quot;message&quot;: &quot;Anda tidak memiliki izin untuk mengakses data ini&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;FORBIDDEN&quot;,
+    &quot;message&quot;: &quot;Anda tidak memiliki izin untuk mengakses data ini&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -2616,6 +3629,173 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;isActive&quot;: true
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;isActive&quot;: true
+}</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;type&quot;: &quot;product&quot;,
+    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 10,
+      &quot;reason&quot;: &quot;Activated by admin&quot;,
+      &quot;isActive&quot;: true,
+      &quot;type&quot;: &quot;product&quot;,
+      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;
+    },
+    &quot;user&quot;: {
+      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;firstName&quot;: &quot;Budi&quot;,
+      &quot;lastName&quot;: &quot;Santoso&quot;,
+      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+      &quot;phoneNumber&quot;: &quot;081298765499&quot;,
+      &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+      &quot;tenant&quot;: {
+        &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+        &quot;name&quot;: &quot;Warung Budi&quot;,
+        &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
+        &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
+        &quot;area&quot;: &quot;Manokwari&quot;,
+        &quot;operationalHours&quot;: &quot;07:00 - 23:00&quot;,
+        &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
+        &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
+        &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
+        &quot;logoId&quot;: 1,
+        &quot;categoryId&quot;: 1,
+        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+        &quot;category&quot;: {
+          &quot;id&quot;: 1,
+          &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;,
+          &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.500Z&quot;
+        },
+        &quot;logo&quot;: {
+          &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+          &quot;id&quot;: 1,
+          &quot;name&quot;: &quot;logo-warung.png&quot;,
+          &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+          &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+          &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+        }
+      },
+      &quot;productId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;product&quot;: {
+        &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+        &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
+        &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
+        &quot;details&quot;: &quot;250 ml, es&quot;,
+        &quot;qty&quot;: 25,
+        &quot;imageId&quot;: 2,
+        &quot;approvalId&quot;: 10,
+        &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.666Z&quot;,
+        &quot;image&quot;: {
+          &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+          &quot;id&quot;: 2,
+          &quot;name&quot;: &quot;logo-warung.png&quot;,
+          &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+          &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+          &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+        }
+      }
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;type&quot;: &quot;product&quot;,
+    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 10,
+      &quot;reason&quot;: &quot;Activated by admin&quot;,
+      &quot;isActive&quot;: true,
+      &quot;type&quot;: &quot;product&quot;,
+      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;
+    },
+    &quot;user&quot;: {
+      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;firstName&quot;: &quot;Budi&quot;,
+      &quot;lastName&quot;: &quot;Santoso&quot;,
+      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+      &quot;phoneNumber&quot;: &quot;081298765499&quot;,
+      &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+      &quot;tenant&quot;: {
+        &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+        &quot;name&quot;: &quot;Warung Budi&quot;,
+        &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
+        &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
+        &quot;area&quot;: &quot;Manokwari&quot;,
+        &quot;operationalHours&quot;: &quot;07:00 - 23:00&quot;,
+        &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
+        &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
+        &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
+        &quot;logoId&quot;: 1,
+        &quot;categoryId&quot;: 1,
+        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+        &quot;category&quot;: {
+          &quot;id&quot;: 1,
+          &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;,
+          &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.500Z&quot;
+        },
+        &quot;logo&quot;: {
+          &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+          &quot;id&quot;: 1,
+          &quot;name&quot;: &quot;logo-warung.png&quot;,
+          &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+          &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+          &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+        }
+      },
+      &quot;productId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;product&quot;: {
+        &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+        &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
+        &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
+        &quot;details&quot;: &quot;250 ml, es&quot;,
+        &quot;qty&quot;: 25,
+        &quot;imageId&quot;: 2,
+        &quot;approvalId&quot;: 10,
+        &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.666Z&quot;,
+        &quot;image&quot;: {
+          &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+          &quot;id&quot;: 2,
+          &quot;name&quot;: &quot;logo-warung.png&quot;,
+          &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+          &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+          &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+        }
+      }
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">403 Forbidden</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;FORBIDDEN&quot;,
+    &quot;message&quot;: &quot;Role disnakertrans tidak dapat mengubah aktivasi produk&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;FORBIDDEN&quot;,
+    &quot;message&quot;: &quot;Role disnakertrans tidak dapat mengubah aktivasi produk&quot;
+  }
 }</code></pre>
   </div>
 </article>
@@ -3220,6 +4400,119 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>superadmin/disnakertrans/admin: every product. tenant: only their own. Optional <code>isActive</code> filter (e.g. <code>false</code> = waiting for approval).</p></div><div data-l="id"><p>superadmin/disnakertrans/admin: semua produk. tenant: hanya produk miliknya. Filter <code>isActive</code> opsional (mis. <code>false</code> = menunggu persetujuan).</p></div>
     <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>isActive</code></td><td><code>false</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr></tbody></table></div>
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
+      &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
+      &quot;details&quot;: &quot;250 ml, es&quot;,
+      &quot;qty&quot;: 10,
+      &quot;imageId&quot;: 2,
+      &quot;approvalId&quot;: 10,
+      &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+      &quot;image&quot;: {
+        &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+        &quot;id&quot;: 2,
+        &quot;name&quot;: &quot;logo-warung.png&quot;,
+        &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+        &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+      },
+      &quot;approval&quot;: {
+        &quot;id&quot;: 10,
+        &quot;isActive&quot;: false,
+        &quot;reason&quot;: &quot;Waiting for approval&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+      },
+      &quot;tenant&quot;: {
+        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+        &quot;firstName&quot;: &quot;Budi&quot;,
+        &quot;lastName&quot;: &quot;Santoso&quot;,
+        &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+      }
+    }
+  ],
+  &quot;meta&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 20,
+    &quot;total&quot;: 1,
+    &quot;totalPages&quot;: 1
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
+      &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
+      &quot;details&quot;: &quot;250 ml, es&quot;,
+      &quot;qty&quot;: 10,
+      &quot;imageId&quot;: 2,
+      &quot;approvalId&quot;: 10,
+      &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+      &quot;image&quot;: {
+        &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+        &quot;id&quot;: 2,
+        &quot;name&quot;: &quot;logo-warung.png&quot;,
+        &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+        &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+      },
+      &quot;approval&quot;: {
+        &quot;id&quot;: 10,
+        &quot;isActive&quot;: false,
+        &quot;reason&quot;: &quot;Waiting for approval&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+      },
+      &quot;tenant&quot;: {
+        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+        &quot;firstName&quot;: &quot;Budi&quot;,
+        &quot;lastName&quot;: &quot;Santoso&quot;,
+        &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+      }
+    }
+  ],
+  &quot;meta&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 20,
+    &quot;total&quot;: 1,
+    &quot;totalPages&quot;: 1
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;limit&quot;,
+        &quot;message&quot;: &quot;limit harus berupa bilangan bulat antara 1 dan 100&quot;
+      }
+    ]
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;limit&quot;,
+        &quot;message&quot;: &quot;limit harus berupa bilangan bulat antara 1 dan 100&quot;
+      }
+    ]
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -3238,6 +4531,91 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>Tenants get 404 for products that are not theirs.</p></div><div data-l="id"><p>Tenant mendapat 404 untuk produk yang bukan miliknya.</p></div>
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
+    &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
+    &quot;details&quot;: &quot;250 ml, es&quot;,
+    &quot;qty&quot;: 10,
+    &quot;imageId&quot;: 2,
+    &quot;approvalId&quot;: 10,
+    &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+    &quot;image&quot;: {
+      &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;id&quot;: 2,
+      &quot;name&quot;: &quot;logo-warung.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+    },
+    &quot;approval&quot;: {
+      &quot;id&quot;: 10,
+      &quot;isActive&quot;: false,
+      &quot;reason&quot;: &quot;Waiting for approval&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+    },
+    &quot;tenant&quot;: {
+      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+      &quot;firstName&quot;: &quot;Budi&quot;,
+      &quot;lastName&quot;: &quot;Santoso&quot;,
+      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
+    &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
+    &quot;details&quot;: &quot;250 ml, es&quot;,
+    &quot;qty&quot;: 10,
+    &quot;imageId&quot;: 2,
+    &quot;approvalId&quot;: 10,
+    &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+    &quot;image&quot;: {
+      &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;id&quot;: 2,
+      &quot;name&quot;: &quot;logo-warung.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+    },
+    &quot;approval&quot;: {
+      &quot;id&quot;: 10,
+      &quot;isActive&quot;: false,
+      &quot;reason&quot;: &quot;Waiting for approval&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+    },
+    &quot;tenant&quot;: {
+      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+      &quot;firstName&quot;: &quot;Budi&quot;,
+      &quot;lastName&quot;: &quot;Santoso&quot;,
+      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Produk tidak ditemukan&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Produk tidak ditemukan&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -3268,6 +4646,103 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;qty&quot;: 10,
   &quot;imageId&quot;: {{imageId}}
 }</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">201 Created</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
+    &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
+    &quot;details&quot;: &quot;250 ml, es&quot;,
+    &quot;qty&quot;: 10,
+    &quot;imageId&quot;: 2,
+    &quot;approvalId&quot;: 10,
+    &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+    &quot;image&quot;: {
+      &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;id&quot;: 2,
+      &quot;name&quot;: &quot;logo-warung.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+    },
+    &quot;approval&quot;: {
+      &quot;id&quot;: 10,
+      &quot;isActive&quot;: false,
+      &quot;reason&quot;: &quot;Waiting for approval&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+    },
+    &quot;tenant&quot;: {
+      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+      &quot;firstName&quot;: &quot;Budi&quot;,
+      &quot;lastName&quot;: &quot;Santoso&quot;,
+      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
+    &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
+    &quot;details&quot;: &quot;250 ml, es&quot;,
+    &quot;qty&quot;: 10,
+    &quot;imageId&quot;: 2,
+    &quot;approvalId&quot;: 10,
+    &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+    &quot;image&quot;: {
+      &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;id&quot;: 2,
+      &quot;name&quot;: &quot;logo-warung.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+    },
+    &quot;approval&quot;: {
+      &quot;id&quot;: 10,
+      &quot;isActive&quot;: false,
+      &quot;reason&quot;: &quot;Waiting for approval&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+    },
+    &quot;tenant&quot;: {
+      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+      &quot;firstName&quot;: &quot;Budi&quot;,
+      &quot;lastName&quot;: &quot;Santoso&quot;,
+      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;imageId&quot;,
+        &quot;message&quot;: &quot;imageId wajib diisi, unggah gambar terlebih dahulu melalui POST /api/images&quot;
+      }
+    ]
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;imageId&quot;,
+        &quot;message&quot;: &quot;imageId wajib diisi, unggah gambar terlebih dahulu melalui POST /api/images&quot;
+      }
+    ]
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -3290,6 +4765,103 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;qty&quot;: 25
 }</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
+    &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
+    &quot;details&quot;: &quot;250 ml, es&quot;,
+    &quot;qty&quot;: 25,
+    &quot;imageId&quot;: 2,
+    &quot;approvalId&quot;: 10,
+    &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.666Z&quot;,
+    &quot;image&quot;: {
+      &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;id&quot;: 2,
+      &quot;name&quot;: &quot;logo-warung.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+    },
+    &quot;approval&quot;: {
+      &quot;id&quot;: 10,
+      &quot;isActive&quot;: false,
+      &quot;reason&quot;: &quot;Waiting for approval&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+    },
+    &quot;tenant&quot;: {
+      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+      &quot;firstName&quot;: &quot;Budi&quot;,
+      &quot;lastName&quot;: &quot;Santoso&quot;,
+      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
+    &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
+    &quot;details&quot;: &quot;250 ml, es&quot;,
+    &quot;qty&quot;: 25,
+    &quot;imageId&quot;: 2,
+    &quot;approvalId&quot;: 10,
+    &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.666Z&quot;,
+    &quot;image&quot;: {
+      &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;id&quot;: 2,
+      &quot;name&quot;: &quot;logo-warung.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+      &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.614Z&quot;
+    },
+    &quot;approval&quot;: {
+      &quot;id&quot;: 10,
+      &quot;isActive&quot;: false,
+      &quot;reason&quot;: &quot;Waiting for approval&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.624Z&quot;
+    },
+    &quot;tenant&quot;: {
+      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+      &quot;firstName&quot;: &quot;Budi&quot;,
+      &quot;lastName&quot;: &quot;Santoso&quot;,
+      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;isActive&quot;,
+        &quot;message&quot;: &quot;hanya admin yang dapat mengaktifkan produk (PATCH /api/approvals/:id?type=product)&quot;
+      }
+    ]
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;isActive&quot;,
+        &quot;message&quot;: &quot;hanya admin yang dapat mengaktifkan produk (PATCH /api/approvals/:id?type=product)&quot;
+      }
+    ]
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -3308,6 +4880,25 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>Own products only. Also deletes its approval and image.</p></div><div data-l="id"><p>Hanya produk milik sendiri. Approval dan gambarnya ikut dihapus.</p></div>
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: null
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: null
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Produk tidak ditemukan&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Produk tidak ditemukan&quot;
+  }
+}</code></pre>
   </div>
 </article>
 </section>
@@ -3375,6 +4966,97 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>Active (approved) products only, without private data (no owner email/phone, no approval reason).</p></div><div data-l="id"><p>Hanya produk aktif (sudah disetujui), tanpa data pribadi (tanpa email/telepon pemilik, tanpa alasan approval).</p></div>
     <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr></tbody></table></div>
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
+      &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
+      &quot;details&quot;: &quot;250 ml, es&quot;,
+      &quot;qty&quot;: 25,
+      &quot;imageId&quot;: 2,
+      &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.666Z&quot;,
+      &quot;image&quot;: {
+        &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+        &quot;id&quot;: 2,
+        &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+        &quot;altText&quot;: &quot;Logo Warung Budi&quot;
+      },
+      &quot;tenant&quot;: {
+        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+        &quot;firstName&quot;: &quot;Budi&quot;,
+        &quot;lastName&quot;: &quot;Santoso&quot;
+      }
+    }
+  ],
+  &quot;meta&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 20,
+    &quot;total&quot;: 1,
+    &quot;totalPages&quot;: 1
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
+      &quot;description&quot;: &quot;Kopi susu dengan gula aren asli&quot;,
+      &quot;details&quot;: &quot;250 ml, es&quot;,
+      &quot;qty&quot;: 25,
+      &quot;imageId&quot;: 2,
+      &quot;tenantId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.625Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.666Z&quot;,
+      &quot;image&quot;: {
+        &quot;url&quot;: &quot;http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+        &quot;id&quot;: 2,
+        &quot;imgUrl&quot;: &quot;/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png&quot;,
+        &quot;altText&quot;: &quot;Logo Warung Budi&quot;
+      },
+      &quot;tenant&quot;: {
+        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+        &quot;firstName&quot;: &quot;Budi&quot;,
+        &quot;lastName&quot;: &quot;Santoso&quot;
+      }
+    }
+  ],
+  &quot;meta&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 20,
+    &quot;total&quot;: 1,
+    &quot;totalPages&quot;: 1
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;page&quot;,
+        &quot;message&quot;: &quot;page harus berupa bilangan bulat positif&quot;
+      }
+    ]
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;page&quot;,
+        &quot;message&quot;: &quot;page harus berupa bilangan bulat positif&quot;
+      }
+    ]
+  }
+}</code></pre>
   </div>
 </article>
 </section>
@@ -3568,6 +5250,51 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>Sorted by name.</p></div><div data-l="id"><p>Diurutkan berdasarkan nama.</p></div>
     <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr></tbody></table></div>
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;Kuliner 1791168925841&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;
+    }
+  ],
+  &quot;meta&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 20,
+    &quot;total&quot;: 1,
+    &quot;totalPages&quot;: 1
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;Kuliner 1791168925841&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;
+    }
+  ],
+  &quot;meta&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 20,
+    &quot;total&quot;: 1,
+    &quot;totalPages&quot;: 1
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">403 Forbidden</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;FORBIDDEN&quot;,
+    &quot;message&quot;: &quot;Anda tidak memiliki izin untuk mengakses data ini&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;FORBIDDEN&quot;,
+    &quot;message&quot;: &quot;Anda tidak memiliki izin untuk mengakses data ini&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -3586,6 +5313,35 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: 1,
+    &quot;name&quot;: &quot;Kuliner 1791168925841&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: 1,
+    &quot;name&quot;: &quot;Kuliner 1791168925841&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Kategori tenant tidak ditemukan&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Kategori tenant tidak ditemukan&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -3607,6 +5363,35 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;name&quot;: &quot;Kuliner {{$timestamp}}&quot;
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;name&quot;: &quot;Kuliner {{$timestamp}}&quot;
+}</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">201 Created</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: 1,
+    &quot;name&quot;: &quot;Kuliner 1791168925841&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: 1,
+    &quot;name&quot;: &quot;Kuliner 1791168925841&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">403 Forbidden</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;FORBIDDEN&quot;,
+    &quot;message&quot;: &quot;Anda tidak memiliki izin untuk mengakses data ini&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;FORBIDDEN&quot;,
+    &quot;message&quot;: &quot;Anda tidak memiliki izin untuk mengakses data ini&quot;
+  }
 }</code></pre>
   </div>
 </article>
@@ -3630,6 +5415,47 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;name&quot;: &quot;Kuliner &amp; Minuman {{$timestamp}}&quot;
 }</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: 1,
+    &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.500Z&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: 1,
+    &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.470Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.500Z&quot;
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;name&quot;,
+        &quot;message&quot;: &quot;name wajib diisi&quot;
+      }
+    ]
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;name&quot;,
+        &quot;message&quot;: &quot;name wajib diisi&quot;
+      }
+    ]
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -3648,6 +5474,25 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>A category still used by a tenant profile cannot be deleted (409 <code>STILL_IN_USE</code>).</p></div><div data-l="id"><p>Kategori yang masih dipakai oleh profil tenant tidak bisa dihapus (409 <code>STILL_IN_USE</code>).</p></div>
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: null
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: null
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">409 Conflict</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;STILL_IN_USE&quot;,
+    &quot;message&quot;: &quot;Data ini masih digunakan sehingga tidak dapat dihapus&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;STILL_IN_USE&quot;,
+    &quot;message&quot;: &quot;Data ini masih digunakan sehingga tidak dapat dihapus&quot;
+  }
+}</code></pre>
   </div>
 </article>
 </section>
@@ -4221,6 +6066,81 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>404 if you have not created your profile yet.</p></div><div data-l="id"><p>404 jika Anda belum membuat profil.</p></div>
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;name&quot;: &quot;Warung Budi&quot;,
+    &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
+    &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
+    &quot;area&quot;: &quot;Manokwari&quot;,
+    &quot;operationalHours&quot;: &quot;08:00 - 22:00&quot;,
+    &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
+    &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
+    &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
+    &quot;logoId&quot;: 1,
+    &quot;categoryId&quot;: 1,
+    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;logo&quot;: {
+      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;logo-warung.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+    },
+    &quot;category&quot;: {
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;name&quot;: &quot;Warung Budi&quot;,
+    &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
+    &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
+    &quot;area&quot;: &quot;Manokwari&quot;,
+    &quot;operationalHours&quot;: &quot;08:00 - 22:00&quot;,
+    &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
+    &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
+    &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
+    &quot;logoId&quot;: 1,
+    &quot;categoryId&quot;: 1,
+    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;logo&quot;: {
+      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;logo-warung.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+    },
+    &quot;category&quot;: {
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Anda belum memiliki profil tenant, buat terlebih dahulu melalui POST /api/tenants/me&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Anda belum memiliki profil tenant, buat terlebih dahulu melalui POST /api/tenants/me&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -4261,6 +6181,81 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;logoId&quot;: {{imageId}},
   &quot;categoryId&quot;: {{categoryId}}
 }</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">201 Created</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;name&quot;: &quot;Warung Budi&quot;,
+    &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
+    &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
+    &quot;area&quot;: &quot;Manokwari&quot;,
+    &quot;operationalHours&quot;: &quot;08:00 - 22:00&quot;,
+    &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
+    &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
+    &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
+    &quot;logoId&quot;: 1,
+    &quot;categoryId&quot;: 1,
+    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;logo&quot;: {
+      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;logo-warung.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+    },
+    &quot;category&quot;: {
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;name&quot;: &quot;Warung Budi&quot;,
+    &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
+    &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
+    &quot;area&quot;: &quot;Manokwari&quot;,
+    &quot;operationalHours&quot;: &quot;08:00 - 22:00&quot;,
+    &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
+    &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
+    &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
+    &quot;logoId&quot;: 1,
+    &quot;categoryId&quot;: 1,
+    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;logo&quot;: {
+      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;logo-warung.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+    },
+    &quot;category&quot;: {
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">409 Conflict</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;CONFLICT&quot;,
+    &quot;message&quot;: &quot;Anda sudah memiliki profil tenant, ubah melalui PATCH /api/tenants/me&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;CONFLICT&quot;,
+    &quot;message&quot;: &quot;Anda sudah memiliki profil tenant, ubah melalui PATCH /api/tenants/me&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -4283,6 +6278,93 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
   &quot;operationalHours&quot;: &quot;07:00 - 23:00&quot;
 }</code></pre>
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;name&quot;: &quot;Warung Budi&quot;,
+    &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
+    &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
+    &quot;area&quot;: &quot;Manokwari&quot;,
+    &quot;operationalHours&quot;: &quot;07:00 - 23:00&quot;,
+    &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
+    &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
+    &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
+    &quot;logoId&quot;: 1,
+    &quot;categoryId&quot;: 1,
+    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+    &quot;logo&quot;: {
+      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;logo-warung.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+    },
+    &quot;category&quot;: {
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;name&quot;: &quot;Warung Budi&quot;,
+    &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
+    &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
+    &quot;area&quot;: &quot;Manokwari&quot;,
+    &quot;operationalHours&quot;: &quot;07:00 - 23:00&quot;,
+    &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
+    &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
+    &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
+    &quot;logoId&quot;: 1,
+    &quot;categoryId&quot;: 1,
+    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+    &quot;logo&quot;: {
+      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;logo-warung.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+    },
+    &quot;category&quot;: {
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;rating&quot;,
+        &quot;message&quot;: &quot;rating bukan field tenant&quot;
+      }
+    ]
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;rating&quot;,
+        &quot;message&quot;: &quot;rating bukan field tenant&quot;
+      }
+    ]
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -4301,6 +6383,25 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>Deletes your tenant profile (your account stays).</p></div><div data-l="id"><p>Menghapus profil tenant Anda (akun Anda tetap ada).</p></div>
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: null
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: null
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Anda belum memiliki profil tenant, buat terlebih dahulu melalui POST /api/tenants/me&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Anda belum memiliki profil tenant, buat terlebih dahulu melalui POST /api/tenants/me&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -4319,6 +6420,111 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>Every tenant profile with its owner, logo and category. Optional <code>categoryId</code> filter.</p></div><div data-l="id"><p>Semua profil tenant beserta pemilik, logo, dan kategorinya. Filter <code>categoryId</code> opsional.</p></div>
     <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>categoryId</code></td><td><code>{{categoryId}}</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr></tbody></table></div>
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+      &quot;name&quot;: &quot;Warung Budi&quot;,
+      &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
+      &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
+      &quot;area&quot;: &quot;Manokwari&quot;,
+      &quot;operationalHours&quot;: &quot;07:00 - 23:00&quot;,
+      &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
+      &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
+      &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
+      &quot;logoId&quot;: 1,
+      &quot;categoryId&quot;: 1,
+      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+      &quot;logo&quot;: {
+        &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;logo-warung.png&quot;,
+        &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+        &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+      },
+      &quot;category&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+      },
+      &quot;owner&quot;: {
+        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;firstName&quot;: &quot;Budi&quot;,
+        &quot;lastName&quot;: &quot;Santoso&quot;,
+        &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+        &quot;tenantName&quot;: &quot;Warung Budi&quot;
+      }
+    }
+  ],
+  &quot;meta&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 20,
+    &quot;total&quot;: 1,
+    &quot;totalPages&quot;: 1
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+      &quot;name&quot;: &quot;Warung Budi&quot;,
+      &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
+      &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
+      &quot;area&quot;: &quot;Manokwari&quot;,
+      &quot;operationalHours&quot;: &quot;07:00 - 23:00&quot;,
+      &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
+      &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
+      &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
+      &quot;logoId&quot;: 1,
+      &quot;categoryId&quot;: 1,
+      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+      &quot;logo&quot;: {
+        &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;logo-warung.png&quot;,
+        &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+        &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+      },
+      &quot;category&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+      },
+      &quot;owner&quot;: {
+        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;firstName&quot;: &quot;Budi&quot;,
+        &quot;lastName&quot;: &quot;Santoso&quot;,
+        &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+        &quot;tenantName&quot;: &quot;Warung Budi&quot;
+      }
+    }
+  ],
+  &quot;meta&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 20,
+    &quot;total&quot;: 1,
+    &quot;totalPages&quot;: 1
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">403 Forbidden</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;FORBIDDEN&quot;,
+    &quot;message&quot;: &quot;Anda tidak memiliki izin untuk mengakses data ini&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;FORBIDDEN&quot;,
+    &quot;message&quot;: &quot;Anda tidak memiliki izin untuk mengakses data ini&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -4337,6 +6543,95 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;name&quot;: &quot;Warung Budi&quot;,
+    &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
+    &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
+    &quot;area&quot;: &quot;Manokwari&quot;,
+    &quot;operationalHours&quot;: &quot;07:00 - 23:00&quot;,
+    &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
+    &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
+    &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
+    &quot;logoId&quot;: 1,
+    &quot;categoryId&quot;: 1,
+    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+    &quot;logo&quot;: {
+      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;logo-warung.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+    },
+    &quot;category&quot;: {
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+    },
+    &quot;owner&quot;: {
+      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;firstName&quot;: &quot;Budi&quot;,
+      &quot;lastName&quot;: &quot;Santoso&quot;,
+      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+      &quot;tenantName&quot;: &quot;Warung Budi&quot;
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;eb27ed2a-ddec-45c1-841b-f0c8dd1043fb&quot;,
+    &quot;name&quot;: &quot;Warung Budi&quot;,
+    &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
+    &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
+    &quot;area&quot;: &quot;Manokwari&quot;,
+    &quot;operationalHours&quot;: &quot;07:00 - 23:00&quot;,
+    &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
+    &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
+    &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
+    &quot;logoId&quot;: 1,
+    &quot;categoryId&quot;: 1,
+    &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.552Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.568Z&quot;,
+    &quot;logo&quot;: {
+      &quot;url&quot;: &quot;http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;logo-warung.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png&quot;,
+      &quot;altText&quot;: &quot;Logo Warung Budi&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.529Z&quot;
+    },
+    &quot;category&quot;: {
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;Kuliner &amp; Minuman 1791168925841&quot;
+    },
+    &quot;owner&quot;: {
+      &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;firstName&quot;: &quot;Budi&quot;,
+      &quot;lastName&quot;: &quot;Santoso&quot;,
+      &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+      &quot;tenantName&quot;: &quot;Warung Budi&quot;
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Tenant tidak ditemukan&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Tenant tidak ditemukan&quot;
+  }
+}</code></pre>
   </div>
 </article>
 </section>
@@ -4544,6 +6839,193 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>Your own notifications, newest first. <code>meta.unreadCount</code> for the badge. Saves the newest one as <code>{{notificationId}}</code>.</p></div><div data-l="id"><p>Notifikasi milik Anda, terbaru di atas. <code>meta.unreadCount</code> untuk badge. Menyimpan notifikasi terbaru sebagai <code>{{notificationId}}</code>.</p></div>
     <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>unread</code></td><td><code>true</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr></tbody></table></div>
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;isRead&quot;: false,
+      &quot;id&quot;: 26,
+      &quot;type&quot;: &quot;PRODUCT_APPROVED&quot;,
+      &quot;name&quot;: &quot;Product approved&quot;,
+      &quot;description&quot;: &quot;\&quot;Kopi Susu Gula Aren\&quot; was approved and is now visible on the landing page.&quot;,
+      &quot;approvalId&quot;: 10,
+      &quot;entityType&quot;: &quot;product&quot;,
+      &quot;entityId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;readAt&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.688Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.688Z&quot;,
+      &quot;approval&quot;: {
+        &quot;id&quot;: 10,
+        &quot;type&quot;: &quot;product&quot;,
+        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;isActive&quot;: true,
+        &quot;reason&quot;: &quot;Activated by admin&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;,
+        &quot;user&quot;: {
+          &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+          &quot;firstName&quot;: &quot;Budi&quot;,
+          &quot;lastName&quot;: &quot;Santoso&quot;,
+          &quot;phoneNumber&quot;: &quot;081298765499&quot;,
+          &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+          &quot;role&quot;: &quot;tenant&quot;,
+          &quot;faceImageId&quot;: null,
+          &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+          &quot;mailActive&quot;: true,
+          &quot;passwordChangedAt&quot;: null,
+          &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;
+        }
+      }
+    },
+    {
+      &quot;isRead&quot;: false,
+      &quot;id&quot;: 21,
+      &quot;type&quot;: &quot;PRODUCT_UNDER_REVIEW&quot;,
+      &quot;name&quot;: &quot;Product under review&quot;,
+      &quot;description&quot;: &quot;\&quot;Kopi Susu Gula Aren\&quot; was created and is under review. You will be notified when it is approved.&quot;,
+      &quot;approvalId&quot;: 10,
+      &quot;entityType&quot;: &quot;product&quot;,
+      &quot;entityId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;readAt&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.638Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.638Z&quot;,
+      &quot;approval&quot;: {
+        &quot;id&quot;: 10,
+        &quot;type&quot;: &quot;product&quot;,
+        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;isActive&quot;: true,
+        &quot;reason&quot;: &quot;Activated by admin&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;,
+        &quot;user&quot;: {
+          &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+          &quot;firstName&quot;: &quot;Budi&quot;,
+          &quot;lastName&quot;: &quot;Santoso&quot;,
+          &quot;phoneNumber&quot;: &quot;081298765499&quot;,
+          &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+          &quot;role&quot;: &quot;tenant&quot;,
+          &quot;faceImageId&quot;: null,
+          &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+          &quot;mailActive&quot;: true,
+          &quot;passwordChangedAt&quot;: null,
+          &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;
+        }
+      }
+    }
+  ],
+  &quot;meta&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 20,
+    &quot;total&quot;: 2,
+    &quot;totalPages&quot;: 1,
+    &quot;unreadCount&quot;: 2
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;isRead&quot;: false,
+      &quot;id&quot;: 26,
+      &quot;type&quot;: &quot;PRODUCT_APPROVED&quot;,
+      &quot;name&quot;: &quot;Product approved&quot;,
+      &quot;description&quot;: &quot;\&quot;Kopi Susu Gula Aren\&quot; was approved and is now visible on the landing page.&quot;,
+      &quot;approvalId&quot;: 10,
+      &quot;entityType&quot;: &quot;product&quot;,
+      &quot;entityId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;readAt&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.688Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.688Z&quot;,
+      &quot;approval&quot;: {
+        &quot;id&quot;: 10,
+        &quot;type&quot;: &quot;product&quot;,
+        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;isActive&quot;: true,
+        &quot;reason&quot;: &quot;Activated by admin&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;,
+        &quot;user&quot;: {
+          &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+          &quot;firstName&quot;: &quot;Budi&quot;,
+          &quot;lastName&quot;: &quot;Santoso&quot;,
+          &quot;phoneNumber&quot;: &quot;081298765499&quot;,
+          &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+          &quot;role&quot;: &quot;tenant&quot;,
+          &quot;faceImageId&quot;: null,
+          &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+          &quot;mailActive&quot;: true,
+          &quot;passwordChangedAt&quot;: null,
+          &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;
+        }
+      }
+    },
+    {
+      &quot;isRead&quot;: false,
+      &quot;id&quot;: 21,
+      &quot;type&quot;: &quot;PRODUCT_UNDER_REVIEW&quot;,
+      &quot;name&quot;: &quot;Product under review&quot;,
+      &quot;description&quot;: &quot;\&quot;Kopi Susu Gula Aren\&quot; was created and is under review. You will be notified when it is approved.&quot;,
+      &quot;approvalId&quot;: 10,
+      &quot;entityType&quot;: &quot;product&quot;,
+      &quot;entityId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+      &quot;readAt&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.638Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.638Z&quot;,
+      &quot;approval&quot;: {
+        &quot;id&quot;: 10,
+        &quot;type&quot;: &quot;product&quot;,
+        &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;isActive&quot;: true,
+        &quot;reason&quot;: &quot;Activated by admin&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;,
+        &quot;user&quot;: {
+          &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+          &quot;firstName&quot;: &quot;Budi&quot;,
+          &quot;lastName&quot;: &quot;Santoso&quot;,
+          &quot;phoneNumber&quot;: &quot;081298765499&quot;,
+          &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+          &quot;role&quot;: &quot;tenant&quot;,
+          &quot;faceImageId&quot;: null,
+          &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+          &quot;mailActive&quot;: true,
+          &quot;passwordChangedAt&quot;: null,
+          &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+          &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;
+        }
+      }
+    }
+  ],
+  &quot;meta&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 20,
+    &quot;total&quot;: 2,
+    &quot;totalPages&quot;: 1,
+    &quot;unreadCount&quot;: 2
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;unread&quot;,
+        &quot;message&quot;: &quot;unread harus bernilai true atau false&quot;
+      }
+    ]
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;unread&quot;,
+        &quot;message&quot;: &quot;unread harus bernilai true atau false&quot;
+      }
+    ]
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -4562,6 +7044,29 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;count&quot;: 2
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;count&quot;: 2
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">401 Unauthorized</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;UNAUTHORIZED&quot;,
+    &quot;message&quot;: &quot;Header Authorization tidak ada atau formatnya salah (gunakan: Bearer &lt;token&gt;)&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;UNAUTHORIZED&quot;,
+    &quot;message&quot;: &quot;Header Authorization tidak ada atau formatnya salah (gunakan: Bearer &lt;token&gt;)&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -4580,6 +7085,93 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;isRead&quot;: true,
+    &quot;id&quot;: 26,
+    &quot;type&quot;: &quot;PRODUCT_APPROVED&quot;,
+    &quot;name&quot;: &quot;Product approved&quot;,
+    &quot;description&quot;: &quot;\&quot;Kopi Susu Gula Aren\&quot; was approved and is now visible on the landing page.&quot;,
+    &quot;approvalId&quot;: 10,
+    &quot;entityType&quot;: &quot;product&quot;,
+    &quot;entityId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;readAt&quot;: &quot;2026-10-05T02:55:28.728Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.688Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.728Z&quot;,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 10,
+      &quot;type&quot;: &quot;product&quot;,
+      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;isActive&quot;: true,
+      &quot;reason&quot;: &quot;Activated by admin&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;,
+      &quot;user&quot;: {
+        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;firstName&quot;: &quot;Budi&quot;,
+        &quot;lastName&quot;: &quot;Santoso&quot;,
+        &quot;phoneNumber&quot;: &quot;081298765499&quot;,
+        &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+        &quot;role&quot;: &quot;tenant&quot;,
+        &quot;faceImageId&quot;: null,
+        &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+        &quot;mailActive&quot;: true,
+        &quot;passwordChangedAt&quot;: null,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;
+      }
+    }
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;isRead&quot;: true,
+    &quot;id&quot;: 26,
+    &quot;type&quot;: &quot;PRODUCT_APPROVED&quot;,
+    &quot;name&quot;: &quot;Product approved&quot;,
+    &quot;description&quot;: &quot;\&quot;Kopi Susu Gula Aren\&quot; was approved and is now visible on the landing page.&quot;,
+    &quot;approvalId&quot;: 10,
+    &quot;entityType&quot;: &quot;product&quot;,
+    &quot;entityId&quot;: &quot;92d8781b-798e-4b42-879a-ebf789615e49&quot;,
+    &quot;readAt&quot;: &quot;2026-10-05T02:55:28.728Z&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-05T02:55:28.688Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.728Z&quot;,
+    &quot;approval&quot;: {
+      &quot;id&quot;: 10,
+      &quot;type&quot;: &quot;product&quot;,
+      &quot;userId&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+      &quot;isActive&quot;: true,
+      &quot;reason&quot;: &quot;Activated by admin&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.682Z&quot;,
+      &quot;user&quot;: {
+        &quot;id&quot;: &quot;b36d8a31-091e-4470-a107-5642d36d8f47&quot;,
+        &quot;firstName&quot;: &quot;Budi&quot;,
+        &quot;lastName&quot;: &quot;Santoso&quot;,
+        &quot;phoneNumber&quot;: &quot;081298765499&quot;,
+        &quot;email&quot;: &quot;budi1791168925841@prafi.test&quot;,
+        &quot;role&quot;: &quot;tenant&quot;,
+        &quot;faceImageId&quot;: null,
+        &quot;tenantName&quot;: &quot;Warung Budi&quot;,
+        &quot;mailActive&quot;: true,
+        &quot;passwordChangedAt&quot;: null,
+        &quot;createdAt&quot;: &quot;2026-10-05T02:55:27.906Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-05T02:55:28.442Z&quot;
+      }
+    }
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Notifikasi tidak ditemukan&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Notifikasi tidak ditemukan&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -4598,6 +7190,29 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>Returns <code>{ updated }</code> (how many were marked).</p></div><div data-l="id"><p>Mengembalikan <code>{ updated }</code> (jumlah yang ditandai).</p></div>
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;updated&quot;: 1
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;updated&quot;: 1
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">401 Unauthorized</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;UNAUTHORIZED&quot;,
+    &quot;message&quot;: &quot;Header Authorization tidak ada atau formatnya salah (gunakan: Bearer &lt;token&gt;)&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;UNAUTHORIZED&quot;,
+    &quot;message&quot;: &quot;Header Authorization tidak ada atau formatnya salah (gunakan: Bearer &lt;token&gt;)&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -4616,6 +7231,25 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: null
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: null
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Notifikasi tidak ditemukan&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Notifikasi tidak ditemukan&quot;
+  }
+}</code></pre>
   </div>
 </article>
 </section>
@@ -4753,6 +7387,13 @@ socket.on('connect_error', (err) =&gt; { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATE
     <div data-l="en"><p>Engine.IO handshake: 200 with a session id means the realtime server is up. To receive events, create a Socket.IO request (see the folder description).</p></div><div data-l="id"><p>Handshake Engine.IO: 200 dengan session id berarti server realtime berjalan. Untuk menerima event, buat request Socket.IO (lihat deskripsi folder).</p></div>
     <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>EIO</code></td><td><code>4</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>transport</code></td><td><code>polling</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr></tbody></table></div>
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="0{&quot;sid&quot;:&quot;pQcFPuw426gZO0U2AAAA&quot;,&quot;upgrades&quot;:[&quot;websocket&quot;],&quot;pingInterval&quot;:25000,&quot;pingTimeout&quot;:20000,&quot;maxPayload&quot;:1000000}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-text">0{&quot;sid&quot;:&quot;pQcFPuw426gZO0U2AAAA&quot;,&quot;upgrades&quot;:[&quot;websocket&quot;],&quot;pingInterval&quot;:25000,&quot;pingTimeout&quot;:20000,&quot;maxPayload&quot;:1000000}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;code&quot;: 0,
+  &quot;message&quot;: &quot;Transport unknown&quot;
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;code&quot;: 0,
+  &quot;message&quot;: &quot;Transport unknown&quot;
+}</code></pre>
   </div>
 </article>
 </section>
@@ -4882,6 +7523,29 @@ socket.on('connect_error', (err) =&gt; { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATE
     
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Hello admin andi.admin1791168925841@prafi.test&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Hello admin andi.admin1791168925841@prafi.test&quot;
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">403 Forbidden</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;FORBIDDEN&quot;,
+    &quot;message&quot;: &quot;Anda tidak memiliki izin untuk mengakses data ini&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;FORBIDDEN&quot;,
+    &quot;message&quot;: &quot;Anda tidak memiliki izin untuk mengakses data ini&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -4900,6 +7564,29 @@ socket.on('connect_error', (err) =&gt; { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATE
     <div data-l="en"><p>Answers with your role and email.</p></div><div data-l="id"><p>Membalas dengan role dan email Anda.</p></div>
     
     
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Hello tenant budi1791168925841@prafi.test&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;message&quot;: &quot;Hello tenant budi1791168925841@prafi.test&quot;
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">401 Unauthorized</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;UNAUTHORIZED&quot;,
+    &quot;message&quot;: &quot;Header Authorization tidak ada atau formatnya salah (gunakan: Bearer &lt;token&gt;)&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;UNAUTHORIZED&quot;,
+    &quot;message&quot;: &quot;Header Authorization tidak ada atau formatnya salah (gunakan: Bearer &lt;token&gt;)&quot;
+  }
+}</code></pre>
   </div>
 </article>
 </section>

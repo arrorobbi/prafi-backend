@@ -26,6 +26,8 @@ interface PmRequest {
     auth?: { type: string };
     body?: { mode: string; raw?: string; formdata?: { key: string; type?: string; value?: string; src?: string }[] };
   };
+  /** Postman examples: a real success response and one typical error, captured from the running API. */
+  response?: { name: string; code: number; status: string; body: string; _postman_previewlanguage?: string }[];
 }
 interface PmFolder {
   name: string;
@@ -178,6 +180,8 @@ const UI = {
   copy: { en: 'Copy', id: 'Salin' },
   queryParams: { en: 'Query parameters', id: 'Parameter query' },
   requestBody: { en: 'Request body', id: 'Body request' },
+  responseExample: { en: 'Response example', id: 'Contoh respons' },
+  errorExample: { en: 'Error example', id: 'Contoh error' },
   name: { en: 'name', id: 'nama' },
   example: { en: 'example', id: 'contoh' },
   required: { en: 'required', id: 'wajib' },
@@ -271,6 +275,16 @@ function requestBlock(folder: PmFolder, r: PmRequest) {
         .join('') +
       '</tbody></table></div>'
     : '';
+  const examples = (r.response ?? [])
+    .map((ex) => {
+      const ok = ex.code < 400;
+      const lang = ex._postman_previewlanguage === 'json' ? 'json' : 'text';
+      return (
+        `<div class="block-head"><h4>${t(ok ? UI.responseExample : UI.errorExample)} <span class="status ${ok ? 'status-ok' : 'status-err'}">${ex.code} ${escapeHtml(ex.status)}</span></h4>${copyButton(ex.body)}</div>` +
+        `<pre class="example"><code class="lang-${lang}">${escapeHtml(ex.body)}</code></pre>`
+      );
+    })
+    .join('');
   const searchText = `${folder.name} ${id.folders.get(folder.name)?.title ?? ''} ${r.name} ${names.id} ${method} ${url}`.toLowerCase();
 
   return `
@@ -289,6 +303,7 @@ function requestBlock(folder: PmFolder, r: PmRequest) {
     ${desc.trim() ? block(desc, id.requests.get(r.name)?.md || undefined) : ''}
     ${params}
     ${body}
+    ${examples}
   </div>
 </article>`;
 }
@@ -481,6 +496,10 @@ blockquote { margin: 14px 0; padding: 6px 16px; border-left: 4px solid var(--pri
 .dot-open { background: var(--get); } .dot-lock { background: var(--post); }
 .endpoint-body h4 { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 16px 0 6px; }
 .block-head { display: flex; align-items: center; justify-content: space-between; }
+.status { font: 700 11px/1 "JetBrains Mono", Consolas, monospace; padding: 4px 8px; border-radius: 6px; margin-left: 6px; letter-spacing: 0; text-transform: none; vertical-align: 1px; }
+.status-ok { color: var(--get); background: var(--get-soft); }
+.status-err { color: var(--delete); background: var(--delete-soft); }
+pre.example { max-height: 420px; overflow: auto; }
 .block-head .copy { margin-top: 8px; }
 .hidden { display: none !important; }
 .to-top { position: fixed; right: 22px; bottom: 22px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--hero); color: #fff; font-size: 18px; cursor: pointer; box-shadow: 0 8px 20px rgba(124,58,237,.4); opacity: 0; pointer-events: none; transition: opacity .2s; }

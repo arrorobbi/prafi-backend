@@ -83,6 +83,40 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/health",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "health"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nReturns `{ status: \"ok\" }` when the API is running.",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"status\": \"ok\"\n  }\n}"
+            }
           ]
         }
       ]
@@ -140,6 +174,102 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nLogs in and saves the access token as `{{token}}` (valid for 1 hour), plus `{{currentUserId}}` and `{{currentRole}}`.\n\n- superadmin: the seed account (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` in `.env`)\n- disnakertrans / admin / tenant: an account made with the Register requests (password `{{newUserPassword}}`; the email is saved as `{{registeredEmail}}`)\n\nErrors: 401 wrong email/password, 403 `EMAIL_NOT_VERIFIED` (verify the email first; `details` has `userId` and `method`), 403 `USER_NOT_ACTIVATED` (account not activated yet). Forgot the password? Use *Forgot Password*.",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{loginPassword}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI…In0.…\",\n    \"tokenType\": \"Bearer\",\n    \"user\": {\n      \"id\": \"eb078e4e-e068-43d9-a2dd-e14d1bab107e\",\n      \"firstName\": \"Super\",\n      \"lastName\": \"Admin\",\n      \"phoneNumber\": \"0000000000\",\n      \"email\": \"superadmin@example.com\",\n      \"role\": \"superadmin\",\n      \"faceImageId\": null,\n      \"tenantName\": null,\n      \"mailActive\": true,\n      \"passwordChangedAt\": null,\n      \"createdAt\": \"2026-10-04T13:19:17.557Z\",\n      \"updatedAt\": \"2026-10-04T13:19:17.557Z\",\n      \"approval\": {\n        \"isActive\": true\n      }\n    }\n  }\n}"
+            },
+            {
+              "name": "401 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nLogs in and saves the access token as `{{token}}` (valid for 1 hour), plus `{{currentUserId}}` and `{{currentRole}}`.\n\n- superadmin: the seed account (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` in `.env`)\n- disnakertrans / admin / tenant: an account made with the Register requests (password `{{newUserPassword}}`; the email is saved as `{{registeredEmail}}`)\n\nErrors: 401 wrong email/password, 403 `EMAIL_NOT_VERIFIED` (verify the email first; `details` has `userId` and `method`), 403 `USER_NOT_ACTIVATED` (account not activated yet). Forgot the password? Use *Forgot Password*.",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{loginPassword}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Email atau password salah\"\n  }\n}"
+            }
           ]
         },
         {
@@ -170,6 +300,68 @@
                   "if (pm.response.code === 200) { pm.environment.unset('token'); console.log('cleared {{token}}'); }"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/logout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "logout"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nRevokes the token used for this request (other sessions stay logged in) and clears `{{token}}`. Its open WebSocket connections receive `session:ended` (`logged_out`)."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Berhasil logout, token ini tidak dapat digunakan lagi\"\n  }\n}"
+            },
+            {
+              "name": "401 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/logout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "logout"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nRevokes the token used for this request (other sessions stay logged in) and clears `{{token}}`. Its open WebSocket connections receive `session:ended` (`logged_out`)."
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Token sudah tidak berlaku (sudah logout), silakan login kembali\"\n  }\n}"
             }
           ]
         },
@@ -222,6 +414,98 @@
                   "if (v && !v.devCode && !v.devLink) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}} (or open the link in the email)');"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "201 Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register/disnakertrans",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register",
+                    "disnakertrans"
+                  ]
+                },
+                "description": "**Access:** superadmin\n\nCreates a **disnakertrans** account (the approver of admin accounts). Its approval is active right away (`approval.isActive: true`), but the email must be activated first: an email in Bahasa Indonesia tells the person the account was created and contains the public activation link (*Verify Email Link*, valid 24 hours). The password is the one in the body; give it to the person yourself.\n\nNotifies every superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development, `{{verifyToken}}`.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Dewi\",\n  \"lastName\": \"Lestari\",\n  \"phoneNumber\": \"081377788899\",\n  \"email\": \"disnaker{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"b58e34d3-86ed-434a-846f-e3362745355b\",\n    \"firstName\": \"Dewi\",\n    \"lastName\": \"Lestari\",\n    \"phoneNumber\": \"081377788899\",\n    \"email\": \"dewi.disnaker1791168925841@prafi.test\",\n    \"role\": \"disnakertrans\",\n    \"faceImageId\": null,\n    \"tenantName\": null,\n    \"mailActive\": false,\n    \"passwordChangedAt\": null,\n    \"createdAt\": \"2026-10-05T02:55:26.524Z\",\n    \"updatedAt\": \"2026-10-05T02:55:26.524Z\",\n    \"faceImage\": null,\n    \"approval\": {\n      \"id\": 7,\n      \"reason\": \"Active on registration (created by superadmin)\",\n      \"isActive\": true,\n      \"type\": \"user\",\n      \"userId\": \"b58e34d3-86ed-434a-846f-e3362745355b\",\n      \"createdAt\": \"2026-10-05T02:55:26.775Z\",\n      \"updatedAt\": \"2026-10-05T02:55:26.775Z\"\n    }\n  },\n  \"meta\": {\n    \"verification\": {\n      \"method\": \"link\",\n      \"sentTo\": \"dewi.disnaker1791168925841@prafi.test\",\n      \"expiresAt\": \"2026-10-06T02:55:26.780Z\",\n      \"emailSent\": true\n    }\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register/disnakertrans",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register",
+                    "disnakertrans"
+                  ]
+                },
+                "description": "**Access:** superadmin\n\nCreates a **disnakertrans** account (the approver of admin accounts). Its approval is active right away (`approval.isActive: true`), but the email must be activated first: an email in Bahasa Indonesia tells the person the account was created and contains the public activation link (*Verify Email Link*, valid 24 hours). The password is the one in the body; give it to the person yourself.\n\nNotifies every superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development, `{{verifyToken}}`.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Dewi\",\n  \"lastName\": \"Lestari\",\n  \"phoneNumber\": \"081377788899\",\n  \"email\": \"disnaker{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"email\",\n        \"message\": \"email wajib diisi\"\n      },\n      {\n        \"field\": \"password\",\n        \"message\": \"password minimal 8 karakter\"\n      }\n    ]\n  }\n}"
             }
           ]
         },
@@ -278,6 +562,104 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "201 Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register/admin",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register",
+                    "admin"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nPublic sign-up for **admin** accounts, no token needed. Sends a 6-digit OTP to the email (valid 15 minutes); verify it with *Verify OTP*. Even after that, the admin cannot log in until a disnakertrans activates it (*Approvals → Activate / Deactivate User*, `approval.isActive: false` until then).\n\nNotifies every disnakertrans (`ADMIN_PENDING_ACTIVATION`) and superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development, `{{otp}}`.\n\nResponse: `data` = the new user (`mailActive: false`), `meta.verification` = `{ method: \"otp\", sentTo, expiresAt, emailSent }`.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Andi\",\n  \"lastName\": \"Wijaya\",\n  \"phoneNumber\": \"081234567890\",\n  \"email\": \"admin{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"cc1f555b-b7f7-421a-b294-471686d85b40\",\n    \"firstName\": \"Andi\",\n    \"lastName\": \"Wijaya\",\n    \"phoneNumber\": \"081234567890\",\n    \"email\": \"andi.admin1791168925841@prafi.test\",\n    \"role\": \"admin\",\n    \"faceImageId\": null,\n    \"tenantName\": null,\n    \"mailActive\": false,\n    \"passwordChangedAt\": null,\n    \"createdAt\": \"2026-10-05T02:55:27.082Z\",\n    \"updatedAt\": \"2026-10-05T02:55:27.082Z\",\n    \"faceImage\": null,\n    \"approval\": {\n      \"id\": 8,\n      \"reason\": \"Waiting for activation by disnakertrans\",\n      \"isActive\": false,\n      \"type\": \"user\",\n      \"userId\": \"cc1f555b-b7f7-421a-b294-471686d85b40\",\n      \"createdAt\": \"2026-10-05T02:55:27.327Z\",\n      \"updatedAt\": \"2026-10-05T02:55:27.327Z\"\n    }\n  },\n  \"meta\": {\n    \"verification\": {\n      \"method\": \"otp\",\n      \"sentTo\": \"andi.admin1791168925841@prafi.test\",\n      \"expiresAt\": \"2026-10-05T03:10:27.330Z\",\n      \"emailSent\": true\n    }\n  }\n}"
+            },
+            {
+              "name": "409 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register/admin",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register",
+                    "admin"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nPublic sign-up for **admin** accounts, no token needed. Sends a 6-digit OTP to the email (valid 15 minutes); verify it with *Verify OTP*. Even after that, the admin cannot log in until a disnakertrans activates it (*Approvals → Activate / Deactivate User*, `approval.isActive: false` until then).\n\nNotifies every disnakertrans (`ADMIN_PENDING_ACTIVATION`) and superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development, `{{otp}}`.\n\nResponse: `data` = the new user (`mailActive: false`), `meta.verification` = `{ method: \"otp\", sentTo, expiresAt, emailSent }`.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Andi\",\n  \"lastName\": \"Wijaya\",\n  \"phoneNumber\": \"081234567890\",\n  \"email\": \"admin{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"UNIQUE_CONSTRAINT\",\n    \"message\": \"email sudah digunakan\",\n    \"details\": [\n      {\n        \"field\": \"email\",\n        \"message\": \"email sudah digunakan\",\n        \"value\": \"andi.admin1791168925841@prafi.test\"\n      }\n    ]\n  }\n}"
+            }
           ]
         },
         {
@@ -333,6 +715,104 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "201 Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register/tenant",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register",
+                    "tenant"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nPublic sign-up, no token needed. `tenantName` is required. The tenant is **active right away** once the email is verified: a 6-digit OTP is sent to the email (valid 15 minutes), verify it with *Verify OTP*.\n\nNotifies every admin (`TENANT_REGISTERED`) and superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development, `{{otp}}`.",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Budi\",\n  \"lastName\": \"Santoso\",\n  \"phoneNumber\": \"081298765432\",\n  \"email\": \"tenant{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\",\n  \"tenantName\": \"Warung Budi\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n    \"firstName\": \"Budi\",\n    \"lastName\": \"Santoso\",\n    \"phoneNumber\": \"081298765432\",\n    \"email\": \"budi1791168925841@prafi.test\",\n    \"role\": \"tenant\",\n    \"faceImageId\": null,\n    \"tenantName\": \"Warung Budi\",\n    \"mailActive\": false,\n    \"passwordChangedAt\": null,\n    \"createdAt\": \"2026-10-05T02:55:27.906Z\",\n    \"updatedAt\": \"2026-10-05T02:55:27.906Z\",\n    \"faceImage\": null,\n    \"approval\": {\n      \"id\": 9,\n      \"reason\": \"Active on registration (self-registered)\",\n      \"isActive\": true,\n      \"type\": \"user\",\n      \"userId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n      \"createdAt\": \"2026-10-05T02:55:28.157Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.157Z\"\n    }\n  },\n  \"meta\": {\n    \"verification\": {\n      \"method\": \"otp\",\n      \"sentTo\": \"budi1791168925841@prafi.test\",\n      \"expiresAt\": \"2026-10-05T03:10:28.160Z\",\n      \"emailSent\": true\n    }\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register/tenant",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register",
+                    "tenant"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nPublic sign-up, no token needed. `tenantName` is required. The tenant is **active right away** once the email is verified: a 6-digit OTP is sent to the email (valid 15 minutes), verify it with *Verify OTP*.\n\nNotifies every admin (`TENANT_REGISTERED`) and superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development, `{{otp}}`.",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Budi\",\n  \"lastName\": \"Santoso\",\n  \"phoneNumber\": \"081298765432\",\n  \"email\": \"tenant{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\",\n  \"tenantName\": \"Warung Budi\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"tenantName\",\n        \"message\": \"tenantName wajib diisi untuk akun tenant\"\n      }\n    ]\n  }\n}"
+            }
           ]
         },
         {
@@ -382,6 +862,104 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/verify-otp/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "verify-otp",
+                    "{{userId}}"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nAdmin and tenant accounts: confirms the email with the 6-digit code from the registration email. `:userId` is the id returned by the registration (or by a 403 `EMAIL_NOT_VERIFIED` login error). Body: `{ \"otp\": \"123456\" }` (`OTP` is accepted too). On success `mailActive` becomes `true` and the user can log in.\n\nErrors: 400 `OTP_INVALID` (wrong code, `details.attemptsLeft`; after 5 wrong tries a new code is needed), 400 `OTP_EXPIRED` (older than 15 minutes), 409 `EMAIL_ALREADY_VERIFIED`, 404 unknown user.",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"otp\": \"{{otp}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Email berhasil diverifikasi, silakan login\",\n    \"user\": {\n      \"id\": \"cc1f555b-b7f7-421a-b294-471686d85b40\",\n      \"firstName\": \"Andi\",\n      \"lastName\": \"Wijaya\",\n      \"phoneNumber\": \"081234567890\",\n      \"email\": \"andi.admin1791168925841@prafi.test\",\n      \"role\": \"admin\",\n      \"faceImageId\": null,\n      \"tenantName\": null,\n      \"mailActive\": true,\n      \"passwordChangedAt\": null,\n      \"createdAt\": \"2026-10-05T02:55:27.082Z\",\n      \"updatedAt\": \"2026-10-05T02:55:27.634Z\",\n      \"faceImage\": null,\n      \"approval\": {\n        \"id\": 8,\n        \"reason\": \"Waiting for activation by disnakertrans\",\n        \"isActive\": false,\n        \"type\": \"user\",\n        \"userId\": \"cc1f555b-b7f7-421a-b294-471686d85b40\",\n        \"createdAt\": \"2026-10-05T02:55:27.327Z\",\n        \"updatedAt\": \"2026-10-05T02:55:27.327Z\"\n      }\n    }\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/verify-otp/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "verify-otp",
+                    "{{userId}}"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nAdmin and tenant accounts: confirms the email with the 6-digit code from the registration email. `:userId` is the id returned by the registration (or by a 403 `EMAIL_NOT_VERIFIED` login error). Body: `{ \"otp\": \"123456\" }` (`OTP` is accepted too). On success `mailActive` becomes `true` and the user can log in.\n\nErrors: 400 `OTP_INVALID` (wrong code, `details.attemptsLeft`; after 5 wrong tries a new code is needed), 400 `OTP_EXPIRED` (older than 15 minutes), 409 `EMAIL_ALREADY_VERIFIED`, 404 unknown user.",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"otp\": \"{{otp}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"OTP_INVALID\",\n    \"message\": \"Kode OTP salah\",\n    \"details\": {\n      \"attemptsLeft\": 4\n    }\n  }\n}"
+            }
           ]
         },
         {
@@ -427,6 +1005,98 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/verify-email/{{userId}}?token={{verifyToken}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "verify-email",
+                    "{{userId}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": "{{verifyToken}}"
+                    }
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nDisnakertrans accounts: the activation link from the email. Opened in a browser it shows a confirmation page (Bahasa Indonesia); API clients get JSON. On success `mailActive` becomes `true`.\n\nErrors: 400 `LINK_INVALID`, 400 `LINK_EXPIRED` (older than 24 hours), 409 `EMAIL_ALREADY_VERIFIED`.",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Email berhasil diaktifkan, silakan login\",\n    \"user\": {\n      \"id\": \"b58e34d3-86ed-434a-846f-e3362745355b\",\n      \"firstName\": \"Dewi\",\n      \"lastName\": \"Lestari\",\n      \"phoneNumber\": \"081377788899\",\n      \"email\": \"dewi.disnaker1791168925841@prafi.test\",\n      \"role\": \"disnakertrans\",\n      \"faceImageId\": null,\n      \"tenantName\": null,\n      \"mailActive\": true,\n      \"passwordChangedAt\": null,\n      \"createdAt\": \"2026-10-05T02:55:26.524Z\",\n      \"updatedAt\": \"2026-10-05T02:55:26.825Z\",\n      \"faceImage\": null,\n      \"approval\": {\n        \"id\": 7,\n        \"reason\": \"Active on registration (created by superadmin)\",\n        \"isActive\": true,\n        \"type\": \"user\",\n        \"userId\": \"b58e34d3-86ed-434a-846f-e3362745355b\",\n        \"createdAt\": \"2026-10-05T02:55:26.775Z\",\n        \"updatedAt\": \"2026-10-05T02:55:26.775Z\"\n      }\n    }\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/verify-email/{{userId}}?token={{verifyToken}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "verify-email",
+                    "{{userId}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": "{{verifyToken}}"
+                    }
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nDisnakertrans accounts: the activation link from the email. Opened in a browser it shows a confirmation page (Bahasa Indonesia); API clients get JSON. On success `mailActive` becomes `true`.\n\nErrors: 400 `LINK_INVALID`, 400 `LINK_EXPIRED` (older than 24 hours), 409 `EMAIL_ALREADY_VERIFIED`.",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"LINK_INVALID\",\n    \"message\": \"Tautan aktivasi tidak valid atau sudah tidak berlaku\"\n  }\n}"
+            }
           ]
         },
         {
@@ -464,6 +1134,76 @@
                   "if (v && !v.devCode && !v.devLink) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}} (or open the link in the email)');"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/resend-verification/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "resend-verification",
+                    "{{userId}}"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nSends a new OTP (admin, tenant) or activation link (disnakertrans); the previous one stops working. At most once per 60 seconds (429 `TOO_MANY_REQUESTS`, `details.retryAfterSeconds`). Saves the new `{{otp}}` / `{{verifyToken}}` in development.",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Kode verifikasi baru telah dikirim ke andi.admin1791168925841@prafi.test\"\n  },\n  \"meta\": {\n    \"verification\": {\n      \"method\": \"otp\",\n      \"sentTo\": \"andi.admin1791168925841@prafi.test\",\n      \"expiresAt\": \"2026-10-05T03:10:27.621Z\",\n      \"emailSent\": true\n    }\n  }\n}"
+            },
+            {
+              "name": "429 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/resend-verification/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "resend-verification",
+                    "{{userId}}"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nSends a new OTP (admin, tenant) or activation link (disnakertrans); the previous one stops working. At most once per 60 seconds (429 `TOO_MANY_REQUESTS`, `details.retryAfterSeconds`). Saves the new `{{otp}}` / `{{verifyToken}}` in development.",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"TOO_MANY_REQUESTS\",\n    \"message\": \"Tunggu 60 detik sebelum meminta kode baru\",\n    \"details\": {\n      \"retryAfterSeconds\": 60\n    }\n  }\n}"
             }
           ]
         },
@@ -515,6 +1255,102 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/forgot-password",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "forgot-password"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nEmails a link to reset the password (Bahasa Indonesia), valid **30 minutes**, single use. The link opens the **frontend** page `<FRONTEND_URL>/reset-password?userId=…&token=…` (`FRONTEND_URL` in `.env`), which calls *Check Reset Link* and *Reset Password*.\n\nThe answer is always the same 200 message, whether or not the email has an account, so it can't be used to find registered emails. At most one email per account every 60 seconds (extra requests get the same answer but send nothing).\n\n**Development:** without `SMTP_HOST` the email is printed in the server log and `meta.devLink` is returned; this request saves its `userId` / `token` as `{{userId}}` / `{{resetToken}}`.",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{registeredEmail}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Jika email terdaftar, tautan untuk mengatur ulang kata sandi telah dikirim. Tautan berlaku 30 menit.\"\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/forgot-password",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "forgot-password"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nEmails a link to reset the password (Bahasa Indonesia), valid **30 minutes**, single use. The link opens the **frontend** page `<FRONTEND_URL>/reset-password?userId=…&token=…` (`FRONTEND_URL` in `.env`), which calls *Check Reset Link* and *Reset Password*.\n\nThe answer is always the same 200 message, whether or not the email has an account, so it can't be used to find registered emails. At most one email per account every 60 seconds (extra requests get the same answer but send nothing).\n\n**Development:** without `SMTP_HOST` the email is printed in the server log and `meta.devLink` is returned; this request saves its `userId` / `token` as `{{userId}}` / `{{resetToken}}`.",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{registeredEmail}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"email\",\n        \"message\": \"email wajib diisi dengan alamat email yang valid\"\n      }\n    ]\n  }\n}"
+            }
           ]
         },
         {
@@ -562,6 +1398,104 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/reset-password/check",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "reset-password",
+                    "check"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nFor the frontend's reset page: is the link from the email still usable? Answers `{ valid: true, email: \"a*****i@gmail.com\", expiresAt }` (masked email, to show whose password is being reset).\n\nErrors: 400 `RESET_LINK_INVALID` (wrong, used or replaced by a newer link), 400 `RESET_LINK_EXPIRED` (older than 30 minutes).",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"token\": \"{{resetToken}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"valid\": true,\n    \"email\": \"b******1@prafi.test\",\n    \"expiresAt\": \"2026-10-05T03:25:28.773Z\"\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/reset-password/check",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "reset-password",
+                    "check"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nFor the frontend's reset page: is the link from the email still usable? Answers `{ valid: true, email: \"a*****i@gmail.com\", expiresAt }` (masked email, to show whose password is being reset).\n\nErrors: 400 `RESET_LINK_INVALID` (wrong, used or replaced by a newer link), 400 `RESET_LINK_EXPIRED` (older than 30 minutes).",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"token\": \"{{resetToken}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"RESET_LINK_INVALID\",\n    \"message\": \"Tautan atur ulang kata sandi tidak valid: token tidak cocok, pastikan seluruh tautan dari email disalin\"\n  }\n}"
             }
           ]
         },
@@ -611,6 +1545,102 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/reset-password",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "reset-password"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nSets the new password (at least 8 characters). The link can only be used once. Because the link came by email, the email also counts as verified (`mailActive: true`).\n\n**Logs the account out everywhere:** every token issued before the reset answers 401, and open WebSocket connections get `session:ended` with reason `password_reset`. Log in again with the new password.\n\nErrors: 400 validation (`password` under 8 characters), 400 `RESET_LINK_INVALID`, 400 `RESET_LINK_EXPIRED`.",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"token\": \"{{resetToken}}\",\n  \"password\": \"PasswordBaru123!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Kata sandi berhasil diubah, silakan login dengan kata sandi baru\"\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/reset-password",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "reset-password"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nSets the new password (at least 8 characters). The link can only be used once. Because the link came by email, the email also counts as verified (`mailActive: true`).\n\n**Logs the account out everywhere:** every token issued before the reset answers 401, and open WebSocket connections get `session:ended` with reason `password_reset`. Log in again with the new password.\n\nErrors: 400 validation (`password` under 8 characters), 400 `RESET_LINK_INVALID`, 400 `RESET_LINK_EXPIRED`.",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"token\": \"{{resetToken}}\",\n  \"password\": \"PasswordBaru123!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"password\",\n        \"message\": \"password minimal 8 karakter\"\n      }\n    ]\n  }\n}"
+            }
           ]
         },
         {
@@ -640,6 +1670,68 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "me"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nThe logged-in account with its `faceImage`, account `approval` and `mailActive`."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n    \"firstName\": \"Budi\",\n    \"lastName\": \"Santoso\",\n    \"phoneNumber\": \"081298765432\",\n    \"email\": \"budi1791168925841@prafi.test\",\n    \"role\": \"tenant\",\n    \"faceImageId\": null,\n    \"tenantName\": \"Warung Budi\",\n    \"mailActive\": true,\n    \"passwordChangedAt\": null,\n    \"createdAt\": \"2026-10-05T02:55:27.906Z\",\n    \"updatedAt\": \"2026-10-05T02:55:28.176Z\",\n    \"faceImage\": null,\n    \"approval\": {\n      \"id\": 9,\n      \"reason\": \"Active on registration (self-registered)\",\n      \"isActive\": true,\n      \"type\": \"user\",\n      \"userId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n      \"createdAt\": \"2026-10-05T02:55:28.157Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.157Z\"\n    }\n  }\n}"
+            },
+            {
+              "name": "401 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "me"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nThe logged-in account with its `faceImage`, account `approval` and `mailActive`."
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Header Authorization tidak ada atau formatnya salah (gunakan: Bearer <token>)\"\n  }\n}"
             }
           ]
         },
@@ -684,6 +1776,96 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "me"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nUpdates your own account; send only the fields to change: `firstName`, `lastName`, `phoneNumber`, `email`, `faceImageId` (or `null`), `tenantName` (tenants only), `password` + `currentPassword`.\n\n`id`, `role` and `mailActive` can never be changed here. Replacing `faceImageId` (or setting it to `null`) deletes the old image and its file.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Andi\",\n  \"phoneNumber\": \"081234567899\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n    \"firstName\": \"Budi\",\n    \"lastName\": \"Santoso\",\n    \"phoneNumber\": \"081298765499\",\n    \"email\": \"budi1791168925841@prafi.test\",\n    \"role\": \"tenant\",\n    \"faceImageId\": null,\n    \"tenantName\": \"Warung Budi\",\n    \"mailActive\": true,\n    \"passwordChangedAt\": null,\n    \"createdAt\": \"2026-10-05T02:55:27.906Z\",\n    \"updatedAt\": \"2026-10-05T02:55:28.442Z\",\n    \"faceImage\": null,\n    \"approval\": {\n      \"id\": 9,\n      \"reason\": \"Active on registration (self-registered)\",\n      \"isActive\": true,\n      \"type\": \"user\",\n      \"userId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n      \"createdAt\": \"2026-10-05T02:55:28.157Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.157Z\"\n    }\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "me"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nUpdates your own account; send only the fields to change: `firstName`, `lastName`, `phoneNumber`, `email`, `faceImageId` (or `null`), `tenantName` (tenants only), `password` + `currentPassword`.\n\n`id`, `role` and `mailActive` can never be changed here. Replacing `faceImageId` (or setting it to `null`) deletes the old image and its file.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Andi\",\n  \"phoneNumber\": \"081234567899\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"role\",\n        \"message\": \"role tidak dapat diubah\"\n      }\n    ]\n  }\n}"
             }
           ]
         }
@@ -737,6 +1919,96 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "201 Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/images",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "images"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nmultipart/form-data, field **image** (pick a file in Body → form-data). Saves `{{imageId}}` and `{{imagePath}}` (`imgUrl`; the response also has the full link in `url`).\n\nAn image can be used once: as one product image, one tenant logo or one face image.",
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "src": "sample-face.png"
+                    },
+                    {
+                      "key": "altText",
+                      "value": "Sample image",
+                      "type": "text"
+                    }
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"url\": \"http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png\",\n    \"id\": 1,\n    \"name\": \"logo-warung.png\",\n    \"imgUrl\": \"/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png\",\n    \"altText\": \"Logo Warung Budi\",\n    \"updatedAt\": \"2026-10-05T02:55:28.529Z\",\n    \"createdAt\": \"2026-10-05T02:55:28.529Z\"\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/images",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "images"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nmultipart/form-data, field **image** (pick a file in Body → form-data). Saves `{{imageId}}` and `{{imagePath}}` (`imgUrl`; the response also has the full link in `url`).\n\nAn image can be used once: as one product image, one tenant logo or one face image.",
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "src": "sample-face.png"
+                    },
+                    {
+                      "key": "altText",
+                      "value": "Sample image",
+                      "type": "text"
+                    }
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"File gambar wajib diunggah (field multipart \\\"image\\\")\"\n  }\n}"
+            }
           ]
         },
         {
@@ -769,6 +2041,70 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}{{imagePath}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{imagePath}}"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nThe public link of the uploaded image (`{{baseUrl}}` + `imgUrl`), as the frontend would load it.",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "image/png"
+                }
+              ],
+              "cookie": [],
+              "body": "<binary image/png>"
+            },
+            {
+              "name": "404 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}{{imagePath}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{imagePath}}"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nThe public link of the uploaded image (`{{baseUrl}}` + `imgUrl`), as the frontend would load it.",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Rute GET /images/tidak-ada.png tidak ditemukan\"\n  }\n}"
+            }
           ]
         },
         {
@@ -798,6 +2134,68 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/images/{{imageId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "images",
+                    "{{imageId}}"
+                  ]
+                },
+                "description": "**Access:** tenant\n\nDeletes the image record and file. An image still used as a tenant logo cannot be deleted (409 `STILL_IN_USE`)."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": null\n}"
+            },
+            {
+              "name": "404 Error",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/images/{{imageId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "images",
+                    "{{imageId}}"
+                  ]
+                },
+                "description": "**Access:** tenant\n\nDeletes the image record and file. An image still used as a tenant logo cannot be deleted (409 `STILL_IN_USE`)."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Gambar tidak ditemukan\"\n  }\n}"
             }
           ]
         }
@@ -848,6 +2246,96 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users?page=1&limit=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "role",
+                      "value": "tenant",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nsuperadmin: every account; disnakertrans: admin accounts only; admin: tenant accounts only. Optional `role` filter. Each user includes `faceImage`, `approval` and `mailActive`."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n      \"firstName\": \"Budi\",\n      \"lastName\": \"Santoso\",\n      \"phoneNumber\": \"081298765499\",\n      \"email\": \"budi1791168925841@prafi.test\",\n      \"role\": \"tenant\",\n      \"faceImageId\": null,\n      \"tenantName\": \"Warung Budi\",\n      \"mailActive\": true,\n      \"passwordChangedAt\": null,\n      \"createdAt\": \"2026-10-05T02:55:27.906Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.442Z\",\n      \"faceImage\": null,\n      \"approval\": {\n        \"id\": 9,\n        \"reason\": \"Active on registration (self-registered)\",\n        \"isActive\": true,\n        \"type\": \"user\",\n        \"userId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n        \"createdAt\": \"2026-10-05T02:55:28.157Z\",\n        \"updatedAt\": \"2026-10-05T02:55:28.157Z\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"totalPages\": 1\n  }\n}"
+            },
+            {
+              "name": "403 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users?page=1&limit=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "role",
+                      "value": "tenant",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nsuperadmin: every account; disnakertrans: admin accounts only; admin: tenant accounts only. Optional `role` filter. Each user includes `faceImage`, `approval` and `mailActive`."
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"FORBIDDEN\",\n    \"message\": \"Anda tidak memiliki izin untuk melihat akun lain, gunakan /api/auth/me\"\n  }\n}"
             }
           ]
         }
@@ -905,6 +2393,108 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approvals/{{userId}}?type=user",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approvals",
+                    "{{userId}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "user"
+                    }
+                  ]
+                },
+                "description": "**Access:** disnakertrans, admin\n\n`isActive`: true/false. `role`: the target account's role, as a confirmation (must match). `reason`: optional.\n\ndisnakertrans activates/deactivates **admin** accounts; admin activates/deactivates **tenant** accounts. Uses `{{userId}}` / `{{userRole}}` saved by the Register requests. Deactivating ends the user's sessions (`session:ended`, reason `deactivated`) and notifies superadmins.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"isActive\": true,\n  \"role\": \"{{userRole}}\",\n  \"reason\": \"Data lengkap\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"type\": \"user\",\n    \"id\": \"cc1f555b-b7f7-421a-b294-471686d85b40\",\n    \"email\": \"andi.admin1791168925841@prafi.test\",\n    \"role\": \"admin\",\n    \"approval\": {\n      \"id\": 8,\n      \"reason\": \"Data lengkap\",\n      \"isActive\": true,\n      \"type\": \"user\",\n      \"userId\": \"cc1f555b-b7f7-421a-b294-471686d85b40\",\n      \"createdAt\": \"2026-10-05T02:55:27.327Z\",\n      \"updatedAt\": \"2026-10-05T02:55:27.646Z\"\n    }\n  }\n}"
+            },
+            {
+              "name": "403 Error",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approvals/{{userId}}?type=user",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approvals",
+                    "{{userId}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "user"
+                    }
+                  ]
+                },
+                "description": "**Access:** disnakertrans, admin\n\n`isActive`: true/false. `role`: the target account's role, as a confirmation (must match). `reason`: optional.\n\ndisnakertrans activates/deactivates **admin** accounts; admin activates/deactivates **tenant** accounts. Uses `{{userId}}` / `{{userRole}}` saved by the Register requests. Deactivating ends the user's sessions (`session:ended`, reason `deactivated`) and notifies superadmins.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"isActive\": true,\n  \"role\": \"{{userRole}}\",\n  \"reason\": \"Data lengkap\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"FORBIDDEN\",\n    \"message\": \"Anda tidak memiliki izin untuk mengakses data ini\"\n  }\n}"
+            }
           ]
         },
         {
@@ -956,6 +2546,108 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approvals/{{productId}}?type=product",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approvals",
+                    "{{productId}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "product"
+                    }
+                  ]
+                },
+                "description": "**Access:** admin\n\nApproves a product (shown on the landing page) or takes it down. The owner gets `PRODUCT_APPROVED`; admins get `PRODUCT_PUBLISHED`; deactivation notifies superadmins.\n\nThe response includes who owns it:\n```json\n{ \"type\": \"product\", \"id\": \"…\", \"name\": \"…\", \"approval\": { \"type\": \"product\", \"userId\": \"…\", \"isActive\": true, … },\n  \"user\": { \"firstName\": \"Budi\", \"lastName\": \"Santoso\", …, \"tenant\": { … } | null, \"productId\": \"…\", \"product\": { … } } }\n```",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"isActive\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"type\": \"product\",\n    \"id\": \"92d8781b-798e-4b42-879a-ebf789615e49\",\n    \"name\": \"Kopi Susu Gula Aren\",\n    \"approval\": {\n      \"id\": 10,\n      \"reason\": \"Activated by admin\",\n      \"isActive\": true,\n      \"type\": \"product\",\n      \"userId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n      \"createdAt\": \"2026-10-05T02:55:28.624Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.682Z\"\n    },\n    \"user\": {\n      \"id\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n      \"firstName\": \"Budi\",\n      \"lastName\": \"Santoso\",\n      \"email\": \"budi1791168925841@prafi.test\",\n      \"phoneNumber\": \"081298765499\",\n      \"tenantName\": \"Warung Budi\",\n      \"tenant\": {\n        \"id\": \"eb27ed2a-ddec-45c1-841b-f0c8dd1043fb\",\n        \"name\": \"Warung Budi\",\n        \"description\": \"Kopi dan makanan ringan\",\n        \"address\": \"Jl. Merdeka No. 1\",\n        \"area\": \"Manokwari\",\n        \"operationalHours\": \"07:00 - 23:00\",\n        \"fbLink\": \"https://facebook.com/warungbudi\",\n        \"whatsappLink\": \"https://wa.me/6281298765432\",\n        \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n        \"logoId\": 1,\n        \"categoryId\": 1,\n        \"userId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n        \"createdAt\": \"2026-10-05T02:55:28.552Z\",\n        \"updatedAt\": \"2026-10-05T02:55:28.568Z\",\n        \"category\": {\n          \"id\": 1,\n          \"name\": \"Kuliner & Minuman 1791168925841\",\n          \"createdAt\": \"2026-10-05T02:55:28.470Z\",\n          \"updatedAt\": \"2026-10-05T02:55:28.500Z\"\n        },\n        \"logo\": {\n          \"url\": \"http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png\",\n          \"id\": 1,\n          \"name\": \"logo-warung.png\",\n          \"imgUrl\": \"/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png\",\n          \"altText\": \"Logo Warung Budi\",\n          \"createdAt\": \"2026-10-05T02:55:28.529Z\",\n          \"updatedAt\": \"2026-10-05T02:55:28.529Z\"\n        }\n      },\n      \"productId\": \"92d8781b-798e-4b42-879a-ebf789615e49\",\n      \"product\": {\n        \"id\": \"92d8781b-798e-4b42-879a-ebf789615e49\",\n        \"name\": \"Kopi Susu Gula Aren\",\n        \"description\": \"Kopi susu dengan gula aren asli\",\n        \"details\": \"250 ml, es\",\n        \"qty\": 25,\n        \"imageId\": 2,\n        \"approvalId\": 10,\n        \"tenantId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n        \"createdAt\": \"2026-10-05T02:55:28.625Z\",\n        \"updatedAt\": \"2026-10-05T02:55:28.666Z\",\n        \"image\": {\n          \"url\": \"http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png\",\n          \"id\": 2,\n          \"name\": \"logo-warung.png\",\n          \"imgUrl\": \"/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png\",\n          \"altText\": \"Logo Warung Budi\",\n          \"createdAt\": \"2026-10-05T02:55:28.614Z\",\n          \"updatedAt\": \"2026-10-05T02:55:28.614Z\"\n        }\n      }\n    }\n  }\n}"
+            },
+            {
+              "name": "403 Error",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approvals/{{productId}}?type=product",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approvals",
+                    "{{productId}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "product"
+                    }
+                  ]
+                },
+                "description": "**Access:** admin\n\nApproves a product (shown on the landing page) or takes it down. The owner gets `PRODUCT_APPROVED`; admins get `PRODUCT_PUBLISHED`; deactivation notifies superadmins.\n\nThe response includes who owns it:\n```json\n{ \"type\": \"product\", \"id\": \"…\", \"name\": \"…\", \"approval\": { \"type\": \"product\", \"userId\": \"…\", \"isActive\": true, … },\n  \"user\": { \"firstName\": \"Budi\", \"lastName\": \"Santoso\", …, \"tenant\": { … } | null, \"productId\": \"…\", \"product\": { … } } }\n```",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"isActive\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"FORBIDDEN\",\n    \"message\": \"Role disnakertrans tidak dapat mengubah aktivasi produk\"\n  }\n}"
+            }
           ]
         }
       ]
@@ -1006,6 +2698,96 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/products?page=1&limit=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "isActive",
+                      "value": "false",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nsuperadmin/disnakertrans/admin: every product. tenant: only their own. Optional `isActive` filter (e.g. `false` = waiting for approval)."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"92d8781b-798e-4b42-879a-ebf789615e49\",\n      \"name\": \"Kopi Susu Gula Aren\",\n      \"description\": \"Kopi susu dengan gula aren asli\",\n      \"details\": \"250 ml, es\",\n      \"qty\": 10,\n      \"imageId\": 2,\n      \"approvalId\": 10,\n      \"tenantId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n      \"createdAt\": \"2026-10-05T02:55:28.625Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.625Z\",\n      \"image\": {\n        \"url\": \"http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png\",\n        \"id\": 2,\n        \"name\": \"logo-warung.png\",\n        \"imgUrl\": \"/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png\",\n        \"altText\": \"Logo Warung Budi\",\n        \"createdAt\": \"2026-10-05T02:55:28.614Z\",\n        \"updatedAt\": \"2026-10-05T02:55:28.614Z\"\n      },\n      \"approval\": {\n        \"id\": 10,\n        \"isActive\": false,\n        \"reason\": \"Waiting for approval\",\n        \"updatedAt\": \"2026-10-05T02:55:28.624Z\"\n      },\n      \"tenant\": {\n        \"id\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n        \"tenantName\": \"Warung Budi\",\n        \"firstName\": \"Budi\",\n        \"lastName\": \"Santoso\",\n        \"email\": \"budi1791168925841@prafi.test\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"totalPages\": 1\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/products?page=1&limit=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "isActive",
+                      "value": "false",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nsuperadmin/disnakertrans/admin: every product. tenant: only their own. Optional `isActive` filter (e.g. `false` = waiting for approval)."
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"limit\",\n        \"message\": \"limit harus berupa bilangan bulat antara 1 dan 100\"\n      }\n    ]\n  }\n}"
+            }
           ]
         },
         {
@@ -1035,6 +2817,68 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/products/{{productId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "products",
+                    "{{productId}}"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nTenants get 404 for products that are not theirs."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"92d8781b-798e-4b42-879a-ebf789615e49\",\n    \"name\": \"Kopi Susu Gula Aren\",\n    \"description\": \"Kopi susu dengan gula aren asli\",\n    \"details\": \"250 ml, es\",\n    \"qty\": 10,\n    \"imageId\": 2,\n    \"approvalId\": 10,\n    \"tenantId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n    \"createdAt\": \"2026-10-05T02:55:28.625Z\",\n    \"updatedAt\": \"2026-10-05T02:55:28.625Z\",\n    \"image\": {\n      \"url\": \"http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png\",\n      \"id\": 2,\n      \"name\": \"logo-warung.png\",\n      \"imgUrl\": \"/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png\",\n      \"altText\": \"Logo Warung Budi\",\n      \"createdAt\": \"2026-10-05T02:55:28.614Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.614Z\"\n    },\n    \"approval\": {\n      \"id\": 10,\n      \"isActive\": false,\n      \"reason\": \"Waiting for approval\",\n      \"updatedAt\": \"2026-10-05T02:55:28.624Z\"\n    },\n    \"tenant\": {\n      \"id\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n      \"tenantName\": \"Warung Budi\",\n      \"firstName\": \"Budi\",\n      \"lastName\": \"Santoso\",\n      \"email\": \"budi1791168925841@prafi.test\"\n    }\n  }\n}"
+            },
+            {
+              "name": "404 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/products/{{productId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "products",
+                    "{{productId}}"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nTenants get 404 for products that are not theirs."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Produk tidak ditemukan\"\n  }\n}"
             }
           ]
         },
@@ -1080,6 +2924,94 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "201 Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/products",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "products"
+                  ]
+                },
+                "description": "**Access:** tenant\n\nUpload the image first (*Images → Upload Image*); `imageId` is required. Saves `{{productId}}`. Superadmins and admins get `PRODUCT_SUBMITTED`, the tenant gets `PRODUCT_UNDER_REVIEW`.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Kopi Susu Gula Aren\",\n  \"description\": \"Kopi susu dengan gula aren asli\",\n  \"details\": \"250 ml, es\",\n  \"qty\": 10,\n  \"imageId\": {{imageId}}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"92d8781b-798e-4b42-879a-ebf789615e49\",\n    \"name\": \"Kopi Susu Gula Aren\",\n    \"description\": \"Kopi susu dengan gula aren asli\",\n    \"details\": \"250 ml, es\",\n    \"qty\": 10,\n    \"imageId\": 2,\n    \"approvalId\": 10,\n    \"tenantId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n    \"createdAt\": \"2026-10-05T02:55:28.625Z\",\n    \"updatedAt\": \"2026-10-05T02:55:28.625Z\",\n    \"image\": {\n      \"url\": \"http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png\",\n      \"id\": 2,\n      \"name\": \"logo-warung.png\",\n      \"imgUrl\": \"/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png\",\n      \"altText\": \"Logo Warung Budi\",\n      \"createdAt\": \"2026-10-05T02:55:28.614Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.614Z\"\n    },\n    \"approval\": {\n      \"id\": 10,\n      \"isActive\": false,\n      \"reason\": \"Waiting for approval\",\n      \"updatedAt\": \"2026-10-05T02:55:28.624Z\"\n    },\n    \"tenant\": {\n      \"id\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n      \"tenantName\": \"Warung Budi\",\n      \"firstName\": \"Budi\",\n      \"lastName\": \"Santoso\",\n      \"email\": \"budi1791168925841@prafi.test\"\n    }\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/products",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "products"
+                  ]
+                },
+                "description": "**Access:** tenant\n\nUpload the image first (*Images → Upload Image*); `imageId` is required. Saves `{{productId}}`. Superadmins and admins get `PRODUCT_SUBMITTED`, the tenant gets `PRODUCT_UNDER_REVIEW`.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Kopi Susu Gula Aren\",\n  \"description\": \"Kopi susu dengan gula aren asli\",\n  \"details\": \"250 ml, es\",\n  \"qty\": 10,\n  \"imageId\": {{imageId}}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"imageId\",\n        \"message\": \"imageId wajib diisi, unggah gambar terlebih dahulu melalui POST /api/images\"\n      }\n    ]\n  }\n}"
+            }
           ]
         },
         {
@@ -1124,6 +3056,96 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/products/{{productId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "products",
+                    "{{productId}}"
+                  ]
+                },
+                "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `qty`, `imageId`. Activation cannot be changed here. Replacing `imageId` deletes the old image and its file.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"qty\": 25\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"92d8781b-798e-4b42-879a-ebf789615e49\",\n    \"name\": \"Kopi Susu Gula Aren\",\n    \"description\": \"Kopi susu dengan gula aren asli\",\n    \"details\": \"250 ml, es\",\n    \"qty\": 25,\n    \"imageId\": 2,\n    \"approvalId\": 10,\n    \"tenantId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n    \"createdAt\": \"2026-10-05T02:55:28.625Z\",\n    \"updatedAt\": \"2026-10-05T02:55:28.666Z\",\n    \"image\": {\n      \"url\": \"http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png\",\n      \"id\": 2,\n      \"name\": \"logo-warung.png\",\n      \"imgUrl\": \"/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png\",\n      \"altText\": \"Logo Warung Budi\",\n      \"createdAt\": \"2026-10-05T02:55:28.614Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.614Z\"\n    },\n    \"approval\": {\n      \"id\": 10,\n      \"isActive\": false,\n      \"reason\": \"Waiting for approval\",\n      \"updatedAt\": \"2026-10-05T02:55:28.624Z\"\n    },\n    \"tenant\": {\n      \"id\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n      \"tenantName\": \"Warung Budi\",\n      \"firstName\": \"Budi\",\n      \"lastName\": \"Santoso\",\n      \"email\": \"budi1791168925841@prafi.test\"\n    }\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/products/{{productId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "products",
+                    "{{productId}}"
+                  ]
+                },
+                "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `qty`, `imageId`. Activation cannot be changed here. Replacing `imageId` deletes the old image and its file.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"qty\": 25\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"isActive\",\n        \"message\": \"hanya admin yang dapat mengaktifkan produk (PATCH /api/approvals/:id?type=product)\"\n      }\n    ]\n  }\n}"
+            }
           ]
         },
         {
@@ -1153,6 +3175,68 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/products/{{productId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "products",
+                    "{{productId}}"
+                  ]
+                },
+                "description": "**Access:** tenant\n\nOwn products only. Also deletes its approval and image."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": null\n}"
+            },
+            {
+              "name": "404 Error",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/products/{{productId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "products",
+                    "{{productId}}"
+                  ]
+                },
+                "description": "**Access:** tenant\n\nOwn products only. Also deletes its approval and image."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Produk tidak ditemukan\"\n  }\n}"
             }
           ]
         }
@@ -1203,6 +3287,94 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/landing/products?page=1&limit=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "landing",
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    }
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nActive (approved) products only, without private data (no owner email/phone, no approval reason).",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"92d8781b-798e-4b42-879a-ebf789615e49\",\n      \"name\": \"Kopi Susu Gula Aren\",\n      \"description\": \"Kopi susu dengan gula aren asli\",\n      \"details\": \"250 ml, es\",\n      \"qty\": 25,\n      \"imageId\": 2,\n      \"tenantId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n      \"createdAt\": \"2026-10-05T02:55:28.625Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.666Z\",\n      \"image\": {\n        \"url\": \"http://localhost:4000/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png\",\n        \"id\": 2,\n        \"imgUrl\": \"/images/585cd0fa-dedd-417d-90da-ae9b0ea738e4.png\",\n        \"altText\": \"Logo Warung Budi\"\n      },\n      \"tenant\": {\n        \"id\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n        \"tenantName\": \"Warung Budi\",\n        \"firstName\": \"Budi\",\n        \"lastName\": \"Santoso\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"totalPages\": 1\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/landing/products?page=1&limit=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "landing",
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    }
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nActive (approved) products only, without private data (no owner email/phone, no approval reason).",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"page\",\n        \"message\": \"page harus berupa bilangan bulat positif\"\n      }\n    ]\n  }\n}"
+            }
           ]
         }
       ]
@@ -1248,6 +3420,86 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenant-categories?page=1&limit=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenant-categories"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    }
+                  ]
+                },
+                "description": "**Access:** superadmin, admin\n\nSorted by name."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"Kuliner 1791168925841\",\n      \"createdAt\": \"2026-10-05T02:55:28.470Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.470Z\"\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"totalPages\": 1\n  }\n}"
+            },
+            {
+              "name": "403 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenant-categories?page=1&limit=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenant-categories"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    }
+                  ]
+                },
+                "description": "**Access:** superadmin, admin\n\nSorted by name."
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"FORBIDDEN\",\n    \"message\": \"Anda tidak memiliki izin untuk mengakses data ini\"\n  }\n}"
+            }
           ]
         },
         {
@@ -1277,6 +3529,68 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenant-categories",
+                    "{{categoryId}}"
+                  ]
+                },
+                "description": "**Access:** superadmin, admin"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Kuliner 1791168925841\",\n    \"createdAt\": \"2026-10-05T02:55:28.470Z\",\n    \"updatedAt\": \"2026-10-05T02:55:28.470Z\"\n  }\n}"
+            },
+            {
+              "name": "404 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenant-categories",
+                    "{{categoryId}}"
+                  ]
+                },
+                "description": "**Access:** superadmin, admin"
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Kategori tenant tidak ditemukan\"\n  }\n}"
             }
           ]
         },
@@ -1322,6 +3636,94 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "201 Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenant-categories",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenant-categories"
+                  ]
+                },
+                "description": "**Access:** admin\n\nNames are unique. Saves `{{categoryId}}`.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Kuliner 1791168925841\",\n    \"updatedAt\": \"2026-10-05T02:55:28.470Z\",\n    \"createdAt\": \"2026-10-05T02:55:28.470Z\"\n  }\n}"
+            },
+            {
+              "name": "403 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenant-categories",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenant-categories"
+                  ]
+                },
+                "description": "**Access:** admin\n\nNames are unique. Saves `{{categoryId}}`.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"FORBIDDEN\",\n    \"message\": \"Anda tidak memiliki izin untuk mengakses data ini\"\n  }\n}"
+            }
           ]
         },
         {
@@ -1366,6 +3768,96 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenant-categories",
+                    "{{categoryId}}"
+                  ]
+                },
+                "description": "**Access:** admin",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Kuliner & Minuman 1791168925841\",\n    \"createdAt\": \"2026-10-05T02:55:28.470Z\",\n    \"updatedAt\": \"2026-10-05T02:55:28.500Z\"\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenant-categories",
+                    "{{categoryId}}"
+                  ]
+                },
+                "description": "**Access:** admin",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"name\",\n        \"message\": \"name wajib diisi\"\n      }\n    ]\n  }\n}"
+            }
           ]
         },
         {
@@ -1395,6 +3887,68 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenant-categories",
+                    "{{categoryId}}"
+                  ]
+                },
+                "description": "**Access:** admin\n\nA category still used by a tenant profile cannot be deleted (409 `STILL_IN_USE`)."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": null\n}"
+            },
+            {
+              "name": "409 Error",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenant-categories",
+                    "{{categoryId}}"
+                  ]
+                },
+                "description": "**Access:** admin\n\nA category still used by a tenant profile cannot be deleted (409 `STILL_IN_USE`)."
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"STILL_IN_USE\",\n    \"message\": \"Data ini masih digunakan sehingga tidak dapat dihapus\"\n  }\n}"
             }
           ]
         }
@@ -1431,6 +3985,68 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenants/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenants",
+                    "me"
+                  ]
+                },
+                "description": "**Access:** tenant\n\n404 if you have not created your profile yet."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"eb27ed2a-ddec-45c1-841b-f0c8dd1043fb\",\n    \"name\": \"Warung Budi\",\n    \"description\": \"Kopi dan makanan ringan\",\n    \"address\": \"Jl. Merdeka No. 1\",\n    \"area\": \"Manokwari\",\n    \"operationalHours\": \"08:00 - 22:00\",\n    \"fbLink\": \"https://facebook.com/warungbudi\",\n    \"whatsappLink\": \"https://wa.me/6281298765432\",\n    \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n    \"logoId\": 1,\n    \"categoryId\": 1,\n    \"userId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n    \"createdAt\": \"2026-10-05T02:55:28.552Z\",\n    \"updatedAt\": \"2026-10-05T02:55:28.552Z\",\n    \"logo\": {\n      \"url\": \"http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png\",\n      \"id\": 1,\n      \"name\": \"logo-warung.png\",\n      \"imgUrl\": \"/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png\",\n      \"altText\": \"Logo Warung Budi\",\n      \"createdAt\": \"2026-10-05T02:55:28.529Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.529Z\"\n    },\n    \"category\": {\n      \"id\": 1,\n      \"name\": \"Kuliner & Minuman 1791168925841\"\n    }\n  }\n}"
+            },
+            {
+              "name": "404 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenants/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenants",
+                    "me"
+                  ]
+                },
+                "description": "**Access:** tenant\n\n404 if you have not created your profile yet."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Anda belum memiliki profil tenant, buat terlebih dahulu melalui POST /api/tenants/me\"\n  }\n}"
             }
           ]
         },
@@ -1486,6 +4102,96 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "201 Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenants/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenants",
+                    "me"
+                  ]
+                },
+                "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName). `logoId`: upload the logo first. `categoryId`: a tenant category (created by an admin). Saves `{{tenantProfileId}}`.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Warung Budi\",\n  \"description\": \"Kopi dan makanan ringan\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00 - 22:00\",\n  \"fbLink\": \"https://facebook.com/warungbudi\",\n  \"whatsappLink\": \"https://wa.me/6281298765432\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"logoId\": {{imageId}},\n  \"categoryId\": {{categoryId}}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"eb27ed2a-ddec-45c1-841b-f0c8dd1043fb\",\n    \"name\": \"Warung Budi\",\n    \"description\": \"Kopi dan makanan ringan\",\n    \"address\": \"Jl. Merdeka No. 1\",\n    \"area\": \"Manokwari\",\n    \"operationalHours\": \"08:00 - 22:00\",\n    \"fbLink\": \"https://facebook.com/warungbudi\",\n    \"whatsappLink\": \"https://wa.me/6281298765432\",\n    \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n    \"logoId\": 1,\n    \"categoryId\": 1,\n    \"userId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n    \"createdAt\": \"2026-10-05T02:55:28.552Z\",\n    \"updatedAt\": \"2026-10-05T02:55:28.552Z\",\n    \"logo\": {\n      \"url\": \"http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png\",\n      \"id\": 1,\n      \"name\": \"logo-warung.png\",\n      \"imgUrl\": \"/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png\",\n      \"altText\": \"Logo Warung Budi\",\n      \"createdAt\": \"2026-10-05T02:55:28.529Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.529Z\"\n    },\n    \"category\": {\n      \"id\": 1,\n      \"name\": \"Kuliner & Minuman 1791168925841\"\n    }\n  }\n}"
+            },
+            {
+              "name": "409 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenants/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenants",
+                    "me"
+                  ]
+                },
+                "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName). `logoId`: upload the logo first. `categoryId`: a tenant category (created by an admin). Saves `{{tenantProfileId}}`.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Warung Budi\",\n  \"description\": \"Kopi dan makanan ringan\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00 - 22:00\",\n  \"fbLink\": \"https://facebook.com/warungbudi\",\n  \"whatsappLink\": \"https://wa.me/6281298765432\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"logoId\": {{imageId}},\n  \"categoryId\": {{categoryId}}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"CONFLICT\",\n    \"message\": \"Anda sudah memiliki profil tenant, ubah melalui PATCH /api/tenants/me\"\n  }\n}"
+            }
           ]
         },
         {
@@ -1530,6 +4236,96 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenants/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenants",
+                    "me"
+                  ]
+                },
+                "description": "**Access:** tenant\n\nSend only the fields to change. Admins get `TENANT_PROFILE_UPDATED`. Replacing `logoId` deletes the old logo and its file.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"operationalHours\": \"07:00 - 23:00\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"eb27ed2a-ddec-45c1-841b-f0c8dd1043fb\",\n    \"name\": \"Warung Budi\",\n    \"description\": \"Kopi dan makanan ringan\",\n    \"address\": \"Jl. Merdeka No. 1\",\n    \"area\": \"Manokwari\",\n    \"operationalHours\": \"07:00 - 23:00\",\n    \"fbLink\": \"https://facebook.com/warungbudi\",\n    \"whatsappLink\": \"https://wa.me/6281298765432\",\n    \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n    \"logoId\": 1,\n    \"categoryId\": 1,\n    \"userId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n    \"createdAt\": \"2026-10-05T02:55:28.552Z\",\n    \"updatedAt\": \"2026-10-05T02:55:28.568Z\",\n    \"logo\": {\n      \"url\": \"http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png\",\n      \"id\": 1,\n      \"name\": \"logo-warung.png\",\n      \"imgUrl\": \"/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png\",\n      \"altText\": \"Logo Warung Budi\",\n      \"createdAt\": \"2026-10-05T02:55:28.529Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.529Z\"\n    },\n    \"category\": {\n      \"id\": 1,\n      \"name\": \"Kuliner & Minuman 1791168925841\"\n    }\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenants/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenants",
+                    "me"
+                  ]
+                },
+                "description": "**Access:** tenant\n\nSend only the fields to change. Admins get `TENANT_PROFILE_UPDATED`. Replacing `logoId` deletes the old logo and its file.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"operationalHours\": \"07:00 - 23:00\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"rating\",\n        \"message\": \"rating bukan field tenant\"\n      }\n    ]\n  }\n}"
+            }
           ]
         },
         {
@@ -1559,6 +4355,68 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenants/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenants",
+                    "me"
+                  ]
+                },
+                "description": "**Access:** tenant\n\nDeletes your tenant profile (your account stays)."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": null\n}"
+            },
+            {
+              "name": "404 Error",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenants/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenants",
+                    "me"
+                  ]
+                },
+                "description": "**Access:** tenant\n\nDeletes your tenant profile (your account stays)."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Anda belum memiliki profil tenant, buat terlebih dahulu melalui POST /api/tenants/me\"\n  }\n}"
             }
           ]
         },
@@ -1605,6 +4463,96 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenants?page=1&limit=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenants"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "categoryId",
+                      "value": "{{categoryId}}",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nEvery tenant profile with its owner, logo and category. Optional `categoryId` filter."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"eb27ed2a-ddec-45c1-841b-f0c8dd1043fb\",\n      \"name\": \"Warung Budi\",\n      \"description\": \"Kopi dan makanan ringan\",\n      \"address\": \"Jl. Merdeka No. 1\",\n      \"area\": \"Manokwari\",\n      \"operationalHours\": \"07:00 - 23:00\",\n      \"fbLink\": \"https://facebook.com/warungbudi\",\n      \"whatsappLink\": \"https://wa.me/6281298765432\",\n      \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n      \"logoId\": 1,\n      \"categoryId\": 1,\n      \"userId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n      \"createdAt\": \"2026-10-05T02:55:28.552Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.568Z\",\n      \"logo\": {\n        \"url\": \"http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png\",\n        \"id\": 1,\n        \"name\": \"logo-warung.png\",\n        \"imgUrl\": \"/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png\",\n        \"altText\": \"Logo Warung Budi\",\n        \"createdAt\": \"2026-10-05T02:55:28.529Z\",\n        \"updatedAt\": \"2026-10-05T02:55:28.529Z\"\n      },\n      \"category\": {\n        \"id\": 1,\n        \"name\": \"Kuliner & Minuman 1791168925841\"\n      },\n      \"owner\": {\n        \"id\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n        \"firstName\": \"Budi\",\n        \"lastName\": \"Santoso\",\n        \"email\": \"budi1791168925841@prafi.test\",\n        \"tenantName\": \"Warung Budi\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"totalPages\": 1\n  }\n}"
+            },
+            {
+              "name": "403 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenants?page=1&limit=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenants"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "categoryId",
+                      "value": "{{categoryId}}",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nEvery tenant profile with its owner, logo and category. Optional `categoryId` filter."
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"FORBIDDEN\",\n    \"message\": \"Anda tidak memiliki izin untuk mengakses data ini\"\n  }\n}"
+            }
           ]
         },
         {
@@ -1634,6 +4582,68 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenants/{{tenantProfileId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenants",
+                    "{{tenantProfileId}}"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"eb27ed2a-ddec-45c1-841b-f0c8dd1043fb\",\n    \"name\": \"Warung Budi\",\n    \"description\": \"Kopi dan makanan ringan\",\n    \"address\": \"Jl. Merdeka No. 1\",\n    \"area\": \"Manokwari\",\n    \"operationalHours\": \"07:00 - 23:00\",\n    \"fbLink\": \"https://facebook.com/warungbudi\",\n    \"whatsappLink\": \"https://wa.me/6281298765432\",\n    \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n    \"logoId\": 1,\n    \"categoryId\": 1,\n    \"userId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n    \"createdAt\": \"2026-10-05T02:55:28.552Z\",\n    \"updatedAt\": \"2026-10-05T02:55:28.568Z\",\n    \"logo\": {\n      \"url\": \"http://localhost:4000/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png\",\n      \"id\": 1,\n      \"name\": \"logo-warung.png\",\n      \"imgUrl\": \"/images/577482d2-26e0-4fcc-b344-313f4d5e9309.png\",\n      \"altText\": \"Logo Warung Budi\",\n      \"createdAt\": \"2026-10-05T02:55:28.529Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.529Z\"\n    },\n    \"category\": {\n      \"id\": 1,\n      \"name\": \"Kuliner & Minuman 1791168925841\"\n    },\n    \"owner\": {\n      \"id\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n      \"firstName\": \"Budi\",\n      \"lastName\": \"Santoso\",\n      \"email\": \"budi1791168925841@prafi.test\",\n      \"tenantName\": \"Warung Budi\"\n    }\n  }\n}"
+            },
+            {
+              "name": "404 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenants/{{tenantProfileId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenants",
+                    "{{tenantProfileId}}"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin"
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Tenant tidak ditemukan\"\n  }\n}"
             }
           ]
         }
@@ -1686,6 +4696,96 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications?page=1&limit=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "notifications"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "unread",
+                      "value": "true",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nYour own notifications, newest first. `meta.unreadCount` for the badge. Saves the newest one as `{{notificationId}}`."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"isRead\": false,\n      \"id\": 26,\n      \"type\": \"PRODUCT_APPROVED\",\n      \"name\": \"Product approved\",\n      \"description\": \"\\\"Kopi Susu Gula Aren\\\" was approved and is now visible on the landing page.\",\n      \"approvalId\": 10,\n      \"entityType\": \"product\",\n      \"entityId\": \"92d8781b-798e-4b42-879a-ebf789615e49\",\n      \"readAt\": null,\n      \"createdAt\": \"2026-10-05T02:55:28.688Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.688Z\",\n      \"approval\": {\n        \"id\": 10,\n        \"type\": \"product\",\n        \"userId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n        \"isActive\": true,\n        \"reason\": \"Activated by admin\",\n        \"updatedAt\": \"2026-10-05T02:55:28.682Z\",\n        \"user\": {\n          \"id\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n          \"firstName\": \"Budi\",\n          \"lastName\": \"Santoso\",\n          \"phoneNumber\": \"081298765499\",\n          \"email\": \"budi1791168925841@prafi.test\",\n          \"role\": \"tenant\",\n          \"faceImageId\": null,\n          \"tenantName\": \"Warung Budi\",\n          \"mailActive\": true,\n          \"passwordChangedAt\": null,\n          \"createdAt\": \"2026-10-05T02:55:27.906Z\",\n          \"updatedAt\": \"2026-10-05T02:55:28.442Z\"\n        }\n      }\n    },\n    {\n      \"isRead\": false,\n      \"id\": 21,\n      \"type\": \"PRODUCT_UNDER_REVIEW\",\n      \"name\": \"Product under review\",\n      \"description\": \"\\\"Kopi Susu Gula Aren\\\" was created and is under review. You will be notified when it is approved.\",\n      \"approvalId\": 10,\n      \"entityType\": \"product\",\n      \"entityId\": \"92d8781b-798e-4b42-879a-ebf789615e49\",\n      \"readAt\": null,\n      \"createdAt\": \"2026-10-05T02:55:28.638Z\",\n      \"updatedAt\": \"2026-10-05T02:55:28.638Z\",\n      \"approval\": {\n        \"id\": 10,\n        \"type\": \"product\",\n        \"userId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n        \"isActive\": true,\n        \"reason\": \"Activated by admin\",\n        \"updatedAt\": \"2026-10-05T02:55:28.682Z\",\n        \"user\": {\n          \"id\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n          \"firstName\": \"Budi\",\n          \"lastName\": \"Santoso\",\n          \"phoneNumber\": \"081298765499\",\n          \"email\": \"budi1791168925841@prafi.test\",\n          \"role\": \"tenant\",\n          \"faceImageId\": null,\n          \"tenantName\": \"Warung Budi\",\n          \"mailActive\": true,\n          \"passwordChangedAt\": null,\n          \"createdAt\": \"2026-10-05T02:55:27.906Z\",\n          \"updatedAt\": \"2026-10-05T02:55:28.442Z\"\n        }\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 2,\n    \"totalPages\": 1,\n    \"unreadCount\": 2\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications?page=1&limit=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "notifications"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "unread",
+                      "value": "true",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nYour own notifications, newest first. `meta.unreadCount` for the badge. Saves the newest one as `{{notificationId}}`."
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"unread\",\n        \"message\": \"unread harus bernilai true atau false\"\n      }\n    ]\n  }\n}"
+            }
           ]
         },
         {
@@ -1715,6 +4815,68 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications/unread-count",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "notifications",
+                    "unread-count"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"count\": 2\n  }\n}"
+            },
+            {
+              "name": "401 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications/unread-count",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "notifications",
+                    "unread-count"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)"
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Header Authorization tidak ada atau formatnya salah (gunakan: Bearer <token>)\"\n  }\n}"
             }
           ]
         },
@@ -1747,6 +4909,70 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications/{{notificationId}}/read",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "notifications",
+                    "{{notificationId}}",
+                    "read"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"isRead\": true,\n    \"id\": 26,\n    \"type\": \"PRODUCT_APPROVED\",\n    \"name\": \"Product approved\",\n    \"description\": \"\\\"Kopi Susu Gula Aren\\\" was approved and is now visible on the landing page.\",\n    \"approvalId\": 10,\n    \"entityType\": \"product\",\n    \"entityId\": \"92d8781b-798e-4b42-879a-ebf789615e49\",\n    \"readAt\": \"2026-10-05T02:55:28.728Z\",\n    \"createdAt\": \"2026-10-05T02:55:28.688Z\",\n    \"updatedAt\": \"2026-10-05T02:55:28.728Z\",\n    \"approval\": {\n      \"id\": 10,\n      \"type\": \"product\",\n      \"userId\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n      \"isActive\": true,\n      \"reason\": \"Activated by admin\",\n      \"updatedAt\": \"2026-10-05T02:55:28.682Z\",\n      \"user\": {\n        \"id\": \"b36d8a31-091e-4470-a107-5642d36d8f47\",\n        \"firstName\": \"Budi\",\n        \"lastName\": \"Santoso\",\n        \"phoneNumber\": \"081298765499\",\n        \"email\": \"budi1791168925841@prafi.test\",\n        \"role\": \"tenant\",\n        \"faceImageId\": null,\n        \"tenantName\": \"Warung Budi\",\n        \"mailActive\": true,\n        \"passwordChangedAt\": null,\n        \"createdAt\": \"2026-10-05T02:55:27.906Z\",\n        \"updatedAt\": \"2026-10-05T02:55:28.442Z\"\n      }\n    }\n  }\n}"
+            },
+            {
+              "name": "404 Error",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications/{{notificationId}}/read",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "notifications",
+                    "{{notificationId}}",
+                    "read"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)"
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Notifikasi tidak ditemukan\"\n  }\n}"
+            }
           ]
         },
         {
@@ -1777,6 +5003,68 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications/read-all",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "notifications",
+                    "read-all"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nReturns `{ updated }` (how many were marked)."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"updated\": 1\n  }\n}"
+            },
+            {
+              "name": "401 Error",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications/read-all",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "notifications",
+                    "read-all"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nReturns `{ updated }` (how many were marked)."
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Header Authorization tidak ada atau formatnya salah (gunakan: Bearer <token>)\"\n  }\n}"
+            }
           ]
         },
         {
@@ -1806,6 +5094,68 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications/{{notificationId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "notifications",
+                    "{{notificationId}}"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": null\n}"
+            },
+            {
+              "name": "404 Error",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications/{{notificationId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "notifications",
+                    "{{notificationId}}"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)"
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Notifikasi tidak ditemukan\"\n  }\n}"
             }
           ]
         }
@@ -1856,6 +5206,92 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/socket.io/?EIO=4&transport=polling",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "socket.io",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "EIO",
+                      "value": "4"
+                    },
+                    {
+                      "key": "transport",
+                      "value": "polling"
+                    }
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nEngine.IO handshake: 200 with a session id means the realtime server is up. To receive events, create a Socket.IO request (see the folder description).",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "cookie": [],
+              "body": "0{\"sid\":\"pQcFPuw426gZO0U2AAAA\",\"upgrades\":[\"websocket\"],\"pingInterval\":25000,\"pingTimeout\":20000,\"maxPayload\":1000000}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/socket.io/?EIO=4&transport=polling",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "socket.io",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "EIO",
+                      "value": "4"
+                    },
+                    {
+                      "key": "transport",
+                      "value": "polling"
+                    }
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nEngine.IO handshake: 200 with a session id means the realtime server is up. To receive events, create a Socket.IO request (see the folder description).",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"code\": 0,\n  \"message\": \"Transport unknown\"\n}"
+            }
           ]
         }
       ]
@@ -1892,6 +5328,68 @@
                 ]
               }
             }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/ping",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "ping"
+                  ]
+                },
+                "description": "**Access:** superadmin, admin"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Hello admin andi.admin1791168925841@prafi.test\"\n  }\n}"
+            },
+            {
+              "name": "403 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/ping",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "ping"
+                  ]
+                },
+                "description": "**Access:** superadmin, admin"
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"FORBIDDEN\",\n    \"message\": \"Anda tidak memiliki izin untuk mengakses data ini\"\n  }\n}"
+            }
           ]
         },
         {
@@ -1921,6 +5419,68 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));"
                 ]
               }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenant/ping",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenant",
+                    "ping"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nAnswers with your role and email."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Hello tenant budi1791168925841@prafi.test\"\n  }\n}"
+            },
+            {
+              "name": "401 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tenant/ping",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tenant",
+                    "ping"
+                  ]
+                },
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nAnswers with your role and email."
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Header Authorization tidak ada atau formatnya salah (gunakan: Bearer <token>)\"\n  }\n}"
             }
           ]
         }
