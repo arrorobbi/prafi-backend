@@ -5255,7 +5255,188 @@
               }
             }
           ],
-          "response": []
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/logs?page=1&limit=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "logs"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "level",
+                      "value": "error",
+                      "disabled": true,
+                      "description": "info (< 400), warn (4xx) or error (5xx)"
+                    },
+                    {
+                      "key": "method",
+                      "value": "GET",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "4xx",
+                      "disabled": true,
+                      "description": "An exact code (404) or a class (4xx)"
+                    },
+                    {
+                      "key": "path",
+                      "value": "/api/tenants",
+                      "disabled": true,
+                      "description": "Part of the path, case-insensitive"
+                    },
+                    {
+                      "key": "email",
+                      "value": "admin",
+                      "disabled": true,
+                      "description": "Part of the user's email, case-insensitive"
+                    },
+                    {
+                      "key": "userId",
+                      "value": "{{currentUserId}}",
+                      "disabled": true
+                    },
+                    {
+                      "key": "errorCode",
+                      "value": "NOT_FOUND",
+                      "disabled": true
+                    },
+                    {
+                      "key": "from",
+                      "value": "2026-10-01",
+                      "disabled": true,
+                      "description": "YYYY-MM-DD or an ISO time"
+                    },
+                    {
+                      "key": "to",
+                      "value": "2026-10-31",
+                      "disabled": true,
+                      "description": "YYYY-MM-DD (the whole day) or an ISO time"
+                    }
+                  ]
+                },
+                "description": "**Access:** superadmin\n\nNewest first, paginated (`limit` up to 100). Every filter is optional and they combine. Leaves out `errorStack`. Saves the newest log as `{{logId}}`."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": 75,\n      \"level\": \"warn\",\n      \"method\": \"GET\",\n      \"path\": \"/api/products\",\n      \"query\": \"page=0\",\n      \"statusCode\": 400,\n      \"durationMs\": 12,\n      \"userId\": \"d05ac765-9491-49a2-9ee0-6611a2226f71\",\n      \"userEmail\": \"transmigrasiprafitep@gmail.com\",\n      \"userRole\": \"superadmin\",\n      \"ip\": \"203.0.113.10\",\n      \"userAgent\": \"Python-urllib/3.12\",\n      \"errorCode\": \"BAD_REQUEST\",\n      \"errorMessage\": \"Validasi gagal\",\n      \"errorDetails\": [\n        {\n          \"field\": \"page\",\n          \"message\": \"page harus berupa bilangan bulat positif\"\n        }\n      ],\n      \"createdAt\": \"2026-10-07T05:46:21.234Z\"\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 2,\n    \"total\": 1,\n    \"totalPages\": 1\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/logs?page=1&limit=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "logs"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "level",
+                      "value": "error",
+                      "disabled": true,
+                      "description": "info (< 400), warn (4xx) or error (5xx)"
+                    },
+                    {
+                      "key": "method",
+                      "value": "GET",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "4xx",
+                      "disabled": true,
+                      "description": "An exact code (404) or a class (4xx)"
+                    },
+                    {
+                      "key": "path",
+                      "value": "/api/tenants",
+                      "disabled": true,
+                      "description": "Part of the path, case-insensitive"
+                    },
+                    {
+                      "key": "email",
+                      "value": "admin",
+                      "disabled": true,
+                      "description": "Part of the user's email, case-insensitive"
+                    },
+                    {
+                      "key": "userId",
+                      "value": "{{currentUserId}}",
+                      "disabled": true
+                    },
+                    {
+                      "key": "errorCode",
+                      "value": "NOT_FOUND",
+                      "disabled": true
+                    },
+                    {
+                      "key": "from",
+                      "value": "2026-10-01",
+                      "disabled": true,
+                      "description": "YYYY-MM-DD or an ISO time"
+                    },
+                    {
+                      "key": "to",
+                      "value": "2026-10-31",
+                      "disabled": true,
+                      "description": "YYYY-MM-DD (the whole day) or an ISO time"
+                    }
+                  ]
+                },
+                "description": "**Access:** superadmin\n\nNewest first, paginated (`limit` up to 100). Every filter is optional and they combine. Leaves out `errorStack`. Saves the newest log as `{{logId}}`."
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"level\",\n        \"message\": \"level harus salah satu dari: info, warn, error\"\n      },\n      {\n        \"field\": \"status\",\n        \"message\": \"status harus berupa kode (mis. 404) atau kelas (mis. 4xx)\"\n      }\n    ],\n    \"stack\": \"…\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Get Log (superadmin)",
@@ -5286,7 +5467,68 @@
               }
             }
           ],
-          "response": []
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/logs/{{logId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "logs",
+                    "{{logId}}"
+                  ]
+                },
+                "description": "**Access:** superadmin\n\nOne log with everything, including `errorStack` for a 5xx. 404 if it doesn't exist (or was purged)."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 75,\n    \"level\": \"warn\",\n    \"method\": \"GET\",\n    \"path\": \"/api/products\",\n    \"query\": \"page=0\",\n    \"statusCode\": 400,\n    \"durationMs\": 12,\n    \"userId\": \"d05ac765-9491-49a2-9ee0-6611a2226f71\",\n    \"userEmail\": \"transmigrasiprafitep@gmail.com\",\n    \"userRole\": \"superadmin\",\n    \"ip\": \"203.0.113.10\",\n    \"userAgent\": \"Python-urllib/3.12\",\n    \"errorCode\": \"BAD_REQUEST\",\n    \"errorMessage\": \"Validasi gagal\",\n    \"errorDetails\": [\n      {\n        \"field\": \"page\",\n        \"message\": \"page harus berupa bilangan bulat positif\"\n      }\n    ],\n    \"errorStack\": null,\n    \"createdAt\": \"2026-10-07T05:46:21.234Z\"\n  }\n}"
+            },
+            {
+              "name": "404 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/logs/{{logId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "logs",
+                    "{{logId}}"
+                  ]
+                },
+                "description": "**Access:** superadmin\n\nOne log with everything, including `errorStack` for a 5xx. 404 if it doesn't exist (or was purged)."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Log tidak ditemukan\",\n    \"stack\": \"…\"\n  }\n}"
+            }
+          ]
         }
       ]
     },

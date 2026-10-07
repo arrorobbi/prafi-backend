@@ -7483,7 +7483,107 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>Newest first, paginated (<code>limit</code> up to 100). Every filter is optional and they combine. Leaves out <code>errorStack</code>. Saves the newest log as <code>{{logId}}</code>.</p></div><div data-l="id"><p>Terbaru di atas, berhalaman (<code>limit</code> maksimal 100). Semua filter opsional dan dapat digabung. Tanpa <code>errorStack</code>. Menyimpan log terbaru sebagai <code>{{logId}}</code>.</p></div>
     <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>level</code></td><td><code>error</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>method</code></td><td><code>GET</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>status</code></td><td><code>4xx</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>path</code></td><td><code>/api/tenants</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>email</code></td><td><code>admin</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>userId</code></td><td><code>{{currentUserId}}</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>errorCode</code></td><td><code>NOT_FOUND</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>from</code></td><td><code>2026-10-01</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>to</code></td><td><code>2026-10-31</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr></tbody></table></div>
     
-    
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: 75,
+      &quot;level&quot;: &quot;warn&quot;,
+      &quot;method&quot;: &quot;GET&quot;,
+      &quot;path&quot;: &quot;/api/products&quot;,
+      &quot;query&quot;: &quot;page=0&quot;,
+      &quot;statusCode&quot;: 400,
+      &quot;durationMs&quot;: 12,
+      &quot;userId&quot;: &quot;d05ac765-9491-49a2-9ee0-6611a2226f71&quot;,
+      &quot;userEmail&quot;: &quot;transmigrasiprafitep@gmail.com&quot;,
+      &quot;userRole&quot;: &quot;superadmin&quot;,
+      &quot;ip&quot;: &quot;203.0.113.10&quot;,
+      &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
+      &quot;errorCode&quot;: &quot;BAD_REQUEST&quot;,
+      &quot;errorMessage&quot;: &quot;Validasi gagal&quot;,
+      &quot;errorDetails&quot;: [
+        {
+          &quot;field&quot;: &quot;page&quot;,
+          &quot;message&quot;: &quot;page harus berupa bilangan bulat positif&quot;
+        }
+      ],
+      &quot;createdAt&quot;: &quot;2026-10-07T05:46:21.234Z&quot;
+    }
+  ],
+  &quot;meta&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 2,
+    &quot;total&quot;: 1,
+    &quot;totalPages&quot;: 1
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: 75,
+      &quot;level&quot;: &quot;warn&quot;,
+      &quot;method&quot;: &quot;GET&quot;,
+      &quot;path&quot;: &quot;/api/products&quot;,
+      &quot;query&quot;: &quot;page=0&quot;,
+      &quot;statusCode&quot;: 400,
+      &quot;durationMs&quot;: 12,
+      &quot;userId&quot;: &quot;d05ac765-9491-49a2-9ee0-6611a2226f71&quot;,
+      &quot;userEmail&quot;: &quot;transmigrasiprafitep@gmail.com&quot;,
+      &quot;userRole&quot;: &quot;superadmin&quot;,
+      &quot;ip&quot;: &quot;203.0.113.10&quot;,
+      &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
+      &quot;errorCode&quot;: &quot;BAD_REQUEST&quot;,
+      &quot;errorMessage&quot;: &quot;Validasi gagal&quot;,
+      &quot;errorDetails&quot;: [
+        {
+          &quot;field&quot;: &quot;page&quot;,
+          &quot;message&quot;: &quot;page harus berupa bilangan bulat positif&quot;
+        }
+      ],
+      &quot;createdAt&quot;: &quot;2026-10-07T05:46:21.234Z&quot;
+    }
+  ],
+  &quot;meta&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 2,
+    &quot;total&quot;: 1,
+    &quot;totalPages&quot;: 1
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;level&quot;,
+        &quot;message&quot;: &quot;level harus salah satu dari: info, warn, error&quot;
+      },
+      {
+        &quot;field&quot;: &quot;status&quot;,
+        &quot;message&quot;: &quot;status harus berupa kode (mis. 404) atau kelas (mis. 4xx)&quot;
+      }
+    ],
+    &quot;stack&quot;: &quot;…&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;message&quot;: &quot;Validasi gagal&quot;,
+    &quot;details&quot;: [
+      {
+        &quot;field&quot;: &quot;level&quot;,
+        &quot;message&quot;: &quot;level harus salah satu dari: info, warn, error&quot;
+      },
+      {
+        &quot;field&quot;: &quot;status&quot;,
+        &quot;message&quot;: &quot;status harus berupa kode (mis. 404) atau kelas (mis. 4xx)&quot;
+      }
+    ],
+    &quot;stack&quot;: &quot;…&quot;
+  }
+}</code></pre>
   </div>
 </article>
 
@@ -7502,7 +7602,73 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div data-l="en"><p>One log with everything, including <code>errorStack</code> for a 5xx. 404 if it doesn't exist (or was purged).</p></div><div data-l="id"><p>Satu log lengkap, termasuk <code>errorStack</code> untuk error 5xx. 404 jika tidak ada (atau sudah dihapus).</p></div>
     
     
-    
+    <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: 75,
+    &quot;level&quot;: &quot;warn&quot;,
+    &quot;method&quot;: &quot;GET&quot;,
+    &quot;path&quot;: &quot;/api/products&quot;,
+    &quot;query&quot;: &quot;page=0&quot;,
+    &quot;statusCode&quot;: 400,
+    &quot;durationMs&quot;: 12,
+    &quot;userId&quot;: &quot;d05ac765-9491-49a2-9ee0-6611a2226f71&quot;,
+    &quot;userEmail&quot;: &quot;transmigrasiprafitep@gmail.com&quot;,
+    &quot;userRole&quot;: &quot;superadmin&quot;,
+    &quot;ip&quot;: &quot;203.0.113.10&quot;,
+    &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
+    &quot;errorCode&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;errorMessage&quot;: &quot;Validasi gagal&quot;,
+    &quot;errorDetails&quot;: [
+      {
+        &quot;field&quot;: &quot;page&quot;,
+        &quot;message&quot;: &quot;page harus berupa bilangan bulat positif&quot;
+      }
+    ],
+    &quot;errorStack&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-07T05:46:21.234Z&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;id&quot;: 75,
+    &quot;level&quot;: &quot;warn&quot;,
+    &quot;method&quot;: &quot;GET&quot;,
+    &quot;path&quot;: &quot;/api/products&quot;,
+    &quot;query&quot;: &quot;page=0&quot;,
+    &quot;statusCode&quot;: 400,
+    &quot;durationMs&quot;: 12,
+    &quot;userId&quot;: &quot;d05ac765-9491-49a2-9ee0-6611a2226f71&quot;,
+    &quot;userEmail&quot;: &quot;transmigrasiprafitep@gmail.com&quot;,
+    &quot;userRole&quot;: &quot;superadmin&quot;,
+    &quot;ip&quot;: &quot;203.0.113.10&quot;,
+    &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
+    &quot;errorCode&quot;: &quot;BAD_REQUEST&quot;,
+    &quot;errorMessage&quot;: &quot;Validasi gagal&quot;,
+    &quot;errorDetails&quot;: [
+      {
+        &quot;field&quot;: &quot;page&quot;,
+        &quot;message&quot;: &quot;page harus berupa bilangan bulat positif&quot;
+      }
+    ],
+    &quot;errorStack&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-07T05:46:21.234Z&quot;
+  }
+}</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Log tidak ditemukan&quot;,
+    &quot;stack&quot;: &quot;…&quot;
+  }
+}"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Log tidak ditemukan&quot;,
+    &quot;stack&quot;: &quot;…&quot;
+  }
+}</code></pre>
   </div>
 </article>
 </section>
