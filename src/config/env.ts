@@ -44,7 +44,7 @@ export const env = {
     secure: process.env.SMTP_SECURE === 'true',
     user: process.env.SMTP_USER ?? '',
     pass: process.env.SMTP_PASS ?? '',
-    from: process.env.MAIL_FROM ?? 'Prafi <no-reply@prafi.local>',
+    from: process.env.MAIL_FROM ?? 'Transniaga <no-reply@transniaga.local>',
   },
 
   /** API request/error logs (GET /api/logs) older than this many days are deleted. */

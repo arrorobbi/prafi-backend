@@ -1,7 +1,7 @@
 import type { RequestHandler } from 'express';
 import { ROLES, type Role } from '../constants/roles';
 import { HttpError } from '../errors/HttpError';
-import { verificationResultPage } from '../mail/templates';
+import { VERIFICATION_PAGE_CSP, verificationResultPage } from '../mail/templates';
 import * as authService from '../services/auth.service';
 import * as emailVerification from '../services/emailVerification.service';
 import * as passwordReset from '../services/passwordReset.service';
@@ -198,11 +198,11 @@ export const verifyEmailLink: RequestHandler = async (req, res) => {
     if (!token) throw HttpError.badRequest('Validasi gagal', [{ field: 'token', message: 'token wajib diisi' }]);
     await emailVerification.verifyLink(userId, token);
     const message = 'Email berhasil diaktifkan, silakan login';
-    if (wantsHtml) res.type('html').send(verificationResultPage(true, message));
+    if (wantsHtml) res.set('Content-Security-Policy', VERIFICATION_PAGE_CSP).type('html').send(verificationResultPage(true, message));
     else res.json({ success: true, data: { message, user: await authService.getProfile(userId) } });
   } catch (err) {
     if (!wantsHtml || !(err instanceof HttpError)) throw err;
-    res.status(err.statusCode).type('html').send(verificationResultPage(false, err.message));
+    res.status(err.statusCode).set('Content-Security-Policy', VERIFICATION_PAGE_CSP).type('html').send(verificationResultPage(false, err.message));
   }
 };
 
