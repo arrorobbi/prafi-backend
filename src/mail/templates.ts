@@ -7,7 +7,7 @@
 import { env } from '../config/env';
 import type { MailMessage } from '../services/mail.service';
 
-const BRAND = 'Transniaga';
+const BRAND = 'Trans Niaga';
 const TAGLINE = 'Produk Pilihan Ada Disini';
 const PLACE = 'Kawasan Transmigrasi Prafi, Manokwari';
 
