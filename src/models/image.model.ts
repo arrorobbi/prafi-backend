@@ -32,7 +32,8 @@ export class Image extends Model<InferAttributes<Image>, InferCreationAttributes
     // users.face_image_id - images.id (one-to-one)
     Image.hasOne(User, { as: 'user', foreignKey: 'faceImageId' });
     // tenants.logo_id - images.id (one-to-one)
-    Image.hasOne(Tenant, { as: 'tenant', foreignKey: 'logoId' });
+    // Same rule as Tenant.belongsTo(Image): an image in use as a logo can't be deleted (without it, sync makes this CASCADE)
+    Image.hasOne(Tenant, { as: 'tenant', foreignKey: 'logoId', onDelete: 'RESTRICT' });
     // products.image_id - images.id (one-to-one)
     Image.hasOne(Product, { as: 'product', foreignKey: 'imageId' });
   }
