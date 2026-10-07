@@ -6,7 +6,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
-const TEXT_FIELDS = ['name', 'description', 'address', 'area', 'operationalHours', 'fbLink', 'whatsappLink', 'gmapsLink'] as const;
+const TEXT_FIELDS = ['name', 'description', 'address', 'area', 'operationalHours', 'fbLink', 'whatsappLink', 'gmapsLink', 'instagramLink'] as const;
 const ID_FIELDS = ['logoId', 'tenantCategoryId'] as const;
 const FIELDS: string[] = [...TEXT_FIELDS, ...ID_FIELDS];
 /** On create, `name` may be left out: it defaults to the owner's tenantName. */
@@ -108,4 +108,39 @@ export const getOne: RequestHandler = async (req, res) => {
   const id = String(req.params.id);
   if (!UUID_RE.test(id)) throw HttpError.badRequest('Validasi gagal', [{ field: 'id', message: 'id harus berupa UUID yang valid' }]);
   res.json({ success: true, data: await tenantService.getById(id) });
+};
+
+// ---------- public (landing page, no login) ----------
+
+/** GET /api/landing/tenants?page=&limit=&tenantCategoryId=&q= — UMKM with an active owner, A→Z, with product count and rating. */
+export const listPublic: RequestHandler = async (req, res) => {
+  const { page = '1', limit = String(DEFAULT_LIMIT), tenantCategoryId, q } = req.query as Record<string, string | undefined>;
+
+  const errors: FieldError[] = [];
+  const pageNum = Number(page);
+  if (!Number.isInteger(pageNum) || pageNum < 1) errors.push({ field: 'page', message: 'page harus berupa bilangan bulat positif' });
+  const limitNum = Number(limit);
+  if (!Number.isInteger(limitNum) || limitNum < 1 || limitNum > MAX_LIMIT) {
+    errors.push({ field: 'limit', message: `limit harus berupa bilangan bulat antara 1 dan ${MAX_LIMIT}` });
+  }
+  const categoryNum = tenantCategoryId === undefined ? undefined : Number(tenantCategoryId);
+  if (categoryNum !== undefined && !Number.isInteger(categoryNum)) {
+    errors.push({ field: 'tenantCategoryId', message: 'tenantCategoryId harus berupa ID (bilangan bulat)' });
+  }
+  if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);
+
+  const { tenants, meta } = await tenantService.listPublic({
+    page: pageNum,
+    limit: limitNum,
+    tenantCategoryId: categoryNum,
+    q: q?.trim() || undefined,
+  });
+  res.json({ success: true, data: tenants, meta });
+};
+
+/** GET /api/landing/tenants/:id — one UMKM by its profile id or its owner's user id (product.tenant.id). */
+export const getPublic: RequestHandler = async (req, res) => {
+  const id = String(req.params.id);
+  if (!UUID_RE.test(id)) throw HttpError.badRequest('Validasi gagal', [{ field: 'id', message: 'id harus berupa UUID yang valid' }]);
+  res.json({ success: true, data: await tenantService.getPublic(id) });
 };

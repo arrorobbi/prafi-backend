@@ -3,7 +3,7 @@ import { HttpError } from '../errors/HttpError';
 import * as imageService from '../services/image.service';
 
 export const upload: RequestHandler = async (req, res) => {
-  if (!req.file) throw HttpError.badRequest('File gambar wajib diunggah (field multipart "image")');
+  if (!req.file) throw new HttpError(400, 'Pilih file gambar terlebih dahulu (field multipart "image")', 'IMAGE_REQUIRED');
 
   const { altText } = (req.body ?? {}) as { altText?: unknown };
   const image = await imageService.createFromUpload(

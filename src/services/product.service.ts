@@ -1,16 +1,20 @@
-import type { Includeable, WhereOptions } from 'sequelize';
+import { literal, type FindAttributeOptions, type Includeable, type WhereOptions } from 'sequelize';
 import { PRODUCT_READ_ALL_ROLES } from '../constants/roles';
 import { HttpError } from '../errors/HttpError';
 import { Approval, Image, Product, sequelize } from '../models';
 import type { AuthUser } from '../types/express';
 import * as imageService from './image.service';
+import { assertProfileComplete } from './tenant.service';
 import { notify } from './notification.service';
 
 export interface ProductInput {
   name: string;
   description: string;
   details: string;
-  qty: number;
+  /** Rupiah (IDR), whole numbers */
+  price: number;
+  /** Optional, defaults to false */
+  isRecommended?: boolean;
   /** Required: upload the image first via POST /api/images. */
   imageId: number;
 }
@@ -34,6 +38,16 @@ const productInclude = (isActive?: boolean): Includeable[] => [
 
 const canReadAll = (user: AuthUser) => PRODUCT_READ_ALL_ROLES.includes(user.role);
 
+/**
+ * Every product response carries its reviews' summary: ratingAverage (1 decimal, null without reviews)
+ * and reviewCount. Subqueries, so paging and counting the products stay correct.
+ */
+const RATING_ATTRIBUTES: [ReturnType<typeof literal>, string][] = [
+  [literal('(SELECT ROUND(AVG(r.stars)::numeric, 1)::float FROM reviews r WHERE r.product_id = "Product"."id")'), 'ratingAverage'],
+  [literal('(SELECT COUNT(*)::int FROM reviews r WHERE r.product_id = "Product"."id")'), 'reviewCount'],
+];
+const withRating = (exclude: string[] = []): FindAttributeOptions => ({ include: RATING_ATTRIBUTES, exclude });
+
 async function assertImageExists(imageId: number) {
   const image = await Image.findByPk(imageId, { attributes: ['id'] });
   if (!image) {
@@ -49,6 +63,7 @@ export async function list(user: AuthUser, { page, limit, isActive }: ListProduc
 
   const { rows, count } = await Product.findAndCountAll({
     where,
+    attributes: withRating(),
     include: productInclude(isActive),
     order: [['createdAt', 'DESC']],
     limit,
@@ -59,18 +74,37 @@ export async function list(user: AuthUser, { page, limit, isActive }: ListProduc
   return { products: rows, meta: { page, limit, total: count, totalPages: Math.ceil(count / limit) } };
 }
 
-/**
- * Public landing page: only products whose approval is active, with public-safe fields
- * (no owner email/phone, no internal approval reason).
- */
-export async function listActive({ page, limit }: Omit<ListProductsOptions, 'isActive'>) {
+export interface ListActiveOptions {
+  page: number;
+  limit: number;
+  /** Only the products their tenant marked as recommended */
+  recommended?: boolean;
+  /** Only this tenant user's products (the owner's user id, as in product.tenant.id) */
+  tenantId?: string;
+}
+
+/** Public-safe shape: no owner email/phone, no internal approval reason. */
+const PUBLIC_INCLUDE: Includeable[] = [
+  { association: 'image', attributes: ['id', 'imgUrl', 'url', 'altText'] },
+  { association: 'approval', attributes: [], where: { isActive: true }, required: true },
+  {
+    association: 'tenant',
+    attributes: ['id', 'tenantName', 'firstName', 'lastName'],
+    // The owner's UMKM profile, for "Lihat UMKM" links (GET /api/landing/tenants/:id)
+    include: [{ association: 'tenant', attributes: ['id', 'name'] }],
+  },
+];
+
+/** Public landing page: only products whose approval is active. */
+export async function listActive({ page, limit, recommended, tenantId }: ListActiveOptions) {
+  const where: WhereOptions = {
+    ...(recommended !== undefined && { isRecommended: recommended }),
+    ...(tenantId && { tenantId }),
+  };
   const { rows, count } = await Product.findAndCountAll({
-    attributes: { exclude: ['approvalId'] },
-    include: [
-      { association: 'image', attributes: ['id', 'imgUrl', 'url', 'altText'] },
-      { association: 'approval', attributes: [], where: { isActive: true }, required: true },
-      { association: 'tenant', attributes: ['id', 'tenantName', 'firstName', 'lastName'] },
-    ],
+    where,
+    attributes: withRating(['approvalId']),
+    include: PUBLIC_INCLUDE,
     order: [['createdAt', 'DESC']],
     limit,
     offset: (page - 1) * limit,
@@ -80,9 +114,16 @@ export async function listActive({ page, limit }: Omit<ListProductsOptions, 'isA
   return { products: rows, meta: { page, limit, total: count, totalPages: Math.ceil(count / limit) } };
 }
 
+/** Public: one approved product (404 for unknown or not-yet-approved ones). */
+export async function getActive(id: string) {
+  const product = await Product.findByPk(id, { attributes: withRating(['approvalId']), include: PUBLIC_INCLUDE });
+  if (!product) throw HttpError.notFound('Produk tidak ditemukan');
+  return product;
+}
+
 /** Tenants get 404 for other tenants' products, so they can't tell which ids exist. */
 export async function getById(user: AuthUser, id: string) {
-  const product = await Product.findByPk(id, { include: productInclude() });
+  const product = await Product.findByPk(id, { attributes: withRating(), include: productInclude() });
   if (!product || (!canReadAll(user) && product.tenantId !== user.id)) {
     throw HttpError.notFound('Produk tidak ditemukan');
   }
@@ -96,8 +137,9 @@ async function findOwnProduct(user: AuthUser, id: string) {
   return product;
 }
 
-/** Creates the product with its own approval, inactive until a superadmin/admin activates it. */
+/** Creates the product with its own approval, inactive until an admin or disnakertrans activates it. */
 export async function create(user: AuthUser, input: ProductInput) {
+  await assertProfileComplete(user);
   await assertImageExists(input.imageId);
 
   // imageId already used by another product → UniqueConstraintError → 409 via the error handler

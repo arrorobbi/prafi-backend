@@ -131,7 +131,45 @@ function fromMulterError(err: unknown): HttpError | null {
   if (err.code === 'LIMIT_UNEXPECTED_FILE') {
     return HttpError.badRequest(`Field file "${err.field}" tidak dikenali, gunakan field "image"`);
   }
-  return HttpError.badRequest(`Upload file gagal (${err.code})`);
+  const messages: Partial<Record<string, string>> = {
+    LIMIT_FILE_COUNT: 'Hanya satu gambar yang dapat diunggah sekaligus',
+    LIMIT_PART_COUNT: 'Isi formulir unggahan terlalu banyak',
+    LIMIT_FIELD_KEY: 'Nama field pada formulir unggahan terlalu panjang',
+    LIMIT_FIELD_VALUE: 'Isi field pada formulir unggahan terlalu panjang',
+    LIMIT_FIELD_COUNT: 'Field pada formulir unggahan terlalu banyak',
+    MISSING_FIELD_NAME: 'Formulir unggahan tidak valid (nama field kosong)',
+  };
+  return new HttpError(400, `Unggah gambar gagal: ${messages[err.code] ?? `kesalahan ${err.code}`}`, 'UPLOAD_FAILED', { reason: err.code });
+}
+
+/**
+ * Upload problems that aren't multer limits: a cut-off upload (busboy) and disk errors while saving the file.
+ * Without this they'd all be a vague 500.
+ */
+function fromUploadError(err: unknown): HttpError | null {
+  if (typeof err !== 'object' || err === null) return null;
+  const e = err as { code?: string; message?: string; syscall?: string };
+
+  if (e.message === 'Unexpected end of form' || e.message === 'Unexpected end of multipart data') {
+    return new HttpError(400, 'Unggah gambar gagal: koneksi terputus sebelum file selesai terkirim, silakan coba lagi', 'UPLOAD_INCOMPLETE');
+  }
+  if (e.message === 'Multipart: Boundary not found' || e.message?.startsWith('Malformed part header')) {
+    return new HttpError(400, 'Unggah gambar gagal: format kiriman tidak valid (harus multipart/form-data)', 'UPLOAD_FAILED');
+  }
+
+  const disk: Partial<Record<string, string>> = {
+    ENOSPC: 'penyimpanan server penuh',
+    EDQUOT: 'kuota penyimpanan server habis',
+    EACCES: 'server tidak memiliki izin menulis ke folder gambar',
+    EPERM: 'server tidak memiliki izin menulis ke folder gambar',
+    ENOENT: 'folder gambar di server tidak ditemukan',
+    EROFS: 'penyimpanan server hanya bisa dibaca',
+    EMFILE: 'server sedang terlalu sibuk',
+  };
+  if (e.code && disk[e.code] && e.syscall) {
+    return new HttpError(500, `Gagal menyimpan gambar: ${disk[e.code]}. Hubungi administrator.`, 'IMAGE_STORAGE_FAILED', { reason: e.code });
+  }
+  return null;
 }
 
 /** Converts errors thrown by Express/body-parser (e.g. malformed JSON). */
@@ -158,6 +196,7 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     (err instanceof HttpError ? err : null) ??
     fromSequelizeError(err) ??
     fromMulterError(err) ??
+    fromUploadError(err) ??
     fromExpressError(err) ??
     HttpError.internal();
 

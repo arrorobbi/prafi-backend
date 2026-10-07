@@ -1,6 +1,7 @@
-import type { Request, RequestHandler } from 'express';
+import type { RequestHandler } from 'express';
 import type { LogLevel } from '../models/apiLog.model';
 import * as apiLogService from '../services/apiLog.service';
+import { clientIp } from '../utils/clientIp';
 
 /** Set by the errorHandler on res.locals, so the request's log row carries its error. */
 export interface LoggedError {
@@ -21,13 +22,6 @@ function maskedQuery(originalUrl: string) {
   const params = new URLSearchParams(originalUrl.slice(i + 1));
   for (const key of params.keys()) if (SECRET_PARAMS.test(key)) params.set(key, '***');
   return decodeURIComponent(params.toString());
-}
-
-/** The client's IP: behind nginx/the frontend proxy the socket is local, so the first X-Forwarded-For entry wins. */
-function clientIp(req: Request) {
-  const forwarded = req.headers['x-forwarded-for'];
-  const first = (Array.isArray(forwarded) ? forwarded[0] : forwarded)?.split(',')[0]?.trim();
-  return (first || req.socket.remoteAddress || null)?.slice(0, 64) ?? null;
 }
 
 const levelOf = (status: number): LogLevel => (status >= 500 ? 'error' : status >= 400 ? 'warn' : 'info');

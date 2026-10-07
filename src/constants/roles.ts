@@ -71,8 +71,8 @@ export const APPROVABLE_ROLES: Record<Role, Role[]> = {
 /** Roles that can activate/deactivate at least one kind of account. */
 export const USER_APPROVER_ROLES: Role[] = ALL_ROLES.filter((r) => APPROVABLE_ROLES[r].length > 0);
 
-/** Only admins activate/deactivate products. */
-export const PRODUCT_APPROVER_ROLES: Role[] = [ROLES.ADMIN];
+/** Admins and disnakertrans activate/deactivate products (and get the same product notifications). */
+export const PRODUCT_APPROVER_ROLES: Role[] = [ROLES.DISNAKERTRANS, ROLES.ADMIN];
 
 /** Only tenants create/update/delete products, and only their own products. */
 export const PRODUCT_OWNER_ROLES: Role[] = [ROLES.TENANT];

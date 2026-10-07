@@ -23,7 +23,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | role | dibuat oleh | verifikasi email | approval awal | dapat |
 |---|---|---|---|---|
 | superadmin | seed (`npm run db:seed`) | sudah terverifikasi | aktif | membuat akun disnakertrans; **hanya membaca** data lainnya (user, produk, tenant, kategori tenant); menerima notifikasi setiap akun dan produk baru |
-| disnakertrans | superadmin (*Register Disnakertrans*) | link aktivasi (24 jam) | aktif | melihat serta mengaktifkan/menonaktifkan akun **admin**, melihat semua produk dan tenant |
+| disnakertrans | superadmin (*Register Disnakertrans*) | link aktivasi (24 jam) | aktif | melihat serta mengaktifkan/menonaktifkan akun **admin** dan **produk**, melihat semua produk dan tenant |
 | admin | daftar sendiri (*Register Admin*) | OTP (15 menit) | **tidak aktif** sampai diaktifkan disnakertrans | mengaktifkan akun tenant **dan produk**, membaca user (tenant)/produk/tenant, mengelola kategori tenant |
 | tenant | daftar sendiri (*Register Tenant*) | OTP (15 menit) | aktif | mengelola produk dan profil tenant miliknya sendiri |
 
@@ -49,13 +49,18 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Gambar | `DELETE /api/images/{{imageId}}` | tenant |
 | Pengguna | `GET /api/users` | superadmin, disnakertrans, admin |
 | Persetujuan | `PATCH /api/approvals/{{userId}}` | disnakertrans, admin |
-| Persetujuan | `PATCH /api/approvals/{{productId}}` | admin |
+| Persetujuan | `PATCH /api/approvals/{{productId}}` | disnakertrans, admin |
 | Produk | `GET /api/products` | Semua role |
 | Produk | `GET /api/products/{{productId}}` | Semua role |
 | Produk | `POST /api/products` | tenant |
 | Produk | `PATCH /api/products/{{productId}}` | tenant |
 | Produk | `DELETE /api/products/{{productId}}` | tenant |
 | Landing | `GET /api/landing/products` | Publik |
+| Landing | `GET /api/landing/products/{{productId}}` | Publik |
+| Landing | `GET /api/landing/products/{{productId}}/reviews` | Publik |
+| Landing | `POST /api/landing/products/{{productId}}/reviews` | Publik |
+| Landing | `GET /api/landing/tenants` | Publik |
+| Landing | `GET /api/landing/tenants/{{tenantProfileId}}` | Publik |
 | Kategori Tenant | `GET /api/tenant-categories` | superadmin, admin, tenant |
 | Kategori Tenant | `GET /api/tenant-categories/{{categoryId}}` | superadmin, admin, tenant |
 | Kategori Tenant | `POST /api/tenant-categories` | admin |
@@ -202,6 +207,8 @@ Mengubah akun Anda sendiri; kirim hanya field yang ingin diubah: `firstName`, `l
 === FOLDER Images => Gambar
 Unggah gambar (maks. 5 MB; jpg, png, webp, gif). Unggah dulu, lalu pakai id yang dikembalikan sebagai `faceImageId`, `imageId` produk, atau `logoId` tenant. File dapat diakses publik di `imgUrl`. Jika gambar sebuah data diganti, gambar lama dan filenya otomatis dihapus.
 
+Setiap kegagalan unggah memiliki pesan yang jelas dan `code` sendiri: `IMAGE_REQUIRED` (tanpa file), `EMPTY_IMAGE` (0 byte), `UNSUPPORTED_IMAGE_TYPE` (mis. `image/heic` dari iPhone), `INVALID_IMAGE_CONTENT` (isi file bukan gambar), `FILE_TOO_LARGE` (413, lebih dari 5 MB), `UPLOAD_INCOMPLETE` (koneksi terputus), `IMAGE_STORAGE_FAILED` / `IMAGE_SAVE_FAILED` (500, penyimpanan atau database server).
+
 === REQ Upload Image (All roles) => Unggah Gambar
 multipart/form-data, field **image** (pilih file di Body → form-data). Menyimpan `{{imageId}}` dan `{{imagePath}}` (`imgUrl`; respons juga berisi link lengkap di `url`).
 
@@ -225,7 +232,7 @@ Mengaktifkan / menonaktifkan akun dan produk: `PATCH /api/approvals/:id?type=use
 | type | siapa yang bisa | dampak |
 |---|---|---|
 | `user` | disnakertrans → akun admin; admin → akun tenant | akun yang tidak aktif tidak bisa login, dan langsung diputus dari realtime |
-| `product` | hanya admin | produk aktif tampil di halaman landing |
+| `product` | disnakertrans, admin | produk aktif tampil di halaman landing |
 
 Superadmin **hanya membaca** dan tidak bisa mengaktifkan apa pun (akun disnakertrans yang dibuatnya langsung aktif). Setiap penonaktifan akun memberi tahu superadmin (`USER_DEACTIVATED`).
 
@@ -236,8 +243,8 @@ Setiap approval memiliki `type` (`user` = approval akun, `product` = approval pr
 
 disnakertrans mengaktifkan/menonaktifkan akun **admin**; admin mengaktifkan/menonaktifkan akun **tenant**. Memakai `{{userId}}` / `{{userRole}}` yang disimpan oleh request Register. Menonaktifkan akun mengakhiri sesi user tersebut (`session:ended`, reason `deactivated`) dan memberi tahu superadmin.
 
-=== REQ Activate / Deactivate Product (admin) => Aktifkan / Nonaktifkan Produk
-Menyetujui produk (tampil di halaman landing) atau menurunkannya. Pemilik menerima `PRODUCT_APPROVED`; admin menerima `PRODUCT_PUBLISHED`; penonaktifan memberi tahu superadmin.
+=== REQ Activate / Deactivate Product (disnakertrans, admin) => Aktifkan / Nonaktifkan Produk
+Menyetujui produk (tampil di halaman landing) atau menurunkannya. Pemilik menerima `PRODUCT_APPROVED`; admin dan disnakertrans menerima `PRODUCT_PUBLISHED`; penonaktifan (oleh keduanya) memberi tahu superadmin.
 
 Respons menyertakan pemilik produk:
 ```json
@@ -246,7 +253,9 @@ Respons menyertakan pemilik produk:
 ```
 
 === FOLDER Products => Produk
-Tenant mengelola produknya sendiri; superadmin, disnakertrans, dan admin membaca semua produk. Produk baru awalnya **tidak aktif** dan menunggu admin (*Persetujuan → Aktifkan / Nonaktifkan Produk*).
+Tenant mengelola produknya sendiri; superadmin, disnakertrans, dan admin membaca semua produk. Produk baru awalnya **tidak aktif** dan menunggu admin atau disnakertrans (*Persetujuan → Aktifkan / Nonaktifkan Produk*).
+
+`price` adalah harga dalam Rupiah (bilangan bulat; menggantikan `qty`). `isRecommended` (true/false, bawaan false) diatur oleh tenant: produk rekomendasi tampil di rekomendasi halaman landing (`GET /api/landing/products?recommended=true`). Setiap produk memiliki `ratingAverage` (1 desimal, `null` jika belum ada ulasan) dan `reviewCount` dari ulasan publiknya.
 
 === REQ List Products (All roles) => Daftar Produk
 superadmin/disnakertrans/admin: semua produk. tenant: hanya produk miliknya. Filter `isActive` opsional (mis. `false` = menunggu persetujuan).
@@ -255,19 +264,36 @@ superadmin/disnakertrans/admin: semua produk. tenant: hanya produk miliknya. Fil
 Tenant mendapat 404 untuk produk yang bukan miliknya.
 
 === REQ Create Product (tenant) => Buat Produk
-Unggah gambarnya dulu (*Gambar → Unggah Gambar*); `imageId` wajib diisi. Menyimpan `{{productId}}`. Superadmin dan admin menerima `PRODUCT_SUBMITTED`, tenant menerima `PRODUCT_UNDER_REVIEW`.
+Profil tenant Anda harus **lengkap** terlebih dahulu (*Tenant → Buat Profil Tenant Saya*); jika belum, 403 `TENANT_PROFILE_INCOMPLETE` dengan `details.missingFields`. Unggah gambarnya dulu (*Gambar → Unggah Gambar*); `imageId` wajib diisi. Menyimpan `{{productId}}`. Superadmin, admin, dan disnakertrans menerima `PRODUCT_SUBMITTED`, tenant menerima `PRODUCT_UNDER_REVIEW`.
 
 === REQ Update Product (tenant) => Ubah Produk
-Hanya produk milik sendiri. Kirim salah satu dari `name`, `description`, `details`, `qty`, `imageId`. Aktivasi tidak bisa diubah di sini. Jika `imageId` diganti, gambar lama beserta filenya dihapus.
+Hanya produk milik sendiri. Kirim salah satu dari `name`, `description`, `details`, `price`, `isRecommended`, `imageId`. Aktivasi tidak bisa diubah di sini. Admin dan disnakertrans menerima `PRODUCT_UPDATED`. Jika `imageId` diganti, gambar lama beserta filenya dihapus.
 
 === REQ Delete Product (tenant) => Hapus Produk
 Hanya produk milik sendiri. Approval dan gambarnya ikut dihapus.
 
 === FOLDER Landing => Landing
-Halaman publik untuk pengunjung.
+Halaman publik untuk pengunjung: tanpa token, tanpa data pribadi (tanpa email/telepon pemilik, tanpa alasan approval). Hanya produk yang **sudah disetujui** dan UMKM yang akun pemiliknya aktif yang ditampilkan.
+
+**Ulasan** juga publik: siapa pun dapat membaca dan menulis ulasan tanpa login (`name`, `stars` 1–5, `review`), hanya untuk produk yang sudah disetujui. Maksimal 5 ulasan per pengunjung (IP) per 10 menit (429 `TOO_MANY_REQUESTS`). Produk memiliki `ratingAverage` (1 desimal, `null` jika belum ada ulasan) dan `reviewCount`; UMKM memiliki `productCount`, `ratingAverage`, dan `reviewCount` dari produknya yang sudah disetujui.
 
 === REQ Landing Products (Public) => Produk Landing
-Hanya produk aktif (sudah disetujui), tanpa data pribadi (tanpa email/telepon pemilik, tanpa alasan approval).
+Hanya produk yang sudah disetujui, terbaru di atas. Opsional `recommended=true` (produk rekomendasi tenant) dan `tenantId` (produk satu pemilik). `tenant.tenant` pada setiap produk adalah profil UMKM pemiliknya (`id`, `name`) untuk *Detail UMKM Landing*.
+
+=== REQ Landing Product (Public) => Detail Produk Landing
+Satu produk yang sudah disetujui beserta `ratingAverage` / `reviewCount`. 404 untuk produk yang tidak ada atau belum disetujui.
+
+=== REQ List Reviews (Public) => Daftar Ulasan
+Ulasan sebuah produk, terbaru di atas. `meta.ratingAverage` dan `meta.reviewCount` untuk ringkasan bintang.
+
+=== REQ Create Review (Public) => Tulis Ulasan
+Tanpa login. `name` (maks. 100), `stars` (bilangan bulat 1–5), `review` (maks. 1000). Hanya untuk produk yang sudah disetujui. Mengembalikan ulasan beserta `meta.ratingAverage` / `meta.reviewCount` terbaru produk tersebut. Maksimal 5 per pengunjung per 10 menit (429).
+
+=== REQ Landing Tenants (Public) => Daftar UMKM Landing
+UMKM (profil tenant) yang akun pemiliknya aktif, urut A→Z, masing-masing dengan kategori, logo, `productCount` (produk yang sudah disetujui), `ratingAverage`, dan `reviewCount`. Opsional `q` (cari nama) dan `tenantCategoryId`. Menyimpan yang pertama sebagai `{{tenantProfileId}}`.
+
+=== REQ Landing Tenant (Public) => Detail UMKM Landing
+Satu UMKM beserta ringkasannya. Id boleh berupa id profil **atau id user pemiliknya** (`product.tenant.id`), sehingga halaman produk dapat langsung menautkan ke UMKM-nya. Produknya: *Produk Landing* dengan `tenantId` = `userId`.
 
 === FOLDER Tenant Categories => Kategori Tenant
 Kategori untuk profil tenant (mis. Kuliner, Fashion). Dikelola oleh admin; superadmin dan tenant dapat membacanya (hanya membaca). Tenant memilih salah satunya untuk profil tenantnya (`tenantCategoryId`).
@@ -289,10 +315,10 @@ Kategori yang masih dipakai oleh profil tenant tidak bisa dihapus (409 `STILL_IN
 Profil tenant (toko). User tenant mengelola profil **miliknya sendiri** di `/api/tenants/me`; superadmin, disnakertrans, dan admin membaca semua profil.
 
 === REQ Get My Tenant (tenant) => Profil Tenant Saya
-404 jika Anda belum membuat profil.
+404 jika Anda belum membuat profil. `isComplete` / `missingFields`: produk baru dapat dibuat setelah semua field wajib terisi (mis. `instagramLink` pada profil yang dibuat sebelum field ini ada).
 
 === REQ Create My Tenant (tenant) => Buat Profil Tenant Saya
-Satu profil per tenant. Wajib: semua field kecuali `name` (bawaan: tenantName Anda). `logoId`: unggah logo dulu. `tenantCategoryId` (**wajib**): kategori tenant, dibuat oleh admin (*Kategori Tenant → Buat*). Menyimpan `{{tenantProfileId}}`.
+Satu profil per tenant. Wajib: semua field kecuali `name` (bawaan: tenantName Anda), termasuk `instagramLink`. `logoId`: unggah logo dulu. `tenantCategoryId` (**wajib**): kategori tenant, dibuat oleh admin (*Kategori Tenant → Buat*). Menyimpan `{{tenantProfileId}}`.
 
 === REQ Update My Tenant (tenant) => Ubah Profil Tenant Saya
 Kirim hanya field yang ingin diubah. Admin menerima `TENANT_PROFILE_UPDATED`. Jika `logoId` diganti, logo lama beserta filenya dihapus.
@@ -312,11 +338,11 @@ Notifikasi untuk setiap role (`/api/notifications`, Bearer `{{token}}`). Notifik
 |---|---|---|
 | `USER_REGISTERED` | superadmin | setiap akun baru (disnakertrans, admin, tenant) |
 | `ADMIN_PENDING_ACTIVATION` | disnakertrans | admin baru mendaftar (perlu diaktifkan) |
-| `PRODUCT_SUBMITTED` | superadmin, admin | tenant membuat produk |
+| `PRODUCT_SUBMITTED` | superadmin, admin, disnakertrans | tenant membuat produk |
 | `USER_DEACTIVATED` | superadmin | disnakertrans atau admin menonaktifkan akun user |
-| `PRODUCT_DEACTIVATED` | superadmin | admin menonaktifkan produk |
-| `PRODUCT_PUBLISHED` | admin | admin mengaktifkan produk (kini tampil di landing) |
-| `PRODUCT_UPDATED` | admin | tenant mengubah produk |
+| `PRODUCT_DEACTIVATED` | superadmin | admin atau disnakertrans menonaktifkan produk |
+| `PRODUCT_PUBLISHED` | admin, disnakertrans | admin atau disnakertrans mengaktifkan produk (kini tampil di landing) |
+| `PRODUCT_UPDATED` | admin, disnakertrans | tenant mengubah produk |
 | `TENANT_PROFILE_UPDATED` | admin | tenant mengubah profil tenantnya |
 | `TENANT_REGISTERED` | admin | tenant baru mendaftar |
 | `PRODUCT_UNDER_REVIEW` | tenant (pemilik) | tenant membuat produk |

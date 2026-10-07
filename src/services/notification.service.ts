@@ -1,5 +1,5 @@
 import { Op, fn, col } from 'sequelize';
-import { ROLES, type Role } from '../constants/roles';
+import { PRODUCT_APPROVER_ROLES, ROLES, type Role } from '../constants/roles';
 import { NOTIFICATION_TYPES as T, type NotificationEntityType, type NotificationType } from '../constants/notifications';
 import { REALTIME_EVENTS as E } from '../constants/realtime';
 import { HttpError } from '../errors/HttpError';
@@ -71,8 +71,8 @@ async function pushUnreadCount(user: AuthUser) {
   emitToUser(user.id, E.NOTIFICATION_UNREAD_COUNT, { count: await countUnread(user) });
 }
 
-/** Every user with this role gets their own copy. */
-async function toRole(role: Role, payload: Payload) {
+/** Every user with this role (or any of these roles) gets their own copy. */
+async function toRole(role: Role | Role[], payload: Payload) {
   const users = await User.findAll({ where: { role }, attributes: ['id'] });
   await toUsers(users.map((u) => u.id), payload);
 }
@@ -144,7 +144,7 @@ export const notify = {
   disnakertransCreated: (user: NewUser, approvalId: number) =>
     safely('disnakertransCreated', () => userRegisteredToSuperadmins(user, approvalId)),
 
-  /** superadmin + admin: review the new product; tenant: it is under review */
+  /** superadmin: a new product exists; admin + disnakertrans: review it; tenant: it is under review */
   productSubmitted: (
     product: { id: string; name: string; approvalId: number | null },
     owner: { id: string; tenantName?: string | null },
@@ -155,10 +155,10 @@ export const notify = {
       await toRole(ROLES.SUPERADMIN, {
         type: T.PRODUCT_SUBMITTED,
         name: 'New product waiting for approval',
-        description: `${by} created "${product.name}". It waits for an admin to review and activate it.`,
+        description: `${by} created "${product.name}". It waits for an admin or disnakertrans to review and activate it.`,
         ...link,
       });
-      await toRole(ROLES.ADMIN, {
+      await toRole(PRODUCT_APPROVER_ROLES, {
         type: T.PRODUCT_SUBMITTED,
         name: 'New product to review',
         description: `${by} created "${product.name}". Please review and activate it.`,
@@ -172,10 +172,10 @@ export const notify = {
       });
     }),
 
-  /** admin: a tenant changed a product */
+  /** admin + disnakertrans: a tenant changed a product */
   productUpdated: (product: { id: string; name: string }, owner: { tenantName?: string | null }) =>
     safely('productUpdated', () =>
-      toRole(ROLES.ADMIN, {
+      toRole(PRODUCT_APPROVER_ROLES, {
         type: T.PRODUCT_UPDATED,
         name: 'Product updated',
         description: `${owner.tenantName ?? 'A tenant'} updated "${product.name}".`,
@@ -198,8 +198,8 @@ export const notify = {
 
   /**
    * A product's activation changed (only real changes notify, not re-sending the same value).
-   * activated → admin: it is on the landing page; tenant: it is approved.
-   * deactivated by an admin → superadmin.
+   * activated → admin + disnakertrans: it is on the landing page; tenant: it is approved.
+   * deactivated by an admin or disnakertrans → superadmin.
    */
   productActivationChanged: (
     actor: AuthUser,
@@ -209,7 +209,7 @@ export const notify = {
     safely('productActivationChanged', async () => {
       const link = { entityType: 'product' as const, entityId: product.id, approvalId: product.approvalId };
       if (isActive) {
-        await toRole(ROLES.ADMIN, {
+        await toRole(PRODUCT_APPROVER_ROLES, {
           type: T.PRODUCT_PUBLISHED,
           name: 'Product published',
           description: `"${product.name}" was activated by ${actor.email} and is now on the landing page.`,
@@ -221,10 +221,10 @@ export const notify = {
           description: `"${product.name}" was approved and is now visible on the landing page.`,
           ...link,
         });
-      } else if (actor.role === ROLES.ADMIN) {
+      } else if (PRODUCT_APPROVER_ROLES.includes(actor.role)) {
         await toRole(ROLES.SUPERADMIN, {
           type: T.PRODUCT_DEACTIVATED,
-          name: 'Product deactivated by an admin',
+          name: `Product deactivated by ${actor.role === ROLES.ADMIN ? 'an admin' : 'a disnakertrans'}`,
           description: `${actor.email} deactivated the product "${product.name}".`,
           ...link,
         });

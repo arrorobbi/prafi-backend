@@ -7,13 +7,18 @@ const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
 const TEXT_FIELDS = ['name', 'description', 'details'] as const;
-const UPDATABLE_FIELDS: string[] = [...TEXT_FIELDS, 'qty', 'imageId'];
+const UPDATABLE_FIELDS: string[] = [...TEXT_FIELDS, 'price', 'isRecommended', 'imageId'];
+/** Rupiah (IDR); also keeps the value inside the INTEGER column */
+const MAX_PRICE = 2_000_000_000;
 const LOCKED_FIELDS: Record<string, string> = {
   id: 'id tidak dapat diubah',
   tenantId: 'produk selalu dimiliki oleh tenant yang membuatnya',
   approvalId: 'approvalId diatur oleh server',
-  approval: 'hanya admin yang dapat mengaktifkan produk (PATCH /api/approvals/:id?type=product)',
-  isActive: 'hanya admin yang dapat mengaktifkan produk (PATCH /api/approvals/:id?type=product)',
+  approval: 'hanya admin atau disnakertrans yang dapat mengaktifkan produk (PATCH /api/approvals/:id?type=product)',
+  isActive: 'hanya admin atau disnakertrans yang dapat mengaktifkan produk (PATCH /api/approvals/:id?type=product)',
+  qty: 'qty sudah tidak dipakai, gunakan price (harga dalam Rupiah)',
+  ratingAverage: 'ratingAverage dihitung dari ulasan',
+  reviewCount: 'reviewCount dihitung dari ulasan',
   createdAt: 'createdAt diatur oleh server',
   updatedAt: 'updatedAt diatur oleh server',
 };
@@ -40,12 +45,20 @@ function parseProductBody(body: Record<string, unknown>, partial: boolean) {
     }
   }
 
-  if (body.qty === undefined) {
-    if (!partial) errors.push({ field: 'qty', message: 'qty wajib diisi' });
-  } else if (!Number.isInteger(body.qty) || (body.qty as number) < 0) {
-    errors.push({ field: 'qty', message: 'qty harus berupa bilangan bulat, minimal 0' });
+  if (body.price === undefined) {
+    if (!partial) errors.push({ field: 'price', message: 'price (harga dalam Rupiah) wajib diisi' });
+  } else if (!Number.isInteger(body.price) || (body.price as number) < 0 || (body.price as number) > MAX_PRICE) {
+    errors.push({ field: 'price', message: 'price harus berupa angka Rupiah tanpa desimal, antara 0 dan 2.000.000.000' });
   } else {
-    input.qty = body.qty as number;
+    input.price = body.price as number;
+  }
+
+  if (body.isRecommended !== undefined) {
+    if (typeof body.isRecommended !== 'boolean') {
+      errors.push({ field: 'isRecommended', message: 'isRecommended harus bernilai true atau false' });
+    } else {
+      input.isRecommended = body.isRecommended;
+    }
   }
 
   if (body.imageId === undefined) {
@@ -93,9 +106,12 @@ export const list: RequestHandler = async (req, res) => {
   res.json({ success: true, data: products, meta });
 };
 
-/** GET /api/landing/products?page=&limit= — public, no login: only products with an active approval. */
+/**
+ * GET /api/landing/products?page=&limit=&recommended=&tenantId= — public, no login: only products with an
+ * active approval. recommended=true: only the ones their tenant recommends; tenantId: one owner's products.
+ */
 export const listPublic: RequestHandler = async (req, res) => {
-  const { page = '1', limit = String(DEFAULT_LIMIT) } = req.query as Record<string, string | undefined>;
+  const { page = '1', limit = String(DEFAULT_LIMIT), recommended, tenantId } = req.query as Record<string, string | undefined>;
 
   const errors: FieldError[] = [];
   const pageNum = Number(page);
@@ -104,10 +120,26 @@ export const listPublic: RequestHandler = async (req, res) => {
   if (!Number.isInteger(limitNum) || limitNum < 1 || limitNum > MAX_LIMIT) {
     errors.push({ field: 'limit', message: `limit harus berupa bilangan bulat antara 1 dan ${MAX_LIMIT}` });
   }
+  if (recommended !== undefined && recommended !== 'true' && recommended !== 'false') {
+    errors.push({ field: 'recommended', message: 'recommended harus bernilai true atau false' });
+  }
+  if (tenantId !== undefined && !UUID_RE.test(tenantId)) {
+    errors.push({ field: 'tenantId', message: 'tenantId harus berupa UUID yang valid (id pemilik produk)' });
+  }
   if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);
 
-  const { products, meta } = await productService.listActive({ page: pageNum, limit: limitNum });
+  const { products, meta } = await productService.listActive({
+    page: pageNum,
+    limit: limitNum,
+    recommended: recommended === undefined ? undefined : recommended === 'true',
+    tenantId,
+  });
   res.json({ success: true, data: products, meta });
+};
+
+/** GET /api/landing/products/:id — public: one approved product, with its rating summary. */
+export const getPublic: RequestHandler = async (req, res) => {
+  res.json({ success: true, data: await productService.getActive(parseId(req.params.id)) });
 };
 
 export const getOne: RequestHandler = async (req, res) => {

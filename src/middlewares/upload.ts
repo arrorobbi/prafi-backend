@@ -17,7 +17,15 @@ export const imageUpload = multer({
   limits: { fileSize: MAX_IMAGE_SIZE, files: 1 },
   fileFilter: (_req, file, cb) => {
     if (IMAGE_MIME_TYPES[file.mimetype]) return cb(null, true);
-    cb(HttpError.badRequest(`Hanya gambar ${Object.keys(IMAGE_MIME_TYPES).join(', ')} yang diizinkan`));
+    // e.g. iPhone photos are image/heic: say what was sent, not only what's allowed
+    cb(
+      new HttpError(
+        400,
+        `Format gambar tidak didukung (${file.mimetype || 'tidak diketahui'}). Gunakan JPG, PNG, WEBP, atau GIF`,
+        'UNSUPPORTED_IMAGE_TYPE',
+        { allowed: Object.keys(IMAGE_MIME_TYPES), received: file.mimetype },
+      ),
+    );
   },
 });
 

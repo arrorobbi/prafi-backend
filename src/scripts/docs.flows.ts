@@ -310,12 +310,11 @@ export const FLOWS: Record<string, Chart[]> = {
         start('PATCH /api/approvals/:id?type=product'),
         ...auth(DK_ADMIN),
         check({ en: 'type, UUID id, isActive valid? (no role)', id: 'type, id UUID, isActive valid? (tanpa role)' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
-        check({ en: 'Caller is admin?', id: 'Pemanggil adalah admin?' }, { en: '403 disnakertrans cannot', id: '403 disnakertrans tidak bisa' }),
         check({ en: 'Product exists?', id: 'Produk ada?' }, '404'),
         step(
           { en: 'Save approval (created + linked the first time)', id: 'Simpan approval (dibuat + ditautkan jika belum ada)' },
-          effect({ en: 'Activated → notify admins + the owning tenant', id: 'Diaktifkan → notifikasi ke admin + tenant pemilik' }),
-          effect({ en: 'Deactivated by an admin → notify superadmins', id: 'Dinonaktifkan admin → notifikasi ke superadmin' }),
+          effect({ en: 'Activated → notify admins + disnakertrans + the owning tenant', id: 'Diaktifkan → notifikasi ke admin + disnakertrans + tenant pemilik' }),
+          effect({ en: 'Deactivated → notify superadmins', id: 'Dinonaktifkan → notifikasi ke superadmin' }),
         ),
         end(
           { en: '200 product + approval + owner', id: '200 produk + approval + pemilik' },
@@ -345,17 +344,21 @@ export const FLOWS: Record<string, Chart[]> = {
       nodes: [
         start('POST /api/products'),
         ...auth('tenant'),
-        check({ en: 'Body valid?', id: 'Body valid?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
+        check(
+          { en: 'Tenant profile complete? (every required field, incl. Instagram)', id: 'Profil tenant lengkap? (semua field wajib, termasuk Instagram)' },
+          { en: '403 TENANT_PROFILE_INCOMPLETE + missingFields', id: '403 TENANT_PROFILE_INCOMPLETE + missingFields' },
+        ),
+        check({ en: 'Body valid? (price in rupiah, isRecommended)', id: 'Body valid? (price dalam Rupiah, isRecommended)' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
         check({ en: '`imageId` exists?', id: '`imageId` ada?' }, { en: '400 upload it first: POST /api/images', id: '400 unggah dulu: POST /api/images' }),
         check({ en: 'Image not used by another product?', id: 'Gambar belum dipakai produk lain?' }, '409 Conflict'),
         step(
           { en: 'Create product + approval (inactive)', id: 'Buat produk + approval (tidak aktif)' },
-          effect({ en: 'Notify superadmins + admins: review it', id: 'Notifikasi ke superadmin + admin: tinjau' }),
+          effect({ en: 'Notify superadmins + admins + disnakertrans: review it', id: 'Notifikasi ke superadmin + admin + disnakertrans: tinjau' }),
           effect({ en: 'Notify you: under review', id: 'Notifikasi ke Anda: sedang ditinjau' }),
         ),
         end(
           { en: '201 product', id: '201 produk' },
-          note({ en: 'On the landing page once an admin activates it', id: 'Tampil di landing setelah diaktifkan admin' }),
+          note({ en: 'On the landing page once an admin or disnakertrans activates it', id: 'Tampil di landing setelah diaktifkan admin atau disnakertrans' }),
         ),
       ],
     },
@@ -369,7 +372,7 @@ export const FLOWS: Record<string, Chart[]> = {
         step(
           { en: 'Save changes', id: 'Simpan perubahan' },
           effect({ en: 'Replaced image: record + file deleted', id: 'Gambar lama: data + file dihapus' }),
-          effect({ en: 'Notify admins: product updated', id: 'Notifikasi ke admin: produk diubah' }),
+          effect({ en: 'Notify admins + disnakertrans: product updated', id: 'Notifikasi ke admin + disnakertrans: produk diubah' }),
         ),
         end({ en: '200 product', id: '200 produk' }),
       ],
@@ -397,7 +400,38 @@ export const FLOWS: Record<string, Chart[]> = {
         step({ en: 'No token needed', id: 'Tanpa token' }),
         step({ en: 'Only products whose approval is active', id: 'Hanya produk dengan approval aktif' }),
         step({ en: 'Public fields only (no owner email/phone, no reason)', id: 'Hanya field publik (tanpa email/telepon pemilik, tanpa reason)' }),
-        end({ en: '200 paginated list, newest first', id: '200 daftar berhalaman, terbaru dulu' }),
+        step({ en: 'Optional: ?recommended=true, ?tenantId=', id: 'Opsional: ?recommended=true, ?tenantId=' }),
+        end(
+          { en: '200 paginated list, newest first', id: '200 daftar berhalaman, terbaru dulu' },
+          note({ en: 'Each with ratingAverage + reviewCount', id: 'Masing-masing dengan ratingAverage + reviewCount' }),
+        ),
+      ],
+    },
+    {
+      title: { en: 'Reviews', id: 'Ulasan' },
+      nodes: [
+        start('GET · POST /api/landing/products/:id/reviews'),
+        step({ en: 'No token needed', id: 'Tanpa token' }),
+        check({ en: 'Product approved?', id: 'Produk sudah disetujui?' }, '404'),
+        check({ en: 'POST: name, stars 1-5, review valid?', id: 'POST: name, stars 1-5, review valid?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
+        check({ en: 'POST: under 5 reviews per visitor in 10 min?', id: 'POST: kurang dari 5 ulasan per pengunjung dalam 10 menit?' }, '429 TOO_MANY_REQUESTS'),
+        end(
+          { en: '200 reviews / 201 review', id: '200 ulasan / 201 ulasan' },
+          note({ en: 'meta: the product\'s ratingAverage + reviewCount', id: 'meta: ratingAverage + reviewCount produk' }),
+        ),
+      ],
+    },
+    {
+      title: { en: 'Landing Tenants (UMKM)', id: 'UMKM Landing' },
+      nodes: [
+        start('GET /api/landing/tenants[/:id]'),
+        step({ en: 'No token needed', id: 'Tanpa token' }),
+        step({ en: 'Only UMKM whose owner account is active', id: 'Hanya UMKM yang akun pemiliknya aktif' }),
+        check({ en: 'Found? (by profile id or owner user id)', id: 'Ditemukan? (id profil atau id user pemilik)' }, '404'),
+        end(
+          { en: '200 UMKM, A→Z', id: '200 UMKM, urut A→Z' },
+          note({ en: 'productCount, ratingAverage, reviewCount of approved products', id: 'productCount, ratingAverage, reviewCount dari produk yang disetujui' }),
+        ),
       ],
     },
   ],
