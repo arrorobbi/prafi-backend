@@ -51,6 +51,7 @@ const auth = (roles?: Text): Node[] => [
   ...(roles ? [check({ en: `Role is ${pick(roles, 'en')}?`, id: `Role adalah ${pick(roles, 'id')}?` }, '403 Forbidden')] : []),
 ];
 const SA_ADMIN: Text = { en: 'superadmin or admin', id: 'superadmin atau admin' };
+const CATEGORY_READERS: Text = { en: 'superadmin, admin or tenant', id: 'superadmin, admin atau tenant' };
 const DK_ADMIN: Text = { en: 'disnakertrans or admin', id: 'disnakertrans atau admin' };
 const READERS: Text = { en: 'superadmin, disnakertrans or admin', id: 'superadmin, disnakertrans atau admin' };
 const SEND_OTP = effect({ en: 'Email (Bahasa Indonesia): account created + 6-digit OTP, valid 15 min', id: 'Email: akun dibuat + OTP 6 digit, berlaku 15 menit' });
@@ -406,8 +407,8 @@ export const FLOWS: Record<string, Chart[]> = {
       title: { en: 'Manage Tenant Categories', id: 'Kelola Kategori Tenant' },
       nodes: [
         start('GET · POST · PATCH · DELETE /api/tenant-categories'),
-        ...auth(SA_ADMIN),
-        check({ en: 'Changing? (POST, PATCH, DELETE) only admin', id: 'Mengubah? (POST, PATCH, DELETE) hanya admin' }, { en: '403 superadmin is read-only', id: '403 superadmin hanya membaca' }),
+        ...auth(CATEGORY_READERS),
+        check({ en: 'Changing? (POST, PATCH, DELETE) only admin', id: 'Mengubah? (POST, PATCH, DELETE) hanya admin' }, { en: '403 superadmin and tenant only read', id: '403 superadmin dan tenant hanya membaca' }),
         check({ en: 'Category exists? (routes with :id)', id: 'Kategori ada? (route dengan :id)' }, '404'),
         check({ en: 'Name not taken? (POST, PATCH)', id: 'Nama belum dipakai? (POST, PATCH)' }, '409 Conflict'),
         check({ en: 'No tenant uses it? (DELETE)', id: 'Tidak dipakai tenant? (DELETE)' }, '409 STILL_IN_USE'),

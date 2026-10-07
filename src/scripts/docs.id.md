@@ -56,8 +56,8 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Produk | `PATCH /api/products/{{productId}}` | tenant |
 | Produk | `DELETE /api/products/{{productId}}` | tenant |
 | Landing | `GET /api/landing/products` | Publik |
-| Kategori Tenant | `GET /api/tenant-categories` | superadmin, admin |
-| Kategori Tenant | `GET /api/tenant-categories/{{categoryId}}` | superadmin, admin |
+| Kategori Tenant | `GET /api/tenant-categories` | superadmin, admin, tenant |
+| Kategori Tenant | `GET /api/tenant-categories/{{categoryId}}` | superadmin, admin, tenant |
 | Kategori Tenant | `POST /api/tenant-categories` | admin |
 | Kategori Tenant | `PATCH /api/tenant-categories/{{categoryId}}` | admin |
 | Kategori Tenant | `DELETE /api/tenant-categories/{{categoryId}}` | admin |
@@ -270,12 +270,12 @@ Halaman publik untuk pengunjung.
 Hanya produk aktif (sudah disetujui), tanpa data pribadi (tanpa email/telepon pemilik, tanpa alasan approval).
 
 === FOLDER Tenant Categories => Kategori Tenant
-Kategori untuk profil tenant (mis. Kuliner, Fashion). Dikelola oleh admin; superadmin dapat membacanya (hanya membaca).
+Kategori untuk profil tenant (mis. Kuliner, Fashion). Dikelola oleh admin; superadmin dan tenant dapat membacanya (hanya membaca). Tenant memilih salah satunya untuk profil tenantnya (`tenantCategoryId`).
 
-=== REQ List Tenant Categories (superadmin, admin) => Daftar Kategori Tenant
+=== REQ List Tenant Categories (superadmin, admin, tenant) => Daftar Kategori Tenant
 Diurutkan berdasarkan nama.
 
-=== REQ Get Tenant Category (superadmin, admin) => Detail Kategori Tenant
+=== REQ Get Tenant Category (superadmin, admin, tenant) => Detail Kategori Tenant
 
 === REQ Create Tenant Category (admin) => Buat Kategori Tenant
 Nama harus unik. Menyimpan `{{categoryId}}`.

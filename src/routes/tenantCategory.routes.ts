@@ -9,7 +9,7 @@ const router = Router();
 // Every /:id route below: missing, blank, "null" or "undefined" id → 400 "ID not provided"
 router.param('id', requireIdParam);
 
-// Read: superadmin (read-only) and admin. Write: admin only
+// Read: superadmin (read-only), admin, and tenants (to pick their profile's category). Write: admin only
 const read = [authenticate, authorize(...TENANT_CATEGORY_READER_ROLES)];
 const write = [authenticate, authorize(...TENANT_CATEGORY_MANAGER_ROLES)];
 

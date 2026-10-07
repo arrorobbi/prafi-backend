@@ -86,8 +86,8 @@ export const TENANT_OWNER_ROLES: Role[] = [ROLES.TENANT];
 /** Roles that can read every tenant profile (GET /api/tenants, GET /api/tenants/:id). */
 export const TENANT_READ_ALL_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.DISNAKERTRANS, ROLES.ADMIN];
 
-/** Roles that read tenant categories (the superadmin is read-only). */
-export const TENANT_CATEGORY_READER_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.ADMIN];
+/** Roles that read tenant categories (the superadmin is read-only; tenants pick one for their tenant profile). */
+export const TENANT_CATEGORY_READER_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.TENANT];
 
 /** Roles that create/update/delete tenant categories. */
 export const TENANT_CATEGORY_MANAGER_ROLES: Role[] = [ROLES.ADMIN];
