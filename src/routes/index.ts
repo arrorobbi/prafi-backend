@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { ALL_ROLES, ROLES } from '../constants/roles';
 import { authenticate, authorize } from '../middlewares/auth';
+import apiLogRoutes from './apiLog.routes';
 import approvalRoutes from './approval.routes';
 import authRoutes from './auth.routes';
 import imageRoutes from './image.routes';
@@ -26,6 +27,7 @@ router.use('/tenants', tenantRoutes);
 router.use('/tenant-categories', tenantCategoryRoutes);
 router.use('/landing', landingRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/logs', apiLogRoutes);
 
 // Example of role-protected routes — replace with real feature routes
 router.get('/admin/ping', authenticate, authorize(ROLES.SUPERADMIN, ROLES.ADMIN), (req, res) => {

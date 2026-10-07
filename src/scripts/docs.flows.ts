@@ -500,6 +500,35 @@ export const FLOWS: Record<string, Chart[]> = {
     },
   ],
 
+  Logs: [
+    {
+      title: { en: 'How a request is logged', id: 'Cara permintaan dicatat' },
+      nodes: [
+        start({ en: 'Any request reaches the API', id: 'Permintaan apa pun masuk ke API' }),
+        step({ en: 'Handled as usual (success or error)', id: 'Diproses seperti biasa (berhasil atau error)' }),
+        step(
+          { en: 'Response sent → one row in api_logs', id: 'Respons terkirim → satu baris di api_logs' },
+          note({ en: 'No body; token/otp/password in the query saved as ***', id: 'Tanpa body; token/otp/password di query disimpan sebagai ***' }),
+          note({ en: '5xx also keeps the real stack trace', id: '5xx juga menyimpan stack trace aslinya' }),
+        ),
+        end(
+          { en: 'Done', id: 'Selesai' },
+          note({ en: 'A failed log write never fails the request', id: 'Gagal menyimpan log tidak menggagalkan permintaan' }),
+        ),
+      ],
+    },
+    {
+      title: { en: 'Read the logs', id: 'Membaca log' },
+      nodes: [
+        start('/api/logs…'),
+        ...auth('superadmin'),
+        check({ en: 'Filters valid? (level, method, status, dates…)', id: 'Filter valid? (level, method, status, tanggal…)' }, '400 Validasi gagal'),
+        check({ en: 'Log exists? (GET /api/logs/:id)', id: 'Log ada? (GET /api/logs/:id)' }, '404'),
+        end({ en: '200 logs, newest first', id: '200 log, terbaru di atas' }),
+      ],
+    },
+  ],
+
   'Realtime (WebSocket)': [
     {
       title: { en: 'Socket.IO connection', id: 'Koneksi Socket.IO' },

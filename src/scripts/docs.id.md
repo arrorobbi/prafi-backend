@@ -72,12 +72,14 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Notifikasi | `PATCH /api/notifications/{{notificationId}}/read` | Semua role |
 | Notifikasi | `PATCH /api/notifications/read-all` | Semua role |
 | Notifikasi | `DELETE /api/notifications/{{notificationId}}` | Semua role |
+| Log | `GET /api/logs` | superadmin |
+| Log | `GET /api/logs/{{logId}}` | superadmin |
 | Contoh | `GET /api/admin/ping` | superadmin, admin |
 | Contoh | `GET /api/tenant/ping` | Semua role |
 | Realtime (WebSocket) | Socket.IO di `{{baseUrl}}` | Semua role (Bearer token) |
 
 ## Variabel yang disimpan
-Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `tenantCategoryId` · `tenantProfileId` · `notificationId`. Setiap penyimpanan dicetak di Postman Console.
+Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `tenantCategoryId` · `tenantProfileId` · `notificationId` · `logId`. Setiap penyimpanan dicetak di Postman Console.
 
 ## Contoh alur
 1. **Login** sebagai superadmin → **Register Disnakertrans** → **Verify Email Link** (atau buka link dari email).
@@ -342,6 +344,21 @@ Notifikasi milik Anda, terbaru di atas. `meta.unreadCount` untuk badge. Menyimpa
 Mengembalikan `{ updated }` (jumlah yang ditandai).
 
 === REQ Delete Notification (All roles) => Hapus Notifikasi
+
+=== FOLDER Logs => Log
+Log permintaan dan error API (`/api/logs`, Bearer `{{token}}`), **hanya superadmin**, hanya-baca.
+
+Setiap permintaan menghasilkan satu baris saat responsnya dikirim: `method`, `path`, `query`, `statusCode`, `durationMs`, `level` (`info` < 400, `warn` 4xx, `error` 5xx), siapa yang memanggil (`userId`, `userEmail`, `userRole`; null untuk tamu), `ip`, `userAgent`. Permintaan yang gagal juga menyimpan error yang diterima klien (`errorCode`, `errorMessage`, `errorDetails`); error 5xx juga menyimpan stack trace error aslinya di `errorStack` (hanya di *Get Log*; klien tidak pernah melihatnya).
+
+- Body permintaan tidak pernah disimpan, dan nilai query rahasia (`token`, `otp`, `password`, `code`) disimpan sebagai `***`.
+- Tidak disimpan: permintaan ke `/api/logs` sendiri, serta file `/images/…` dan `/docs` yang berhasil (yang gagal tetap disimpan).
+- Baris yang lebih lama dari `LOG_RETENTION_DAYS` (bawaan 30 hari) dihapus setiap hari.
+
+=== REQ List Logs (superadmin) => Daftar Log
+Terbaru di atas, berhalaman (`limit` maksimal 100). Semua filter opsional dan dapat digabung. Tanpa `errorStack`. Menyimpan log terbaru sebagai `{{logId}}`.
+
+=== REQ Get Log (superadmin) => Detail Log
+Satu log lengkap, termasuk `errorStack` untuk error 5xx. 404 jika tidak ada (atau sudah dihapus).
 
 === FOLDER Realtime (WebSocket) => Realtime (WebSocket)
 Notifikasi realtime melalui **Socket.IO** (host dan port yang sama dengan API).

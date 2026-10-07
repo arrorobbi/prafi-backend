@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Prafi API",
-    "description": "Backend API for Prafi (Express + Sequelize + PostgreSQL), with realtime notifications over Socket.IO and emails (nodemailer).\n\n## Setup (once)\n1. Import this collection and `Prafi-Local.postman_environment.json`, then select **Prafi Local** (environment dropdown, top right).\n2. In **Prafi Local** set `loginEmail` / `loginPassword` (Current value) to the superadmin from `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`), then Ctrl+S.\n3. Start the server (`npm run dev` or `npm run build && npm start`). `baseUrl` is `http://localhost:4000`.\n4. Email: set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` in `.env` to send real emails. Set `FRONTEND_URL` to the frontend's address: the forgot-password email links to `<FRONTEND_URL>/reset-password`. Without `SMTP_HOST` (development) emails are printed in the server log and the OTP / activation token is returned in `meta.verification` and saved as `{{otp}}` / `{{verifyToken}}`.\n\n## Login and roles\n- Every request uses **Bearer `{{token}}`** (set on the collection; requests inherit it). Public requests have *No Auth*.\n- **Auth → Login** saves the token to `{{token}}` (valid **1 hour**). To switch role, change `loginEmail` / `loginPassword` (or the Login body) and send Login again.\n- The **name of each request says who can call it**: `(All roles)` = superadmin, disnakertrans, admin and tenant; `(superadmin, disnakertrans, admin)`, `(admin)`, `(tenant)`… = only those roles; `(Public)` = no login. Any other role gets **403**.\n- Every account must have a **verified email** (`mailActive: true`) and an **active approval** (`approval.isActive: true`) to log in and use the API.\n\n| role | created by | email verification | approval at start | can |\n|---|---|---|---|---|\n| superadmin | seed (`npm run db:seed`) | already verified | active | create disnakertrans accounts; **read-only** for everything else (users, products, tenants, tenant categories); notified of every new account and product |\n| disnakertrans | superadmin (*Register Disnakertrans*) | activation link (24 h) | active | view and activate/deactivate **admin** accounts, view all products and tenants |\n| admin | self sign-up (*Register Admin*) | OTP (15 min) | **inactive** until a disnakertrans activates it | activate tenant accounts **and products**, read users (tenants)/products/tenants, manage tenant categories |\n| tenant | self sign-up (*Register Tenant*) | OTP (15 min) | active | manage their own products and tenant profile |\n\n## Endpoints\n| folder | endpoint | access |\n|---|---|---|\n| Health | `GET /api/health` | Public |\n| Auth | `POST /api/auth/login` | Public |\n| Auth | `POST /api/auth/logout` | All roles |\n| Auth | `POST /api/auth/register/disnakertrans` | superadmin |\n| Auth | `POST /api/auth/register/admin` | Public |\n| Auth | `POST /api/auth/register/tenant` | Public |\n| Auth | `POST /api/auth/verify-otp/{{userId}}` | Public |\n| Auth | `GET /api/auth/verify-email/{{userId}}` | Public |\n| Auth | `POST /api/auth/resend-verification/{{userId}}` | Public |\n| Auth | `POST /api/auth/forgot-password` | Public |\n| Auth | `POST /api/auth/reset-password/check` | Public |\n| Auth | `POST /api/auth/reset-password` | Public |\n| Auth | `GET /api/auth/me` | All roles |\n| Auth | `PATCH /api/auth/me` | All roles |\n| Images | `POST /api/images` | All roles |\n| Images | `GET {{imagePath}}` | Public |\n| Images | `DELETE /api/images/{{imageId}}` | tenant |\n| Users | `GET /api/users` | superadmin, disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{userId}}` | disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{productId}}` | admin |\n| Products | `GET /api/products` | All roles |\n| Products | `GET /api/products/{{productId}}` | All roles |\n| Products | `POST /api/products` | tenant |\n| Products | `PATCH /api/products/{{productId}}` | tenant |\n| Products | `DELETE /api/products/{{productId}}` | tenant |\n| Landing | `GET /api/landing/products` | Public |\n| Tenant Categories | `GET /api/tenant-categories` | superadmin, admin |\n| Tenant Categories | `GET /api/tenant-categories/{{categoryId}}` | superadmin, admin |\n| Tenant Categories | `POST /api/tenant-categories` | admin |\n| Tenant Categories | `PATCH /api/tenant-categories/{{categoryId}}` | admin |\n| Tenant Categories | `DELETE /api/tenant-categories/{{categoryId}}` | admin |\n| Tenants | `GET /api/tenants/me` | tenant |\n| Tenants | `POST /api/tenants/me` | tenant |\n| Tenants | `PATCH /api/tenants/me` | tenant |\n| Tenants | `DELETE /api/tenants/me` | tenant |\n| Tenants | `GET /api/tenants` | superadmin, disnakertrans, admin |\n| Tenants | `GET /api/tenants/{{tenantProfileId}}` | superadmin, disnakertrans, admin |\n| Notifications | `GET /api/notifications` | All roles |\n| Notifications | `GET /api/notifications/unread-count` | All roles |\n| Notifications | `PATCH /api/notifications/{{notificationId}}/read` | All roles |\n| Notifications | `PATCH /api/notifications/read-all` | All roles |\n| Notifications | `DELETE /api/notifications/{{notificationId}}` | All roles |\n| Examples | `GET /api/admin/ping` | superadmin, admin |\n| Examples | `GET /api/tenant/ping` | All roles |\n| Realtime (WebSocket) | Socket.IO at `{{baseUrl}}` | All roles (Bearer token) |\n\n## Saved variables\nRequests save what the next ones need: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `tenantCategoryId` · `tenantProfileId` · `notificationId`. Each save is printed in the Postman Console.\n\n## Example walkthrough\n1. **Login** as superadmin → **Register Disnakertrans** → **Verify Email Link** (or open the link from the email).\n2. **Register Admin** → **Verify OTP** (code from the email, or `{{otp}}` in development).\n3. Set `loginEmail` = the disnakertrans email, `loginPassword` = `{{newUserPassword}}` → **Login** → **Activate / Deactivate User** with `userId` = the admin's id and `userRole` = `admin`.\n4. **Login** as the admin → **Create Tenant Category**.\n5. **Register Tenant** → **Verify OTP** → **Login** as the tenant → **Upload Image** → **Create My Tenant** → **Upload Image** again → **Create Product**.\n6. **Login** as the admin → **List Notifications** → **Activate / Deactivate Product** → **Landing Products** shows it.\n\n## Responses\n- Success: `{ \"success\": true, \"data\": …, \"meta\"?: { page, limit, total, totalPages } | { verification } }`\n- Error: `{ \"success\": false, \"error\": { \"code\", \"message\", \"details\"? } }`\n- `message` and `details[].message` are in **Bahasa Indonesia** (ready to show in the frontend). `code` and `field` stay in English; frontend logic should switch on `code`.\n\n| status | code (examples) | meaning |\n|---|---|---|\n| 400 | `VALIDATION_ERROR`, `BAD_REQUEST`, `ID_NOT_PROVIDED` | invalid input (`details` lists the fields) |\n| 400 | `OTP_INVALID`, `OTP_EXPIRED`, `LINK_INVALID`, `LINK_EXPIRED`, `RESET_LINK_INVALID`, `RESET_LINK_EXPIRED` | wrong or expired verification code / link / password reset link |\n| 401 | `UNAUTHORIZED` | no/invalid/expired/logged-out token, or the password was reset → log in again |\n| 403 | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `USER_NOT_ACTIVATED` | wrong role, email not verified yet, or account not activated |\n| 404 | `NOT_FOUND` | not found, or not yours |\n| 409 | `UNIQUE_CONSTRAINT`, `STILL_IN_USE`, `CONFLICT`, `EMAIL_ALREADY_VERIFIED` | duplicate value, record still in use, already verified |\n| 413 | `FILE_TOO_LARGE` | image over 5 MB |\n| 429 | `TOO_MANY_REQUESTS` | a new verification code was requested less than 60 seconds ago |\n\n## Notifications and realtime\nEvery role gets notifications for the events that concern them (see **Notifications**); activation notifications include the `approval` with `userId` and the `user`. They arrive live over Socket.IO as `notification:new` (see **Realtime (WebSocket)** for connecting in Postman and in the frontend).",
+    "description": "Backend API for Prafi (Express + Sequelize + PostgreSQL), with realtime notifications over Socket.IO and emails (nodemailer).\n\n## Setup (once)\n1. Import this collection and `Prafi-Local.postman_environment.json`, then select **Prafi Local** (environment dropdown, top right).\n2. In **Prafi Local** set `loginEmail` / `loginPassword` (Current value) to the superadmin from `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`), then Ctrl+S.\n3. Start the server (`npm run dev` or `npm run build && npm start`). `baseUrl` is `http://localhost:4000`.\n4. Email: set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` in `.env` to send real emails. Set `FRONTEND_URL` to the frontend's address: the forgot-password email links to `<FRONTEND_URL>/reset-password`. Without `SMTP_HOST` (development) emails are printed in the server log and the OTP / activation token is returned in `meta.verification` and saved as `{{otp}}` / `{{verifyToken}}`.\n\n## Login and roles\n- Every request uses **Bearer `{{token}}`** (set on the collection; requests inherit it). Public requests have *No Auth*.\n- **Auth → Login** saves the token to `{{token}}` (valid **1 hour**). To switch role, change `loginEmail` / `loginPassword` (or the Login body) and send Login again.\n- The **name of each request says who can call it**: `(All roles)` = superadmin, disnakertrans, admin and tenant; `(superadmin, disnakertrans, admin)`, `(admin)`, `(tenant)`… = only those roles; `(Public)` = no login. Any other role gets **403**.\n- Every account must have a **verified email** (`mailActive: true`) and an **active approval** (`approval.isActive: true`) to log in and use the API.\n\n| role | created by | email verification | approval at start | can |\n|---|---|---|---|---|\n| superadmin | seed (`npm run db:seed`) | already verified | active | create disnakertrans accounts; **read-only** for everything else (users, products, tenants, tenant categories); notified of every new account and product |\n| disnakertrans | superadmin (*Register Disnakertrans*) | activation link (24 h) | active | view and activate/deactivate **admin** accounts, view all products and tenants |\n| admin | self sign-up (*Register Admin*) | OTP (15 min) | **inactive** until a disnakertrans activates it | activate tenant accounts **and products**, read users (tenants)/products/tenants, manage tenant categories |\n| tenant | self sign-up (*Register Tenant*) | OTP (15 min) | active | manage their own products and tenant profile |\n\n## Endpoints\n| folder | endpoint | access |\n|---|---|---|\n| Health | `GET /api/health` | Public |\n| Auth | `POST /api/auth/login` | Public |\n| Auth | `POST /api/auth/logout` | All roles |\n| Auth | `POST /api/auth/register/disnakertrans` | superadmin |\n| Auth | `POST /api/auth/register/admin` | Public |\n| Auth | `POST /api/auth/register/tenant` | Public |\n| Auth | `POST /api/auth/verify-otp/{{userId}}` | Public |\n| Auth | `GET /api/auth/verify-email/{{userId}}` | Public |\n| Auth | `POST /api/auth/resend-verification/{{userId}}` | Public |\n| Auth | `POST /api/auth/forgot-password` | Public |\n| Auth | `POST /api/auth/reset-password/check` | Public |\n| Auth | `POST /api/auth/reset-password` | Public |\n| Auth | `GET /api/auth/me` | All roles |\n| Auth | `PATCH /api/auth/me` | All roles |\n| Images | `POST /api/images` | All roles |\n| Images | `GET {{imagePath}}` | Public |\n| Images | `DELETE /api/images/{{imageId}}` | tenant |\n| Users | `GET /api/users` | superadmin, disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{userId}}` | disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{productId}}` | admin |\n| Products | `GET /api/products` | All roles |\n| Products | `GET /api/products/{{productId}}` | All roles |\n| Products | `POST /api/products` | tenant |\n| Products | `PATCH /api/products/{{productId}}` | tenant |\n| Products | `DELETE /api/products/{{productId}}` | tenant |\n| Landing | `GET /api/landing/products` | Public |\n| Tenant Categories | `GET /api/tenant-categories` | superadmin, admin |\n| Tenant Categories | `GET /api/tenant-categories/{{categoryId}}` | superadmin, admin |\n| Tenant Categories | `POST /api/tenant-categories` | admin |\n| Tenant Categories | `PATCH /api/tenant-categories/{{categoryId}}` | admin |\n| Tenant Categories | `DELETE /api/tenant-categories/{{categoryId}}` | admin |\n| Tenants | `GET /api/tenants/me` | tenant |\n| Tenants | `POST /api/tenants/me` | tenant |\n| Tenants | `PATCH /api/tenants/me` | tenant |\n| Tenants | `DELETE /api/tenants/me` | tenant |\n| Tenants | `GET /api/tenants` | superadmin, disnakertrans, admin |\n| Tenants | `GET /api/tenants/{{tenantProfileId}}` | superadmin, disnakertrans, admin |\n| Notifications | `GET /api/notifications` | All roles |\n| Notifications | `GET /api/notifications/unread-count` | All roles |\n| Notifications | `PATCH /api/notifications/{{notificationId}}/read` | All roles |\n| Notifications | `PATCH /api/notifications/read-all` | All roles |\n| Notifications | `DELETE /api/notifications/{{notificationId}}` | All roles |\n| Logs | `GET /api/logs` | superadmin |\n| Logs | `GET /api/logs/{{logId}}` | superadmin |\n| Examples | `GET /api/admin/ping` | superadmin, admin |\n| Examples | `GET /api/tenant/ping` | All roles |\n| Realtime (WebSocket) | Socket.IO at `{{baseUrl}}` | All roles (Bearer token) |\n\n## Saved variables\nRequests save what the next ones need: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `tenantCategoryId` · `tenantProfileId` · `notificationId` · `logId`. Each save is printed in the Postman Console.\n\n## Example walkthrough\n1. **Login** as superadmin → **Register Disnakertrans** → **Verify Email Link** (or open the link from the email).\n2. **Register Admin** → **Verify OTP** (code from the email, or `{{otp}}` in development).\n3. Set `loginEmail` = the disnakertrans email, `loginPassword` = `{{newUserPassword}}` → **Login** → **Activate / Deactivate User** with `userId` = the admin's id and `userRole` = `admin`.\n4. **Login** as the admin → **Create Tenant Category**.\n5. **Register Tenant** → **Verify OTP** → **Login** as the tenant → **Upload Image** → **Create My Tenant** → **Upload Image** again → **Create Product**.\n6. **Login** as the admin → **List Notifications** → **Activate / Deactivate Product** → **Landing Products** shows it.\n\n## Responses\n- Success: `{ \"success\": true, \"data\": …, \"meta\"?: { page, limit, total, totalPages } | { verification } }`\n- Error: `{ \"success\": false, \"error\": { \"code\", \"message\", \"details\"? } }`\n- `message` and `details[].message` are in **Bahasa Indonesia** (ready to show in the frontend). `code` and `field` stay in English; frontend logic should switch on `code`.\n\n| status | code (examples) | meaning |\n|---|---|---|\n| 400 | `VALIDATION_ERROR`, `BAD_REQUEST`, `ID_NOT_PROVIDED` | invalid input (`details` lists the fields) |\n| 400 | `OTP_INVALID`, `OTP_EXPIRED`, `LINK_INVALID`, `LINK_EXPIRED`, `RESET_LINK_INVALID`, `RESET_LINK_EXPIRED` | wrong or expired verification code / link / password reset link |\n| 401 | `UNAUTHORIZED` | no/invalid/expired/logged-out token, or the password was reset → log in again |\n| 403 | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `USER_NOT_ACTIVATED` | wrong role, email not verified yet, or account not activated |\n| 404 | `NOT_FOUND` | not found, or not yours |\n| 409 | `UNIQUE_CONSTRAINT`, `STILL_IN_USE`, `CONFLICT`, `EMAIL_ALREADY_VERIFIED` | duplicate value, record still in use, already verified |\n| 413 | `FILE_TOO_LARGE` | image over 5 MB |\n| 429 | `TOO_MANY_REQUESTS` | a new verification code was requested less than 60 seconds ago |\n\n## Notifications and realtime\nEvery role gets notifications for the events that concern them (see **Notifications**); activation notifications include the `approval` with `userId` and the `user`. They arrive live over Socket.IO as `notification:new` (see **Realtime (WebSocket)** for connecting in Postman and in the frontend).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -5158,6 +5158,135 @@
               "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Notifikasi tidak ditemukan\"\n  }\n}"
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "Logs",
+      "description": "Request and error logs of the API (`/api/logs`, Bearer `{{token}}`), **superadmin only**, read-only.\n\nEvery request gets one row when its response is sent: `method`, `path`, `query`, `statusCode`, `durationMs`, `level` (`info` < 400, `warn` 4xx, `error` 5xx), who made it (`userId`, `userEmail`, `userRole`; null for guests), `ip`, `userAgent`. A failed request also has the error the client got (`errorCode`, `errorMessage`, `errorDetails`); a 5xx also keeps the real error's stack trace in `errorStack` (only in *Get Log*; the client never sees it).\n\n- Request bodies are never stored, and secret query values (`token`, `otp`, `password`, `code`) are saved as `***`.\n- Not stored: requests to `/api/logs` itself, and successful `/images/…` and `/docs` files (their failures are).\n- Rows older than `LOG_RETENTION_DAYS` (default 30) are deleted daily.",
+      "item": [
+        {
+          "name": "List Logs (superadmin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/logs?page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "logs"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "level",
+                  "value": "error",
+                  "disabled": true,
+                  "description": "info (< 400), warn (4xx) or error (5xx)"
+                },
+                {
+                  "key": "method",
+                  "value": "GET",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "4xx",
+                  "disabled": true,
+                  "description": "An exact code (404) or a class (4xx)"
+                },
+                {
+                  "key": "path",
+                  "value": "/api/tenants",
+                  "disabled": true,
+                  "description": "Part of the path, case-insensitive"
+                },
+                {
+                  "key": "email",
+                  "value": "admin",
+                  "disabled": true,
+                  "description": "Part of the user's email, case-insensitive"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{currentUserId}}",
+                  "disabled": true
+                },
+                {
+                  "key": "errorCode",
+                  "value": "NOT_FOUND",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2026-10-01",
+                  "disabled": true,
+                  "description": "YYYY-MM-DD or an ISO time"
+                },
+                {
+                  "key": "to",
+                  "value": "2026-10-31",
+                  "disabled": true,
+                  "description": "YYYY-MM-DD (the whole day) or an ISO time"
+                }
+              ]
+            },
+            "description": "**Access:** superadmin\n\nNewest first, paginated (`limit` up to 100). Every filter is optional and they combine. Leaves out `errorStack`. Saves the newest log as `{{logId}}`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200 && pm.response.json().data.length) { pm.environment.set('logId', pm.response.json().data[0].id); console.log('saved {{logId}} = ' + pm.environment.get('logId')); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Get Log (superadmin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/logs/{{logId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "logs",
+                "{{logId}}"
+              ]
+            },
+            "description": "**Access:** superadmin\n\nOne log with everything, including `errorStack` for a 5xx. 404 if it doesn't exist (or was purged)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "response": []
         }
       ]
     },

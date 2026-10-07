@@ -14,6 +14,7 @@ import {
 } from 'sequelize';
 import { env } from '../config/env';
 import { HttpError } from '../errors/HttpError';
+import type { LoggedError } from './requestLogger';
 
 interface ErrorBody {
   success: false;
@@ -167,6 +168,11 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     const details = httpError.details !== undefined ? ` ${JSON.stringify(httpError.details)}` : '';
     console.warn(`[${req.method} ${req.originalUrl}] ${httpError.statusCode} ${httpError.code}: ${httpError.message}${details}`);
   }
+
+  // For the request's row in api_logs (requestLogger); 5xx keep the real error's stack, which the client never sees
+  const logged: LoggedError = { code: httpError.code, message: httpError.message, details: httpError.details };
+  if (httpError.statusCode >= 500) logged.stack = err instanceof Error ? err.stack : String(err);
+  res.locals.apiError = logged;
 
   const body: ErrorBody = {
     success: false,

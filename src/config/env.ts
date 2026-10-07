@@ -47,6 +47,9 @@ export const env = {
     from: process.env.MAIL_FROM ?? 'Prafi <no-reply@prafi.local>',
   },
 
+  /** API request/error logs (GET /api/logs) older than this many days are deleted. */
+  logRetentionDays: Math.max(1, Number(process.env.LOG_RETENTION_DAYS ?? 30) || 30),
+
   corsOrigin: (process.env.CORS_ORIGIN ?? '')
     .split(',')
     .map((origin) => origin.trim())

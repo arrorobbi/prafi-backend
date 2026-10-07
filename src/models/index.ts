@@ -1,4 +1,5 @@
 import { sequelize } from '../config/database';
+import { ApiLog } from './apiLog.model';
 import { Approval } from './approval.model';
 import { Image } from './image.model';
 import { Notification } from './notification.model';
@@ -9,11 +10,11 @@ import { Tenant } from './tenant.model';
 import { TenantCategory } from './tenantCategory.model';
 import { User } from './user.model';
 
-const models = { Approval, Image, Notification, Otp, Product, RevokedToken, Tenant, TenantCategory, User };
+const models = { ApiLog, Approval, Image, Notification, Otp, Product, RevokedToken, Tenant, TenantCategory, User };
 
 export type DbModels = typeof models;
 
 // Relations are defined in each model's static associate()
 Object.values(models).forEach((model) => model.associate(models));
 
-export { sequelize, Approval, Image, Notification, Otp, Product, RevokedToken, Tenant, TenantCategory, User };
+export { sequelize, ApiLog, Approval, Image, Notification, Otp, Product, RevokedToken, Tenant, TenantCategory, User };

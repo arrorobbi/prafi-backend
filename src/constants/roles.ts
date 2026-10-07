@@ -91,3 +91,6 @@ export const TENANT_CATEGORY_READER_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.ADM
 
 /** Roles that create/update/delete tenant categories. */
 export const TENANT_CATEGORY_MANAGER_ROLES: Role[] = [ROLES.ADMIN];
+
+/** Only the superadmin reads the API request/error logs (GET /api/logs). */
+export const LOG_READER_ROLES: Role[] = [ROLES.SUPERADMIN];
