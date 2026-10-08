@@ -18,8 +18,8 @@ function parseDate(value: string, endOfDay: boolean) {
 }
 
 /**
- * GET /api/logs?page=&limit=&level=&method=&status=&path=&userId=&email=&errorCode=&from=&to= — superadmin only.
- * Newest first. status is an exact code (404) or a class (4xx).
+ * GET /api/logs?page=&limit=&outcome=&level=&method=&status=&path=&userId=&email=&errorCode=&from=&to= — superadmin
+ * only. Newest first. outcome: success (< 400) or failed (4xx and 5xx). status is an exact code (404) or a class (4xx).
  */
 export const list: RequestHandler = async (req, res) => {
   const q = req.query as Record<string, string | undefined>;
@@ -33,6 +33,9 @@ export const list: RequestHandler = async (req, res) => {
   }
   if (q.level !== undefined && !LOG_LEVELS.includes(q.level as LogLevel)) {
     errors.push({ field: 'level', message: `level harus salah satu dari: ${LOG_LEVELS.join(', ')}` });
+  }
+  if (q.outcome !== undefined && q.outcome !== 'success' && q.outcome !== 'failed') {
+    errors.push({ field: 'outcome', message: 'outcome harus bernilai success atau failed' });
   }
   const method = q.method?.toUpperCase();
   if (method !== undefined && !METHODS.includes(method)) {
@@ -61,6 +64,7 @@ export const list: RequestHandler = async (req, res) => {
     page,
     limit,
     level: q.level as LogLevel | undefined,
+    outcome: q.outcome as 'success' | 'failed' | undefined,
     method,
     status,
     path: q.path?.trim() || undefined,

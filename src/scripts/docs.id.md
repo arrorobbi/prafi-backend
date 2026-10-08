@@ -387,7 +387,7 @@ Setiap permintaan **tambah / ubah / hapus** (POST, PUT, PATCH, DELETE) menghasil
 - Baris yang lebih lama dari `LOG_RETENTION_DAYS` (bawaan 30 hari) dihapus setiap hari.
 
 === REQ List Logs (superadmin) => Daftar Log
-Terbaru di atas, berhalaman (`limit` maksimal 100). Semua filter opsional dan dapat digabung. Tanpa `errorStack`. Menyimpan log terbaru sebagai `{{logId}}`.
+Terbaru di atas, berhalaman (`limit` maksimal 100). Semua filter opsional dan dapat digabung. `outcome=failed` menampilkan semua permintaan yang gagal (4xx, mis. password salah atau data tidak valid, dan 5xx kesalahan server); `level` mempersempitnya ke salah satunya. Tanpa `errorStack`. Menyimpan log terbaru sebagai `{{logId}}`.
 
 === REQ Get Log (superadmin) => Detail Log
 Satu log lengkap, termasuk `errorStack` untuk error 5xx. 404 jika tidak ada (atau sudah dihapus).

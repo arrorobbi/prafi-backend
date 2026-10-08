@@ -40,6 +40,8 @@ export interface ListLogsOptions {
   page: number;
   limit: number;
   level?: LogLevel;
+  /** success = status < 400, failed = 400 and up (both client 4xx and server 5xx errors) */
+  outcome?: 'success' | 'failed';
   method?: string;
   /** An exact code (404) or a class (4 = every 4xx) */
   status?: { exact: number } | { class: number };
@@ -58,6 +60,8 @@ export async function list(opts: ListLogsOptions) {
   const { page, limit } = opts;
   const where: WhereOptions<ApiLog>[] = [];
   if (opts.level) where.push({ level: opts.level });
+  if (opts.outcome === 'success') where.push({ statusCode: { [Op.lt]: 400 } });
+  if (opts.outcome === 'failed') where.push({ statusCode: { [Op.gte]: 400 } });
   if (opts.method) where.push({ method: opts.method });
   if (opts.status && 'exact' in opts.status) where.push({ statusCode: opts.status.exact });
   if (opts.status && 'class' in opts.status) {

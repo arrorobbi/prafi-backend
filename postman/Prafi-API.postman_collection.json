@@ -5869,6 +5869,12 @@
                   "value": "20"
                 },
                 {
+                  "key": "outcome",
+                  "value": "failed",
+                  "disabled": true,
+                  "description": "success (< 400) or failed (every 4xx and 5xx)"
+                },
+                {
                   "key": "level",
                   "value": "error",
                   "disabled": true,
@@ -5921,7 +5927,7 @@
                 }
               ]
             },
-            "description": "**Access:** superadmin\n\nNewest first, paginated (`limit` up to 100). Every filter is optional and they combine. Leaves out `errorStack`. Saves the newest log as `{{logId}}`."
+            "description": "**Access:** superadmin\n\nNewest first, paginated (`limit` up to 100). Every filter is optional and they combine. `outcome=failed` lists every failed request (both 4xx, e.g. wrong password or invalid data, and 5xx server errors); `level` narrows it to one of them. Leaves out `errorStack`. Saves the newest log as `{{logId}}`."
           },
           "event": [
             {
@@ -5958,6 +5964,12 @@
                     {
                       "key": "limit",
                       "value": "20"
+                    },
+                    {
+                      "key": "outcome",
+                      "value": "failed",
+                      "disabled": true,
+                      "description": "success (< 400) or failed (every 4xx and 5xx)"
                     },
                     {
                       "key": "level",
@@ -6050,6 +6062,12 @@
                       "value": "20"
                     },
                     {
+                      "key": "outcome",
+                      "value": "failed",
+                      "disabled": true,
+                      "description": "success (< 400) or failed (every 4xx and 5xx)"
+                    },
+                    {
                       "key": "level",
                       "value": "error",
                       "disabled": true,
@@ -6057,7 +6075,7 @@
                     },
                     {
                       "key": "method",
-                      "value": "GET",
+                      "value": "POST",
                       "disabled": true
                     },
                     {
