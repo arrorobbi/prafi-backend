@@ -53,7 +53,6 @@ const PROFILE_TEXT_FIELDS = [
   'address',
   'area',
   'operationalHours',
-  'fbLink',
   'whatsappLink',
   'gmapsLink',
 ] as const;
@@ -66,6 +65,8 @@ export function missingProfileFields(tenant: Tenant | null, owner?: { faceImageI
   const ownerMissing = owner && owner.faceImageId == null ? ['faceImageId'] : [];
   if (!tenant) return ['profile', ...ownerMissing];
   const missing: string[] = PROFILE_TEXT_FIELDS.filter((f) => !String(tenant[f] ?? '').trim());
+  // Facebook must be a real link: older profiles saved "-" when it was left empty
+  if (!/^https?:\/\/\S+$/i.test(tenant.fbLink ?? '')) missing.push('fbLink');
   if (tenant.logoId == null) missing.push('logoId');
   return [...missing, ...ownerMissing];
 }

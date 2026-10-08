@@ -6,12 +6,14 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
-const TEXT_FIELDS = ['name', 'description', 'address', 'area', 'operationalHours', 'fbLink', 'whatsappLink', 'gmapsLink'] as const;
+const TEXT_FIELDS = ['name', 'description', 'address', 'area', 'operationalHours', 'whatsappLink', 'gmapsLink'] as const;
+/** Required links: a real http(s) link (a "-" placeholder is refused) */
+const REQUIRED_LINK_FIELDS = ['fbLink'] as const;
 /** Optional links: a http(s) link, or null / "" for none */
 const OPTIONAL_LINK_FIELDS = ['instagramLink', 'googleBusinessLink', 'shopeeLink'] as const;
 const MAX_LINK = 255;
 const ID_FIELDS = ['logoId'] as const;
-const FIELDS: string[] = [...TEXT_FIELDS, ...OPTIONAL_LINK_FIELDS, ...ID_FIELDS];
+const FIELDS: string[] = [...TEXT_FIELDS, ...REQUIRED_LINK_FIELDS, ...OPTIONAL_LINK_FIELDS, ...ID_FIELDS];
 /** On create, `name` may be left out: it defaults to the owner's tenantName. */
 const OPTIONAL_ON_CREATE = ['name'];
 const LOCKED_FIELDS: Record<string, string> = {
@@ -23,6 +25,8 @@ const LOCKED_FIELDS: Record<string, string> = {
 };
 
 type FieldError = { field: string; message: string };
+
+const isLink = (value: string) => /^https?:\/\/\S+$/i.test(value.trim());
 
 /** Validates a tenant body. `partial` = update (every field optional, at least one required). */
 function parseTenantBody(body: Record<string, unknown>, partial: boolean) {
@@ -44,12 +48,25 @@ function parseTenantBody(body: Record<string, unknown>, partial: boolean) {
     }
   }
 
+  for (const field of REQUIRED_LINK_FIELDS) {
+    const value = body[field];
+    if (value === undefined) {
+      if (!partial) errors.push({ field, message: `${field} wajib diisi` });
+    } else if (typeof value !== 'string' || !isLink(value)) {
+      errors.push({ field, message: `${field} wajib diisi dengan tautan yang diawali http:// atau https://` });
+    } else if (value.trim().length > MAX_LINK) {
+      errors.push({ field, message: `${field} maksimal ${MAX_LINK} karakter` });
+    } else {
+      input[field] = value.trim();
+    }
+  }
+
   for (const field of OPTIONAL_LINK_FIELDS) {
     const value = body[field];
     if (value === undefined) continue;
     if (value === null || (typeof value === 'string' && !value.trim())) {
       input[field] = null;
-    } else if (typeof value !== 'string' || !/^https?:\/\/\S+$/i.test(value.trim())) {
+    } else if (typeof value !== 'string' || !isLink(value)) {
       errors.push({ field, message: `${field} harus berupa tautan yang diawali http:// atau https://, atau dikosongkan` });
     } else if (value.trim().length > MAX_LINK) {
       errors.push({ field, message: `${field} maksimal ${MAX_LINK} karakter` });

@@ -4740,7 +4740,7 @@
     },
     {
       "name": "Tenants",
-      "description": "Tenant (shop) profiles. A tenant user manages **their own** profile at `/api/tenants/me`; superadmin, disnakertrans and admin read every profile.\n\n**Links:** `whatsappLink`, `fbLink` and `gmapsLink` are required (the frontend saves `\"-\"` for an empty Facebook / Google Maps link). `instagramLink`, `googleBusinessLink` and `shopeeLink` are **optional**: a `http(s)://` link, or `null` / `\"\"` for none (stored as `null`). Optional links never block a profile from being complete.",
+      "description": "Tenant (shop) profiles. A tenant user manages **their own** profile at `/api/tenants/me`; superadmin, disnakertrans and admin read every profile.\n\n**Links:** `whatsappLink` and `gmapsLink` are required (the frontend saves `\"-\"` for an empty Google Maps link). `fbLink` is **required as a real link** `http(s)://`: `\"-\"` or empty is refused (400), and older profiles still saved with `\"-\"` count as incomplete (`missingFields` includes `fbLink`), so they can't add products yet. `instagramLink`, `googleBusinessLink` and `shopeeLink` are **optional**: a `http(s)://` link, or `null` / `\"\"` for none (stored as `null`). Optional links never block a profile from being complete.",
       "item": [
         {
           "name": "Get My Tenant (tenant)",

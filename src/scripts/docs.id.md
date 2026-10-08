@@ -325,7 +325,7 @@ Kategori yang masih dipakai produk tidak bisa dihapus (409 `STILL_IN_USE`, `deta
 === FOLDER Tenants => Tenant
 Profil tenant (toko). User tenant mengelola profil **miliknya sendiri** di `/api/tenants/me`; superadmin, disnakertrans, dan admin membaca semua profil.
 
-**Tautan:** `whatsappLink`, `fbLink`, dan `gmapsLink` wajib (frontend menyimpan `"-"` untuk tautan Facebook / Google Maps yang kosong). `instagramLink`, `googleBusinessLink`, dan `shopeeLink` **opsional**: tautan `http(s)://`, atau `null` / `""` jika tidak ada (disimpan sebagai `null`). Tautan opsional tidak pernah membuat profil dianggap belum lengkap.
+**Tautan:** `whatsappLink` dan `gmapsLink` wajib (frontend menyimpan `"-"` untuk tautan Google Maps yang kosong). `fbLink` **wajib berupa tautan** `http(s)://`: `"-"` atau kosong ditolak (400), dan profil lama yang masih `"-"` dianggap belum lengkap (`missingFields` berisi `fbLink`) sehingga belum bisa menambah produk. `instagramLink`, `googleBusinessLink`, dan `shopeeLink` **opsional**: tautan `http(s)://`, atau `null` / `""` jika tidak ada (disimpan sebagai `null`). Tautan opsional tidak pernah membuat profil dianggap belum lengkap.
 
 === REQ Get My Tenant (tenant) => Profil Tenant Saya
 404 jika Anda belum membuat profil. `isComplete` / `missingFields`: produk baru dapat dibuat setelah semua field wajib terisi (tautan opsional tidak dihitung). `missingFields` juga berisi `faceImageId` selama akun Anda belum memiliki foto profil..
