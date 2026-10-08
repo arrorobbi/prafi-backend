@@ -93,7 +93,7 @@ export const TENANT_READ_ALL_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.DISNAKERTR
 export const PRODUCT_CATEGORY_READER_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.DISNAKERTRANS, ROLES.ADMIN, ROLES.TENANT];
 
 /** Roles that create/update/delete product categories. */
-export const PRODUCT_CATEGORY_MANAGER_ROLES: Role[] = [ROLES.ADMIN];
+export const PRODUCT_CATEGORY_MANAGER_ROLES: Role[] = [ROLES.DISNAKERTRANS, ROLES.ADMIN];
 
 /** Only the superadmin reads the API request/error logs (GET /api/logs). */
 export const LOG_READER_ROLES: Role[] = [ROLES.SUPERADMIN];

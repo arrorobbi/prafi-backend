@@ -462,7 +462,10 @@ export const FLOWS: Record<string, Chart[]> = {
       nodes: [
         start('GET · POST · PATCH · DELETE /api/product-categories'),
         ...auth(),
-        check({ en: 'Changing? (POST, PATCH, DELETE) only admin', id: 'Mengubah? (POST, PATCH, DELETE) hanya admin' }, { en: '403 other roles only read', id: '403 role lain hanya membaca' }),
+        check(
+          { en: 'Changing? (POST, PATCH, DELETE) only disnakertrans or admin', id: 'Mengubah? (POST, PATCH, DELETE) hanya disnakertrans atau admin' },
+          { en: '403 superadmin and tenant only read', id: '403 superadmin dan tenant hanya membaca' },
+        ),
         check({ en: 'Category exists? (routes with :id)', id: 'Kategori ada? (route dengan :id)' }, '404'),
         check({ en: '`imageId` exists? (if sent)', id: '`imageId` ada? (jika dikirim)' }, '400'),
         check({ en: 'Name / image not taken? (POST, PATCH)', id: 'Nama / gambar belum dipakai? (POST, PATCH)' }, '409 Conflict'),

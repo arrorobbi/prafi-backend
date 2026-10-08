@@ -23,7 +23,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | role | dibuat oleh | verifikasi email | approval awal | dapat |
 |---|---|---|---|---|
 | superadmin | seed (`npm run db:seed`) | sudah terverifikasi | aktif | membuat akun disnakertrans; **hanya membaca** data lainnya (user, produk, tenant, kategori produk); menerima notifikasi setiap akun dan produk baru |
-| disnakertrans | superadmin (*Register Disnakertrans*) | link aktivasi (24 jam) | aktif | melihat serta mengaktifkan/menonaktifkan akun **admin** dan **produk**, melihat semua produk dan tenant |
+| disnakertrans | superadmin (*Register Disnakertrans*) | link aktivasi (24 jam) | aktif | melihat serta mengaktifkan/menonaktifkan akun **admin** dan **produk**, melihat semua produk dan tenant, mengelola kategori produk |
 | admin | daftar sendiri (*Register Admin*) | OTP (15 menit) | **tidak aktif** sampai diaktifkan disnakertrans | mengaktifkan akun tenant **dan produk**, membaca user (tenant)/produk/tenant, mengelola kategori produk |
 | tenant | daftar sendiri (*Register Tenant*) | OTP (15 menit) | aktif | mengelola produk dan profil tenant miliknya sendiri |
 
@@ -64,9 +64,9 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Landing | `GET /api/landing/tenants/{{tenantProfileId}}` | Publik |
 | Kategori Produk | `GET /api/product-categories` | Semua role |
 | Kategori Produk | `GET /api/product-categories/{{categoryId}}` | Semua role |
-| Kategori Produk | `POST /api/product-categories` | admin |
-| Kategori Produk | `PATCH /api/product-categories/{{categoryId}}` | admin |
-| Kategori Produk | `DELETE /api/product-categories/{{categoryId}}` | admin |
+| Kategori Produk | `POST /api/product-categories` | disnakertrans, admin |
+| Kategori Produk | `PATCH /api/product-categories/{{categoryId}}` | disnakertrans, admin |
+| Kategori Produk | `DELETE /api/product-categories/{{categoryId}}` | disnakertrans, admin |
 | Tenant | `GET /api/tenants/me` | tenant |
 | Tenant | `POST /api/tenants/me` | tenant |
 | Tenant | `PATCH /api/tenants/me` | tenant |
@@ -306,20 +306,20 @@ UMKM (profil tenant) yang akun pemiliknya aktif, urut A→Z, masing-masing denga
 Satu UMKM beserta ringkasannya. Id boleh berupa id profil **atau id user pemiliknya** (`product.tenant.id`), sehingga halaman produk dapat langsung menautkan ke UMKM-nya. Produknya: *Produk Landing* dengan `tenantId` = `userId`.
 
 === FOLDER Product Categories => Kategori Produk
-Kategori produk (mis. Kuliner, Kerajinan). Dikelola oleh admin; semua role yang login dapat membacanya (superadmin, disnakertrans, dan tenant hanya membaca). Tenant memilih salah satunya untuk setiap produk (`categoryId`). Setiap kategori boleh memiliki gambar (`imageId`, unggah dulu melalui *Gambar → Unggah Gambar*): carousel halaman landing menampilkannya, dengan produk kategori tersebut di sebelahnya. Pengunjung membaca daftarnya melalui *Landing → Kategori Landing*. Setiap kategori membawa `productCount`.
+Kategori produk (mis. Kuliner, Kerajinan). Dikelola oleh disnakertrans dan admin; semua role yang login dapat membacanya (superadmin dan tenant hanya membaca). Tenant memilih salah satunya untuk setiap produk (`categoryId`). Setiap kategori boleh memiliki gambar (`imageId`, unggah dulu melalui *Gambar → Unggah Gambar*): carousel halaman landing menampilkannya, dengan produk kategori tersebut di sebelahnya. Pengunjung membaca daftarnya melalui *Landing → Kategori Landing*. Setiap kategori membawa `productCount`.
 
 === REQ List Product Categories (All roles) => Daftar Kategori Produk
 Diurutkan berdasarkan nama, masing-masing dengan `image` (atau null) dan `productCount` (semua produknya, status apa pun).
 
 === REQ Get Product Category (All roles) => Detail Kategori Produk
 
-=== REQ Create Product Category (admin) => Buat Kategori Produk
+=== REQ Create Product Category (disnakertrans, admin) => Buat Kategori Produk
 Nama harus unik. `imageId` opsional (unggah gambarnya dulu; satu gambar per kategori): carousel di halaman landing menampilkannya. Menyimpan `{{categoryId}}`.
 
-=== REQ Update Product Category (admin) => Ubah Kategori Produk
+=== REQ Update Product Category (disnakertrans, admin) => Ubah Kategori Produk
 Kirim `name` dan/atau `imageId`. `imageId` baru menggantikan gambar (gambar lama beserta filenya dihapus); `null` menghapus gambarnya.
 
-=== REQ Delete Product Category (admin) => Hapus Kategori Produk
+=== REQ Delete Product Category (disnakertrans, admin) => Hapus Kategori Produk
 Kategori yang masih dipakai produk tidak bisa dihapus (409 `STILL_IN_USE`, `details.productCount`): pindahkan dulu produknya ke kategori lain. Gambarnya (beserta file) ikut dihapus.
 
 === FOLDER Tenants => Tenant

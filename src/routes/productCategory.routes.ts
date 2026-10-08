@@ -9,7 +9,7 @@ const router = Router();
 // Every /:id route below: missing, blank, "null" or "undefined" id → 400 "ID not provided"
 router.param('id', requireIdParam);
 
-// Read: every signed-in role (tenants pick one for each product). Write: admin only
+// Read: every signed-in role (tenants pick one for each product). Write: disnakertrans and admin
 const read = [authenticate, authorize(...PRODUCT_CATEGORY_READER_ROLES)];
 const write = [authenticate, authorize(...PRODUCT_CATEGORY_MANAGER_ROLES)];
 
