@@ -1,4 +1,4 @@
-import type { RequestHandler } from 'express';
+import type { Request, RequestHandler } from 'express';
 import type { LogLevel } from '../models/apiLog.model';
 import * as apiLogService from '../services/apiLog.service';
 import { clientIp } from '../utils/clientIp';
@@ -89,13 +89,18 @@ function sentFields(body: unknown, hasFile: boolean) {
 
 const levelOf = (status: number): LogLevel => (status >= 500 ? 'error' : status >= 400 ? 'warn' : 'info');
 
-/** Saved to the database: create/update/delete requests only (the console still shows every request). */
-const skipDb = (method: string) => !STORED_METHODS.has(method);
+/**
+ * Saved to the database: create/update/delete requests from signed-in users only — a valid login, or at least
+ * a Bearer token (an expired/invalid one is still a session, not a guest). Guests' requests (public sign-up,
+ * login, reviews, bots) are not stored. The console still shows every request.
+ */
+const skipDb = (req: Request) =>
+  !STORED_METHODS.has(req.method) || (!req.user && !/^Bearer\s+\S+/i.test(req.get('authorization') ?? ''));
 
 /**
  * Logs one line per request when the response finishes, e.g.
  *   [14:05:12] POST /api/auth/register 201 254ms - admin admin1@prafi.test
- * and saves create/update/delete requests to api_logs (GET /api/logs), with the names of the sent fields
+ * and saves signed-in users' create/update/delete requests to api_logs (GET /api/logs), with the names of the sent fields
  * and a safe summary of the response. Request body values are never logged (they contain passwords).
  */
 export const requestLogger: RequestHandler = (req, res, next) => {
@@ -123,7 +128,7 @@ export const requestLogger: RequestHandler = (req, res, next) => {
     else if (status >= 400) console.warn(line);
     else console.log(line);
 
-    if (skipDb(req.method)) return;
+    if (skipDb(req)) return;
     const error = res.locals.apiError as LoggedError | undefined;
     apiLogService.record({
       level: levelOf(status),

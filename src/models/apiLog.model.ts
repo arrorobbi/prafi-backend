@@ -14,7 +14,8 @@ export const LOG_LEVELS = ['info', 'warn', 'error'] as const;
 export type LogLevel = (typeof LOG_LEVELS)[number];
 
 /**
- * One row per create/update/delete API request (POST, PUT, PATCH, DELETE; reads are not stored),
+ * One row per create/update/delete API request (POST, PUT, PATCH, DELETE) from a signed-in user (reads and
+ * guests' requests are not stored),
  * written by the requestLogger middleware when the response finishes.
  * A failed request carries its error on the same row (errorStack only for 5xx). Request bodies are never stored.
  * Read by the superadmin through GET /api/logs; rows older than LOG_RETENTION_DAYS are purged.
