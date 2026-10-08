@@ -1380,9 +1380,11 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   <div class="endpoint-body">
     <div data-l="en"><p>Logs in and saves the access token as <code>{{token}}</code> (valid for 1 hour), plus <code>{{currentUserId}}</code> and <code>{{currentRole}}</code>.</p>
 <ul><li>superadmin: the seed account (<code>SEED_ADMIN_EMAIL</code> / <code>SEED_ADMIN_PASSWORD</code> in <code>.env</code>)</li><li>disnakertrans / admin / tenant: an account made with the Register requests (password <code>{{newUserPassword}}</code>; the email is saved as <code>{{registeredEmail}}</code>)</li></ul>
-<p>Errors: 401 wrong email/password, 403 <code>EMAIL_NOT_VERIFIED</code> (verify the email first; <code>details</code> has <code>userId</code> and <code>method</code>), 403 <code>USER_NOT_ACTIVATED</code> (account not activated yet). Forgot the password? Use <em>Forgot Password</em>.</p></div><div data-l="id"><p>Masuk dan menyimpan access token sebagai <code>{{token}}</code> (berlaku 1 jam), serta <code>{{currentUserId}}</code> dan <code>{{currentRole}}</code>.</p>
+<p>Errors: 401 wrong email/password, 403 <code>EMAIL_NOT_VERIFIED</code> (verify the email first; <code>details</code> has <code>userId</code> and <code>method</code>), 403 <code>USER_NOT_ACTIVATED</code> (account not activated yet). Forgot the password? Use <em>Forgot Password</em>.</p>
+<p><code>data.user</code> is the full profile, the same as <em>Get Me</em> (<code>faceImage</code>, <code>approval</code>), so the photo can be shown right after login.</p></div><div data-l="id"><p>Masuk dan menyimpan access token sebagai <code>{{token}}</code> (berlaku 1 jam), serta <code>{{currentUserId}}</code> dan <code>{{currentRole}}</code>.</p>
 <ul><li>superadmin: akun seed (<code>SEED_ADMIN_EMAIL</code> / <code>SEED_ADMIN_PASSWORD</code> di <code>.env</code>)</li><li>disnakertrans / admin / tenant: akun yang dibuat dengan request Register (password <code>{{newUserPassword}}</code>; email disimpan sebagai <code>{{registeredEmail}}</code>)</li></ul>
-<p>Error: 401 email/password salah, 403 <code>EMAIL_NOT_VERIFIED</code> (verifikasi email dulu; <code>details</code> berisi <code>userId</code> dan <code>method</code>), 403 <code>USER_NOT_ACTIVATED</code> (akun belum diaktifkan). Lupa kata sandi? Gunakan <em>Lupa Kata Sandi</em>.</p></div>
+<p>Error: 401 email/password salah, 403 <code>EMAIL_NOT_VERIFIED</code> (verifikasi email dulu; <code>details</code> berisi <code>userId</code> dan <code>method</code>), 403 <code>USER_NOT_ACTIVATED</code> (akun belum diaktifkan). Lupa kata sandi? Gunakan <em>Lupa Kata Sandi</em>.</p>
+<p><code>data.user</code> adalah profil lengkap, sama seperti <em>Profil Saya</em> (<code>faceImage</code>, <code>approval</code>), sehingga foto dapat langsung ditampilkan setelah login.</p></div>
     
     <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;email&quot;: &quot;{{loginEmail}}&quot;,
@@ -1394,46 +1396,78 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;accessToken&quot;: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI…In0.…&quot;,
+    &quot;accessToken&quot;: &quot;eyJhbGciOiJIUzI1NiIsInR5…&quot;,
     &quot;tokenType&quot;: &quot;Bearer&quot;,
     &quot;user&quot;: {
-      &quot;id&quot;: &quot;eb078e4e-e068-43d9-a2dd-e14d1bab107e&quot;,
-      &quot;firstName&quot;: &quot;Super&quot;,
-      &quot;lastName&quot;: &quot;Admin&quot;,
-      &quot;phoneNumber&quot;: &quot;0000000000&quot;,
-      &quot;email&quot;: &quot;superadmin@example.com&quot;,
-      &quot;role&quot;: &quot;superadmin&quot;,
-      &quot;faceImageId&quot;: null,
-      &quot;tenantName&quot;: null,
+      &quot;id&quot;: &quot;92c76f0b-2b73-4533-903e-c1f6c0c9d683&quot;,
+      &quot;firstName&quot;: &quot;Uji&quot;,
+      &quot;lastName&quot;: &quot;Tenant&quot;,
+      &quot;phoneNumber&quot;: &quot;+6281200000000&quot;,
+      &quot;email&quot;: &quot;tenant.test@example.com&quot;,
+      &quot;role&quot;: &quot;tenant&quot;,
+      &quot;faceImageId&quot;: 17,
+      &quot;tenantName&quot;: &quot;Toko Uji&quot;,
       &quot;mailActive&quot;: true,
       &quot;passwordChangedAt&quot;: null,
-      &quot;createdAt&quot;: &quot;2026-10-04T13:19:17.557Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-04T13:19:17.557Z&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:22:03.557Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-08T03:22:22.830Z&quot;,
+      &quot;faceImage&quot;: {
+        &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/de2fb606-1969-4300-a211-50be0d95a6f7.png&quot;,
+        &quot;id&quot;: 17,
+        &quot;name&quot;: &quot;a.png&quot;,
+        &quot;imgUrl&quot;: &quot;/images/de2fb606-1969-4300-a211-50be0d95a6f7.png&quot;,
+        &quot;altText&quot;: &quot;a&quot;,
+        &quot;uploaderId&quot;: &quot;92c76f0b-2b73-4533-903e-c1f6c0c9d683&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-08T03:22:22.793Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-08T03:22:22.793Z&quot;
+      },
       &quot;approval&quot;: {
-        &quot;isActive&quot;: true
+        &quot;id&quot;: 14,
+        &quot;reason&quot;: &quot;test&quot;,
+        &quot;isActive&quot;: true,
+        &quot;type&quot;: &quot;user&quot;,
+        &quot;userId&quot;: &quot;92c76f0b-2b73-4533-903e-c1f6c0c9d683&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-08T03:22:04.021Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-08T03:22:04.021Z&quot;
       }
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;accessToken&quot;: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI…In0.…&quot;,
+    &quot;accessToken&quot;: &quot;eyJhbGciOiJIUzI1NiIsInR5…&quot;,
     &quot;tokenType&quot;: &quot;Bearer&quot;,
     &quot;user&quot;: {
-      &quot;id&quot;: &quot;eb078e4e-e068-43d9-a2dd-e14d1bab107e&quot;,
-      &quot;firstName&quot;: &quot;Super&quot;,
-      &quot;lastName&quot;: &quot;Admin&quot;,
-      &quot;phoneNumber&quot;: &quot;0000000000&quot;,
-      &quot;email&quot;: &quot;superadmin@example.com&quot;,
-      &quot;role&quot;: &quot;superadmin&quot;,
-      &quot;faceImageId&quot;: null,
-      &quot;tenantName&quot;: null,
+      &quot;id&quot;: &quot;92c76f0b-2b73-4533-903e-c1f6c0c9d683&quot;,
+      &quot;firstName&quot;: &quot;Uji&quot;,
+      &quot;lastName&quot;: &quot;Tenant&quot;,
+      &quot;phoneNumber&quot;: &quot;+6281200000000&quot;,
+      &quot;email&quot;: &quot;tenant.test@example.com&quot;,
+      &quot;role&quot;: &quot;tenant&quot;,
+      &quot;faceImageId&quot;: 17,
+      &quot;tenantName&quot;: &quot;Toko Uji&quot;,
       &quot;mailActive&quot;: true,
       &quot;passwordChangedAt&quot;: null,
-      &quot;createdAt&quot;: &quot;2026-10-04T13:19:17.557Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-04T13:19:17.557Z&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:22:03.557Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-08T03:22:22.830Z&quot;,
+      &quot;faceImage&quot;: {
+        &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/de2fb606-1969-4300-a211-50be0d95a6f7.png&quot;,
+        &quot;id&quot;: 17,
+        &quot;name&quot;: &quot;a.png&quot;,
+        &quot;imgUrl&quot;: &quot;/images/de2fb606-1969-4300-a211-50be0d95a6f7.png&quot;,
+        &quot;altText&quot;: &quot;a&quot;,
+        &quot;uploaderId&quot;: &quot;92c76f0b-2b73-4533-903e-c1f6c0c9d683&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-08T03:22:22.793Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-08T03:22:22.793Z&quot;
+      },
       &quot;approval&quot;: {
-        &quot;isActive&quot;: true
+        &quot;id&quot;: 14,
+        &quot;reason&quot;: &quot;test&quot;,
+        &quot;isActive&quot;: true,
+        &quot;type&quot;: &quot;user&quot;,
+        &quot;userId&quot;: &quot;92c76f0b-2b73-4533-903e-c1f6c0c9d683&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-08T03:22:04.021Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-08T03:22:04.021Z&quot;
       }
     }
   }
@@ -3931,7 +3965,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <line class="fc-line" x1="120" y1="366" x2="120" y2="395" marker-end="url(#fc-arrow-71)"/>
     <text class="fc-label" x="126" y="385">yes</text>
     <polygon class="fc-box fc-check" points="20,396 220,396 232,428 220,460 20,460 8,428"/>
-    <text class="fc-text fc-text-check" x="120" y="417" text-anchor="middle">Tenant profile complete?</text><text class="fc-text fc-text-check" x="120" y="433" text-anchor="middle">(every required field, incl.</text><text class="fc-text fc-text-check" x="120" y="449" text-anchor="middle">Instagram)</text>
+    <text class="fc-text fc-text-check" x="120" y="417" text-anchor="middle">Tenant profile complete +</text><text class="fc-text fc-text-check" x="120" y="433" text-anchor="middle">account photo? (optional links</text><text class="fc-text fc-text-check" x="120" y="449" text-anchor="middle">don't count)</text>
     <path class="fc-line fc-line-error" d="M232,428 H275" fill="none" marker-end="url(#fc-arrow-71)"/>
     <text class="fc-label" x="237" y="423">no</text>
     <rect class="fc-box fc-error" x="276" y="396" width="196" height="64" rx="8"/>
@@ -4227,7 +4261,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <line class="fc-line" x1="120" y1="382" x2="120" y2="411" marker-end="url(#fc-arrow-75)"/>
     <text class="fc-label" x="126" y="401">ya</text>
     <polygon class="fc-box fc-check" points="20,412 220,412 232,444 220,476 20,476 8,444"/>
-    <text class="fc-text fc-text-check" x="120" y="433" text-anchor="middle">Profil tenant lengkap? (semua</text><text class="fc-text fc-text-check" x="120" y="449" text-anchor="middle">field wajib, termasuk</text><text class="fc-text fc-text-check" x="120" y="465" text-anchor="middle">Instagram)</text>
+    <text class="fc-text fc-text-check" x="120" y="433" text-anchor="middle">Profil tenant lengkap + foto</text><text class="fc-text fc-text-check" x="120" y="449" text-anchor="middle">akun? (tautan opsional tidak</text><text class="fc-text fc-text-check" x="120" y="465" text-anchor="middle">dihitung)</text>
     <path class="fc-line fc-line-error" d="M232,444 H275" fill="none" marker-end="url(#fc-arrow-75)"/>
     <text class="fc-label" x="237" y="439">tidak</text>
     <rect class="fc-box fc-error" x="276" y="412" width="196" height="64" rx="8"/>
@@ -4749,7 +4783,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   </div>
   <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <div data-l="en"><p>Your tenant profile must be <strong>complete</strong> first (<em>Tenants → Create My Tenant</em>), otherwise 403 <code>TENANT_PROFILE_INCOMPLETE</code> with <code>details.missingFields</code>. Upload the image first (<em>Images → Upload Image</em>); <code>imageId</code> is required. Saves <code>{{productId}}</code>. Superadmins, admins and disnakertrans get <code>PRODUCT_SUBMITTED</code>, the tenant gets <code>PRODUCT_UNDER_REVIEW</code>.</p></div><div data-l="id"><p>Profil tenant Anda harus <strong>lengkap</strong> terlebih dahulu (<em>Tenant → Buat Profil Tenant Saya</em>); jika belum, 403 <code>TENANT_PROFILE_INCOMPLETE</code> dengan <code>details.missingFields</code>. Unggah gambarnya dulu (<em>Gambar → Unggah Gambar</em>); <code>imageId</code> wajib diisi. Menyimpan <code>{{productId}}</code>. Superadmin, admin, dan disnakertrans menerima <code>PRODUCT_SUBMITTED</code>, tenant menerima <code>PRODUCT_UNDER_REVIEW</code>.</p></div>
+    <div data-l="en"><p>Your tenant profile must be <strong>complete</strong> first (<em>Tenants → Create My Tenant</em>) and your account needs a <strong>profile photo</strong> (<code>faceImageId</code>, <em>Auth → Update Me</em>); otherwise 403 <code>TENANT_PROFILE_INCOMPLETE</code> with <code>details.missingFields</code> (e.g. <code>[&quot;faceImageId&quot;]</code>). Upload the image first (<em>Images → Upload Image</em>); <code>imageId</code> is required. Saves <code>{{productId}}</code>. Superadmins, admins and disnakertrans get <code>PRODUCT_SUBMITTED</code>, the tenant gets <code>PRODUCT_UNDER_REVIEW</code>.</p></div><div data-l="id"><p>Profil tenant Anda harus <strong>lengkap</strong> terlebih dahulu (<em>Tenant → Buat Profil Tenant Saya</em>) dan akun Anda harus memiliki <strong>foto profil</strong> (<code>faceImageId</code>, <em>Auth → Ubah Profil Saya</em>); jika belum, 403 <code>TENANT_PROFILE_INCOMPLETE</code> dengan <code>details.missingFields</code> (mis. <code>[&quot;faceImageId&quot;]</code>). Unggah gambarnya dulu (<em>Gambar → Unggah Gambar</em>); <code>imageId</code> wajib diisi. Menyimpan <code>{{productId}}</code>. Superadmin, admin, dan disnakertrans menerima <code>PRODUCT_SUBMITTED</code>, tenant menerima <code>PRODUCT_UNDER_REVIEW</code>.</p></div>
     
     <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
@@ -5690,36 +5724,38 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: &quot;5eda1254-b8a9-4393-92c0-20d1717d45a9&quot;,
+      &quot;id&quot;: &quot;93ce5eee-d07f-4025-95dc-76ee1589403e&quot;,
       &quot;name&quot;: &quot;Toko Uji&quot;,
       &quot;description&quot;: &quot;Toko uji coba&quot;,
       &quot;address&quot;: &quot;Jl. Uji 1&quot;,
-      &quot;area&quot;: &quot;Prafi&quot;,
-      &quot;operationalHours&quot;: &quot;08.00-17.00&quot;,
-      &quot;fbLink&quot;: &quot;https://facebook.com/uji&quot;,
+      &quot;area&quot;: &quot;Wilayah SP 1&quot;,
+      &quot;operationalHours&quot;: &quot;08:00 - 17:00 WIT&quot;,
+      &quot;fbLink&quot;: &quot;-&quot;,
       &quot;whatsappLink&quot;: &quot;https://wa.me/6281200000000&quot;,
-      &quot;gmapsLink&quot;: &quot;https://maps.google.com/?q=prafi&quot;,
-      &quot;instagramLink&quot;: &quot;https://instagram.com/tokouji&quot;,
-      &quot;logoId&quot;: 12,
+      &quot;gmapsLink&quot;: &quot;-&quot;,
+      &quot;instagramLink&quot;: null,
+      &quot;googleBusinessLink&quot;: &quot;https://g.page/tokouji&quot;,
+      &quot;shopeeLink&quot;: &quot;https://shopee.co.id/tokouji&quot;,
+      &quot;logoId&quot;: 15,
       &quot;tenantCategoryId&quot;: 4,
-      &quot;userId&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
-      &quot;productCount&quot;: 1,
-      &quot;ratingAverage&quot;: 3.1,
-      &quot;reviewCount&quot;: 8,
+      &quot;userId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.725Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-08T03:08:56.434Z&quot;,
+      &quot;productCount&quot;: 0,
+      &quot;ratingAverage&quot;: null,
+      &quot;reviewCount&quot;: 0,
       &quot;logo&quot;: {
-        &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-        &quot;id&quot;: 12,
-        &quot;imgUrl&quot;: &quot;/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-        &quot;altText&quot;: &quot;logo&quot;
+        &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+        &quot;id&quot;: 15,
+        &quot;imgUrl&quot;: &quot;/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+        &quot;altText&quot;: &quot;a&quot;
       },
       &quot;category&quot;: {
         &quot;id&quot;: 4,
         &quot;name&quot;: &quot;Kuliner Uji&quot;
       },
       &quot;owner&quot;: {
-        &quot;id&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
+        &quot;id&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
         &quot;tenantName&quot;: &quot;Toko Uji&quot;
       }
     }
@@ -5734,36 +5770,38 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: &quot;5eda1254-b8a9-4393-92c0-20d1717d45a9&quot;,
+      &quot;id&quot;: &quot;93ce5eee-d07f-4025-95dc-76ee1589403e&quot;,
       &quot;name&quot;: &quot;Toko Uji&quot;,
       &quot;description&quot;: &quot;Toko uji coba&quot;,
       &quot;address&quot;: &quot;Jl. Uji 1&quot;,
-      &quot;area&quot;: &quot;Prafi&quot;,
-      &quot;operationalHours&quot;: &quot;08.00-17.00&quot;,
-      &quot;fbLink&quot;: &quot;https://facebook.com/uji&quot;,
+      &quot;area&quot;: &quot;Wilayah SP 1&quot;,
+      &quot;operationalHours&quot;: &quot;08:00 - 17:00 WIT&quot;,
+      &quot;fbLink&quot;: &quot;-&quot;,
       &quot;whatsappLink&quot;: &quot;https://wa.me/6281200000000&quot;,
-      &quot;gmapsLink&quot;: &quot;https://maps.google.com/?q=prafi&quot;,
-      &quot;instagramLink&quot;: &quot;https://instagram.com/tokouji&quot;,
-      &quot;logoId&quot;: 12,
+      &quot;gmapsLink&quot;: &quot;-&quot;,
+      &quot;instagramLink&quot;: null,
+      &quot;googleBusinessLink&quot;: &quot;https://g.page/tokouji&quot;,
+      &quot;shopeeLink&quot;: &quot;https://shopee.co.id/tokouji&quot;,
+      &quot;logoId&quot;: 15,
       &quot;tenantCategoryId&quot;: 4,
-      &quot;userId&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
-      &quot;productCount&quot;: 1,
-      &quot;ratingAverage&quot;: 3.1,
-      &quot;reviewCount&quot;: 8,
+      &quot;userId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.725Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-08T03:08:56.434Z&quot;,
+      &quot;productCount&quot;: 0,
+      &quot;ratingAverage&quot;: null,
+      &quot;reviewCount&quot;: 0,
       &quot;logo&quot;: {
-        &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-        &quot;id&quot;: 12,
-        &quot;imgUrl&quot;: &quot;/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-        &quot;altText&quot;: &quot;logo&quot;
+        &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+        &quot;id&quot;: 15,
+        &quot;imgUrl&quot;: &quot;/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+        &quot;altText&quot;: &quot;a&quot;
       },
       &quot;category&quot;: {
         &quot;id&quot;: 4,
         &quot;name&quot;: &quot;Kuliner Uji&quot;
       },
       &quot;owner&quot;: {
-        &quot;id&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
+        &quot;id&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
         &quot;tenantName&quot;: &quot;Toko Uji&quot;
       }
     }
@@ -5822,72 +5860,76 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;5eda1254-b8a9-4393-92c0-20d1717d45a9&quot;,
+    &quot;id&quot;: &quot;93ce5eee-d07f-4025-95dc-76ee1589403e&quot;,
     &quot;name&quot;: &quot;Toko Uji&quot;,
     &quot;description&quot;: &quot;Toko uji coba&quot;,
     &quot;address&quot;: &quot;Jl. Uji 1&quot;,
-    &quot;area&quot;: &quot;Prafi&quot;,
-    &quot;operationalHours&quot;: &quot;08.00-17.00&quot;,
-    &quot;fbLink&quot;: &quot;https://facebook.com/uji&quot;,
+    &quot;area&quot;: &quot;Wilayah SP 1&quot;,
+    &quot;operationalHours&quot;: &quot;08:00 - 17:00 WIT&quot;,
+    &quot;fbLink&quot;: &quot;-&quot;,
     &quot;whatsappLink&quot;: &quot;https://wa.me/6281200000000&quot;,
-    &quot;gmapsLink&quot;: &quot;https://maps.google.com/?q=prafi&quot;,
-    &quot;instagramLink&quot;: &quot;https://instagram.com/tokouji&quot;,
-    &quot;logoId&quot;: 12,
+    &quot;gmapsLink&quot;: &quot;-&quot;,
+    &quot;instagramLink&quot;: null,
+    &quot;googleBusinessLink&quot;: &quot;https://g.page/tokouji&quot;,
+    &quot;shopeeLink&quot;: &quot;https://shopee.co.id/tokouji&quot;,
+    &quot;logoId&quot;: 15,
     &quot;tenantCategoryId&quot;: 4,
-    &quot;userId&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
-    &quot;productCount&quot;: 1,
-    &quot;ratingAverage&quot;: 3.1,
-    &quot;reviewCount&quot;: 8,
+    &quot;userId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.725Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-08T03:08:56.434Z&quot;,
+    &quot;productCount&quot;: 0,
+    &quot;ratingAverage&quot;: null,
+    &quot;reviewCount&quot;: 0,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-      &quot;id&quot;: 12,
-      &quot;imgUrl&quot;: &quot;/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-      &quot;altText&quot;: &quot;logo&quot;
+      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;id&quot;: 15,
+      &quot;imgUrl&quot;: &quot;/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;altText&quot;: &quot;a&quot;
     },
     &quot;category&quot;: {
       &quot;id&quot;: 4,
       &quot;name&quot;: &quot;Kuliner Uji&quot;
     },
     &quot;owner&quot;: {
-      &quot;id&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
+      &quot;id&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
       &quot;tenantName&quot;: &quot;Toko Uji&quot;
     }
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;5eda1254-b8a9-4393-92c0-20d1717d45a9&quot;,
+    &quot;id&quot;: &quot;93ce5eee-d07f-4025-95dc-76ee1589403e&quot;,
     &quot;name&quot;: &quot;Toko Uji&quot;,
     &quot;description&quot;: &quot;Toko uji coba&quot;,
     &quot;address&quot;: &quot;Jl. Uji 1&quot;,
-    &quot;area&quot;: &quot;Prafi&quot;,
-    &quot;operationalHours&quot;: &quot;08.00-17.00&quot;,
-    &quot;fbLink&quot;: &quot;https://facebook.com/uji&quot;,
+    &quot;area&quot;: &quot;Wilayah SP 1&quot;,
+    &quot;operationalHours&quot;: &quot;08:00 - 17:00 WIT&quot;,
+    &quot;fbLink&quot;: &quot;-&quot;,
     &quot;whatsappLink&quot;: &quot;https://wa.me/6281200000000&quot;,
-    &quot;gmapsLink&quot;: &quot;https://maps.google.com/?q=prafi&quot;,
-    &quot;instagramLink&quot;: &quot;https://instagram.com/tokouji&quot;,
-    &quot;logoId&quot;: 12,
+    &quot;gmapsLink&quot;: &quot;-&quot;,
+    &quot;instagramLink&quot;: null,
+    &quot;googleBusinessLink&quot;: &quot;https://g.page/tokouji&quot;,
+    &quot;shopeeLink&quot;: &quot;https://shopee.co.id/tokouji&quot;,
+    &quot;logoId&quot;: 15,
     &quot;tenantCategoryId&quot;: 4,
-    &quot;userId&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
-    &quot;productCount&quot;: 1,
-    &quot;ratingAverage&quot;: 3.1,
-    &quot;reviewCount&quot;: 8,
+    &quot;userId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.725Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-08T03:08:56.434Z&quot;,
+    &quot;productCount&quot;: 0,
+    &quot;ratingAverage&quot;: null,
+    &quot;reviewCount&quot;: 0,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-      &quot;id&quot;: 12,
-      &quot;imgUrl&quot;: &quot;/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-      &quot;altText&quot;: &quot;logo&quot;
+      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;id&quot;: 15,
+      &quot;imgUrl&quot;: &quot;/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;altText&quot;: &quot;a&quot;
     },
     &quot;category&quot;: {
       &quot;id&quot;: 4,
       &quot;name&quot;: &quot;Kuliner Uji&quot;
     },
     &quot;owner&quot;: {
-      &quot;id&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
+      &quot;id&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
       &quot;tenantName&quot;: &quot;Toko Uji&quot;
     }
   }
@@ -6348,7 +6390,9 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 
 <section class="folder" id="tenants">
   <div class="folder-title"><h2><span data-l="en">Tenants</span><span data-l="id">Tenant</span></h2><span class="pill">6 <span data-l="en">endpoints</span><span data-l="id">endpoint</span></span></div>
-  <div class="folder-desc" data-l="en"><p>Tenant (shop) profiles. A tenant user manages <strong>their own</strong> profile at <code>/api/tenants/me</code>; superadmin, disnakertrans and admin read every profile.</p></div><div class="folder-desc" data-l="id"><p>Profil tenant (toko). User tenant mengelola profil <strong>miliknya sendiri</strong> di <code>/api/tenants/me</code>; superadmin, disnakertrans, dan admin membaca semua profil.</p></div>
+  <div class="folder-desc" data-l="en"><p>Tenant (shop) profiles. A tenant user manages <strong>their own</strong> profile at <code>/api/tenants/me</code>; superadmin, disnakertrans and admin read every profile.</p>
+<p><strong>Links:</strong> <code>whatsappLink</code>, <code>fbLink</code> and <code>gmapsLink</code> are required (the frontend saves <code>&quot;-&quot;</code> for an empty Facebook / Google Maps link). <code>instagramLink</code>, <code>googleBusinessLink</code> and <code>shopeeLink</code> are <strong>optional</strong>: a <code>http(s)://</code> link, or <code>null</code> / <code>&quot;&quot;</code> for none (stored as <code>null</code>). Optional links never block a profile from being complete.</p></div><div class="folder-desc" data-l="id"><p>Profil tenant (toko). User tenant mengelola profil <strong>miliknya sendiri</strong> di <code>/api/tenants/me</code>; superadmin, disnakertrans, dan admin membaca semua profil.</p>
+<p><strong>Tautan:</strong> <code>whatsappLink</code>, <code>fbLink</code>, dan <code>gmapsLink</code> wajib (frontend menyimpan <code>&quot;-&quot;</code> untuk tautan Facebook / Google Maps yang kosong). <code>instagramLink</code>, <code>googleBusinessLink</code>, dan <code>shopeeLink</code> <strong>opsional</strong>: tautan <code>http(s)://</code>, atau <code>null</code> / <code>&quot;&quot;</code> jika tidak ada (disimpan sebagai <code>null</code>). Tautan opsional tidak pernah membuat profil dianggap belum lengkap.</p></div>
   <details class="flows" open>
   <summary><span data-l="en">Flowchart</span><span data-l="id">Diagram alur</span></summary>
   <div class="legend"><span class="lg lg-start">Request</span><span class="lg lg-check"><span data-l="en">Check</span><span data-l="id">Pengecekan</span></span><span class="lg lg-error"><span data-l="en">Error response</span><span data-l="id">Respons error</span></span><span class="lg lg-end"><span data-l="en">Success</span><span data-l="id">Berhasil</span></span><span class="lg lg-effect"><span data-l="en">Side effect</span><span data-l="id">Efek samping</span></span><span class="lg lg-note"><span data-l="en">Note</span><span data-l="id">Catatan</span></span></div>
@@ -6912,35 +6956,38 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   </div>
   <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <div data-l="en"><p>404 if you have not created your profile yet. <code>isComplete</code> / <code>missingFields</code>: products can only be created once every required field is filled in (e.g. <code>instagramLink</code> on profiles made before it existed).</p></div><div data-l="id"><p>404 jika Anda belum membuat profil. <code>isComplete</code> / <code>missingFields</code>: produk baru dapat dibuat setelah semua field wajib terisi (mis. <code>instagramLink</code> pada profil yang dibuat sebelum field ini ada).</p></div>
+    <div data-l="en"><p>404 if you have not created your profile yet. <code>isComplete</code> / <code>missingFields</code>: products can only be created once every required field is filled in (the optional links don't count). <code>missingFields</code> also lists <code>faceImageId</code> while your account has no profile photo..</p></div><div data-l="id"><p>404 jika Anda belum membuat profil. <code>isComplete</code> / <code>missingFields</code>: produk baru dapat dibuat setelah semua field wajib terisi (tautan opsional tidak dihitung). <code>missingFields</code> juga berisi <code>faceImageId</code> selama akun Anda belum memiliki foto profil..</p></div>
     
     
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;5eda1254-b8a9-4393-92c0-20d1717d45a9&quot;,
+    &quot;id&quot;: &quot;93ce5eee-d07f-4025-95dc-76ee1589403e&quot;,
     &quot;name&quot;: &quot;Toko Uji&quot;,
     &quot;description&quot;: &quot;Toko uji coba&quot;,
     &quot;address&quot;: &quot;Jl. Uji 1&quot;,
-    &quot;area&quot;: &quot;Prafi&quot;,
-    &quot;operationalHours&quot;: &quot;08.00-17.00&quot;,
-    &quot;fbLink&quot;: &quot;https://facebook.com/uji&quot;,
+    &quot;area&quot;: &quot;Wilayah SP 1&quot;,
+    &quot;operationalHours&quot;: &quot;08:00 - 17:00 WIT&quot;,
+    &quot;fbLink&quot;: &quot;-&quot;,
     &quot;whatsappLink&quot;: &quot;https://wa.me/6281200000000&quot;,
-    &quot;gmapsLink&quot;: &quot;https://maps.google.com/?q=prafi&quot;,
-    &quot;instagramLink&quot;: &quot;https://instagram.com/tokouji&quot;,
-    &quot;logoId&quot;: 12,
+    &quot;gmapsLink&quot;: &quot;-&quot;,
+    &quot;instagramLink&quot;: null,
+    &quot;googleBusinessLink&quot;: &quot;https://g.page/tokouji&quot;,
+    &quot;shopeeLink&quot;: null,
+    &quot;logoId&quot;: 15,
     &quot;tenantCategoryId&quot;: 4,
-    &quot;userId&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
+    &quot;userId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.725Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-08T03:08:25.796Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-      &quot;id&quot;: 12,
-      &quot;name&quot;: &quot;logo.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-      &quot;altText&quot;: &quot;logo&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.384Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.384Z&quot;
+      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;id&quot;: 15,
+      &quot;name&quot;: &quot;a.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;altText&quot;: &quot;a&quot;,
+      &quot;uploaderId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;
     },
     &quot;category&quot;: {
       &quot;id&quot;: 4,
@@ -6952,29 +6999,32 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;5eda1254-b8a9-4393-92c0-20d1717d45a9&quot;,
+    &quot;id&quot;: &quot;93ce5eee-d07f-4025-95dc-76ee1589403e&quot;,
     &quot;name&quot;: &quot;Toko Uji&quot;,
     &quot;description&quot;: &quot;Toko uji coba&quot;,
     &quot;address&quot;: &quot;Jl. Uji 1&quot;,
-    &quot;area&quot;: &quot;Prafi&quot;,
-    &quot;operationalHours&quot;: &quot;08.00-17.00&quot;,
-    &quot;fbLink&quot;: &quot;https://facebook.com/uji&quot;,
+    &quot;area&quot;: &quot;Wilayah SP 1&quot;,
+    &quot;operationalHours&quot;: &quot;08:00 - 17:00 WIT&quot;,
+    &quot;fbLink&quot;: &quot;-&quot;,
     &quot;whatsappLink&quot;: &quot;https://wa.me/6281200000000&quot;,
-    &quot;gmapsLink&quot;: &quot;https://maps.google.com/?q=prafi&quot;,
-    &quot;instagramLink&quot;: &quot;https://instagram.com/tokouji&quot;,
-    &quot;logoId&quot;: 12,
+    &quot;gmapsLink&quot;: &quot;-&quot;,
+    &quot;instagramLink&quot;: null,
+    &quot;googleBusinessLink&quot;: &quot;https://g.page/tokouji&quot;,
+    &quot;shopeeLink&quot;: null,
+    &quot;logoId&quot;: 15,
     &quot;tenantCategoryId&quot;: 4,
-    &quot;userId&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
+    &quot;userId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.725Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-08T03:08:25.796Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-      &quot;id&quot;: 12,
-      &quot;name&quot;: &quot;logo.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-      &quot;altText&quot;: &quot;logo&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.384Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.384Z&quot;
+      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;id&quot;: 15,
+      &quot;name&quot;: &quot;a.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;altText&quot;: &quot;a&quot;,
+      &quot;uploaderId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;
     },
     &quot;category&quot;: {
       &quot;id&quot;: 4,
@@ -7011,7 +7061,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   </div>
   <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <div data-l="en"><p>One profile per tenant. Required: every field except <code>name</code> (defaults to your tenantName), including <code>instagramLink</code>. <code>logoId</code>: upload the logo first. <code>tenantCategoryId</code> (<strong>required</strong>): a tenant category, created by an admin (<em>Tenant Categories → Create</em>). Saves <code>{{tenantProfileId}}</code>.</p></div><div data-l="id"><p>Satu profil per tenant. Wajib: semua field kecuali <code>name</code> (bawaan: tenantName Anda), termasuk <code>instagramLink</code>. <code>logoId</code>: unggah logo dulu. <code>tenantCategoryId</code> (<strong>wajib</strong>): kategori tenant, dibuat oleh admin (<em>Kategori Tenant → Buat</em>). Menyimpan <code>{{tenantProfileId}}</code>.</p></div>
+    <div data-l="en"><p>One profile per tenant. Required: every field except <code>name</code> (defaults to your tenantName) and the optional links <code>instagramLink</code>, <code>googleBusinessLink</code>, <code>shopeeLink</code>. <code>logoId</code>: upload the logo first. <code>tenantCategoryId</code> (<strong>required</strong>): a tenant category, created by an admin (<em>Tenant Categories → Create</em>). Saves <code>{{tenantProfileId}}</code>.</p></div><div data-l="id"><p>Satu profil per tenant. Wajib: semua field kecuali <code>name</code> (bawaan: tenantName Anda) dan tautan opsional <code>instagramLink</code>, <code>googleBusinessLink</code>, <code>shopeeLink</code>. <code>logoId</code>: unggah logo dulu. <code>tenantCategoryId</code> (<strong>wajib</strong>): kategori tenant, dibuat oleh admin (<em>Kategori Tenant → Buat</em>). Menyimpan <code>{{tenantProfileId}}</code>.</p></div>
     
     <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;name&quot;: &quot;Warung Budi&quot;,
@@ -7023,6 +7073,8 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
   &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
   &quot;instagramLink&quot;: &quot;https://instagram.com/warungbudi&quot;,
+  &quot;googleBusinessLink&quot;: &quot;https://g.page/warungbudi&quot;,
+  &quot;shopeeLink&quot;: null,
   &quot;logoId&quot;: {{imageId}},
   &quot;tenantCategoryId&quot;: {{categoryId}}
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
@@ -7035,35 +7087,40 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
   &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
   &quot;instagramLink&quot;: &quot;https://instagram.com/warungbudi&quot;,
+  &quot;googleBusinessLink&quot;: &quot;https://g.page/warungbudi&quot;,
+  &quot;shopeeLink&quot;: null,
   &quot;logoId&quot;: {{imageId}},
   &quot;tenantCategoryId&quot;: {{categoryId}}
 }</code></pre>
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">201 Created</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;b8c4495f-0d06-4b94-9b30-bb1a59afe99d&quot;,
-    &quot;name&quot;: &quot;Warung Uji Dua&quot;,
-    &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
-    &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
-    &quot;area&quot;: &quot;Bandung&quot;,
-    &quot;operationalHours&quot;: &quot;08:00 - 22:00&quot;,
-    &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
-    &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
-    &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-    &quot;instagramLink&quot;: &quot;https://instagram.com/warungbudi&quot;,
+    &quot;id&quot;: &quot;93ce5eee-d07f-4025-95dc-76ee1589403e&quot;,
+    &quot;name&quot;: &quot;Toko Uji&quot;,
+    &quot;description&quot;: &quot;Toko uji coba&quot;,
+    &quot;address&quot;: &quot;Jl. Uji 1&quot;,
+    &quot;area&quot;: &quot;Wilayah SP 1&quot;,
+    &quot;operationalHours&quot;: &quot;08:00 - 17:00 WIT&quot;,
+    &quot;fbLink&quot;: &quot;-&quot;,
+    &quot;whatsappLink&quot;: &quot;https://wa.me/6281200000000&quot;,
+    &quot;gmapsLink&quot;: &quot;-&quot;,
+    &quot;instagramLink&quot;: null,
+    &quot;googleBusinessLink&quot;: &quot;https://g.page/tokouji&quot;,
+    &quot;shopeeLink&quot;: null,
     &quot;logoId&quot;: 15,
     &quot;tenantCategoryId&quot;: 4,
-    &quot;userId&quot;: &quot;2bcf0341-b5dc-4c29-9cdd-7d65c407bae5&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-07T17:35:28.636Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-07T17:35:28.636Z&quot;,
+    &quot;userId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.725Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-08T03:08:25.796Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/b88f973d-0b31-4874-b6e0-56e15c507538.png&quot;,
+      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
       &quot;id&quot;: 15,
-      &quot;name&quot;: &quot;logo.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/b88f973d-0b31-4874-b6e0-56e15c507538.png&quot;,
-      &quot;altText&quot;: &quot;logo&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-07T17:35:28.570Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-07T17:35:28.570Z&quot;
+      &quot;name&quot;: &quot;a.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;altText&quot;: &quot;a&quot;,
+      &quot;uploaderId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;
     },
     &quot;category&quot;: {
       &quot;id&quot;: 4,
@@ -7075,29 +7132,32 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;b8c4495f-0d06-4b94-9b30-bb1a59afe99d&quot;,
-    &quot;name&quot;: &quot;Warung Uji Dua&quot;,
-    &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
-    &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
-    &quot;area&quot;: &quot;Bandung&quot;,
-    &quot;operationalHours&quot;: &quot;08:00 - 22:00&quot;,
-    &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
-    &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
-    &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-    &quot;instagramLink&quot;: &quot;https://instagram.com/warungbudi&quot;,
+    &quot;id&quot;: &quot;93ce5eee-d07f-4025-95dc-76ee1589403e&quot;,
+    &quot;name&quot;: &quot;Toko Uji&quot;,
+    &quot;description&quot;: &quot;Toko uji coba&quot;,
+    &quot;address&quot;: &quot;Jl. Uji 1&quot;,
+    &quot;area&quot;: &quot;Wilayah SP 1&quot;,
+    &quot;operationalHours&quot;: &quot;08:00 - 17:00 WIT&quot;,
+    &quot;fbLink&quot;: &quot;-&quot;,
+    &quot;whatsappLink&quot;: &quot;https://wa.me/6281200000000&quot;,
+    &quot;gmapsLink&quot;: &quot;-&quot;,
+    &quot;instagramLink&quot;: null,
+    &quot;googleBusinessLink&quot;: &quot;https://g.page/tokouji&quot;,
+    &quot;shopeeLink&quot;: null,
     &quot;logoId&quot;: 15,
     &quot;tenantCategoryId&quot;: 4,
-    &quot;userId&quot;: &quot;2bcf0341-b5dc-4c29-9cdd-7d65c407bae5&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-07T17:35:28.636Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-07T17:35:28.636Z&quot;,
+    &quot;userId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.725Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-08T03:08:25.796Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/b88f973d-0b31-4874-b6e0-56e15c507538.png&quot;,
+      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
       &quot;id&quot;: 15,
-      &quot;name&quot;: &quot;logo.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/b88f973d-0b31-4874-b6e0-56e15c507538.png&quot;,
-      &quot;altText&quot;: &quot;logo&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-07T17:35:28.570Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-07T17:35:28.570Z&quot;
+      &quot;name&quot;: &quot;a.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;altText&quot;: &quot;a&quot;,
+      &quot;uploaderId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;
     },
     &quot;category&quot;: {
       &quot;id&quot;: 4,
@@ -7114,10 +7174,10 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;details&quot;: [
       {
         &quot;field&quot;: &quot;instagramLink&quot;,
-        &quot;message&quot;: &quot;instagramLink wajib diisi&quot;
+        &quot;message&quot;: &quot;instagramLink harus berupa tautan yang diawali http:// atau https://, atau dikosongkan&quot;
       }
     ],
-    &quot;stack&quot;: &quot;…&quot;
+    &quot;stack&quot;: &quot;HttpError: Validasi gagal\n    at Function.badRequest (/home/prafi/project/prafi-backend/src/errors/HttpError.ts:15:12)\n    at parseTenantBody (/home/prafi/project/prafi-backend/src/controllers/tenant.controller.ts:72:38)\n    at updateMine (/home/prafi/project/prafi-backend/src/controllers/tenant.controller.ts:92:19)\n    at Layer.handleRequest (/home/prafi/project/prafi-backend/node_modules/router/lib/layer.js:152:17)\n    at next (/home/prafi/project/prafi-backend/node_modules/router/lib/route.js:157:13)\n    at &lt;anonymous&gt; (/home/prafi/project/prafi-backend/src/middlewares/auth.ts:91:5)\n    at Layer.handleRequest (/home/prafi/project/prafi-backend/node_modules/router/lib/layer.js:152:17)\n    at next (/home/prafi/project/prafi-backend/node_modules/router/lib/route.js:157:13)\n    at authenticate (/home/prafi/project/prafi-backend/src/middlewares/auth.ts:23:3)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)&quot;
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: false,
@@ -7127,10 +7187,10 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;details&quot;: [
       {
         &quot;field&quot;: &quot;instagramLink&quot;,
-        &quot;message&quot;: &quot;instagramLink wajib diisi&quot;
+        &quot;message&quot;: &quot;instagramLink harus berupa tautan yang diawali http:// atau https://, atau dikosongkan&quot;
       }
     ],
-    &quot;stack&quot;: &quot;…&quot;
+    &quot;stack&quot;: &quot;HttpError: Validasi gagal\n    at Function.badRequest (/home/prafi/project/prafi-backend/src/errors/HttpError.ts:15:12)\n    at parseTenantBody (/home/prafi/project/prafi-backend/src/controllers/tenant.controller.ts:72:38)\n    at updateMine (/home/prafi/project/prafi-backend/src/controllers/tenant.controller.ts:92:19)\n    at Layer.handleRequest (/home/prafi/project/prafi-backend/node_modules/router/lib/layer.js:152:17)\n    at next (/home/prafi/project/prafi-backend/node_modules/router/lib/route.js:157:13)\n    at &lt;anonymous&gt; (/home/prafi/project/prafi-backend/src/middlewares/auth.ts:91:5)\n    at Layer.handleRequest (/home/prafi/project/prafi-backend/node_modules/router/lib/layer.js:152:17)\n    at next (/home/prafi/project/prafi-backend/node_modules/router/lib/route.js:157:13)\n    at authenticate (/home/prafi/project/prafi-backend/src/middlewares/auth.ts:23:3)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)&quot;
   }
 }</code></pre>
   </div>
@@ -7148,39 +7208,46 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   </div>
   <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <div data-l="en"><p>Send only the fields to change. Admins get <code>TENANT_PROFILE_UPDATED</code>. Replacing <code>logoId</code> deletes the old logo and its file.</p></div><div data-l="id"><p>Kirim hanya field yang ingin diubah. Admin menerima <code>TENANT_PROFILE_UPDATED</code>. Jika <code>logoId</code> diganti, logo lama beserta filenya dihapus.</p></div>
+    <div data-l="en"><p>Send only the fields to change. Send <code>null</code> (or <code>&quot;&quot;</code>) to remove an optional link. Admins get <code>TENANT_PROFILE_UPDATED</code>. Replacing <code>logoId</code> deletes the old logo and its file.</p></div><div data-l="id"><p>Kirim hanya field yang ingin diubah. Kirim <code>null</code> (atau <code>&quot;&quot;</code>) untuk menghapus tautan opsional. Admin menerima <code>TENANT_PROFILE_UPDATED</code>. Jika <code>logoId</code> diganti, logo lama beserta filenya dihapus.</p></div>
     
     <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
-  &quot;instagramLink&quot;: &quot;https://instagram.com/warungbudi.official&quot;
+  &quot;googleBusinessLink&quot;: &quot;https://g.page/warungbudi&quot;,
+  &quot;shopeeLink&quot;: &quot;https://shopee.co.id/warungbudi&quot;,
+  &quot;instagramLink&quot;: null
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre><code class="lang-json">{
-  &quot;instagramLink&quot;: &quot;https://instagram.com/warungbudi.official&quot;
+  &quot;googleBusinessLink&quot;: &quot;https://g.page/warungbudi&quot;,
+  &quot;shopeeLink&quot;: &quot;https://shopee.co.id/warungbudi&quot;,
+  &quot;instagramLink&quot;: null
 }</code></pre>
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;b8c4495f-0d06-4b94-9b30-bb1a59afe99d&quot;,
-    &quot;name&quot;: &quot;Warung Uji Dua&quot;,
-    &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
-    &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
-    &quot;area&quot;: &quot;Bandung&quot;,
-    &quot;operationalHours&quot;: &quot;08:00 - 22:00&quot;,
-    &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
-    &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
-    &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-    &quot;instagramLink&quot;: &quot;https://instagram.com/warunguji.official&quot;,
+    &quot;id&quot;: &quot;93ce5eee-d07f-4025-95dc-76ee1589403e&quot;,
+    &quot;name&quot;: &quot;Toko Uji&quot;,
+    &quot;description&quot;: &quot;Toko uji coba&quot;,
+    &quot;address&quot;: &quot;Jl. Uji 1&quot;,
+    &quot;area&quot;: &quot;Wilayah SP 1&quot;,
+    &quot;operationalHours&quot;: &quot;08:00 - 17:00 WIT&quot;,
+    &quot;fbLink&quot;: &quot;-&quot;,
+    &quot;whatsappLink&quot;: &quot;https://wa.me/6281200000000&quot;,
+    &quot;gmapsLink&quot;: &quot;-&quot;,
+    &quot;instagramLink&quot;: null,
+    &quot;googleBusinessLink&quot;: &quot;https://g.page/tokouji&quot;,
+    &quot;shopeeLink&quot;: &quot;https://shopee.co.id/tokouji&quot;,
     &quot;logoId&quot;: 15,
     &quot;tenantCategoryId&quot;: 4,
-    &quot;userId&quot;: &quot;2bcf0341-b5dc-4c29-9cdd-7d65c407bae5&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-07T17:35:28.636Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-07T17:35:28.698Z&quot;,
+    &quot;userId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.725Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-08T03:08:56.434Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/b88f973d-0b31-4874-b6e0-56e15c507538.png&quot;,
+      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
       &quot;id&quot;: 15,
-      &quot;name&quot;: &quot;logo.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/b88f973d-0b31-4874-b6e0-56e15c507538.png&quot;,
-      &quot;altText&quot;: &quot;logo&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-07T17:35:28.570Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-07T17:35:28.570Z&quot;
+      &quot;name&quot;: &quot;a.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;altText&quot;: &quot;a&quot;,
+      &quot;uploaderId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;
     },
     &quot;category&quot;: {
       &quot;id&quot;: 4,
@@ -7192,29 +7259,32 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;b8c4495f-0d06-4b94-9b30-bb1a59afe99d&quot;,
-    &quot;name&quot;: &quot;Warung Uji Dua&quot;,
-    &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
-    &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
-    &quot;area&quot;: &quot;Bandung&quot;,
-    &quot;operationalHours&quot;: &quot;08:00 - 22:00&quot;,
-    &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
-    &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
-    &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-    &quot;instagramLink&quot;: &quot;https://instagram.com/warunguji.official&quot;,
+    &quot;id&quot;: &quot;93ce5eee-d07f-4025-95dc-76ee1589403e&quot;,
+    &quot;name&quot;: &quot;Toko Uji&quot;,
+    &quot;description&quot;: &quot;Toko uji coba&quot;,
+    &quot;address&quot;: &quot;Jl. Uji 1&quot;,
+    &quot;area&quot;: &quot;Wilayah SP 1&quot;,
+    &quot;operationalHours&quot;: &quot;08:00 - 17:00 WIT&quot;,
+    &quot;fbLink&quot;: &quot;-&quot;,
+    &quot;whatsappLink&quot;: &quot;https://wa.me/6281200000000&quot;,
+    &quot;gmapsLink&quot;: &quot;-&quot;,
+    &quot;instagramLink&quot;: null,
+    &quot;googleBusinessLink&quot;: &quot;https://g.page/tokouji&quot;,
+    &quot;shopeeLink&quot;: &quot;https://shopee.co.id/tokouji&quot;,
     &quot;logoId&quot;: 15,
     &quot;tenantCategoryId&quot;: 4,
-    &quot;userId&quot;: &quot;2bcf0341-b5dc-4c29-9cdd-7d65c407bae5&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-07T17:35:28.636Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-07T17:35:28.698Z&quot;,
+    &quot;userId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.725Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-08T03:08:56.434Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/b88f973d-0b31-4874-b6e0-56e15c507538.png&quot;,
+      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
       &quot;id&quot;: 15,
-      &quot;name&quot;: &quot;logo.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/b88f973d-0b31-4874-b6e0-56e15c507538.png&quot;,
-      &quot;altText&quot;: &quot;logo&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-07T17:35:28.570Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-07T17:35:28.570Z&quot;
+      &quot;name&quot;: &quot;a.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;altText&quot;: &quot;a&quot;,
+      &quot;uploaderId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;
     },
     &quot;category&quot;: {
       &quot;id&quot;: 4,
@@ -7307,73 +7377,39 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: &quot;b8c4495f-0d06-4b94-9b30-bb1a59afe99d&quot;,
-      &quot;name&quot;: &quot;Warung Uji Dua&quot;,
-      &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
-      &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
-      &quot;area&quot;: &quot;Bandung&quot;,
-      &quot;operationalHours&quot;: &quot;08:00 - 22:00&quot;,
-      &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
-      &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
-      &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-      &quot;instagramLink&quot;: &quot;https://instagram.com/warunguji.official&quot;,
-      &quot;logoId&quot;: 15,
-      &quot;tenantCategoryId&quot;: 4,
-      &quot;userId&quot;: &quot;2bcf0341-b5dc-4c29-9cdd-7d65c407bae5&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-07T17:35:28.636Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-07T17:35:28.698Z&quot;,
-      &quot;logo&quot;: {
-        &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/b88f973d-0b31-4874-b6e0-56e15c507538.png&quot;,
-        &quot;id&quot;: 15,
-        &quot;name&quot;: &quot;logo.png&quot;,
-        &quot;imgUrl&quot;: &quot;/images/b88f973d-0b31-4874-b6e0-56e15c507538.png&quot;,
-        &quot;altText&quot;: &quot;logo&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-07T17:35:28.570Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-07T17:35:28.570Z&quot;
-      },
-      &quot;category&quot;: {
-        &quot;id&quot;: 4,
-        &quot;name&quot;: &quot;Kuliner Uji&quot;
-      },
-      &quot;owner&quot;: {
-        &quot;id&quot;: &quot;2bcf0341-b5dc-4c29-9cdd-7d65c407bae5&quot;,
-        &quot;firstName&quot;: &quot;Uji&quot;,
-        &quot;lastName&quot;: &quot;tenant&quot;,
-        &quot;email&quot;: &quot;tenant2.test@example.com&quot;,
-        &quot;tenantName&quot;: &quot;Warung Uji Dua&quot;
-      }
-    },
-    {
-      &quot;id&quot;: &quot;5eda1254-b8a9-4393-92c0-20d1717d45a9&quot;,
+      &quot;id&quot;: &quot;93ce5eee-d07f-4025-95dc-76ee1589403e&quot;,
       &quot;name&quot;: &quot;Toko Uji&quot;,
       &quot;description&quot;: &quot;Toko uji coba&quot;,
       &quot;address&quot;: &quot;Jl. Uji 1&quot;,
-      &quot;area&quot;: &quot;Prafi&quot;,
-      &quot;operationalHours&quot;: &quot;08.00-17.00&quot;,
-      &quot;fbLink&quot;: &quot;https://facebook.com/uji&quot;,
+      &quot;area&quot;: &quot;Wilayah SP 1&quot;,
+      &quot;operationalHours&quot;: &quot;08:00 - 17:00 WIT&quot;,
+      &quot;fbLink&quot;: &quot;-&quot;,
       &quot;whatsappLink&quot;: &quot;https://wa.me/6281200000000&quot;,
-      &quot;gmapsLink&quot;: &quot;https://maps.google.com/?q=prafi&quot;,
-      &quot;instagramLink&quot;: &quot;https://instagram.com/tokouji&quot;,
-      &quot;logoId&quot;: 12,
+      &quot;gmapsLink&quot;: &quot;-&quot;,
+      &quot;instagramLink&quot;: null,
+      &quot;googleBusinessLink&quot;: &quot;https://g.page/tokouji&quot;,
+      &quot;shopeeLink&quot;: &quot;https://shopee.co.id/tokouji&quot;,
+      &quot;logoId&quot;: 15,
       &quot;tenantCategoryId&quot;: 4,
-      &quot;userId&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
+      &quot;userId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.725Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-08T03:08:56.434Z&quot;,
       &quot;logo&quot;: {
-        &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-        &quot;id&quot;: 12,
-        &quot;name&quot;: &quot;logo.png&quot;,
-        &quot;imgUrl&quot;: &quot;/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-        &quot;altText&quot;: &quot;logo&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.384Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.384Z&quot;
+        &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+        &quot;id&quot;: 15,
+        &quot;name&quot;: &quot;a.png&quot;,
+        &quot;imgUrl&quot;: &quot;/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+        &quot;altText&quot;: &quot;a&quot;,
+        &quot;uploaderId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;
       },
       &quot;category&quot;: {
         &quot;id&quot;: 4,
         &quot;name&quot;: &quot;Kuliner Uji&quot;
       },
       &quot;owner&quot;: {
-        &quot;id&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
+        &quot;id&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
         &quot;firstName&quot;: &quot;Uji&quot;,
         &quot;lastName&quot;: &quot;tenant&quot;,
         &quot;email&quot;: &quot;tenant.test@example.com&quot;,
@@ -7384,80 +7420,46 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;meta&quot;: {
     &quot;page&quot;: 1,
     &quot;limit&quot;: 20,
-    &quot;total&quot;: 2,
+    &quot;total&quot;: 1,
     &quot;totalPages&quot;: 1
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: &quot;b8c4495f-0d06-4b94-9b30-bb1a59afe99d&quot;,
-      &quot;name&quot;: &quot;Warung Uji Dua&quot;,
-      &quot;description&quot;: &quot;Kopi dan makanan ringan&quot;,
-      &quot;address&quot;: &quot;Jl. Merdeka No. 1&quot;,
-      &quot;area&quot;: &quot;Bandung&quot;,
-      &quot;operationalHours&quot;: &quot;08:00 - 22:00&quot;,
-      &quot;fbLink&quot;: &quot;https://facebook.com/warungbudi&quot;,
-      &quot;whatsappLink&quot;: &quot;https://wa.me/6281298765432&quot;,
-      &quot;gmapsLink&quot;: &quot;https://maps.app.goo.gl/example&quot;,
-      &quot;instagramLink&quot;: &quot;https://instagram.com/warunguji.official&quot;,
-      &quot;logoId&quot;: 15,
-      &quot;tenantCategoryId&quot;: 4,
-      &quot;userId&quot;: &quot;2bcf0341-b5dc-4c29-9cdd-7d65c407bae5&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-07T17:35:28.636Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-07T17:35:28.698Z&quot;,
-      &quot;logo&quot;: {
-        &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/b88f973d-0b31-4874-b6e0-56e15c507538.png&quot;,
-        &quot;id&quot;: 15,
-        &quot;name&quot;: &quot;logo.png&quot;,
-        &quot;imgUrl&quot;: &quot;/images/b88f973d-0b31-4874-b6e0-56e15c507538.png&quot;,
-        &quot;altText&quot;: &quot;logo&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-07T17:35:28.570Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-07T17:35:28.570Z&quot;
-      },
-      &quot;category&quot;: {
-        &quot;id&quot;: 4,
-        &quot;name&quot;: &quot;Kuliner Uji&quot;
-      },
-      &quot;owner&quot;: {
-        &quot;id&quot;: &quot;2bcf0341-b5dc-4c29-9cdd-7d65c407bae5&quot;,
-        &quot;firstName&quot;: &quot;Uji&quot;,
-        &quot;lastName&quot;: &quot;tenant&quot;,
-        &quot;email&quot;: &quot;tenant2.test@example.com&quot;,
-        &quot;tenantName&quot;: &quot;Warung Uji Dua&quot;
-      }
-    },
-    {
-      &quot;id&quot;: &quot;5eda1254-b8a9-4393-92c0-20d1717d45a9&quot;,
+      &quot;id&quot;: &quot;93ce5eee-d07f-4025-95dc-76ee1589403e&quot;,
       &quot;name&quot;: &quot;Toko Uji&quot;,
       &quot;description&quot;: &quot;Toko uji coba&quot;,
       &quot;address&quot;: &quot;Jl. Uji 1&quot;,
-      &quot;area&quot;: &quot;Prafi&quot;,
-      &quot;operationalHours&quot;: &quot;08.00-17.00&quot;,
-      &quot;fbLink&quot;: &quot;https://facebook.com/uji&quot;,
+      &quot;area&quot;: &quot;Wilayah SP 1&quot;,
+      &quot;operationalHours&quot;: &quot;08:00 - 17:00 WIT&quot;,
+      &quot;fbLink&quot;: &quot;-&quot;,
       &quot;whatsappLink&quot;: &quot;https://wa.me/6281200000000&quot;,
-      &quot;gmapsLink&quot;: &quot;https://maps.google.com/?q=prafi&quot;,
-      &quot;instagramLink&quot;: &quot;https://instagram.com/tokouji&quot;,
-      &quot;logoId&quot;: 12,
+      &quot;gmapsLink&quot;: &quot;-&quot;,
+      &quot;instagramLink&quot;: null,
+      &quot;googleBusinessLink&quot;: &quot;https://g.page/tokouji&quot;,
+      &quot;shopeeLink&quot;: &quot;https://shopee.co.id/tokouji&quot;,
+      &quot;logoId&quot;: 15,
       &quot;tenantCategoryId&quot;: 4,
-      &quot;userId&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
+      &quot;userId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.725Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-08T03:08:56.434Z&quot;,
       &quot;logo&quot;: {
-        &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-        &quot;id&quot;: 12,
-        &quot;name&quot;: &quot;logo.png&quot;,
-        &quot;imgUrl&quot;: &quot;/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-        &quot;altText&quot;: &quot;logo&quot;,
-        &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.384Z&quot;,
-        &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.384Z&quot;
+        &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+        &quot;id&quot;: 15,
+        &quot;name&quot;: &quot;a.png&quot;,
+        &quot;imgUrl&quot;: &quot;/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+        &quot;altText&quot;: &quot;a&quot;,
+        &quot;uploaderId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+        &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;,
+        &quot;updatedAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;
       },
       &quot;category&quot;: {
         &quot;id&quot;: 4,
         &quot;name&quot;: &quot;Kuliner Uji&quot;
       },
       &quot;owner&quot;: {
-        &quot;id&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
+        &quot;id&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
         &quot;firstName&quot;: &quot;Uji&quot;,
         &quot;lastName&quot;: &quot;tenant&quot;,
         &quot;email&quot;: &quot;tenant.test@example.com&quot;,
@@ -7468,7 +7470,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;meta&quot;: {
     &quot;page&quot;: 1,
     &quot;limit&quot;: 20,
-    &quot;total&quot;: 2,
+    &quot;total&quot;: 1,
     &quot;totalPages&quot;: 1
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">403 Forbidden</span></h4><button class="copy" type="button" data-copy="{
@@ -7505,36 +7507,39 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;5eda1254-b8a9-4393-92c0-20d1717d45a9&quot;,
+    &quot;id&quot;: &quot;93ce5eee-d07f-4025-95dc-76ee1589403e&quot;,
     &quot;name&quot;: &quot;Toko Uji&quot;,
     &quot;description&quot;: &quot;Toko uji coba&quot;,
     &quot;address&quot;: &quot;Jl. Uji 1&quot;,
-    &quot;area&quot;: &quot;Prafi&quot;,
-    &quot;operationalHours&quot;: &quot;08.00-17.00&quot;,
-    &quot;fbLink&quot;: &quot;https://facebook.com/uji&quot;,
+    &quot;area&quot;: &quot;Wilayah SP 1&quot;,
+    &quot;operationalHours&quot;: &quot;08:00 - 17:00 WIT&quot;,
+    &quot;fbLink&quot;: &quot;-&quot;,
     &quot;whatsappLink&quot;: &quot;https://wa.me/6281200000000&quot;,
-    &quot;gmapsLink&quot;: &quot;https://maps.google.com/?q=prafi&quot;,
-    &quot;instagramLink&quot;: &quot;https://instagram.com/tokouji&quot;,
-    &quot;logoId&quot;: 12,
+    &quot;gmapsLink&quot;: &quot;-&quot;,
+    &quot;instagramLink&quot;: null,
+    &quot;googleBusinessLink&quot;: &quot;https://g.page/tokouji&quot;,
+    &quot;shopeeLink&quot;: &quot;https://shopee.co.id/tokouji&quot;,
+    &quot;logoId&quot;: 15,
     &quot;tenantCategoryId&quot;: 4,
-    &quot;userId&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
+    &quot;userId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.725Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-08T03:08:56.434Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-      &quot;id&quot;: 12,
-      &quot;name&quot;: &quot;logo.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-      &quot;altText&quot;: &quot;logo&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.384Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.384Z&quot;
+      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;id&quot;: 15,
+      &quot;name&quot;: &quot;a.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;altText&quot;: &quot;a&quot;,
+      &quot;uploaderId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;
     },
     &quot;category&quot;: {
       &quot;id&quot;: 4,
       &quot;name&quot;: &quot;Kuliner Uji&quot;
     },
     &quot;owner&quot;: {
-      &quot;id&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
+      &quot;id&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
       &quot;firstName&quot;: &quot;Uji&quot;,
       &quot;lastName&quot;: &quot;tenant&quot;,
       &quot;email&quot;: &quot;tenant.test@example.com&quot;,
@@ -7544,36 +7549,39 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: &quot;5eda1254-b8a9-4393-92c0-20d1717d45a9&quot;,
+    &quot;id&quot;: &quot;93ce5eee-d07f-4025-95dc-76ee1589403e&quot;,
     &quot;name&quot;: &quot;Toko Uji&quot;,
     &quot;description&quot;: &quot;Toko uji coba&quot;,
     &quot;address&quot;: &quot;Jl. Uji 1&quot;,
-    &quot;area&quot;: &quot;Prafi&quot;,
-    &quot;operationalHours&quot;: &quot;08.00-17.00&quot;,
-    &quot;fbLink&quot;: &quot;https://facebook.com/uji&quot;,
+    &quot;area&quot;: &quot;Wilayah SP 1&quot;,
+    &quot;operationalHours&quot;: &quot;08:00 - 17:00 WIT&quot;,
+    &quot;fbLink&quot;: &quot;-&quot;,
     &quot;whatsappLink&quot;: &quot;https://wa.me/6281200000000&quot;,
-    &quot;gmapsLink&quot;: &quot;https://maps.google.com/?q=prafi&quot;,
-    &quot;instagramLink&quot;: &quot;https://instagram.com/tokouji&quot;,
-    &quot;logoId&quot;: 12,
+    &quot;gmapsLink&quot;: &quot;-&quot;,
+    &quot;instagramLink&quot;: null,
+    &quot;googleBusinessLink&quot;: &quot;https://g.page/tokouji&quot;,
+    &quot;shopeeLink&quot;: &quot;https://shopee.co.id/tokouji&quot;,
+    &quot;logoId&quot;: 15,
     &quot;tenantCategoryId&quot;: 4,
-    &quot;userId&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
-    &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
-    &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.491Z&quot;,
+    &quot;userId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.725Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-10-08T03:08:56.434Z&quot;,
     &quot;logo&quot;: {
-      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-      &quot;id&quot;: 12,
-      &quot;name&quot;: &quot;logo.png&quot;,
-      &quot;imgUrl&quot;: &quot;/images/4d816874-04a5-461e-b4bd-54d00c82e636.png&quot;,
-      &quot;altText&quot;: &quot;logo&quot;,
-      &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.384Z&quot;,
-      &quot;updatedAt&quot;: &quot;2026-10-07T17:19:58.384Z&quot;
+      &quot;url&quot;: &quot;https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;id&quot;: 15,
+      &quot;name&quot;: &quot;a.png&quot;,
+      &quot;imgUrl&quot;: &quot;/images/99479aee-c58a-434c-8442-81bbedc041a5.png&quot;,
+      &quot;altText&quot;: &quot;a&quot;,
+      &quot;uploaderId&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;,
+      &quot;updatedAt&quot;: &quot;2026-10-08T03:08:25.666Z&quot;
     },
     &quot;category&quot;: {
       &quot;id&quot;: 4,
       &quot;name&quot;: &quot;Kuliner Uji&quot;
     },
     &quot;owner&quot;: {
-      &quot;id&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
+      &quot;id&quot;: &quot;3983b347-fc9a-4a26-bffc-5eb85e24bb64&quot;,
       &quot;firstName&quot;: &quot;Uji&quot;,
       &quot;lastName&quot;: &quot;tenant&quot;,
       &quot;email&quot;: &quot;tenant.test@example.com&quot;,
@@ -8954,7 +8962,7 @@ socket.on('connect_error', (err) =&gt; { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATE
   </div>
 </article>
 </section>
-  <footer><span data-l="en">Generated from <code>postman/Prafi-API.postman_collection.json</code> on 2026-10-07 · regenerate with <code>npm run docs</code></span><span data-l="id">Dibuat dari <code>postman/Prafi-API.postman_collection.json</code> pada 2026-10-07 · buat ulang dengan <code>npm run docs</code></span></footer>
+  <footer><span data-l="en">Generated from <code>postman/Prafi-API.postman_collection.json</code> on 2026-10-08 · regenerate with <code>npm run docs</code></span><span data-l="id">Dibuat dari <code>postman/Prafi-API.postman_collection.json</code> pada 2026-10-08 · buat ulang dengan <code>npm run docs</code></span></footer>
 </div>
 </main>
 </div>

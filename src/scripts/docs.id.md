@@ -144,6 +144,8 @@ Masuk dan menyimpan access token sebagai `{{token}}` (berlaku 1 jam), serta `{{c
 
 Error: 401 email/password salah, 403 `EMAIL_NOT_VERIFIED` (verifikasi email dulu; `details` berisi `userId` dan `method`), 403 `USER_NOT_ACTIVATED` (akun belum diaktifkan). Lupa kata sandi? Gunakan *Lupa Kata Sandi*.
 
+`data.user` adalah profil lengkap, sama seperti *Profil Saya* (`faceImage`, `approval`), sehingga foto dapat langsung ditampilkan setelah login.
+
 === REQ Logout (All roles) => Logout
 Mencabut token yang dipakai untuk request ini (sesi lain tetap login) dan mengosongkan `{{token}}`. Koneksi WebSocket yang memakai token ini menerima `session:ended` (`logged_out`).
 
@@ -264,7 +266,7 @@ superadmin/disnakertrans/admin: semua produk. tenant: hanya produk miliknya. Fil
 Tenant mendapat 404 untuk produk yang bukan miliknya.
 
 === REQ Create Product (tenant) => Buat Produk
-Profil tenant Anda harus **lengkap** terlebih dahulu (*Tenant → Buat Profil Tenant Saya*); jika belum, 403 `TENANT_PROFILE_INCOMPLETE` dengan `details.missingFields`. Unggah gambarnya dulu (*Gambar → Unggah Gambar*); `imageId` wajib diisi. Menyimpan `{{productId}}`. Superadmin, admin, dan disnakertrans menerima `PRODUCT_SUBMITTED`, tenant menerima `PRODUCT_UNDER_REVIEW`.
+Profil tenant Anda harus **lengkap** terlebih dahulu (*Tenant → Buat Profil Tenant Saya*) dan akun Anda harus memiliki **foto profil** (`faceImageId`, *Auth → Ubah Profil Saya*); jika belum, 403 `TENANT_PROFILE_INCOMPLETE` dengan `details.missingFields` (mis. `["faceImageId"]`). Unggah gambarnya dulu (*Gambar → Unggah Gambar*); `imageId` wajib diisi. Menyimpan `{{productId}}`. Superadmin, admin, dan disnakertrans menerima `PRODUCT_SUBMITTED`, tenant menerima `PRODUCT_UNDER_REVIEW`.
 
 === REQ Update Product (tenant) => Ubah Produk
 Hanya produk milik sendiri. Kirim salah satu dari `name`, `description`, `details`, `price`, `isRecommended`, `imageId`. Aktivasi tidak bisa diubah di sini. Admin dan disnakertrans menerima `PRODUCT_UPDATED`. Jika `imageId` diganti, gambar lama beserta filenya dihapus.
@@ -314,14 +316,16 @@ Kategori yang masih dipakai oleh profil tenant tidak bisa dihapus (409 `STILL_IN
 === FOLDER Tenants => Tenant
 Profil tenant (toko). User tenant mengelola profil **miliknya sendiri** di `/api/tenants/me`; superadmin, disnakertrans, dan admin membaca semua profil.
 
+**Tautan:** `whatsappLink`, `fbLink`, dan `gmapsLink` wajib (frontend menyimpan `"-"` untuk tautan Facebook / Google Maps yang kosong). `instagramLink`, `googleBusinessLink`, dan `shopeeLink` **opsional**: tautan `http(s)://`, atau `null` / `""` jika tidak ada (disimpan sebagai `null`). Tautan opsional tidak pernah membuat profil dianggap belum lengkap.
+
 === REQ Get My Tenant (tenant) => Profil Tenant Saya
-404 jika Anda belum membuat profil. `isComplete` / `missingFields`: produk baru dapat dibuat setelah semua field wajib terisi (mis. `instagramLink` pada profil yang dibuat sebelum field ini ada).
+404 jika Anda belum membuat profil. `isComplete` / `missingFields`: produk baru dapat dibuat setelah semua field wajib terisi (tautan opsional tidak dihitung). `missingFields` juga berisi `faceImageId` selama akun Anda belum memiliki foto profil..
 
 === REQ Create My Tenant (tenant) => Buat Profil Tenant Saya
-Satu profil per tenant. Wajib: semua field kecuali `name` (bawaan: tenantName Anda), termasuk `instagramLink`. `logoId`: unggah logo dulu. `tenantCategoryId` (**wajib**): kategori tenant, dibuat oleh admin (*Kategori Tenant → Buat*). Menyimpan `{{tenantProfileId}}`.
+Satu profil per tenant. Wajib: semua field kecuali `name` (bawaan: tenantName Anda) dan tautan opsional `instagramLink`, `googleBusinessLink`, `shopeeLink`. `logoId`: unggah logo dulu. `tenantCategoryId` (**wajib**): kategori tenant, dibuat oleh admin (*Kategori Tenant → Buat*). Menyimpan `{{tenantProfileId}}`.
 
 === REQ Update My Tenant (tenant) => Ubah Profil Tenant Saya
-Kirim hanya field yang ingin diubah. Admin menerima `TENANT_PROFILE_UPDATED`. Jika `logoId` diganti, logo lama beserta filenya dihapus.
+Kirim hanya field yang ingin diubah. Kirim `null` (atau `""`) untuk menghapus tautan opsional. Admin menerima `TENANT_PROFILE_UPDATED`. Jika `logoId` diganti, logo lama beserta filenya dihapus.
 
 === REQ Delete My Tenant (tenant) => Hapus Profil Tenant Saya
 Menghapus profil tenant Anda (akun Anda tetap ada).

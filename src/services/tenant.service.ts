@@ -15,7 +15,10 @@ export interface TenantInput {
   fbLink: string;
   whatsappLink: string;
   gmapsLink: string;
-  instagramLink: string;
+  /** Optional (null = none) */
+  instagramLink?: string | null;
+  googleBusinessLink?: string | null;
+  shopeeLink?: string | null;
   /** Required: upload the logo first via POST /api/images. */
   logoId: number;
   tenantCategoryId: number;
@@ -63,27 +66,35 @@ const PROFILE_TEXT_FIELDS = [
   'fbLink',
   'whatsappLink',
   'gmapsLink',
-  'instagramLink',
 ] as const;
 
-/** Required fields that are still blank (e.g. instagramLink on profiles made before it existed). */
-export function missingProfileFields(tenant: Tenant | null): string[] {
-  if (!tenant) return ['profile'];
+/**
+ * Required fields that are still blank. The optional links (Instagram, Google Bisnis, Shopee) never count.
+ * `owner`: the tenant's own account also needs a profile photo (faceImageId) before products can be added.
+ */
+export function missingProfileFields(tenant: Tenant | null, owner?: { faceImageId: number | null } | null): string[] {
+  const ownerMissing = owner && owner.faceImageId == null ? ['faceImageId'] : [];
+  if (!tenant) return ['profile', ...ownerMissing];
   const missing: string[] = PROFILE_TEXT_FIELDS.filter((f) => !String(tenant[f] ?? '').trim());
   if (tenant.logoId == null) missing.push('logoId');
   if (tenant.tenantCategoryId == null) missing.push('tenantCategoryId');
-  return missing;
+  return [...missing, ...ownerMissing];
 }
 
-/** Products can only be created once the owner's tenant profile ("Profil UMKM") is complete. */
+const ownerOf = (user: AuthUser) => User.findByPk(user.id, { attributes: ['id', 'faceImageId'] });
+
+/** Products can only be created once the tenant profile ("Profil UMKM") is complete and the account has a profile photo. */
 export async function assertProfileComplete(user: AuthUser) {
-  const missing = missingProfileFields(await findOwn(user));
+  const missing = missingProfileFields(await findOwn(user), await ownerOf(user));
   if (missing.length) {
+    const onlyPhoto = missing.length === 1 && missing[0] === 'faceImageId';
     throw new HttpError(
       403,
-      missing.includes('profile')
-        ? 'Buat profil UMKM (Profil Toko) terlebih dahulu sebelum menambahkan produk'
-        : 'Lengkapi profil UMKM (Profil Toko) terlebih dahulu sebelum menambahkan produk',
+      onlyPhoto
+        ? 'Unggah foto profil akun Anda terlebih dahulu (Pengaturan Akun) sebelum menambahkan produk'
+        : missing.includes('profile')
+          ? 'Buat profil UMKM (Profil Toko) terlebih dahulu sebelum menambahkan produk'
+          : 'Lengkapi profil UMKM (Profil Toko) dan data akun Anda terlebih dahulu sebelum menambahkan produk',
       'TENANT_PROFILE_INCOMPLETE',
       { missingFields: missing },
     );
@@ -96,7 +107,7 @@ export async function assertProfileComplete(user: AuthUser) {
 export async function getMine(user: AuthUser) {
   const tenant = await Tenant.findOne({ where: { userId: user.id }, include: tenantInclude(false) });
   if (!tenant) throw HttpError.notFound(NO_PROFILE);
-  const missingFields = missingProfileFields(tenant);
+  const missingFields = missingProfileFields(tenant, await ownerOf(user));
   return { ...tenant.toJSON(), isComplete: missingFields.length === 0, missingFields };
 }
 

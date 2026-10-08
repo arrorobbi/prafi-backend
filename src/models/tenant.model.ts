@@ -24,7 +24,10 @@ export class Tenant extends Model<InferAttributes<Tenant>, InferCreationAttribut
   declare fbLink: string;
   declare whatsappLink: string;
   declare gmapsLink: string;
-  declare instagramLink: string;
+  /** Optional links (null when not given) */
+  declare instagramLink: string | null;
+  declare googleBusinessLink: string | null;
+  declare shopeeLink: string | null;
   /** Required: upload the logo first via POST /api/images. */
   declare logoId: ForeignKey<Image['id']>;
   /** Required: the tenant category (created by an admin). */
@@ -59,7 +62,9 @@ Tenant.init(
     fbLink: { type: DataTypes.STRING, allowNull: false },
     whatsappLink: { type: DataTypes.STRING, allowNull: false },
     gmapsLink: { type: DataTypes.STRING, allowNull: false },
-    instagramLink: { type: DataTypes.STRING, allowNull: false },
+    instagramLink: { type: DataTypes.STRING, allowNull: true },
+    googleBusinessLink: { type: DataTypes.STRING, allowNull: true },
+    shopeeLink: { type: DataTypes.STRING, allowNull: true },
     logoId: {
       type: DataTypes.INTEGER,
       allowNull: false,

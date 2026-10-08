@@ -345,7 +345,7 @@ export const FLOWS: Record<string, Chart[]> = {
         start('POST /api/products'),
         ...auth('tenant'),
         check(
-          { en: 'Tenant profile complete? (every required field, incl. Instagram)', id: 'Profil tenant lengkap? (semua field wajib, termasuk Instagram)' },
+          { en: 'Tenant profile complete + account photo? (optional links don\'t count)', id: 'Profil tenant lengkap + foto akun? (tautan opsional tidak dihitung)' },
           { en: '403 TENANT_PROFILE_INCOMPLETE + missingFields', id: '403 TENANT_PROFILE_INCOMPLETE + missingFields' },
         ),
         check({ en: 'Body valid? (price in rupiah, isRecommended)', id: 'Body valid? (price dalam Rupiah, isRecommended)' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),

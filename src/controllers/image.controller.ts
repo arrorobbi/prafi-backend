@@ -9,6 +9,7 @@ export const upload: RequestHandler = async (req, res) => {
   const image = await imageService.createFromUpload(
     req.file,
     typeof altText === 'string' ? altText : undefined,
+    req.user!.id,
   );
   res.status(201).json({ success: true, data: image });
 };
@@ -17,6 +18,6 @@ export const remove: RequestHandler = async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id)) throw HttpError.badRequest('ID gambar tidak valid');
 
-  await imageService.remove(id);
+  await imageService.removeOwnUnused(req.user!, id);
   res.json({ success: true, data: null });
 };

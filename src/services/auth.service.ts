@@ -47,7 +47,8 @@ export async function login(email: string, password: string) {
   if (user.approval?.isActive !== true) throw HttpError.notActivated();
 
   const accessToken = signAccessToken({ sub: user.id, role: user.role });
-  return { accessToken, tokenType: 'Bearer', user: user.toJSON() };
+  // Same shape as GET /api/auth/me (with faceImage), so the frontend can show the photo right after login
+  return { accessToken, tokenType: 'Bearer', user: await getProfile(user.id) };
 }
 
 /**

@@ -1,6 +1,7 @@
 import {
   CreationOptional,
   DataTypes,
+  ForeignKey,
   InferAttributes,
   InferCreationAttributes,
   Model,
@@ -18,6 +19,8 @@ export class Image extends Model<InferAttributes<Image>, InferCreationAttributes
   declare name: string;
   declare imgUrl: string;
   declare altText: string;
+  /** Who uploaded it: only they may delete it, and only while nothing uses it yet. Null for older images. */
+  declare uploaderId: ForeignKey<User['id']> | null;
   /** Absolute link for the frontend, e.g. http://localhost:4000/images/<file> (not stored in the DB). */
   declare url: CreationOptional<string>;
   declare createdAt: CreationOptional<Date>;
@@ -36,6 +39,8 @@ export class Image extends Model<InferAttributes<Image>, InferCreationAttributes
     Image.hasOne(Tenant, { as: 'tenant', foreignKey: 'logoId', onDelete: 'RESTRICT' });
     // products.image_id - images.id (one-to-one)
     Image.hasOne(Product, { as: 'product', foreignKey: 'imageId' });
+    // images.uploader_id > users.id (deleting the user keeps the image, e.g. a logo, without an uploader)
+    Image.belongsTo(User, { as: 'uploader', foreignKey: 'uploaderId', onDelete: 'SET NULL' });
   }
 }
 
@@ -45,6 +50,11 @@ Image.init(
     name: { type: DataTypes.STRING, allowNull: false, validate: { notEmpty: true } },
     imgUrl: { type: DataTypes.STRING, allowNull: false, validate: { notEmpty: true } },
     altText: { type: DataTypes.STRING, allowNull: false },
+    uploaderId: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      references: { model: 'users', key: 'id' },
+    },
     url: {
       type: DataTypes.VIRTUAL,
       get(this: Image) {

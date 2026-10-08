@@ -6,9 +6,12 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
-const TEXT_FIELDS = ['name', 'description', 'address', 'area', 'operationalHours', 'fbLink', 'whatsappLink', 'gmapsLink', 'instagramLink'] as const;
+const TEXT_FIELDS = ['name', 'description', 'address', 'area', 'operationalHours', 'fbLink', 'whatsappLink', 'gmapsLink'] as const;
+/** Optional links: a http(s) link, or null / "" for none */
+const OPTIONAL_LINK_FIELDS = ['instagramLink', 'googleBusinessLink', 'shopeeLink'] as const;
+const MAX_LINK = 255;
 const ID_FIELDS = ['logoId', 'tenantCategoryId'] as const;
-const FIELDS: string[] = [...TEXT_FIELDS, ...ID_FIELDS];
+const FIELDS: string[] = [...TEXT_FIELDS, ...OPTIONAL_LINK_FIELDS, ...ID_FIELDS];
 /** On create, `name` may be left out: it defaults to the owner's tenantName. */
 const OPTIONAL_ON_CREATE = ['name'];
 const LOCKED_FIELDS: Record<string, string> = {
@@ -37,6 +40,20 @@ function parseTenantBody(body: Record<string, unknown>, partial: boolean) {
       errors.push({ field, message: `${field} tidak boleh kosong` });
     } else {
       input[field] = (body[field] as string).trim();
+    }
+  }
+
+  for (const field of OPTIONAL_LINK_FIELDS) {
+    const value = body[field];
+    if (value === undefined) continue;
+    if (value === null || (typeof value === 'string' && !value.trim())) {
+      input[field] = null;
+    } else if (typeof value !== 'string' || !/^https?:\/\/\S+$/i.test(value.trim())) {
+      errors.push({ field, message: `${field} harus berupa tautan yang diawali http:// atau https://, atau dikosongkan` });
+    } else if (value.trim().length > MAX_LINK) {
+      errors.push({ field, message: `${field} maksimal ${MAX_LINK} karakter` });
+    } else {
+      input[field] = value.trim();
     }
   }
 

@@ -27,7 +27,7 @@ async function readHead(filePath: string) {
  * Saves an uploaded file (from the `uploadImage` middleware) as an Image record. Every failure says why in
  * Bahasa Indonesia, and the file is removed again so nothing is left behind.
  */
-export async function createFromUpload(file: Express.Multer.File, altText?: string) {
+export async function createFromUpload(file: Express.Multer.File, altText: string | undefined, uploaderId: string) {
   const discard = () => fs.unlink(file.path).catch(() => {});
 
   if (file.size === 0) {
@@ -50,6 +50,7 @@ export async function createFromUpload(file: Express.Multer.File, altText?: stri
       name: file.originalname,
       imgUrl: `${IMAGES_URL_PATH}/${file.filename}`,
       altText: altText?.trim() || path.parse(file.originalname).name,
+      uploaderId,
     });
   } catch (err) {
     // Don't leave orphan files behind if the DB insert fails
@@ -58,6 +59,32 @@ export async function createFromUpload(file: Express.Multer.File, altText?: stri
     const reason = err instanceof Error ? err.name : 'UnknownError';
     throw new HttpError(500, 'Gambar sudah terkirim tetapi gagal disimpan ke database, silakan coba lagi', 'IMAGE_SAVE_FAILED', { reason });
   }
+}
+
+/** Whether a user photo, tenant logo or product uses this image. */
+async function isInUse(imageId: number) {
+  const [products, tenants, users] = await Promise.all([
+    Product.count({ where: { imageId } }),
+    Tenant.count({ where: { logoId: imageId } }),
+    User.count({ where: { faceImageId: imageId } }),
+  ]);
+  return products + tenants + users > 0;
+}
+
+/**
+ * DELETE /api/images/:id — throw away an upload you didn't save after all (e.g. you left the form).
+ * Only your own uploads, and only while nothing uses them; images in use are replaced or deleted
+ * through their owner (product, tenant profile, account), which cleans up the old image itself.
+ */
+export async function removeOwnUnused(user: { id: string }, id: number) {
+  const image = await Image.findByPk(id);
+  if (!image) throw HttpError.notFound('Gambar tidak ditemukan');
+  if (image.uploaderId !== user.id) throw HttpError.forbidden('Anda hanya dapat menghapus gambar yang Anda unggah sendiri');
+  if (await isInUse(id)) {
+    throw new HttpError(409, 'Gambar sudah dipakai sehingga tidak dapat dihapus di sini', 'STILL_IN_USE');
+  }
+  await image.destroy();
+  await deleteFile(image.imgUrl);
 }
 
 /** Deletes an Image record and its file on disk. */
@@ -80,12 +107,7 @@ const deleteFile = (imgUrl: string) => fs.unlink(path.join(IMAGES_DIR, path.base
 export async function removeReplaced(oldImageId: number | null | undefined, newImageId?: number | null) {
   if (oldImageId == null || oldImageId === newImageId) return;
   try {
-    const [products, tenants, users] = await Promise.all([
-      Product.count({ where: { imageId: oldImageId } }),
-      Tenant.count({ where: { logoId: oldImageId } }),
-      User.count({ where: { faceImageId: oldImageId } }),
-    ]);
-    if (products + tenants + users > 0) return;
+    if (await isInUse(oldImageId)) return;
 
     const image = await Image.findByPk(oldImageId);
     if (!image) return;
