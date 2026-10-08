@@ -36,6 +36,15 @@ export const env = {
    */
   frontendUrl: (process.env.FRONTEND_URL ?? 'http://localhost:5173').replace(/\/+$/, ''),
 
+  /**
+   * Landing pages refresh at once after a public change: the backend POSTs to the frontend's /internal/revalidate
+   * with this shared secret (the same REVALIDATE_SECRET in the frontend .env). Empty = off (pages refresh within 60 s).
+   */
+  revalidate: {
+    secret: process.env.REVALIDATE_SECRET ?? '',
+    url: (process.env.FRONTEND_REVALIDATE_URL || `${(process.env.FRONTEND_URL ?? 'http://localhost:5173').replace(/\/+$/, '')}/internal/revalidate`),
+  },
+
   /** Outgoing email (nodemailer). Without SMTP_HOST, emails are not sent but printed in the server log (development). */
   mail: {
     host: process.env.SMTP_HOST ?? '',

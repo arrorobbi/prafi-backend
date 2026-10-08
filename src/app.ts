@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import { env } from './config/env';
 import { IMAGES_DIR, IMAGES_URL_PATH } from './config/upload';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
+import { landingRefresh } from './middlewares/landingRefresh';
 import { requestLogger } from './middlewares/requestLogger';
 import routes from './routes';
 
@@ -15,6 +16,7 @@ export const app = express();
 
 app.disable('x-powered-by');
 app.use(requestLogger);
+app.use(landingRefresh);
 app.use(helmet());
 app.use(cors({ origin: env.corsOrigin.length ? env.corsOrigin : false, credentials: true }));
 app.use(express.json({ limit: '1mb' }));
