@@ -90,8 +90,14 @@ const PUBLIC_INCLUDE: Includeable[] = [
   {
     association: 'tenant',
     attributes: ['id', 'tenantName', 'firstName', 'lastName'],
-    // The owner's UMKM profile, for "Lihat UMKM" links (GET /api/landing/tenants/:id)
-    include: [{ association: 'tenant', attributes: ['id', 'name'] }],
+    // The owner's UMKM profile: "Lihat UMKM" links (GET /api/landing/tenants/:id) and its contact buttons
+    // (the same public links as the UMKM page; empty ones are null or "-")
+    include: [
+      {
+        association: 'tenant',
+        attributes: ['id', 'name', 'whatsappLink', 'instagramLink', 'shopeeLink', 'googleBusinessLink', 'fbLink', 'gmapsLink'],
+      },
+    ],
   },
 ];
 

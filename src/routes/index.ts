@@ -8,6 +8,7 @@ import imageRoutes from './image.routes';
 import landingRoutes from './landing.routes';
 import notificationRoutes from './notification.routes';
 import productRoutes from './product.routes';
+import statsRoutes from './stats.routes';
 import tenantRoutes from './tenant.routes';
 import tenantCategoryRoutes from './tenantCategory.routes';
 import userRoutes from './user.routes';
@@ -28,6 +29,7 @@ router.use('/tenant-categories', tenantCategoryRoutes);
 router.use('/landing', landingRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/logs', apiLogRoutes);
+router.use('/stats', statsRoutes);
 
 // Example of role-protected routes — replace with real feature routes
 router.get('/admin/ping', authenticate, authorize(ROLES.SUPERADMIN, ROLES.ADMIN), (req, res) => {
