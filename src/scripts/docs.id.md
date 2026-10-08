@@ -417,7 +417,7 @@ Satu log lengkap, termasuk `errorStack` untuk error 5xx. 404 jika tidak ada (ata
 Cara server disiapkan dan dirawat (service, deploy, database, backup), untuk pengelola server. Buka `{{baseUrl}}/api/docs/server` di browser lalu masuk sebagai **superadmin**. Sumber panduan: `docs/SERVER-GUIDE.md` di repository ini.
 
 === REQ Server Guide Page (Public) => Halaman Panduan Server
-Buka di browser. Halaman meminta login **superadmin** (*Auth → Login*), menyimpan token hanya untuk tab tersebut, lalu memuat *Isi Panduan Server*. Role lain ditolak dan langsung dikeluarkan lagi. Halaman ini sendiri tidak berisi informasi server. Script: `/api/docs/server/app.js`.
+Buka di browser. Halaman meminta login **superadmin** (*Auth → Login*), menyimpan token hanya untuk tab tersebut, lalu memuat *Isi Panduan Server*. Dibuka dari menu **Panduan Server** di dashboard superadmin (domain website, lewat proxy `/api`), login dashboard langsung dipakai tanpa login ulang. Role lain ditolak dan langsung dikeluarkan lagi. Halaman ini sendiri tidak berisi informasi server. Script: `/api/docs/server/app.js`.
 
 === REQ Server Guide Content (superadmin) => Isi Panduan Server
 Panduan server (`docs/SERVER-GUIDE.md`) dalam bentuk HTML, beserta `updatedAt` (kapan file terakhir diubah). Dibaca dari file setiap request, sehingga mengubahnya tidak perlu restart. Dikirim dengan `Cache-Control: no-store`. Role lain mendapat 403.

@@ -1,7 +1,12 @@
 // Server guide page (GET /api/docs/server): log in as superadmin, then load the guide from
 // GET /api/docs/server/content with the token. The token is kept for this browser tab only (sessionStorage).
+// Opened from the website's superadmin dashboard (same domain through its /api proxy), the dashboard's own login
+// (localStorage "prafi_token") is used instead, so there is no second login.
 (function () {
   var KEY = 'prafi_server_docs_token';
+  var DASHBOARD_KEY = 'prafi_token';
+  /** The token came from the dashboard: "Keluar" must not end that session */
+  var shared = false;
   var $ = function (id) { return document.getElementById(id); };
 
   function getToken() { try { return sessionStorage.getItem(KEY); } catch (e) { return null; } }
@@ -11,6 +16,7 @@
     $('login').classList.toggle('hidden', view !== 'login');
     $('guide').classList.toggle('hidden', view !== 'guide');
     $('logout').classList.toggle('hidden', view !== 'guide');
+    $('logout').textContent = shared ? 'Kembali ke Dashboard' : 'Keluar';
     $('who').classList.toggle('hidden', view !== 'guide');
   }
 
@@ -58,6 +64,13 @@
       .then(function (res) { return res.json().then(function (json) { return { res: res, json: json }; }); })
       .then(function (r) {
         if (!r.res.ok) {
+          if (shared) {
+            // The dashboard login isn't a (valid) superadmin session: ask for a login here, leave the dashboard alone
+            shared = false;
+            show('login');
+            if (r.res.status === 403) showError('Akun yang sedang login di dashboard bukan superadmin.');
+            return;
+          }
           setToken(null);
           show('login');
           showError(r.res.status === 403 ? 'Akun ini bukan superadmin.' : apiError(r.json, 'Sesi berakhir, silakan masuk lagi.'));
@@ -109,6 +122,10 @@
   });
 
   $('logout').addEventListener('click', function () {
+    if (shared) {
+      location.href = '/superadmin';
+      return;
+    }
     var token = getToken();
     setToken(null);
     $('content').innerHTML = '';
@@ -117,10 +134,19 @@
   });
 
   var saved = getToken();
+  var dashboard = null;
+  try { dashboard = localStorage.getItem(DASHBOARD_KEY); } catch (e) { /* ignore */ }
   if (saved) {
     var email = null;
     try { email = sessionStorage.getItem(KEY + '_email'); } catch (e) { /* ignore */ }
     loadGuide(saved, email);
+  } else if (dashboard) {
+    shared = true;
+    loadGuide(dashboard, null);
+    fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + dashboard } })
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (json) { if (json && json.data) $('who').textContent = json.data.email; })
+      .catch(function () { /* the email is only a label */ });
   } else {
     show('login');
   }

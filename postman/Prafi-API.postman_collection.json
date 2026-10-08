@@ -6571,7 +6571,7 @@
                 "server"
               ]
             },
-            "description": "**Access:** public, no token (the page itself holds no server information)\n\nOpen it in a browser. It asks for the **superadmin** login (*Auth → Login*), keeps the token for that tab only, then loads *Server Guide Content*. Other roles are refused and logged out again. Script: `/api/docs/server/app.js`.",
+            "description": "**Access:** public, no token (the page itself holds no server information)\n\nOpen it in a browser. It asks for the **superadmin** login (*Auth → Login*), keeps the token for that tab only, then loads *Server Guide Content*. Opened from **Panduan Server** in the website's superadmin dashboard (same domain, through its `/api` proxy), the dashboard login is used directly, without a second login. Other roles are refused and logged out again. Script: `/api/docs/server/app.js`.",
             "auth": {
               "type": "noauth"
             }
@@ -6604,7 +6604,7 @@
                     "server"
                   ]
                 },
-                "description": "**Access:** public, no token (the page itself holds no server information)\n\nOpen it in a browser. It asks for the **superadmin** login (*Auth → Login*), keeps the token for that tab only, then loads *Server Guide Content*. Other roles are refused and logged out again. Script: `/api/docs/server/app.js`.",
+                "description": "**Access:** public, no token (the page itself holds no server information)\n\nOpen it in a browser. It asks for the **superadmin** login (*Auth → Login*), keeps the token for that tab only, then loads *Server Guide Content*. Opened from **Panduan Server** in the website's superadmin dashboard (same domain, through its `/api` proxy), the dashboard login is used directly, without a second login. Other roles are refused and logged out again. Script: `/api/docs/server/app.js`.",
                 "auth": {
                   "type": "noauth"
                 }

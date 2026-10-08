@@ -14,7 +14,7 @@ How the Trans Niaga (UMKM Prafi) server is set up and how to run, update and loo
 | Website (frontend) | `https://transniaga.manokwarikab.go.id` |
 | API (backend) | `https://api.transniaga.manokwarikab.go.id` |
 | Public API docs | `https://api.transniaga.manokwarikab.go.id/docs` |
-| This guide | `https://api.transniaga.manokwarikab.go.id/api/docs/server` (superadmin only) |
+| This guide | Superadmin dashboard → **Panduan Server**, or `https://api.transniaga.manokwarikab.go.id/api/docs/server` (superadmin only) |
 | Server panel (Webmin) | `https://core.transniaga.manokwarikab.go.id` |
 
 How a visit reaches the apps:
