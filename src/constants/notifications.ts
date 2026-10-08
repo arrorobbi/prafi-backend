@@ -4,8 +4,9 @@
  *
  * Recipients:
  *   superadmin    — USER_REGISTERED (every new account), PRODUCT_SUBMITTED, USER_DEACTIVATED, PRODUCT_DEACTIVATED
- *   disnakertrans — ADMIN_PENDING_ACTIVATION, PRODUCT_SUBMITTED, PRODUCT_PUBLISHED, PRODUCT_UPDATED
- *   admin         — PRODUCT_SUBMITTED, PRODUCT_PUBLISHED, PRODUCT_UPDATED, TENANT_PROFILE_UPDATED, TENANT_REGISTERED
+ *   disnakertrans — ADMIN_PENDING_ACTIVATION, PRODUCT_SUBMITTED, PRODUCT_PUBLISHED, PRODUCT_UPDATED, PRODUCT_DELETED
+ *   admin         — PRODUCT_SUBMITTED, PRODUCT_PUBLISHED, PRODUCT_UPDATED, PRODUCT_DELETED, TENANT_PROFILE_UPDATED,
+ *                   TENANT_REGISTERED
  *   tenant        — about their own products: PRODUCT_UNDER_REVIEW, PRODUCT_APPROVED, PRODUCT_TAKEN_DOWN,
  *                   PRODUCT_CHANGES_SAVED, PRODUCT_REVIEWED
  */
@@ -24,6 +25,8 @@ export const NOTIFICATION_TYPES = {
   PRODUCT_PUBLISHED: 'PRODUCT_PUBLISHED',
   /** A tenant changed one of their products. */
   PRODUCT_UPDATED: 'PRODUCT_UPDATED',
+  /** To admins and disnakertrans: a tenant deleted one of their products (no link: the product is gone). */
+  PRODUCT_DELETED: 'PRODUCT_DELETED',
   /** A tenant changed their tenant profile. */
   TENANT_PROFILE_UPDATED: 'TENANT_PROFILE_UPDATED',
   /** A new tenant signed up. */

@@ -1,7 +1,7 @@
 import { literal, type FindAttributeOptions, type Includeable, type WhereOptions } from 'sequelize';
 import { PRODUCT_READ_ALL_ROLES } from '../constants/roles';
 import { HttpError } from '../errors/HttpError';
-import { Approval, Image, Product, ProductCategory, sequelize } from '../models';
+import { Approval, Image, Product, ProductCategory, sequelize, User } from '../models';
 import type { AuthUser } from '../types/express';
 import * as imageService from './image.service';
 import { assertProfileComplete } from './tenant.service';
@@ -202,14 +202,16 @@ export async function update(user: AuthUser, id: string, changes: Partial<Produc
   return updated;
 }
 
-/** Deletes the product together with its approval and its image (file included). */
+/** Deletes the product together with its approval and its image (file included); admins and disnakertrans are notified. */
 export async function remove(user: AuthUser, id: string) {
   const product = await findOwnProduct(user, id);
-  const { approvalId, imageId } = product;
+  const { approvalId, imageId, name } = product;
 
   await sequelize.transaction(async (transaction) => {
     await product.destroy({ transaction });
     if (approvalId) await Approval.destroy({ where: { id: approvalId }, transaction });
   });
   if (imageId) await imageService.remove(imageId).catch(() => {});
+  const owner = await User.findByPk(user.id, { attributes: ['tenantName'] });
+  await notify.productDeleted({ name }, { tenantName: owner?.tenantName });
 }

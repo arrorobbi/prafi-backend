@@ -390,6 +390,7 @@ export const FLOWS: Record<string, Chart[]> = {
         step(
           { en: 'Delete product + its approval', id: 'Hapus produk + approval-nya' },
           effect({ en: 'Image record + file deleted', id: 'Data + file gambar dihapus' }),
+          effect({ en: 'Notify admins + disnakertrans: product deleted', id: 'Notifikasi ke admin + disnakertrans: produk dihapus' }),
         ),
         end('200'),
       ],

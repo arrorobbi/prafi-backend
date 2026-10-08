@@ -199,6 +199,16 @@ export const notify = {
       });
     }),
 
+  /** admins + disnakertrans: a tenant deleted a product (it no longer exists, so there is nothing to link to) */
+  productDeleted: (product: { name: string }, owner: { tenantName?: string | null }) =>
+    safely('productDeleted', () =>
+      toRole(PRODUCT_APPROVER_ROLES, {
+        type: T.PRODUCT_DELETED,
+        name: 'Product deleted',
+        description: `${owner.tenantName ?? 'A tenant'} deleted "${product.name}".`,
+      }),
+    ),
+
   /** the tenant: a visitor reviewed their product */
   productReviewed: (
     product: { id: string; name: string; tenantId: string; approvalId: number | null },

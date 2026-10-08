@@ -275,7 +275,7 @@ Profil tenant Anda harus **lengkap** terlebih dahulu (*Tenant → Buat Profil Te
 Hanya produk milik sendiri. Kirim salah satu dari `name`, `description`, `details`, `price`, `categoryId`, `imageId`. Aktivasi dan `isRecommended` tidak bisa diubah di sini. Admin dan disnakertrans menerima `PRODUCT_UPDATED`. Jika `imageId` diganti, gambar lama beserta filenya dihapus.
 
 === REQ Delete Product (tenant) => Hapus Produk
-Hanya produk milik sendiri. Approval dan gambarnya ikut dihapus.
+Hanya produk milik sendiri. Approval, ulasan, dan gambarnya ikut dihapus. Admin dan disnakertrans menerima `PRODUCT_DELETED`.
 
 === FOLDER Landing => Landing
 Halaman publik untuk pengunjung: tanpa token, tanpa data pribadi (tanpa email/telepon pemilik, tanpa alasan approval). Hanya produk yang **sudah disetujui** dan UMKM yang akun pemiliknya aktif yang ditampilkan.
@@ -356,6 +356,7 @@ Notifikasi untuk setiap role (`/api/notifications`, Bearer `{{token}}`). Notifik
 | `PRODUCT_DEACTIVATED` | superadmin | admin atau disnakertrans menurunkan produk yang **sedang tayang** |
 | `PRODUCT_PUBLISHED` | admin, disnakertrans | admin atau disnakertrans mengaktifkan produk (kini tampil di landing) |
 | `PRODUCT_UPDATED` | admin, disnakertrans | tenant mengubah produk |
+| `PRODUCT_DELETED` | admin, disnakertrans | tenant menghapus produk (tanpa `entityType` / `entityId`: produknya sudah tidak ada) |
 | `TENANT_PROFILE_UPDATED` | admin | tenant mengubah profil tenantnya |
 | `TENANT_REGISTERED` | admin | tenant baru mendaftar |
 | `PRODUCT_UNDER_REVIEW` | tenant (pemilik) | tenant membuat produk |
