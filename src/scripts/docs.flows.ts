@@ -467,7 +467,7 @@ export const FLOWS: Record<string, Chart[]> = {
           { en: '403 superadmin and tenant only read', id: '403 superadmin dan tenant hanya membaca' },
         ),
         check({ en: 'Category exists? (routes with :id)', id: 'Kategori ada? (route dengan :id)' }, '404'),
-        check({ en: '`imageId` exists? (if sent)', id: '`imageId` ada? (jika dikirim)' }, '400'),
+        check({ en: '`imageId` sent (POST) and exists? never null', id: '`imageId` dikirim (POST) dan ada? tidak boleh null' }, '400'),
         check({ en: 'Name / image not taken? (POST, PATCH)', id: 'Nama / gambar belum dipakai? (POST, PATCH)' }, '409 Conflict'),
         check({ en: 'No product uses it? (DELETE)', id: 'Tidak dipakai produk? (DELETE)' }, '409 STILL_IN_USE'),
         step(

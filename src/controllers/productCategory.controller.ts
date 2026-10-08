@@ -15,7 +15,10 @@ const LOCKED_FIELDS: Record<string, string> = {
 
 type FieldError = { field: string; message: string };
 
-/** Body for create/update: `name` (required on create) and `imageId` (optional; null removes the image). */
+/**
+ * Body for create/update: `name` and `imageId` (the carousel image, upload it first via POST /api/images). Both are
+ * required on create; an update may replace the image but never remove it.
+ */
 function parseBody(body: Record<string, unknown>, partial: boolean) {
   const errors: FieldError[] = [];
   const input: Partial<categoryService.CategoryInput> = {};
@@ -34,12 +37,14 @@ function parseBody(body: Record<string, unknown>, partial: boolean) {
     input.name = body.name.trim();
   }
 
-  if (body.imageId !== undefined) {
-    if (body.imageId !== null && !Number.isInteger(body.imageId)) {
-      errors.push({ field: 'imageId', message: 'imageId harus berupa ID gambar (bilangan bulat) atau null' });
-    } else {
-      input.imageId = body.imageId as number | null;
-    }
+  if (body.imageId === undefined) {
+    if (!partial) errors.push({ field: 'imageId', message: 'imageId (gambar kategori) wajib diisi, unggah gambar terlebih dahulu melalui POST /api/images' });
+  } else if (body.imageId === null) {
+    errors.push({ field: 'imageId', message: 'Gambar kategori wajib ada: kirim imageId gambar baru untuk menggantinya' });
+  } else if (!Number.isInteger(body.imageId)) {
+    errors.push({ field: 'imageId', message: 'imageId harus berupa ID gambar (bilangan bulat)' });
+  } else {
+    input.imageId = body.imageId as number;
   }
 
   if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);

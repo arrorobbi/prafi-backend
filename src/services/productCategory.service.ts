@@ -10,8 +10,8 @@ export interface ListCategoriesOptions {
 
 export interface CategoryInput {
   name: string;
-  /** Upload it first via POST /api/images; null removes the image */
-  imageId?: number | null;
+  /** Required: the carousel image, uploaded first via POST /api/images */
+  imageId: number;
 }
 
 const IMAGE_INCLUDE = { association: 'image', attributes: ['id', 'imgUrl', 'url', 'altText'] };
@@ -54,8 +54,8 @@ export async function getById(id: number) {
   return category;
 }
 
-async function assertImageExists(imageId: number | null | undefined) {
-  if (imageId == null) return;
+async function assertImageExists(imageId: number | undefined) {
+  if (imageId === undefined) return;
   const image = await Image.findByPk(imageId, { attributes: ['id'] });
   if (!image) {
     throw HttpError.badRequest('Validasi gagal', [
@@ -67,11 +67,11 @@ async function assertImageExists(imageId: number | null | undefined) {
 /** Duplicate name (or an image already used by another category) → UniqueConstraintError → 409 via the error handler. */
 export async function create(input: CategoryInput) {
   await assertImageExists(input.imageId);
-  const category = await ProductCategory.create({ name: input.name, imageId: input.imageId ?? null });
+  const category = await ProductCategory.create({ name: input.name, imageId: input.imageId });
   return getById(category.id);
 }
 
-/** A new image (or null) replaces the old one: its record and file are deleted. */
+/** A new image replaces the old one: its record and file are deleted. */
 export async function update(id: number, changes: Partial<CategoryInput>) {
   const category = await ProductCategory.findByPk(id);
   if (!category) throw HttpError.notFound('Kategori produk tidak ditemukan');

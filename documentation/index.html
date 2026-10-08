@@ -5325,7 +5325,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   </div>
   <p class="auth"><span class="dot dot-open"></span><span data-l="en">No authentication needed</span><span data-l="id">Tanpa autentikasi</span></p>
   <div class="endpoint-body">
-    <div data-l="en"><p>Every product category A→Z with its <code>image</code> (or null) and <code>productCount</code> (approved products only), for the home page carousel: each slide is a category image, and next to it <em>Landing Products</em> with <code>categoryId</code> shows that category's products.</p></div><div data-l="id"><p>Semua kategori produk urut A→Z beserta <code>image</code> (atau null) dan <code>productCount</code> (hanya produk yang sudah disetujui), untuk carousel beranda: setiap slide adalah gambar kategori, dan di sebelahnya <em>Produk Landing</em> dengan <code>categoryId</code> menampilkan produk kategori tersebut.</p></div>
+    <div data-l="en"><p>Every product category A→Z with its <code>image</code> (null only for older categories not given one yet) and <code>productCount</code> (approved products only), for the home page carousel: each slide is a category image, and next to it <em>Landing Products</em> with <code>categoryId</code> shows that category's products.</p></div><div data-l="id"><p>Semua kategori produk urut A→Z beserta <code>image</code> (null hanya untuk kategori lama yang belum diberi gambar) dan <code>productCount</code> (hanya produk yang sudah disetujui), untuk carousel beranda: setiap slide adalah gambar kategori, dan di sebelahnya <em>Produk Landing</em> dengan <code>categoryId</code> menampilkan produk kategori tersebut.</p></div>
     
     
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
@@ -6073,13 +6073,13 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 
 <section class="folder" id="product-categories">
   <div class="folder-title"><h2><span data-l="en">Product Categories</span><span data-l="id">Kategori Produk</span></h2><span class="pill">5 <span data-l="en">endpoints</span><span data-l="id">endpoint</span></span></div>
-  <div class="folder-desc" data-l="en"><p>Product categories (e.g. Kuliner, Kerajinan). Managed by disnakertrans and admin; every signed-in role can read them (superadmin and tenants read-only). A tenant picks one for each product (<code>categoryId</code>). Each category may have an image (<code>imageId</code>, upload it first via <em>Images → Upload Image</em>): the landing page carousel shows it, with the category's products next to it. Visitors read the list through <em>Landing → Landing Categories</em>. Each category carries <code>productCount</code>.</p></div><div class="folder-desc" data-l="id"><p>Kategori produk (mis. Kuliner, Kerajinan). Dikelola oleh disnakertrans dan admin; semua role yang login dapat membacanya (superadmin dan tenant hanya membaca). Tenant memilih salah satunya untuk setiap produk (<code>categoryId</code>). Setiap kategori boleh memiliki gambar (<code>imageId</code>, unggah dulu melalui <em>Gambar → Unggah Gambar</em>): carousel halaman landing menampilkannya, dengan produk kategori tersebut di sebelahnya. Pengunjung membaca daftarnya melalui <em>Landing → Kategori Landing</em>. Setiap kategori membawa <code>productCount</code>.</p></div>
+  <div class="folder-desc" data-l="en"><p>Product categories (e.g. Kuliner, Kerajinan). Managed by disnakertrans and admin; every signed-in role can read them (superadmin and tenants read-only). A tenant picks one for each product (<code>categoryId</code>). Each category <strong>must</strong> have an image (<code>imageId</code>, upload it first via <em>Images → Upload Image</em>): the landing page carousel shows it, with the category's products next to it. Visitors read the list through <em>Landing → Landing Categories</em>. Each category carries <code>productCount</code>.</p></div><div class="folder-desc" data-l="id"><p>Kategori produk (mis. Kuliner, Kerajinan). Dikelola oleh disnakertrans dan admin; semua role yang login dapat membacanya (superadmin dan tenant hanya membaca). Tenant memilih salah satunya untuk setiap produk (<code>categoryId</code>). Setiap kategori <strong>wajib</strong> memiliki gambar (<code>imageId</code>, unggah dulu melalui <em>Gambar → Unggah Gambar</em>): carousel halaman landing menampilkannya, dengan produk kategori tersebut di sebelahnya. Pengunjung membaca daftarnya melalui <em>Landing → Kategori Landing</em>. Setiap kategori membawa <code>productCount</code>.</p></div>
   <details class="flows" open>
   <summary><span data-l="en">Flowchart</span><span data-l="id">Diagram alur</span></summary>
   <div class="legend"><span class="lg lg-start">Request</span><span class="lg lg-check"><span data-l="en">Check</span><span data-l="id">Pengecekan</span></span><span class="lg lg-error"><span data-l="en">Error response</span><span data-l="id">Respons error</span></span><span class="lg lg-end"><span data-l="en">Success</span><span data-l="id">Berhasil</span></span><span class="lg lg-effect"><span data-l="en">Side effect</span><span data-l="id">Efek samping</span></span><span class="lg lg-note"><span data-l="en">Note</span><span data-l="id">Catatan</span></span></div>
   <div class="flow-grid" data-l="en"><figure class="flow">
   <figcaption>Manage Product Categories</figcaption>
-  <svg class="fc" viewBox="0 0 480 874" width="480" height="874" role="img" aria-label="Manage Product Categories">
+  <svg class="fc" viewBox="0 0 480 890" width="480" height="890" role="img" aria-label="Manage Product Categories">
     <defs><marker id="fc-arrow-88" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
     <rect class="fc-box fc-start" x="8" y="8" width="224" height="48" rx="18"/>
     <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">GET · POST · PATCH · DELETE</text><text class="fc-text fc-text-start" x="120" y="45" text-anchor="middle">/api/product-categories</text>
@@ -6132,43 +6132,43 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <text class="fc-text fc-text-error" x="374" y="473" text-anchor="middle">404</text>
     <line class="fc-line" x1="120" y1="492" x2="120" y2="521" marker-end="url(#fc-arrow-88)"/>
     <text class="fc-label" x="126" y="511">yes</text>
-    <polygon class="fc-box fc-check" points="20,522 220,522 232,538 220,554 20,554 8,538"/>
-    <text class="fc-text fc-text-check" x="120" y="543" text-anchor="middle"><tspan class="fc-code">imageId</tspan> exists? (if sent)</text>
-    <path class="fc-line fc-line-error" d="M232,538 H275" fill="none" marker-end="url(#fc-arrow-88)"/>
-    <text class="fc-label" x="237" y="533">no</text>
-    <rect class="fc-box fc-error" x="276" y="522" width="196" height="32" rx="8"/>
-    <text class="fc-text fc-text-error" x="374" y="543" text-anchor="middle">400</text>
-    <line class="fc-line" x1="120" y1="554" x2="120" y2="583" marker-end="url(#fc-arrow-88)"/>
-    <text class="fc-label" x="126" y="573">yes</text>
-    <polygon class="fc-box fc-check" points="20,584 220,584 232,608 220,632 20,632 8,608"/>
-    <text class="fc-text fc-text-check" x="120" y="605" text-anchor="middle">Name / image not taken?</text><text class="fc-text fc-text-check" x="120" y="621" text-anchor="middle">(POST, PATCH)</text>
-    <path class="fc-line fc-line-error" d="M232,608 H275" fill="none" marker-end="url(#fc-arrow-88)"/>
-    <text class="fc-label" x="237" y="603">no</text>
-    <rect class="fc-box fc-error" x="276" y="592" width="196" height="32" rx="8"/>
-    <text class="fc-text fc-text-error" x="374" y="613" text-anchor="middle">409 Conflict</text>
-    <line class="fc-line" x1="120" y1="632" x2="120" y2="661" marker-end="url(#fc-arrow-88)"/>
-    <text class="fc-label" x="126" y="651">yes</text>
-    <polygon class="fc-box fc-check" points="20,662 220,662 232,678 220,694 20,694 8,678"/>
-    <text class="fc-text fc-text-check" x="120" y="683" text-anchor="middle">No product uses it? (DELETE)</text>
-    <path class="fc-line fc-line-error" d="M232,678 H275" fill="none" marker-end="url(#fc-arrow-88)"/>
-    <text class="fc-label" x="237" y="673">no</text>
-    <rect class="fc-box fc-error" x="276" y="662" width="196" height="32" rx="8"/>
-    <text class="fc-text fc-text-error" x="374" y="683" text-anchor="middle">409 STILL_IN_USE</text>
-    <line class="fc-line" x1="120" y1="694" x2="120" y2="731" marker-end="url(#fc-arrow-88)"/>
-    <text class="fc-label" x="126" y="717">yes</text>
-    <rect class="fc-box fc-step" x="8" y="732" width="224" height="32" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="753" text-anchor="middle">Save</text>
-    <path class="fc-line fc-line-effect" d="M232,748 H275" fill="none" marker-end="url(#fc-arrow-88)"/>
-    <rect class="fc-box fc-effect" x="276" y="724" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-effect" x="374" y="745" text-anchor="middle">Replaced / removed image:</text><text class="fc-text fc-text-effect" x="374" y="761" text-anchor="middle">record + file deleted</text>
-    <line class="fc-line" x1="120" y1="764" x2="120" y2="801" marker-end="url(#fc-arrow-88)"/>
-    <rect class="fc-box fc-end" x="8" y="802" width="224" height="64" rx="18"/>
-    <text class="fc-text fc-text-end" x="120" y="823" text-anchor="middle">200 / 201 category with image +</text><text class="fc-text fc-text-end" x="120" y="839" text-anchor="middle">productCount, or list sorted by</text><text class="fc-text fc-text-end" x="120" y="855" text-anchor="middle">name</text>
+    <polygon class="fc-box fc-check" points="20,522 220,522 232,546 220,570 20,570 8,546"/>
+    <text class="fc-text fc-text-check" x="120" y="543" text-anchor="middle"><tspan class="fc-code">imageId</tspan> sent (POST) and</text><text class="fc-text fc-text-check" x="120" y="559" text-anchor="middle">exists? never null</text>
+    <path class="fc-line fc-line-error" d="M232,546 H275" fill="none" marker-end="url(#fc-arrow-88)"/>
+    <text class="fc-label" x="237" y="541">no</text>
+    <rect class="fc-box fc-error" x="276" y="530" width="196" height="32" rx="8"/>
+    <text class="fc-text fc-text-error" x="374" y="551" text-anchor="middle">400</text>
+    <line class="fc-line" x1="120" y1="570" x2="120" y2="599" marker-end="url(#fc-arrow-88)"/>
+    <text class="fc-label" x="126" y="589">yes</text>
+    <polygon class="fc-box fc-check" points="20,600 220,600 232,624 220,648 20,648 8,624"/>
+    <text class="fc-text fc-text-check" x="120" y="621" text-anchor="middle">Name / image not taken?</text><text class="fc-text fc-text-check" x="120" y="637" text-anchor="middle">(POST, PATCH)</text>
+    <path class="fc-line fc-line-error" d="M232,624 H275" fill="none" marker-end="url(#fc-arrow-88)"/>
+    <text class="fc-label" x="237" y="619">no</text>
+    <rect class="fc-box fc-error" x="276" y="608" width="196" height="32" rx="8"/>
+    <text class="fc-text fc-text-error" x="374" y="629" text-anchor="middle">409 Conflict</text>
+    <line class="fc-line" x1="120" y1="648" x2="120" y2="677" marker-end="url(#fc-arrow-88)"/>
+    <text class="fc-label" x="126" y="667">yes</text>
+    <polygon class="fc-box fc-check" points="20,678 220,678 232,694 220,710 20,710 8,694"/>
+    <text class="fc-text fc-text-check" x="120" y="699" text-anchor="middle">No product uses it? (DELETE)</text>
+    <path class="fc-line fc-line-error" d="M232,694 H275" fill="none" marker-end="url(#fc-arrow-88)"/>
+    <text class="fc-label" x="237" y="689">no</text>
+    <rect class="fc-box fc-error" x="276" y="678" width="196" height="32" rx="8"/>
+    <text class="fc-text fc-text-error" x="374" y="699" text-anchor="middle">409 STILL_IN_USE</text>
+    <line class="fc-line" x1="120" y1="710" x2="120" y2="747" marker-end="url(#fc-arrow-88)"/>
+    <text class="fc-label" x="126" y="733">yes</text>
+    <rect class="fc-box fc-step" x="8" y="748" width="224" height="32" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="769" text-anchor="middle">Save</text>
+    <path class="fc-line fc-line-effect" d="M232,764 H275" fill="none" marker-end="url(#fc-arrow-88)"/>
+    <rect class="fc-box fc-effect" x="276" y="740" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-effect" x="374" y="761" text-anchor="middle">Replaced / removed image:</text><text class="fc-text fc-text-effect" x="374" y="777" text-anchor="middle">record + file deleted</text>
+    <line class="fc-line" x1="120" y1="780" x2="120" y2="817" marker-end="url(#fc-arrow-88)"/>
+    <rect class="fc-box fc-end" x="8" y="818" width="224" height="64" rx="18"/>
+    <text class="fc-text fc-text-end" x="120" y="839" text-anchor="middle">200 / 201 category with image +</text><text class="fc-text fc-text-end" x="120" y="855" text-anchor="middle">productCount, or list sorted by</text><text class="fc-text fc-text-end" x="120" y="871" text-anchor="middle">name</text>
   </svg>
 </figure></div>
   <div class="flow-grid" data-l="id"><figure class="flow">
   <figcaption>Kelola Kategori Produk</figcaption>
-  <svg class="fc" viewBox="0 0 480 906" width="480" height="906" role="img" aria-label="Kelola Kategori Produk">
+  <svg class="fc" viewBox="0 0 480 922" width="480" height="922" role="img" aria-label="Kelola Kategori Produk">
     <defs><marker id="fc-arrow-89" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
     <rect class="fc-box fc-start" x="8" y="8" width="224" height="48" rx="18"/>
     <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">GET · POST · PATCH · DELETE</text><text class="fc-text fc-text-start" x="120" y="45" text-anchor="middle">/api/product-categories</text>
@@ -6221,38 +6221,38 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <text class="fc-text fc-text-error" x="374" y="489" text-anchor="middle">404</text>
     <line class="fc-line" x1="120" y1="508" x2="120" y2="537" marker-end="url(#fc-arrow-89)"/>
     <text class="fc-label" x="126" y="527">ya</text>
-    <polygon class="fc-box fc-check" points="20,538 220,538 232,554 220,570 20,570 8,554"/>
-    <text class="fc-text fc-text-check" x="120" y="559" text-anchor="middle"><tspan class="fc-code">imageId</tspan> ada? (jika dikirim)</text>
-    <path class="fc-line fc-line-error" d="M232,554 H275" fill="none" marker-end="url(#fc-arrow-89)"/>
-    <text class="fc-label" x="237" y="549">tidak</text>
-    <rect class="fc-box fc-error" x="276" y="538" width="196" height="32" rx="8"/>
-    <text class="fc-text fc-text-error" x="374" y="559" text-anchor="middle">400</text>
-    <line class="fc-line" x1="120" y1="570" x2="120" y2="599" marker-end="url(#fc-arrow-89)"/>
-    <text class="fc-label" x="126" y="589">ya</text>
-    <polygon class="fc-box fc-check" points="20,600 220,600 232,624 220,648 20,648 8,624"/>
-    <text class="fc-text fc-text-check" x="120" y="621" text-anchor="middle">Nama / gambar belum dipakai?</text><text class="fc-text fc-text-check" x="120" y="637" text-anchor="middle">(POST, PATCH)</text>
-    <path class="fc-line fc-line-error" d="M232,624 H275" fill="none" marker-end="url(#fc-arrow-89)"/>
-    <text class="fc-label" x="237" y="619">tidak</text>
-    <rect class="fc-box fc-error" x="276" y="608" width="196" height="32" rx="8"/>
-    <text class="fc-text fc-text-error" x="374" y="629" text-anchor="middle">409 Conflict</text>
-    <line class="fc-line" x1="120" y1="648" x2="120" y2="677" marker-end="url(#fc-arrow-89)"/>
-    <text class="fc-label" x="126" y="667">ya</text>
-    <polygon class="fc-box fc-check" points="20,678 220,678 232,702 220,726 20,726 8,702"/>
-    <text class="fc-text fc-text-check" x="120" y="699" text-anchor="middle">Tidak dipakai produk?</text><text class="fc-text fc-text-check" x="120" y="715" text-anchor="middle">(DELETE)</text>
-    <path class="fc-line fc-line-error" d="M232,702 H275" fill="none" marker-end="url(#fc-arrow-89)"/>
-    <text class="fc-label" x="237" y="697">tidak</text>
-    <rect class="fc-box fc-error" x="276" y="686" width="196" height="32" rx="8"/>
-    <text class="fc-text fc-text-error" x="374" y="707" text-anchor="middle">409 STILL_IN_USE</text>
-    <line class="fc-line" x1="120" y1="726" x2="120" y2="763" marker-end="url(#fc-arrow-89)"/>
-    <text class="fc-label" x="126" y="749">ya</text>
-    <rect class="fc-box fc-step" x="8" y="764" width="224" height="32" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="785" text-anchor="middle">Simpan</text>
-    <path class="fc-line fc-line-effect" d="M232,780 H275" fill="none" marker-end="url(#fc-arrow-89)"/>
-    <rect class="fc-box fc-effect" x="276" y="756" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-effect" x="374" y="777" text-anchor="middle">Gambar lama / dihapus: data</text><text class="fc-text fc-text-effect" x="374" y="793" text-anchor="middle">+ file dihapus</text>
-    <line class="fc-line" x1="120" y1="796" x2="120" y2="833" marker-end="url(#fc-arrow-89)"/>
-    <rect class="fc-box fc-end" x="8" y="834" width="224" height="64" rx="18"/>
-    <text class="fc-text fc-text-end" x="120" y="855" text-anchor="middle">200 / 201 kategori dengan</text><text class="fc-text fc-text-end" x="120" y="871" text-anchor="middle">gambar + productCount, atau daftar</text><text class="fc-text fc-text-end" x="120" y="887" text-anchor="middle">urut nama</text>
+    <polygon class="fc-box fc-check" points="20,538 220,538 232,562 220,586 20,586 8,562"/>
+    <text class="fc-text fc-text-check" x="120" y="559" text-anchor="middle"><tspan class="fc-code">imageId</tspan> dikirim (POST) dan</text><text class="fc-text fc-text-check" x="120" y="575" text-anchor="middle">ada? tidak boleh null</text>
+    <path class="fc-line fc-line-error" d="M232,562 H275" fill="none" marker-end="url(#fc-arrow-89)"/>
+    <text class="fc-label" x="237" y="557">tidak</text>
+    <rect class="fc-box fc-error" x="276" y="546" width="196" height="32" rx="8"/>
+    <text class="fc-text fc-text-error" x="374" y="567" text-anchor="middle">400</text>
+    <line class="fc-line" x1="120" y1="586" x2="120" y2="615" marker-end="url(#fc-arrow-89)"/>
+    <text class="fc-label" x="126" y="605">ya</text>
+    <polygon class="fc-box fc-check" points="20,616 220,616 232,640 220,664 20,664 8,640"/>
+    <text class="fc-text fc-text-check" x="120" y="637" text-anchor="middle">Nama / gambar belum dipakai?</text><text class="fc-text fc-text-check" x="120" y="653" text-anchor="middle">(POST, PATCH)</text>
+    <path class="fc-line fc-line-error" d="M232,640 H275" fill="none" marker-end="url(#fc-arrow-89)"/>
+    <text class="fc-label" x="237" y="635">tidak</text>
+    <rect class="fc-box fc-error" x="276" y="624" width="196" height="32" rx="8"/>
+    <text class="fc-text fc-text-error" x="374" y="645" text-anchor="middle">409 Conflict</text>
+    <line class="fc-line" x1="120" y1="664" x2="120" y2="693" marker-end="url(#fc-arrow-89)"/>
+    <text class="fc-label" x="126" y="683">ya</text>
+    <polygon class="fc-box fc-check" points="20,694 220,694 232,718 220,742 20,742 8,718"/>
+    <text class="fc-text fc-text-check" x="120" y="715" text-anchor="middle">Tidak dipakai produk?</text><text class="fc-text fc-text-check" x="120" y="731" text-anchor="middle">(DELETE)</text>
+    <path class="fc-line fc-line-error" d="M232,718 H275" fill="none" marker-end="url(#fc-arrow-89)"/>
+    <text class="fc-label" x="237" y="713">tidak</text>
+    <rect class="fc-box fc-error" x="276" y="702" width="196" height="32" rx="8"/>
+    <text class="fc-text fc-text-error" x="374" y="723" text-anchor="middle">409 STILL_IN_USE</text>
+    <line class="fc-line" x1="120" y1="742" x2="120" y2="779" marker-end="url(#fc-arrow-89)"/>
+    <text class="fc-label" x="126" y="765">ya</text>
+    <rect class="fc-box fc-step" x="8" y="780" width="224" height="32" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="801" text-anchor="middle">Simpan</text>
+    <path class="fc-line fc-line-effect" d="M232,796 H275" fill="none" marker-end="url(#fc-arrow-89)"/>
+    <rect class="fc-box fc-effect" x="276" y="772" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-effect" x="374" y="793" text-anchor="middle">Gambar lama / dihapus: data</text><text class="fc-text fc-text-effect" x="374" y="809" text-anchor="middle">+ file dihapus</text>
+    <line class="fc-line" x1="120" y1="812" x2="120" y2="849" marker-end="url(#fc-arrow-89)"/>
+    <rect class="fc-box fc-end" x="8" y="850" width="224" height="64" rx="18"/>
+    <text class="fc-text fc-text-end" x="120" y="871" text-anchor="middle">200 / 201 kategori dengan</text><text class="fc-text fc-text-end" x="120" y="887" text-anchor="middle">gambar + productCount, atau daftar</text><text class="fc-text fc-text-end" x="120" y="903" text-anchor="middle">urut nama</text>
   </svg>
 </figure></div>
 </details>
@@ -6269,7 +6269,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   </div>
   <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <div data-l="en"><p>Sorted by name, each with its <code>image</code> (or null) and <code>productCount</code> (all its products, any status).</p></div><div data-l="id"><p>Diurutkan berdasarkan nama, masing-masing dengan <code>image</code> (atau null) dan <code>productCount</code> (semua produknya, status apa pun).</p></div>
+    <div data-l="en"><p>Sorted by name, each with its <code>image</code> and <code>productCount</code> (all its products, any status).</p></div><div data-l="id"><p>Diurutkan berdasarkan nama, masing-masing dengan <code>image</code> dan <code>productCount</code> (semua produknya, status apa pun).</p></div>
     <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr></tbody></table></div>
     
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
@@ -6419,7 +6419,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   </div>
   <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <div data-l="en"><p>Names are unique. <code>imageId</code> is optional (upload the image first; one image per category): the carousel on the landing page shows it. Saves <code>{{categoryId}}</code>.</p></div><div data-l="id"><p>Nama harus unik. <code>imageId</code> opsional (unggah gambarnya dulu; satu gambar per kategori): carousel di halaman landing menampilkannya. Menyimpan <code>{{categoryId}}</code>.</p></div>
+    <div data-l="en"><p>Names are unique. <code>imageId</code> is <strong>required</strong> (upload the image first; one image per category): the carousel on the landing page shows it. Saves <code>{{categoryId}}</code>.</p></div><div data-l="id"><p>Nama harus unik. <code>imageId</code> <strong>wajib</strong> (unggah gambarnya dulu; satu gambar per kategori): carousel di halaman landing menampilkannya. Menyimpan <code>{{categoryId}}</code>.</p></div>
     
     <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;name&quot;: &quot;Kuliner {{$timestamp}}&quot;,
@@ -6488,7 +6488,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   </div>
   <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <div data-l="en"><p>Send <code>name</code> and/or <code>imageId</code>. A new <code>imageId</code> replaces the image (the old one and its file are deleted); <code>null</code> removes it.</p></div><div data-l="id"><p>Kirim <code>name</code> dan/atau <code>imageId</code>. <code>imageId</code> baru menggantikan gambar (gambar lama beserta filenya dihapus); <code>null</code> menghapus gambarnya.</p></div>
+    <div data-l="en"><p>Send <code>name</code> and/or <code>imageId</code>. A new <code>imageId</code> replaces the image (the old one and its file are deleted). The image can't be removed (<code>imageId: null</code> → 400), only replaced. Older categories without an image should get one.</p></div><div data-l="id"><p>Kirim <code>name</code> dan/atau <code>imageId</code>. <code>imageId</code> baru menggantikan gambar (gambar lama beserta filenya dihapus). Gambar tidak bisa dihapus (<code>imageId: null</code> → 400), hanya diganti. Kategori lama yang belum punya gambar sebaiknya segera diberi gambar.</p></div>
     
     <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;name&quot;: &quot;Kuliner &amp; Minuman {{$timestamp}}&quot;,
