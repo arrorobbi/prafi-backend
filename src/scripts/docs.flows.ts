@@ -536,6 +536,22 @@ export const FLOWS: Record<string, Chart[]> = {
     },
   ],
 
+  Stats: [
+    {
+      title: { en: 'Dashboard statistics', id: 'Statistik dashboard' },
+      nodes: [
+        start('GET /api/stats/overview'),
+        ...auth({ en: 'superadmin, disnakertrans or admin', id: 'superadmin, disnakertrans atau admin' }),
+        check({ en: 'days 1-365?', id: 'days 1-365?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
+        step(
+          { en: 'Count in the database (days in WIT)', id: 'Hitung di database (hari dalam WIT)' },
+          note({ en: 'Users: only the roles the caller may list', id: 'Pengguna: hanya role yang boleh dilihat pemanggil' }),
+        ),
+        end({ en: '200 products, UMKM, users, per day', id: '200 produk, UMKM, pengguna, per hari' }),
+      ],
+    },
+  ],
+
   Logs: [
     {
       title: { en: 'How a request is logged', id: 'Cara permintaan dicatat' },

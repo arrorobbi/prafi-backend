@@ -77,7 +77,9 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Notifikasi | `PATCH /api/notifications/{{notificationId}}/read` | Semua role |
 | Notifikasi | `PATCH /api/notifications/read-all` | Semua role |
 | Notifikasi | `DELETE /api/notifications/{{notificationId}}` | Semua role |
+| Statistik | `GET /api/stats/overview` | superadmin, disnakertrans, admin |
 | Log | `GET /api/logs` | superadmin |
+| Log | `GET /api/logs/stats` | superadmin |
 | Log | `GET /api/logs/{{logId}}` | superadmin |
 | Contoh | `GET /api/admin/ping` | superadmin, admin |
 | Contoh | `GET /api/tenant/ping` | Semua role |
@@ -280,7 +282,7 @@ Halaman publik untuk pengunjung: tanpa token, tanpa data pribadi (tanpa email/te
 **Ulasan** juga publik: siapa pun dapat membaca dan menulis ulasan tanpa login (`name`, `stars` 1–5, `review`), hanya untuk produk yang sudah disetujui. Maksimal 5 ulasan per pengunjung (IP) per 10 menit (429 `TOO_MANY_REQUESTS`). Produk memiliki `ratingAverage` (1 desimal, `null` jika belum ada ulasan) dan `reviewCount`; UMKM memiliki `productCount`, `ratingAverage`, dan `reviewCount` dari produknya yang sudah disetujui.
 
 === REQ Landing Products (Public) => Produk Landing
-Hanya produk yang sudah disetujui, terbaru di atas. Opsional `recommended=true` (produk rekomendasi tenant) dan `tenantId` (produk satu pemilik). `tenant.tenant` pada setiap produk adalah profil UMKM pemiliknya (`id`, `name`) untuk *Detail UMKM Landing*.
+Hanya produk yang sudah disetujui, terbaru di atas. Opsional `recommended=true` (produk rekomendasi tenant) dan `tenantId` (produk satu pemilik). `tenant.tenant` pada setiap produk adalah profil UMKM pemiliknya (`id`, `name`, dan tautan publiknya `whatsappLink`, `instagramLink`, `shopeeLink`, `googleBusinessLink`, `fbLink`, `gmapsLink`; yang kosong bernilai `null` atau `"-"`) untuk *Detail UMKM Landing* dan tombol kontak di halaman produk.
 
 === REQ Landing Product (Public) => Detail Produk Landing
 Satu produk yang sudah disetujui beserta `ratingAverage` / `reviewCount`. 404 untuk produk yang tidak ada atau belum disetujui.
@@ -378,6 +380,12 @@ Mengembalikan `{ updated }` (jumlah yang ditandai).
 
 === REQ Delete Notification (All roles) => Hapus Notifikasi
 
+=== FOLDER Stats => Statistik
+Statistik dashboard (`/api/stats`, Bearer `{{token}}`) untuk grafik di dashboard superadmin, disnakertrans, dan admin. Dihitung di database, sehingga frontend tidak perlu memuat semua data. Grafik log API ada di *Log → Statistik Log*.
+
+=== REQ Stats Overview (superadmin, disnakertrans, admin) => Ringkasan Statistik
+Angka untuk grafik dashboard. `products.byStatus` (active / pending / rejected / inactive, aturan yang sama dengan status produk di frontend), `tenants.byCategory` dan `byArea`, `users.byRole` (aktif / tidak aktif) **hanya untuk role yang boleh dilihat pemanggil** (superadmin: semua, disnakertrans: admin, admin: tenant), dan `perDay` (produk, UMKM, dan akun baru per hari, termasuk hari tanpa data). Hari dihitung dalam WIT (`Asia/Jayapura`).
+
 === FOLDER Logs => Log
 Log permintaan dan error API (`/api/logs`, Bearer `{{token}}`), **hanya superadmin**, hanya-baca.
 
@@ -388,6 +396,9 @@ Yang disimpan, satu baris saat responsnya dikirim: setiap permintaan **tambah / 
 
 === REQ List Logs (superadmin) => Daftar Log
 Terbaru di atas, berhalaman (`limit` maksimal 100). Semua filter opsional dan dapat digabung. `outcome=failed` menampilkan semua permintaan yang gagal (4xx, mis. password salah atau data tidak valid, dan 5xx kesalahan server); `level` mempersempitnya ke salah satunya. Tanpa `errorStack`. Menyimpan log terbaru sebagai `{{logId}}`.
+
+=== REQ Log Stats (superadmin) => Statistik Log
+Angka untuk grafik log API selama `days` hari terakhir (WIT): `total`, `success`, `failed`, `perDay` (berhasil / gagal), `byMethod`, `byRole` (`guest` untuk aktivitas akun tanpa login), `topEndpoints` (id pada alamat digabung menjadi `:id`, beserta jumlah yang gagal) dan `topErrors`.
 
 === REQ Get Log (superadmin) => Detail Log
 Satu log lengkap, termasuk `errorStack` untuk error 5xx. 404 jika tidak ada (atau sudah dihapus).

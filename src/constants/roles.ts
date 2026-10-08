@@ -94,3 +94,6 @@ export const TENANT_CATEGORY_MANAGER_ROLES: Role[] = [ROLES.ADMIN];
 
 /** Only the superadmin reads the API request/error logs (GET /api/logs). */
 export const LOG_READER_ROLES: Role[] = [ROLES.SUPERADMIN];
+
+/** Roles that see the dashboard statistics (GET /api/stats/overview); user numbers follow READABLE_ROLES. */
+export const STATS_READER_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.DISNAKERTRANS, ROLES.ADMIN];

@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Prafi API",
-    "description": "Backend API for Prafi (Express + Sequelize + PostgreSQL), with realtime notifications over Socket.IO and emails (nodemailer).\n\n## Setup (once)\n1. Import this collection and `Prafi-Local.postman_environment.json`, then select **Prafi Local** (environment dropdown, top right).\n2. In **Prafi Local** set `loginEmail` / `loginPassword` (Current value) to the superadmin from `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`), then Ctrl+S.\n3. Start the server (`npm run dev` or `npm run build && npm start`). `baseUrl` is `http://localhost:4000`.\n4. Email: set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` in `.env` to send real emails. Set `FRONTEND_URL` to the frontend's address: the forgot-password email links to `<FRONTEND_URL>/reset-password`. Without `SMTP_HOST` (development) emails are printed in the server log and the OTP / activation token is returned in `meta.verification` and saved as `{{otp}}` / `{{verifyToken}}`.\n\n## Login and roles\n- Every request uses **Bearer `{{token}}`** (set on the collection; requests inherit it). Public requests have *No Auth*.\n- **Auth → Login** saves the token to `{{token}}` (valid **1 hour**). To switch role, change `loginEmail` / `loginPassword` (or the Login body) and send Login again.\n- The **name of each request says who can call it**: `(All roles)` = superadmin, disnakertrans, admin and tenant; `(superadmin, disnakertrans, admin)`, `(admin)`, `(tenant)`… = only those roles; `(Public)` = no login. Any other role gets **403**.\n- Every account must have a **verified email** (`mailActive: true`) and an **active approval** (`approval.isActive: true`) to log in and use the API.\n\n| role | created by | email verification | approval at start | can |\n|---|---|---|---|---|\n| superadmin | seed (`npm run db:seed`) | already verified | active | create disnakertrans accounts; **read-only** for everything else (users, products, tenants, tenant categories); notified of every new account and product |\n| disnakertrans | superadmin (*Register Disnakertrans*) | activation link (24 h) | active | view and activate/deactivate **admin** accounts and **products**, view all products and tenants |\n| admin | self sign-up (*Register Admin*) | OTP (15 min) | **inactive** until a disnakertrans activates it | activate tenant accounts **and products**, read users (tenants)/products/tenants, manage tenant categories |\n| tenant | self sign-up (*Register Tenant*) | OTP (15 min) | active | manage their own products and tenant profile |\n\n## Endpoints\n| folder | endpoint | access |\n|---|---|---|\n| Health | `GET /api/health` | Public |\n| Auth | `POST /api/auth/login` | Public |\n| Auth | `POST /api/auth/logout` | All roles |\n| Auth | `POST /api/auth/register/disnakertrans` | superadmin |\n| Auth | `POST /api/auth/register/admin` | Public |\n| Auth | `POST /api/auth/register/tenant` | Public |\n| Auth | `POST /api/auth/verify-otp/{{userId}}` | Public |\n| Auth | `GET /api/auth/verify-email/{{userId}}` | Public |\n| Auth | `POST /api/auth/resend-verification/{{userId}}` | Public |\n| Auth | `POST /api/auth/forgot-password` | Public |\n| Auth | `POST /api/auth/reset-password/check` | Public |\n| Auth | `POST /api/auth/reset-password` | Public |\n| Auth | `GET /api/auth/me` | All roles |\n| Auth | `PATCH /api/auth/me` | All roles |\n| Images | `POST /api/images` | All roles |\n| Images | `GET {{imagePath}}` | Public |\n| Images | `DELETE /api/images/{{imageId}}` | tenant |\n| Users | `GET /api/users` | superadmin, disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{userId}}` | disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{productId}}` | disnakertrans, admin |\n| Products | `GET /api/products` | All roles |\n| Products | `GET /api/products/{{productId}}` | All roles |\n| Products | `POST /api/products` | tenant |\n| Products | `PATCH /api/products/{{productId}}` | tenant |\n| Products | `DELETE /api/products/{{productId}}` | tenant |\n| Landing | `GET /api/landing/products` | Public |\n| Landing | `GET /api/landing/products/{{productId}}` | Public |\n| Landing | `GET /api/landing/products/{{productId}}/reviews` | Public |\n| Landing | `POST /api/landing/products/{{productId}}/reviews` | Public |\n| Landing | `GET /api/landing/tenants` | Public |\n| Landing | `GET /api/landing/tenants/{{tenantProfileId}}` | Public |\n| Tenant Categories | `GET /api/tenant-categories` | superadmin, admin, tenant |\n| Tenant Categories | `GET /api/tenant-categories/{{categoryId}}` | superadmin, admin, tenant |\n| Tenant Categories | `POST /api/tenant-categories` | admin |\n| Tenant Categories | `PATCH /api/tenant-categories/{{categoryId}}` | admin |\n| Tenant Categories | `DELETE /api/tenant-categories/{{categoryId}}` | admin |\n| Tenants | `GET /api/tenants/me` | tenant |\n| Tenants | `POST /api/tenants/me` | tenant |\n| Tenants | `PATCH /api/tenants/me` | tenant |\n| Tenants | `DELETE /api/tenants/me` | tenant |\n| Tenants | `GET /api/tenants` | superadmin, disnakertrans, admin |\n| Tenants | `GET /api/tenants/{{tenantProfileId}}` | superadmin, disnakertrans, admin |\n| Notifications | `GET /api/notifications` | All roles |\n| Notifications | `GET /api/notifications/unread-count` | All roles |\n| Notifications | `PATCH /api/notifications/{{notificationId}}/read` | All roles |\n| Notifications | `PATCH /api/notifications/read-all` | All roles |\n| Notifications | `DELETE /api/notifications/{{notificationId}}` | All roles |\n| Logs | `GET /api/logs` | superadmin |\n| Logs | `GET /api/logs/{{logId}}` | superadmin |\n| Examples | `GET /api/admin/ping` | superadmin, admin |\n| Examples | `GET /api/tenant/ping` | All roles |\n| Realtime (WebSocket) | Socket.IO at `{{baseUrl}}` | All roles (Bearer token) |\n\n## Saved variables\nRequests save what the next ones need: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `tenantCategoryId` · `tenantProfileId` · `notificationId` · `logId`. Each save is printed in the Postman Console.\n\n## Example walkthrough\n1. **Login** as superadmin → **Register Disnakertrans** → **Verify Email Link** (or open the link from the email).\n2. **Register Admin** → **Verify OTP** (code from the email, or `{{otp}}` in development).\n3. Set `loginEmail` = the disnakertrans email, `loginPassword` = `{{newUserPassword}}` → **Login** → **Activate / Deactivate User** with `userId` = the admin's id and `userRole` = `admin`.\n4. **Login** as the admin → **Create Tenant Category**.\n5. **Register Tenant** → **Verify OTP** → **Login** as the tenant → **Upload Image** → **Create My Tenant** → **Upload Image** again → **Create Product**.\n6. **Login** as the admin → **List Notifications** → **Activate / Deactivate Product** → **Landing Products** shows it.\n\n## Responses\n- Success: `{ \"success\": true, \"data\": …, \"meta\"?: { page, limit, total, totalPages } | { verification } }`\n- Error: `{ \"success\": false, \"error\": { \"code\", \"message\", \"details\"? } }`\n- `message` and `details[].message` are in **Bahasa Indonesia** (ready to show in the frontend). `code` and `field` stay in English; frontend logic should switch on `code`.\n\n| status | code (examples) | meaning |\n|---|---|---|\n| 400 | `VALIDATION_ERROR`, `BAD_REQUEST`, `ID_NOT_PROVIDED` | invalid input (`details` lists the fields) |\n| 400 | `OTP_INVALID`, `OTP_EXPIRED`, `LINK_INVALID`, `LINK_EXPIRED`, `RESET_LINK_INVALID`, `RESET_LINK_EXPIRED` | wrong or expired verification code / link / password reset link |\n| 401 | `UNAUTHORIZED` | no/invalid/expired/logged-out token, or the password was reset → log in again |\n| 403 | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `USER_NOT_ACTIVATED` | wrong role, email not verified yet, or account not activated |\n| 404 | `NOT_FOUND` | not found, or not yours |\n| 409 | `UNIQUE_CONSTRAINT`, `STILL_IN_USE`, `CONFLICT`, `EMAIL_ALREADY_VERIFIED` | duplicate value, record still in use, already verified |\n| 413 | `FILE_TOO_LARGE` | image over 5 MB |\n| 429 | `TOO_MANY_REQUESTS` | a new verification code was requested less than 60 seconds ago |\n\n## Notifications and realtime\nEvery role gets notifications for the events that concern them (see **Notifications**); activation notifications include the `approval` with `userId` and the `user`. They arrive live over Socket.IO as `notification:new` (see **Realtime (WebSocket)** for connecting in Postman and in the frontend).",
+    "description": "Backend API for Prafi (Express + Sequelize + PostgreSQL), with realtime notifications over Socket.IO and emails (nodemailer).\n\n## Setup (once)\n1. Import this collection and `Prafi-Local.postman_environment.json`, then select **Prafi Local** (environment dropdown, top right).\n2. In **Prafi Local** set `loginEmail` / `loginPassword` (Current value) to the superadmin from `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`), then Ctrl+S.\n3. Start the server (`npm run dev` or `npm run build && npm start`). `baseUrl` is `http://localhost:4000`.\n4. Email: set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` in `.env` to send real emails. Set `FRONTEND_URL` to the frontend's address: the forgot-password email links to `<FRONTEND_URL>/reset-password`. Without `SMTP_HOST` (development) emails are printed in the server log and the OTP / activation token is returned in `meta.verification` and saved as `{{otp}}` / `{{verifyToken}}`.\n\n## Login and roles\n- Every request uses **Bearer `{{token}}`** (set on the collection; requests inherit it). Public requests have *No Auth*.\n- **Auth → Login** saves the token to `{{token}}` (valid **1 hour**). To switch role, change `loginEmail` / `loginPassword` (or the Login body) and send Login again.\n- The **name of each request says who can call it**: `(All roles)` = superadmin, disnakertrans, admin and tenant; `(superadmin, disnakertrans, admin)`, `(admin)`, `(tenant)`… = only those roles; `(Public)` = no login. Any other role gets **403**.\n- Every account must have a **verified email** (`mailActive: true`) and an **active approval** (`approval.isActive: true`) to log in and use the API.\n\n| role | created by | email verification | approval at start | can |\n|---|---|---|---|---|\n| superadmin | seed (`npm run db:seed`) | already verified | active | create disnakertrans accounts; **read-only** for everything else (users, products, tenants, tenant categories); notified of every new account and product |\n| disnakertrans | superadmin (*Register Disnakertrans*) | activation link (24 h) | active | view and activate/deactivate **admin** accounts and **products**, view all products and tenants |\n| admin | self sign-up (*Register Admin*) | OTP (15 min) | **inactive** until a disnakertrans activates it | activate tenant accounts **and products**, read users (tenants)/products/tenants, manage tenant categories |\n| tenant | self sign-up (*Register Tenant*) | OTP (15 min) | active | manage their own products and tenant profile |\n\n## Endpoints\n| folder | endpoint | access |\n|---|---|---|\n| Health | `GET /api/health` | Public |\n| Auth | `POST /api/auth/login` | Public |\n| Auth | `POST /api/auth/logout` | All roles |\n| Auth | `POST /api/auth/register/disnakertrans` | superadmin |\n| Auth | `POST /api/auth/register/admin` | Public |\n| Auth | `POST /api/auth/register/tenant` | Public |\n| Auth | `POST /api/auth/verify-otp/{{userId}}` | Public |\n| Auth | `GET /api/auth/verify-email/{{userId}}` | Public |\n| Auth | `POST /api/auth/resend-verification/{{userId}}` | Public |\n| Auth | `POST /api/auth/forgot-password` | Public |\n| Auth | `POST /api/auth/reset-password/check` | Public |\n| Auth | `POST /api/auth/reset-password` | Public |\n| Auth | `GET /api/auth/me` | All roles |\n| Auth | `PATCH /api/auth/me` | All roles |\n| Images | `POST /api/images` | All roles |\n| Images | `GET {{imagePath}}` | Public |\n| Images | `DELETE /api/images/{{imageId}}` | tenant |\n| Users | `GET /api/users` | superadmin, disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{userId}}` | disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{productId}}` | disnakertrans, admin |\n| Products | `GET /api/products` | All roles |\n| Products | `GET /api/products/{{productId}}` | All roles |\n| Products | `POST /api/products` | tenant |\n| Products | `PATCH /api/products/{{productId}}` | tenant |\n| Products | `DELETE /api/products/{{productId}}` | tenant |\n| Landing | `GET /api/landing/products` | Public |\n| Landing | `GET /api/landing/products/{{productId}}` | Public |\n| Landing | `GET /api/landing/products/{{productId}}/reviews` | Public |\n| Landing | `POST /api/landing/products/{{productId}}/reviews` | Public |\n| Landing | `GET /api/landing/tenants` | Public |\n| Landing | `GET /api/landing/tenants/{{tenantProfileId}}` | Public |\n| Tenant Categories | `GET /api/tenant-categories` | superadmin, admin, tenant |\n| Tenant Categories | `GET /api/tenant-categories/{{categoryId}}` | superadmin, admin, tenant |\n| Tenant Categories | `POST /api/tenant-categories` | admin |\n| Tenant Categories | `PATCH /api/tenant-categories/{{categoryId}}` | admin |\n| Tenant Categories | `DELETE /api/tenant-categories/{{categoryId}}` | admin |\n| Tenants | `GET /api/tenants/me` | tenant |\n| Tenants | `POST /api/tenants/me` | tenant |\n| Tenants | `PATCH /api/tenants/me` | tenant |\n| Tenants | `DELETE /api/tenants/me` | tenant |\n| Tenants | `GET /api/tenants` | superadmin, disnakertrans, admin |\n| Tenants | `GET /api/tenants/{{tenantProfileId}}` | superadmin, disnakertrans, admin |\n| Notifications | `GET /api/notifications` | All roles |\n| Notifications | `GET /api/notifications/unread-count` | All roles |\n| Notifications | `PATCH /api/notifications/{{notificationId}}/read` | All roles |\n| Notifications | `PATCH /api/notifications/read-all` | All roles |\n| Notifications | `DELETE /api/notifications/{{notificationId}}` | All roles |\n| Stats | `GET /api/stats/overview` | superadmin, disnakertrans, admin |\n| Logs | `GET /api/logs` | superadmin |\n| Logs | `GET /api/logs/stats` | superadmin |\n| Logs | `GET /api/logs/{{logId}}` | superadmin |\n| Examples | `GET /api/admin/ping` | superadmin, admin |\n| Examples | `GET /api/tenant/ping` | All roles |\n| Realtime (WebSocket) | Socket.IO at `{{baseUrl}}` | All roles (Bearer token) |\n\n## Saved variables\nRequests save what the next ones need: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `tenantCategoryId` · `tenantProfileId` · `notificationId` · `logId`. Each save is printed in the Postman Console.\n\n## Example walkthrough\n1. **Login** as superadmin → **Register Disnakertrans** → **Verify Email Link** (or open the link from the email).\n2. **Register Admin** → **Verify OTP** (code from the email, or `{{otp}}` in development).\n3. Set `loginEmail` = the disnakertrans email, `loginPassword` = `{{newUserPassword}}` → **Login** → **Activate / Deactivate User** with `userId` = the admin's id and `userRole` = `admin`.\n4. **Login** as the admin → **Create Tenant Category**.\n5. **Register Tenant** → **Verify OTP** → **Login** as the tenant → **Upload Image** → **Create My Tenant** → **Upload Image** again → **Create Product**.\n6. **Login** as the admin → **List Notifications** → **Activate / Deactivate Product** → **Landing Products** shows it.\n\n## Responses\n- Success: `{ \"success\": true, \"data\": …, \"meta\"?: { page, limit, total, totalPages } | { verification } }`\n- Error: `{ \"success\": false, \"error\": { \"code\", \"message\", \"details\"? } }`\n- `message` and `details[].message` are in **Bahasa Indonesia** (ready to show in the frontend). `code` and `field` stay in English; frontend logic should switch on `code`.\n\n| status | code (examples) | meaning |\n|---|---|---|\n| 400 | `VALIDATION_ERROR`, `BAD_REQUEST`, `ID_NOT_PROVIDED` | invalid input (`details` lists the fields) |\n| 400 | `OTP_INVALID`, `OTP_EXPIRED`, `LINK_INVALID`, `LINK_EXPIRED`, `RESET_LINK_INVALID`, `RESET_LINK_EXPIRED` | wrong or expired verification code / link / password reset link |\n| 401 | `UNAUTHORIZED` | no/invalid/expired/logged-out token, or the password was reset → log in again |\n| 403 | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `USER_NOT_ACTIVATED` | wrong role, email not verified yet, or account not activated |\n| 404 | `NOT_FOUND` | not found, or not yours |\n| 409 | `UNIQUE_CONSTRAINT`, `STILL_IN_USE`, `CONFLICT`, `EMAIL_ALREADY_VERIFIED` | duplicate value, record still in use, already verified |\n| 413 | `FILE_TOO_LARGE` | image over 5 MB |\n| 429 | `TOO_MANY_REQUESTS` | a new verification code was requested less than 60 seconds ago |\n\n## Notifications and realtime\nEvery role gets notifications for the events that concern them (see **Notifications**); activation notifications include the `approval` with `userId` and the `user`. They arrive live over Socket.IO as `notification:new` (see **Realtime (WebSocket)** for connecting in Postman and in the frontend).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -3284,7 +3284,7 @@
                 }
               ]
             },
-            "description": "**Access:** public, no token\n\nApproved products only, newest first. Optional `recommended=true` (the tenant's recommended products) and `tenantId` (one owner's products). Each product's `tenant.tenant` is the owner's UMKM profile (`id`, `name`) for *Landing Tenant*.",
+            "description": "**Access:** public, no token\n\nApproved products only, newest first. Optional `recommended=true` (the tenant's recommended products) and `tenantId` (one owner's products). Each product's `tenant.tenant` is the owner's UMKM profile (`id`, `name`, and its public links `whatsappLink`, `instagramLink`, `shopeeLink`, `googleBusinessLink`, `fbLink`, `gmapsLink`; empty ones are `null` or `\"-\"`) for *Landing Tenant* and the product page's contact buttons.",
             "auth": {
               "type": "noauth"
             }
@@ -5842,6 +5842,125 @@
       ]
     },
     {
+      "name": "Stats",
+      "description": "Dashboard statistics (`/api/stats`, Bearer `{{token}}`) for the charts on the superadmin, disnakertrans and admin dashboards. Computed in the database, so the frontend doesn't have to load every record. The API log charts are in *Logs → Log Stats*.",
+      "item": [
+        {
+          "name": "Stats Overview (superadmin, disnakertrans, admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/stats/overview?days=30",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "stats",
+                "overview"
+              ],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30",
+                  "description": "Length of the per-day series, 1-365 (default 30)"
+                }
+              ]
+            },
+            "description": "**Access:** superadmin, disnakertrans, admin\n\nNumbers for the dashboard charts. `products.byStatus` (active / pending / rejected / inactive, the same rule as the frontend's product status), `tenants.byCategory` and `byArea`, `users.byRole` (active / inactive) **only for the roles the caller may list** (superadmin: all, disnakertrans: admin, admin: tenant), and `perDay` (new products, UMKM and accounts per day, zeros included). Days are counted in WIT (`Asia/Jayapura`)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/stats/overview?days=30",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "stats",
+                    "overview"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "30",
+                      "description": "Length of the per-day series, 1-365 (default 30)"
+                    }
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nNumbers for the dashboard charts. `products.byStatus` (active / pending / rejected / inactive, the same rule as the frontend's product status), `tenants.byCategory` and `byArea`, `users.byRole` (active / inactive) **only for the roles the caller may list** (superadmin: all, disnakertrans: admin, admin: tenant), and `perDay` (new products, UMKM and accounts per day, zeros included). Days are counted in WIT (`Asia/Jayapura`)."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"days\": 7,\n    \"timezone\": \"Asia/Jayapura\",\n    \"products\": {\n      \"total\": 5,\n      \"byStatus\": {\n        \"active\": 2,\n        \"pending\": 0,\n        \"rejected\": 0,\n        \"inactive\": 3\n      }\n    },\n    \"tenants\": {\n      \"total\": 2,\n      \"byCategory\": [\n        {\n          \"name\": \"makanan berat\",\n          \"count\": 1\n        },\n        {\n          \"name\": \"minuman\",\n          \"count\": 1\n        },\n        {\n          \"name\": \"BUMDES\",\n          \"count\": 0\n        },\n        {\n          \"name\": \"makanan ringan\",\n          \"count\": 0\n        }\n      ],\n      \"byArea\": [\n        {\n          \"area\": \"Wilayah SP 1\",\n          \"count\": 1\n        },\n        {\n          \"area\": \"Wilayah SP 3\",\n          \"count\": 1\n        }\n      ]\n    },\n    \"users\": {\n      \"roles\": [\n        \"tenant\"\n      ],\n      \"total\": 3,\n      \"byRole\": [\n        {\n          \"role\": \"tenant\",\n          \"active\": 3,\n          \"inactive\": 0\n        }\n      ]\n    },\n    \"perDay\": [\n      {\n        \"date\": \"2026-10-02\",\n        \"products\": 0,\n        \"tenants\": 0,\n        \"users\": 0\n      },\n      {\n        \"date\": \"2026-10-03\",\n        \"products\": 0,\n        \"tenants\": 0,\n        \"users\": 0\n      },\n      {\n        \"date\": \"2026-10-04\",\n        \"products\": 0,\n        \"tenants\": 0,\n        \"users\": 0\n      },\n      {\n        \"date\": \"2026-10-05\",\n        \"products\": 0,\n        \"tenants\": 0,\n        \"users\": 0\n      },\n      {\n        \"date\": \"2026-10-06\",\n        \"products\": 0,\n        \"tenants\": 0,\n        \"users\": 0\n      },\n      {\n        \"date\": \"2026-10-07\",\n        \"products\": 4,\n        \"tenants\": 2,\n        \"users\": 2\n      },\n      {\n        \"date\": \"2026-10-08\",\n        \"products\": 1,\n        \"tenants\": 0,\n        \"users\": 1\n      }\n    ]\n  }\n}"
+            },
+            {
+              "name": "403 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/stats/overview?days=30",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "stats",
+                    "overview"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "30",
+                      "description": "Length of the per-day series, 1-365 (default 30)"
+                    }
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nNumbers for the dashboard charts. `products.byStatus` (active / pending / rejected / inactive, the same rule as the frontend's product status), `tenants.byCategory` and `byArea`, `users.byRole` (active / inactive) **only for the roles the caller may list** (superadmin: all, disnakertrans: admin, admin: tenant), and `perDay` (new products, UMKM and accounts per day, zeros included). Days are counted in WIT (`Asia/Jayapura`)."
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"FORBIDDEN\",\n    \"message\": \"Anda tidak memiliki izin untuk mengakses data ini\",\n    \"stack\": \"HttpError: Anda tidak memiliki izin untuk mengakses data ini\\n    at Function.forbidden (/home/prafi/project/prafi-backend/src/errors/HttpError.ts:23:12)\\n    at <anonymous> (/home/prafi/project/prafi-backend/src/middlewares/auth.ts:89:23)\\n    at Layer.handleRequest (/home/prafi/project/prafi-backend/node_modules/router/lib/layer.js:152:17)\\n    at next (/home/prafi/project/prafi-backend/node_modules/router/lib/route.js:157:13)\\n    at authenticate (/home/prafi/project/prafi-backend/src/middlewares/auth.ts:23:3)\\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Logs",
       "description": "Request and error logs of the API (`/api/logs`, Bearer `{{token}}`), **superadmin only**, read-only.\n\nStored, one row each when the response is sent: every **create / update / delete** request (POST, PUT, PATCH, DELETE) **from a signed-in user** (a request with an expired or invalid token too, without a user), and **every auth action, also from guests**: login (including a wrong email or password), sign-up, OTP, activation link, resend, forgot / reset password, logout, profile changes (`GET /api/auth/me`, called by every page, is not). Reads and other guests' requests (reviews, bots) are not stored. A row has: `method`, `path`, `query`, `statusCode`, `durationMs`, `level` (`info` < 400, `warn` 4xx, `error` 5xx), who made it (`userId`, `userEmail`, `userRole`; null for guests), `authEmail` (auth actions: the email that was given, e.g. for a failed login, or the account of the `userId` sent), `ip`, `userAgent`. `requestFields` (the **names** of the sent fields, never their values, plus `image` for an upload) and `responseSummary` (a safe extract of a successful response: allowlisted keys such as `id`, `name`, `email`, `role`, `isActive`, `price`, `stars`, also inside `user` / `approval` / `product` / `tenant`; a list gives `{ count }`; tokens and passwords can never appear). A failed request also has the error the client got (`errorCode`, `errorMessage`, `errorDetails`); a 5xx also keeps the real error's stack trace in `errorStack` (only in *Get Log*; the client never sees it).\n\n- Request bodies are never stored, and secret query values (`token`, `otp`, `password`, `code`) are saved as `***`.\n- Rows older than `LOG_RETENTION_DAYS` (default 30) are deleted daily.",
       "item": [
@@ -6133,6 +6252,119 @@
               ],
               "cookie": [],
               "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"level\",\n        \"message\": \"level harus salah satu dari: info, warn, error\"\n      },\n      {\n        \"field\": \"status\",\n        \"message\": \"status harus berupa kode (mis. 404) atau kelas (mis. 4xx)\"\n      }\n    ],\n    \"stack\": \"…\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Log Stats (superadmin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/logs/stats?days=14",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "logs",
+                "stats"
+              ],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "14",
+                  "description": "1-365 (default 14)"
+                }
+              ]
+            },
+            "description": "**Access:** superadmin\n\nNumbers for the API log charts over the last `days` days (WIT): `total`, `success`, `failed`, `perDay` (success / failed), `byMethod`, `byRole` (`guest` for auth actions without a login), `topEndpoints` (ids in paths grouped as `:id`, with how many failed) and `topErrors`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/logs/stats?days=14",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "logs",
+                    "stats"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "14",
+                      "description": "1-365 (default 14)"
+                    }
+                  ]
+                },
+                "description": "**Access:** superadmin\n\nNumbers for the API log charts over the last `days` days (WIT): `total`, `success`, `failed`, `perDay` (success / failed), `byMethod`, `byRole` (`guest` for auth actions without a login), `topEndpoints` (ids in paths grouped as `:id`, with how many failed) and `topErrors`."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"days\": 7,\n    \"timezone\": \"Asia/Jayapura\",\n    \"total\": 144,\n    \"success\": 139,\n    \"failed\": 5,\n    \"perDay\": [\n      {\n        \"date\": \"2026-10-02\",\n        \"success\": 0,\n        \"failed\": 0\n      },\n      {\n        \"date\": \"2026-10-03\",\n        \"success\": 0,\n        \"failed\": 0\n      },\n      {\n        \"date\": \"2026-10-04\",\n        \"success\": 0,\n        \"failed\": 0\n      },\n      {\n        \"date\": \"2026-10-05\",\n        \"success\": 0,\n        \"failed\": 0\n      },\n      {\n        \"date\": \"2026-10-06\",\n        \"success\": 0,\n        \"failed\": 0\n      },\n      {\n        \"date\": \"2026-10-07\",\n        \"success\": 57,\n        \"failed\": 2\n      },\n      {\n        \"date\": \"2026-10-08\",\n        \"success\": 82,\n        \"failed\": 3\n      }\n    ],\n    \"byMethod\": [\n      {\n        \"method\": \"POST\",\n        \"count\": 98\n      },\n      {\n        \"method\": \"PATCH\",\n        \"count\": 44\n      },\n      {\n        \"method\": \"DELETE\",\n        \"count\": 2\n      }\n    ],\n    \"byRole\": [\n      {\n        \"role\": \"admin\",\n        \"count\": 53\n      },\n      {\n        \"role\": \"tenant\",\n        \"count\": 37\n      },\n      {\n        \"role\": \"disnakertrans\",\n        \"count\": 21\n      },\n      {\n        \"role\": \"guest\",\n        \"count\": 18\n      },\n      {\n        \"role\": \"superadmin\",\n        \"count\": 15\n      }\n    ],\n    \"topEndpoints\": [\n      {\n        \"endpoint\": \"POST /api/auth/logout\",\n        \"count\": 48,\n        \"failed\": 0\n      },\n      {\n        \"endpoint\": \"POST /api/auth/login\",\n        \"count\": 18,\n        \"failed\": 3\n      },\n      {\n        \"endpoint\": \"POST /api/images\",\n        \"count\": 17,\n        \"failed\": 0\n      },\n      {\n        \"endpoint\": \"PATCH /api/approvals/:id\",\n        \"count\": 15,\n        \"failed\": 2\n      },\n      {\n        \"endpoint\": \"PATCH /api/auth/me\",\n        \"count\": 10,\n        \"failed\": 0\n      },\n      {\n        \"endpoint\": \"PATCH /api/notifications/:id/read\",\n        \"count\": 9,\n        \"failed\": 0\n      },\n      {\n        \"endpoint\": \"POST /api/products\",\n        \"count\": 7,\n        \"failed\": 0\n      },\n      {\n        \"endpoint\": \"POST /api/tenant-categories\",\n        \"count\": 4,\n        \"failed\": 0\n      }\n    ],\n    \"topErrors\": [\n      {\n        \"errorCode\": \"UNAUTHORIZED\",\n        \"count\": 3\n      },\n      {\n        \"errorCode\": \"FORBIDDEN\",\n        \"count\": 2\n      }\n    ]\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/logs/stats?days=14",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "logs",
+                    "stats"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "14",
+                      "description": "1-365 (default 14)"
+                    }
+                  ]
+                },
+                "description": "**Access:** superadmin\n\nNumbers for the API log charts over the last `days` days (WIT): `total`, `success`, `failed`, `perDay` (success / failed), `byMethod`, `byRole` (`guest` for auth actions without a login), `topEndpoints` (ids in paths grouped as `:id`, with how many failed) and `topErrors`."
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"days\",\n        \"message\": \"days harus berupa bilangan bulat antara 1 dan 365\"\n      }\n    ],\n    \"stack\": \"HttpError: Validasi gagal\\n    at Function.badRequest (/home/prafi/project/prafi-backend/src/errors/HttpError.ts:15:12)\\n    at parseDays (/home/prafi/project/prafi-backend/src/controllers/stats.controller.ts:13:21)\\n    at logs (/home/prafi/project/prafi-backend/src/controllers/stats.controller.ts:25:59)\\n    at Layer.handleRequest (/home/prafi/project/prafi-backend/node_modules/router/lib/layer.js:152:17)\\n    at next (/home/prafi/project/prafi-backend/node_modules/router/lib/route.js:157:13)\\n    at Route.dispatch (/home/prafi/project/prafi-backend/node_modules/router/lib/route.js:117:3)\\n    at handle (/home/prafi/project/prafi-backend/node_modules/router/index.js:435:11)\\n    at Layer.handleRequest (/home/prafi/project/prafi-backend/node_modules/router/lib/layer.js:152:17)\\n    at /home/prafi/project/prafi-backend/node_modules/router/index.js:295:15\\n    at processParams (/home/prafi/project/prafi-backend/node_modules/router/index.js:582:12)\"\n  }\n}"
             }
           ]
         },
