@@ -7,7 +7,7 @@ const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
 const TEXT_FIELDS = ['name', 'description', 'details'] as const;
-const UPDATABLE_FIELDS: string[] = [...TEXT_FIELDS, 'price', 'isRecommended', 'imageId'];
+const UPDATABLE_FIELDS: string[] = [...TEXT_FIELDS, 'price', 'categoryId', 'imageId'];
 /** Rupiah (IDR); also keeps the value inside the INTEGER column */
 const MAX_PRICE = 2_000_000_000;
 const LOCKED_FIELDS: Record<string, string> = {
@@ -17,6 +17,8 @@ const LOCKED_FIELDS: Record<string, string> = {
   approval: 'hanya admin atau disnakertrans yang dapat mengaktifkan produk (PATCH /api/approvals/:id?type=product)',
   isActive: 'hanya admin atau disnakertrans yang dapat mengaktifkan produk (PATCH /api/approvals/:id?type=product)',
   qty: 'qty sudah tidak dipakai, gunakan price (harga dalam Rupiah)',
+  isRecommended: 'isRecommended diatur otomatis: produk menjadi rekomendasi bila rata-rata ulasannya 4,8 bintang atau lebih',
+  category: 'kirim categoryId (ID kategori produk)',
   ratingAverage: 'ratingAverage dihitung dari ulasan',
   reviewCount: 'reviewCount dihitung dari ulasan',
   createdAt: 'createdAt diatur oleh server',
@@ -53,12 +55,12 @@ function parseProductBody(body: Record<string, unknown>, partial: boolean) {
     input.price = body.price as number;
   }
 
-  if (body.isRecommended !== undefined) {
-    if (typeof body.isRecommended !== 'boolean') {
-      errors.push({ field: 'isRecommended', message: 'isRecommended harus bernilai true atau false' });
-    } else {
-      input.isRecommended = body.isRecommended;
-    }
+  if (body.categoryId === undefined) {
+    if (!partial) errors.push({ field: 'categoryId', message: 'categoryId (kategori produk) wajib diisi' });
+  } else if (!Number.isInteger(body.categoryId) || (body.categoryId as number) < 1) {
+    errors.push({ field: 'categoryId', message: 'categoryId harus berupa ID kategori produk (bilangan bulat)' });
+  } else {
+    input.categoryId = body.categoryId as number;
   }
 
   if (body.imageId === undefined) {
@@ -82,9 +84,9 @@ function parseId(value: unknown) {
   return id;
 }
 
-/** GET /api/products?page=&limit=&isActive= — superadmin/admin: all products, tenant: own products. */
+/** GET /api/products?page=&limit=&isActive=&categoryId= — superadmin/admin: all products, tenant: own products. */
 export const list: RequestHandler = async (req, res) => {
-  const { page = '1', limit = String(DEFAULT_LIMIT), isActive } = req.query as Record<string, string | undefined>;
+  const { page = '1', limit = String(DEFAULT_LIMIT), isActive, categoryId } = req.query as Record<string, string | undefined>;
 
   const errors: FieldError[] = [];
   const pageNum = Number(page);
@@ -96,22 +98,31 @@ export const list: RequestHandler = async (req, res) => {
   if (isActive !== undefined && isActive !== 'true' && isActive !== 'false') {
     errors.push({ field: 'isActive', message: 'isActive harus bernilai true atau false' });
   }
+  const categoryNum = categoryId === undefined ? undefined : Number(categoryId);
+  if (categoryNum !== undefined && (!Number.isInteger(categoryNum) || categoryNum < 1)) {
+    errors.push({ field: 'categoryId', message: 'categoryId harus berupa ID kategori produk (bilangan bulat)' });
+  }
   if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);
 
   const { products, meta } = await productService.list(req.user!, {
     page: pageNum,
     limit: limitNum,
     isActive: isActive === undefined ? undefined : isActive === 'true',
+    categoryId: categoryNum,
   });
   res.json({ success: true, data: products, meta });
 };
 
 /**
- * GET /api/landing/products?page=&limit=&recommended=&tenantId= — public, no login: only products with an
- * active approval. recommended=true: only the ones their tenant recommends; tenantId: one owner's products.
+ * GET /api/landing/products?page=&limit=&recommended=&tenantId=&categoryId=&sort= — public, no login: only products
+ * with an active approval. recommended=true: only the recommended ones (reviews average 4.8+); tenantId: one owner's
+ * products; categoryId: one category. sort: newest (default) or rating (best rated first, unrated last).
  */
 export const listPublic: RequestHandler = async (req, res) => {
-  const { page = '1', limit = String(DEFAULT_LIMIT), recommended, tenantId } = req.query as Record<string, string | undefined>;
+  const { page = '1', limit = String(DEFAULT_LIMIT), recommended, tenantId, categoryId, sort } = req.query as Record<
+    string,
+    string | undefined
+  >;
 
   const errors: FieldError[] = [];
   const pageNum = Number(page);
@@ -126,6 +137,13 @@ export const listPublic: RequestHandler = async (req, res) => {
   if (tenantId !== undefined && !UUID_RE.test(tenantId)) {
     errors.push({ field: 'tenantId', message: 'tenantId harus berupa UUID yang valid (id pemilik produk)' });
   }
+  const categoryNum = categoryId === undefined ? undefined : Number(categoryId);
+  if (categoryNum !== undefined && (!Number.isInteger(categoryNum) || categoryNum < 1)) {
+    errors.push({ field: 'categoryId', message: 'categoryId harus berupa ID kategori produk (bilangan bulat)' });
+  }
+  if (sort !== undefined && sort !== 'newest' && sort !== 'rating') {
+    errors.push({ field: 'sort', message: 'sort harus bernilai newest atau rating' });
+  }
   if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);
 
   const { products, meta } = await productService.listActive({
@@ -133,6 +151,8 @@ export const listPublic: RequestHandler = async (req, res) => {
     limit: limitNum,
     recommended: recommended === undefined ? undefined : recommended === 'true',
     tenantId,
+    categoryId: categoryNum,
+    sort: sort as 'newest' | 'rating' | undefined,
   });
   res.json({ success: true, data: products, meta });
 };

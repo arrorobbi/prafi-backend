@@ -11,6 +11,7 @@ import { sequelize } from '../config/database';
 import type { DbModels } from '.';
 import type { Approval } from './approval.model';
 import type { Image } from './image.model';
+import type { ProductCategory } from './productCategory.model';
 import type { Review } from './review.model';
 import type { User } from './user.model';
 
@@ -21,8 +22,13 @@ export class Product extends Model<InferAttributes<Product>, InferCreationAttrib
   declare details: string;
   /** In rupiah (IDR), whole numbers only. */
   declare price: number;
-  /** Set by the owning tenant: shown in the landing page's recommended products. */
+  /**
+   * Set by the server, never by the tenant: true while the product's reviews average RECOMMENDED_MIN_RATING
+   * stars or more (recomputed on every new review). Shown in the landing page's recommended products.
+   */
   declare isRecommended: CreationOptional<boolean>;
+  /** The product category (created by an admin). Required for new products; null only for older ones. */
+  declare categoryId: ForeignKey<ProductCategory['id']> | null;
   declare imageId: ForeignKey<Image['id']> | null;
   declare approvalId: ForeignKey<Approval['id']> | null;
   /** The tenant user who owns this product. */
@@ -32,13 +38,16 @@ export class Product extends Model<InferAttributes<Product>, InferCreationAttrib
 
   // Relations (populated when loaded with `include`)
   declare image?: NonAttribute<Image>;
+  declare category?: NonAttribute<ProductCategory>;
   declare approval?: NonAttribute<Approval>;
   declare tenant?: NonAttribute<User>;
   declare reviews?: NonAttribute<Review[]>;
 
-  static associate({ Image, Approval, User, Review }: DbModels) {
+  static associate({ Image, Approval, ProductCategory, User, Review }: DbModels) {
     // products.image_id - images.id (one-to-one)
     Product.belongsTo(Image, { as: 'image', foreignKey: 'imageId', onDelete: 'SET NULL' });
+    // products.category_id > product_categories.id (many products per category; a category in use can't be deleted)
+    Product.belongsTo(ProductCategory, { as: 'category', foreignKey: 'categoryId', onDelete: 'RESTRICT' });
     // products.approval_id - approvals.id (one-to-one)
     Product.belongsTo(Approval, { as: 'approval', foreignKey: 'approvalId', onDelete: 'SET NULL' });
     // products.tenant_id > users.id (a tenant user has many products; deleting the user deletes them)
@@ -61,6 +70,11 @@ Product.init(
       allowNull: true,
       unique: true,
       references: { model: 'images', key: 'id' },
+    },
+    categoryId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: { model: 'product_categories', key: 'id' },
     },
     approvalId: {
       type: DataTypes.INTEGER,

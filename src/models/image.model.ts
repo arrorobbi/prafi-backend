@@ -11,6 +11,7 @@ import { sequelize } from '../config/database';
 import { env } from '../config/env';
 import type { DbModels } from '.';
 import type { Product } from './product.model';
+import type { ProductCategory } from './productCategory.model';
 import type { Tenant } from './tenant.model';
 import type { User } from './user.model';
 
@@ -30,8 +31,9 @@ export class Image extends Model<InferAttributes<Image>, InferCreationAttributes
   declare user?: NonAttribute<User>;
   declare product?: NonAttribute<Product>;
   declare tenant?: NonAttribute<Tenant>;
+  declare productCategory?: NonAttribute<ProductCategory>;
 
-  static associate({ User, Product, Tenant }: DbModels) {
+  static associate({ User, Product, ProductCategory, Tenant }: DbModels) {
     // users.face_image_id - images.id (one-to-one)
     Image.hasOne(User, { as: 'user', foreignKey: 'faceImageId' });
     // tenants.logo_id - images.id (one-to-one)
@@ -39,6 +41,8 @@ export class Image extends Model<InferAttributes<Image>, InferCreationAttributes
     Image.hasOne(Tenant, { as: 'tenant', foreignKey: 'logoId', onDelete: 'RESTRICT' });
     // products.image_id - images.id (one-to-one)
     Image.hasOne(Product, { as: 'product', foreignKey: 'imageId' });
+    // product_categories.image_id - images.id (one-to-one)
+    Image.hasOne(ProductCategory, { as: 'productCategory', foreignKey: 'imageId' });
     // images.uploader_id > users.id (deleting the user keeps the image, e.g. a logo, without an uploader)
     Image.belongsTo(User, { as: 'uploader', foreignKey: 'uploaderId', onDelete: 'SET NULL' });
   }

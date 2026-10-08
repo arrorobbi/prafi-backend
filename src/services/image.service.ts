@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { IMAGES_DIR, IMAGES_URL_PATH } from '../config/upload';
 import { HttpError } from '../errors/HttpError';
-import { Image, Product, Tenant, User } from '../models';
+import { Image, Product, ProductCategory, Tenant, User } from '../models';
 
 /** The first bytes of each allowed type, so a renamed non-image (e.g. a PDF saved as .jpg) is refused. */
 const SIGNATURES: Record<string, (b: Buffer) => boolean> = {
@@ -61,14 +61,15 @@ export async function createFromUpload(file: Express.Multer.File, altText: strin
   }
 }
 
-/** Whether a user photo, tenant logo or product uses this image. */
+/** Whether a user photo, tenant logo, product or product category uses this image. */
 async function isInUse(imageId: number) {
-  const [products, tenants, users] = await Promise.all([
+  const [products, tenants, users, categories] = await Promise.all([
     Product.count({ where: { imageId } }),
     Tenant.count({ where: { logoId: imageId } }),
     User.count({ where: { faceImageId: imageId } }),
+    ProductCategory.count({ where: { imageId } }),
   ]);
-  return products + tenants + users > 0;
+  return products + tenants + users + categories > 0;
 }
 
 /**
@@ -100,7 +101,7 @@ export async function remove(id: number) {
 const deleteFile = (imgUrl: string) => fs.unlink(path.join(IMAGES_DIR, path.basename(imgUrl))).catch(() => {});
 
 /**
- * Called after a product image, face image or tenant logo was replaced (or removed):
+ * Called after a product image, face image, tenant logo or category image was replaced (or removed):
  * deletes the old image record and file, unless something still uses it.
  * Never throws, so a cleanup problem can't fail the update that triggered it.
  */

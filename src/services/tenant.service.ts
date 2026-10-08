@@ -1,6 +1,6 @@
 import { literal, Op, type Includeable, type WhereOptions } from 'sequelize';
 import { HttpError } from '../errors/HttpError';
-import { Image, Tenant, TenantCategory, User } from '../models';
+import { Image, Tenant, User } from '../models';
 import type { AuthUser } from '../types/express';
 import * as imageService from './image.service';
 import { notify } from './notification.service';
@@ -21,18 +21,15 @@ export interface TenantInput {
   shopeeLink?: string | null;
   /** Required: upload the logo first via POST /api/images. */
   logoId: number;
-  tenantCategoryId: number;
 }
 
 export interface ListTenantsOptions {
   page: number;
   limit: number;
-  tenantCategoryId?: number;
 }
 
 const tenantInclude = (withOwner: boolean): Includeable[] => [
   { association: 'logo' },
-  { association: 'category', attributes: ['id', 'name'] },
   ...(withOwner ? [{ association: 'owner', attributes: ['id', 'firstName', 'lastName', 'email', 'tenantName'] }] : []),
 ];
 
@@ -44,13 +41,6 @@ async function assertLogoExists(logoId: number) {
     throw HttpError.badRequest('Validasi gagal', [
       { field: 'logoId', message: 'Gambar tidak ditemukan, unggah logo terlebih dahulu melalui POST /api/images' },
     ]);
-  }
-}
-
-async function assertCategoryExists(tenantCategoryId: number) {
-  const category = await TenantCategory.findByPk(tenantCategoryId, { attributes: ['id'] });
-  if (!category) {
-    throw HttpError.badRequest('Validasi gagal', [{ field: 'tenantCategoryId', message: 'Kategori tenant tidak ditemukan' }]);
   }
 }
 
@@ -77,7 +67,6 @@ export function missingProfileFields(tenant: Tenant | null, owner?: { faceImageI
   if (!tenant) return ['profile', ...ownerMissing];
   const missing: string[] = PROFILE_TEXT_FIELDS.filter((f) => !String(tenant[f] ?? '').trim());
   if (tenant.logoId == null) missing.push('logoId');
-  if (tenant.tenantCategoryId == null) missing.push('tenantCategoryId');
   return [...missing, ...ownerMissing];
 }
 
@@ -117,7 +106,6 @@ export async function createMine(user: AuthUser, input: Omit<TenantInput, 'name'
     throw HttpError.conflict('Anda sudah memiliki profil tenant, ubah melalui PATCH /api/tenants/me');
   }
   await assertLogoExists(input.logoId);
-  await assertCategoryExists(input.tenantCategoryId);
 
   const name = input.name ?? (await User.findByPk(user.id, { attributes: ['tenantName'] }))?.tenantName;
   if (!name) {
@@ -134,7 +122,6 @@ export async function updateMine(user: AuthUser, changes: Partial<TenantInput>) 
   const tenant = await findOwn(user);
   if (!tenant) throw HttpError.notFound(NO_PROFILE);
   if (changes.logoId !== undefined) await assertLogoExists(changes.logoId);
-  if (changes.tenantCategoryId !== undefined) await assertCategoryExists(changes.tenantCategoryId);
 
   const oldLogoId = tenant.logoId;
   await tenant.update(changes);
@@ -156,10 +143,8 @@ export async function deleteMine(user: AuthUser) {
 
 // ---------- superadmin / admin: read all ----------
 
-export async function list({ page, limit, tenantCategoryId }: ListTenantsOptions) {
-  const where: WhereOptions = tenantCategoryId !== undefined ? { tenantCategoryId } : {};
+export async function list({ page, limit }: ListTenantsOptions) {
   const { rows, count } = await Tenant.findAndCountAll({
-    where,
     include: tenantInclude(true),
     order: [['createdAt', 'DESC']],
     limit,
@@ -193,7 +178,6 @@ const PUBLIC_ATTRIBUTES = {
 /** Only UMKM whose owner account is active are public. */
 const PUBLIC_INCLUDE: Includeable[] = [
   { association: 'logo', attributes: ['id', 'imgUrl', 'url', 'altText'] },
-  { association: 'category', attributes: ['id', 'name'] },
   {
     association: 'owner',
     attributes: ['id', 'tenantName'],
@@ -205,14 +189,12 @@ const PUBLIC_INCLUDE: Includeable[] = [
 export interface ListPublicTenantsOptions {
   page: number;
   limit: number;
-  tenantCategoryId?: number;
   /** Part of the UMKM name, case-insensitive */
   q?: string;
 }
 
-export async function listPublic({ page, limit, tenantCategoryId, q }: ListPublicTenantsOptions) {
+export async function listPublic({ page, limit, q }: ListPublicTenantsOptions) {
   const where: WhereOptions = {
-    ...(tenantCategoryId !== undefined && { tenantCategoryId }),
     ...(q && { name: { [Op.iLike]: `%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%` } }),
   };
   const { rows, count } = await Tenant.findAndCountAll({

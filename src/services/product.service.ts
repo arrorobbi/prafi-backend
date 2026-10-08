@@ -1,7 +1,7 @@
 import { literal, type FindAttributeOptions, type Includeable, type WhereOptions } from 'sequelize';
 import { PRODUCT_READ_ALL_ROLES } from '../constants/roles';
 import { HttpError } from '../errors/HttpError';
-import { Approval, Image, Product, sequelize } from '../models';
+import { Approval, Image, Product, ProductCategory, sequelize } from '../models';
 import type { AuthUser } from '../types/express';
 import * as imageService from './image.service';
 import { assertProfileComplete } from './tenant.service';
@@ -13,8 +13,8 @@ export interface ProductInput {
   details: string;
   /** Rupiah (IDR), whole numbers */
   price: number;
-  /** Optional, defaults to false */
-  isRecommended?: boolean;
+  /** The product category (GET /api/product-categories) */
+  categoryId: number;
   /** Required: upload the image first via POST /api/images. */
   imageId: number;
 }
@@ -24,10 +24,14 @@ export interface ListProductsOptions {
   limit: number;
   /** Optional filter on the product's approval. */
   isActive?: boolean;
+  categoryId?: number;
 }
+
+const CATEGORY_INCLUDE: Includeable = { association: 'category', attributes: ['id', 'name'] };
 
 const productInclude = (isActive?: boolean): Includeable[] => [
   { association: 'image' },
+  CATEGORY_INCLUDE,
   {
     association: 'approval',
     attributes: ['id', 'isActive', 'reason', 'updatedAt'],
@@ -48,6 +52,13 @@ const RATING_ATTRIBUTES: [ReturnType<typeof literal>, string][] = [
 ];
 const withRating = (exclude: string[] = []): FindAttributeOptions => ({ include: RATING_ATTRIBUTES, exclude });
 
+async function assertCategoryExists(categoryId: number) {
+  const category = await ProductCategory.findByPk(categoryId, { attributes: ['id'] });
+  if (!category) {
+    throw HttpError.badRequest('Validasi gagal', [{ field: 'categoryId', message: 'Kategori produk tidak ditemukan' }]);
+  }
+}
+
 async function assertImageExists(imageId: number) {
   const image = await Image.findByPk(imageId, { attributes: ['id'] });
   if (!image) {
@@ -58,8 +69,11 @@ async function assertImageExists(imageId: number) {
 }
 
 /** superadmin/admin: every product. tenant: only their own products. */
-export async function list(user: AuthUser, { page, limit, isActive }: ListProductsOptions) {
-  const where: WhereOptions = canReadAll(user) ? {} : { tenantId: user.id };
+export async function list(user: AuthUser, { page, limit, isActive, categoryId }: ListProductsOptions) {
+  const where: WhereOptions = {
+    ...(!canReadAll(user) && { tenantId: user.id }),
+    ...(categoryId !== undefined && { categoryId }),
+  };
 
   const { rows, count } = await Product.findAndCountAll({
     where,
@@ -77,15 +91,19 @@ export async function list(user: AuthUser, { page, limit, isActive }: ListProduc
 export interface ListActiveOptions {
   page: number;
   limit: number;
-  /** Only the products their tenant marked as recommended */
+  /** Only the recommended products (reviews average RECOMMENDED_MIN_RATING or more) */
   recommended?: boolean;
   /** Only this tenant user's products (the owner's user id, as in product.tenant.id) */
   tenantId?: string;
+  categoryId?: number;
+  /** newest (default) or rating: best average first, products without reviews last */
+  sort?: 'newest' | 'rating';
 }
 
 /** Public-safe shape: no owner email/phone, no internal approval reason. */
 const PUBLIC_INCLUDE: Includeable[] = [
   { association: 'image', attributes: ['id', 'imgUrl', 'url', 'altText'] },
+  CATEGORY_INCLUDE,
   { association: 'approval', attributes: [], where: { isActive: true }, required: true },
   {
     association: 'tenant',
@@ -102,16 +120,24 @@ const PUBLIC_INCLUDE: Includeable[] = [
 ];
 
 /** Public landing page: only products whose approval is active. */
-export async function listActive({ page, limit, recommended, tenantId }: ListActiveOptions) {
+export async function listActive({ page, limit, recommended, tenantId, categoryId, sort }: ListActiveOptions) {
   const where: WhereOptions = {
     ...(recommended !== undefined && { isRecommended: recommended }),
     ...(tenantId && { tenantId }),
+    ...(categoryId !== undefined && { categoryId }),
   };
   const { rows, count } = await Product.findAndCountAll({
     where,
     attributes: withRating(['approvalId']),
     include: PUBLIC_INCLUDE,
-    order: [['createdAt', 'DESC']],
+    order:
+      sort === 'rating'
+        ? [
+            [literal('"ratingAverage"'), 'DESC NULLS LAST'],
+            [literal('"reviewCount"'), 'DESC'],
+            ['createdAt', 'DESC'],
+          ]
+        : [['createdAt', 'DESC']],
     limit,
     offset: (page - 1) * limit,
     distinct: true,
@@ -146,6 +172,7 @@ async function findOwnProduct(user: AuthUser, id: string) {
 /** Creates the product with its own approval, inactive until an admin or disnakertrans activates it. */
 export async function create(user: AuthUser, input: ProductInput) {
   await assertProfileComplete(user);
+  await assertCategoryExists(input.categoryId);
   await assertImageExists(input.imageId);
 
   // imageId already used by another product → UniqueConstraintError → 409 via the error handler
@@ -163,6 +190,7 @@ export async function create(user: AuthUser, input: ProductInput) {
 
 export async function update(user: AuthUser, id: string, changes: Partial<ProductInput>) {
   const product = await findOwnProduct(user, id);
+  if (changes.categoryId !== undefined) await assertCategoryExists(changes.categoryId);
   if (changes.imageId !== undefined) await assertImageExists(changes.imageId);
 
   const oldImageId = product.imageId;

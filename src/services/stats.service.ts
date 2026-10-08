@@ -63,9 +63,12 @@ export async function overview(user: AuthUser, days: number) {
     query<DayCount>(perDay('products'), r),
     query<{ count: number }>(`SELECT COUNT(*)::int AS count FROM tenants`, r),
     query<{ name: string; count: number }>(
-      `SELECT c.name, COUNT(t.id)::int AS count
-       FROM tenant_categories c LEFT JOIN tenants t ON t.tenant_category_id = c.id
-       GROUP BY c.id, c.name ORDER BY count DESC, c.name`,
+      `SELECT c.name, COUNT(p.id)::int AS count
+       FROM product_categories c LEFT JOIN products p ON p.category_id = c.id
+       GROUP BY c.id, c.name
+       UNION ALL
+       SELECT 'Tanpa kategori', COUNT(*)::int FROM products WHERE category_id IS NULL HAVING COUNT(*) > 0
+       ORDER BY count DESC, name`,
       r,
     ),
     query<{ area: string; count: number }>(
@@ -95,8 +98,8 @@ export async function overview(user: AuthUser, days: number) {
   return {
     days,
     timezone: STATS_TIMEZONE,
-    products: { total: Object.values(byStatus).reduce((a, b) => a + b, 0), byStatus },
-    tenants: { total: tenantTotal[0]?.count ?? 0, byCategory: categoryRows, byArea: areaRows },
+    products: { total: Object.values(byStatus).reduce((a, b) => a + b, 0), byStatus, byCategory: categoryRows },
+    tenants: { total: tenantTotal[0]?.count ?? 0, byArea: areaRows },
     users: { roles, total: byRole.reduce((a, x) => a + x.active + x.inactive, 0), byRole },
     // New products, UMKM profiles and accounts (readable roles) per day
     perDay: productDays.map((d, i) => ({
