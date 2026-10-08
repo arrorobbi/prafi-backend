@@ -3277,7 +3277,7 @@
                 "categories"
               ]
             },
-            "description": "**Access:** public, no token\n\nEvery product category A→Z with its `image` (or null) and `productCount` (approved products only), for the home page carousel: each slide is a category image, and next to it *Landing Products* with `categoryId` shows that category's products.",
+            "description": "**Access:** public, no token\n\nEvery product category A→Z with its `image` (null only for older categories not given one yet) and `productCount` (approved products only), for the home page carousel: each slide is a category image, and next to it *Landing Products* with `categoryId` shows that category's products.",
             "auth": {
               "type": "noauth"
             }
@@ -3310,7 +3310,7 @@
                     "categories"
                   ]
                 },
-                "description": "**Access:** public, no token\n\nEvery product category A→Z with its `image` (or null) and `productCount` (approved products only), for the home page carousel: each slide is a category image, and next to it *Landing Products* with `categoryId` shows that category's products.",
+                "description": "**Access:** public, no token\n\nEvery product category A→Z with its `image` (null only for older categories not given one yet) and `productCount` (approved products only), for the home page carousel: each slide is a category image, and next to it *Landing Products* with `categoryId` shows that category's products.",
                 "auth": {
                   "type": "noauth"
                 }
@@ -4165,7 +4165,7 @@
     },
     {
       "name": "Product Categories",
-      "description": "Product categories (e.g. Kuliner, Kerajinan). Managed by disnakertrans and admin; every signed-in role can read them (superadmin and tenants read-only). A tenant picks one for each product (`categoryId`). Each category may have an image (`imageId`, upload it first via *Images → Upload Image*): the landing page carousel shows it, with the category's products next to it. Visitors read the list through *Landing → Landing Categories*. Each category carries `productCount`.",
+      "description": "Product categories (e.g. Kuliner, Kerajinan). Managed by disnakertrans and admin; every signed-in role can read them (superadmin and tenants read-only). A tenant picks one for each product (`categoryId`). Each category **must** have an image (`imageId`, upload it first via *Images → Upload Image*): the landing page carousel shows it, with the category's products next to it. Visitors read the list through *Landing → Landing Categories*. Each category carries `productCount`.",
       "item": [
         {
           "name": "List Product Categories (All roles)",
@@ -4192,7 +4192,7 @@
                 }
               ]
             },
-            "description": "**Access:** superadmin, disnakertrans, admin, tenant\n\nSorted by name, each with its `image` (or null) and `productCount` (all its products, any status)."
+            "description": "**Access:** superadmin, disnakertrans, admin, tenant\n\nSorted by name, each with its `image` and `productCount` (all its products, any status)."
           },
           "event": [
             {
@@ -4231,7 +4231,7 @@
                     }
                   ]
                 },
-                "description": "**Access:** superadmin, disnakertrans, admin, tenant\n\nSorted by name, each with its `image` (or null) and `productCount` (all its products, any status)."
+                "description": "**Access:** superadmin, disnakertrans, admin, tenant\n\nSorted by name, each with its `image` and `productCount` (all its products, any status)."
               },
               "status": "OK",
               "code": 200,
@@ -4270,7 +4270,7 @@
                     }
                   ]
                 },
-                "description": "**Access:** superadmin, disnakertrans, admin, tenant\n\nSorted by name, each with its `image` (or null) and `productCount` (all its products, any status)."
+                "description": "**Access:** superadmin, disnakertrans, admin, tenant\n\nSorted by name, each with its `image` and `productCount` (all its products, any status)."
               },
               "status": "Forbidden",
               "code": 403,
@@ -4398,7 +4398,7 @@
                 "product-categories"
               ]
             },
-            "description": "**Access:** disnakertrans, admin\n\nNames are unique. `imageId` is optional (upload the image first; one image per category): the carousel on the landing page shows it. Saves `{{categoryId}}`.",
+            "description": "**Access:** disnakertrans, admin\n\nNames are unique. `imageId` is **required** (upload the image first; one image per category): the carousel on the landing page shows it. Saves `{{categoryId}}`.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
@@ -4442,7 +4442,7 @@
                     "product-categories"
                   ]
                 },
-                "description": "**Access:** disnakertrans, admin\n\nNames are unique. `imageId` is optional (upload the image first; one image per category): the carousel on the landing page shows it. Saves `{{categoryId}}`.",
+                "description": "**Access:** disnakertrans, admin\n\nNames are unique. `imageId` is **required** (upload the image first; one image per category): the carousel on the landing page shows it. Saves `{{categoryId}}`.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
@@ -4485,7 +4485,7 @@
                     "product-categories"
                   ]
                 },
-                "description": "**Access:** disnakertrans, admin\n\nNames are unique. `imageId` is optional (upload the image first; one image per category): the carousel on the landing page shows it. Saves `{{categoryId}}`.",
+                "description": "**Access:** disnakertrans, admin\n\nNames are unique. `imageId` is **required** (upload the image first; one image per category): the carousel on the landing page shows it. Saves `{{categoryId}}`.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
@@ -4531,7 +4531,7 @@
                 "{{categoryId}}"
               ]
             },
-            "description": "**Access:** disnakertrans, admin\n\nSend `name` and/or `imageId`. A new `imageId` replaces the image (the old one and its file are deleted); `null` removes it.",
+            "description": "**Access:** disnakertrans, admin\n\nSend `name` and/or `imageId`. A new `imageId` replaces the image (the old one and its file are deleted). The image can't be removed (`imageId: null` → 400), only replaced. Older categories without an image should get one.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
@@ -4575,7 +4575,7 @@
                     "{{categoryId}}"
                   ]
                 },
-                "description": "**Access:** disnakertrans, admin\n\nSend `name` and/or `imageId`. A new `imageId` replaces the image (the old one and its file are deleted); `null` removes it.",
+                "description": "**Access:** disnakertrans, admin\n\nSend `name` and/or `imageId`. A new `imageId` replaces the image (the old one and its file are deleted). The image can't be removed (`imageId: null` → 400), only replaced. Older categories without an image should get one.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
@@ -4619,7 +4619,7 @@
                     "{{categoryId}}"
                   ]
                 },
-                "description": "**Access:** disnakertrans, admin\n\nSend `name` and/or `imageId`. A new `imageId` replaces the image (the old one and its file are deleted); `null` removes it.",
+                "description": "**Access:** disnakertrans, admin\n\nSend `name` and/or `imageId`. A new `imageId` replaces the image (the old one and its file are deleted). The image can't be removed (`imageId: null` → 400), only replaced. Older categories without an image should get one.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",

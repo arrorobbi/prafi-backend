@@ -12,14 +12,17 @@ import type { DbModels } from '.';
 import type { Image } from './image.model';
 import type { Product } from './product.model';
 
-/** Product categories, managed by admins. Each has an optional image: the landing page carousel shows it. */
+/** Product categories, managed by disnakertrans and admins. Each has an image: the landing page carousel shows it. */
 export class ProductCategory extends Model<
   InferAttributes<ProductCategory>,
   InferCreationAttributes<ProductCategory>
 > {
   declare id: CreationOptional<number>;
   declare name: string;
-  /** Optional: upload it first via POST /api/images. Shown in the landing page carousel. */
+  /**
+   * Required by the API (create needs one, update can only replace it): the landing page carousel shows it.
+   * Nullable in the database only for categories created before images existed, until an image is added.
+   */
   declare imageId: ForeignKey<Image['id']> | null;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
