@@ -117,13 +117,11 @@ async function productApprovalView(approvalId: number) {
         association: 'user',
         attributes: ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'tenantName'],
         include: [
-          {
-            association: 'tenant',
-            include: [{ association: 'category' }, { association: 'logo' }],
-          },
+          // The UMKM profile (it has no category any more: the product has one)
+          { association: 'tenant', include: [{ association: 'logo' }] },
         ],
       },
-      { association: 'product', include: [{ association: 'image' }] },
+      { association: 'product', include: [{ association: 'image' }, { association: 'category', attributes: ['id', 'name'] }] },
     ],
   });
   if (!approval) throw HttpError.notFound('Persetujuan tidak ditemukan');
