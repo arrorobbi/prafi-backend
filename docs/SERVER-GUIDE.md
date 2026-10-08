@@ -445,7 +445,110 @@ npm run dev                        # http://localhost:3000
 | `npm run typecheck` / `npm run lint` | type check | lint |
 | `npm run docs` | regenerates the public API docs | |
 
-## 12. Troubleshooting
+## 12. Updating the Panduan (help pages)
+
+The **Panduan** is the website's help: `/panduan` for everyone (header and footer link) and **Bantuan & Ketentuan** in the seller (tenant) dashboard. Both show the same list of topics; each topic opens to show its text and step-by-step screenshots. All of it lives in the **frontend** code; the backend is not involved.
+
+### Where the files are
+
+All paths are inside `/home/prafi/project/prafi-frontend`.
+
+| file | what it does |
+|---|---|
+| `src/lib/guides.tsx` | **The content.** The `GUIDES` list: every topic with its title, icon, who sees it, and its text. This is the file you edit |
+| `public/panduan/*.jpg` | The screenshots used by the steps (1024×640 JPG) |
+| `src/components/GuideSteps.tsx` | `Steps` and `Step`: the numbered steps, each with an optional screenshot (click = full size) |
+| `src/components/GuideList.tsx` | Draws the topic list (each topic is an expandable box) |
+| `src/app/(public)/panduan/page.tsx` | The public page `/panduan`: shows topics whose `audience` has `"public"` |
+| `src/app/tenant/bantuan/page.tsx` | The seller page `/tenant/bantuan`: shows topics whose `audience` has `"tenant"` |
+| `docs/PANDUAN-PENGGUNA.md` | The same guide as a document (for printing / sharing). Not shown on the website: update it by hand when a topic changes |
+
+### How a topic is written
+
+Each entry in `GUIDES` (in `src/lib/guides.tsx`) has these fields:
+
+| field | meaning |
+|---|---|
+| `id` | Short name with dashes, unique. Also the topic's link: `/panduan#<id>` (e.g. the login page links to `/panduan#ketentuan`) |
+| `title` | Topic title (Bahasa Indonesia) |
+| `summary` | One line under the title |
+| `icon` | An icon from `src/components/Icons.tsx` (e.g. `IconPlus`, `IconStore`); import it at the top of the file |
+| `color` | Icon colour, e.g. `"#0e3c69"` (navy) or `"#ea7b25"` (orange) |
+| `audience` | Where it shows: `"public"` = `/panduan`, `"tenant"` = seller dashboard. `"admin"` is accepted but no page shows it yet |
+| `body` | The content: steps (`<Steps>` / `<Step>`), or ordinary text (`<p>`, `<ul><li>`) |
+
+Inside the text, `<b>…</b>` makes words bold (use it for button and menu names, as the other topics do) and `<Link href="/register">…</Link>` links to a page of the website. The topics show in the order of the list.
+
+A step with a screenshot:
+
+```tsx
+<Step image="produk-2-foto" alt="Kotak unggah foto produk">
+  Klik kotak <b>UNGGAH FOTO PRODUK</b> lalu <b>PILIH FILE</b>.
+</Step>
+```
+
+`image` is the file name in `public/panduan/` **without** `.jpg`; `alt` describes the picture for screen readers. Leave out `image` for a step without a picture.
+
+### Example 1: add a new topic
+
+A new topic *Cara Memberi Ulasan* for visitors and sellers. It uses the thumbs-up icon `IconThumb` (any icon exported by `src/components/Icons.tsx` works): add it to the `import { … } from "@/components/Icons"` list at the top of `src/lib/guides.tsx`. Then add an entry to `GUIDES`, between two existing `{ … },` entries, at the place it should appear:
+
+```tsx
+  {
+    id: "beri-ulasan",
+    title: "Cara Memberi Ulasan",
+    summary: "Memberi bintang dan ulasan pada produk",
+    icon: IconThumb,
+    color: "#ea7b25",
+    audience: ["public", "tenant"],
+    body: (
+      <Steps>
+        <Step image="ulasan-1-form" alt="Form ulasan di halaman produk">
+          Buka halaman produk, gulir ke bagian <b>ULASAN PEMBELI</b>, lalu di <b>Tulis Ulasan</b> pilih jumlah bintang (1 – 5).
+        </Step>
+        <Step>
+          Isi nama dan ulasan Anda, lalu klik <b>Kirim Ulasan</b>. Tidak perlu login.
+        </Step>
+      </Steps>
+    ),
+  },
+```
+
+Put the screenshot at `public/panduan/ulasan-1-form.jpg` (section below). The topic is then at `/panduan#beri-ulasan`.
+
+### Example 2: change an existing topic
+
+Search `src/lib/guides.tsx` for the topic's `id` (e.g. `id: "tambah-produk"`) and edit its text, or add a `<Step>` between two existing ones. For example, to tell sellers about photo quality in *Panduan Menambahkan Produk*, add after the photo step:
+
+```tsx
+        <Step>
+          Gunakan foto yang terang dan jelas, dengan latar polos. Lihat juga topik <b>Ketentuan Foto / Deskripsi</b>.
+        </Step>
+```
+
+Step numbers are added automatically. For a topic without steps (like *Kebijakan Privasi*), add or edit `<li>…</li>` lines in its `<ul>`.
+
+### Screenshots
+
+- Take the screenshot from the real website (with sample data, not real customers), and outline the part the step talks about in **red**, as in the existing pictures.
+- Save it as **JPG, 1024×640** pixels (the page reserves that shape), under about 200 KB.
+- Name it `<topic>-<number>-<what>.jpg` (e.g. `ulasan-1-form.jpg`) and put it in `public/panduan/`.
+- To replace a picture, overwrite the file with the same name: no code change needed.
+
+### Publishing the change
+
+The Panduan is part of the frontend build, so a change shows only after a rebuild. Work in git as for any change (section 5):
+
+```bash
+cd /home/prafi/project/prafi-frontend
+npm run lint                  # catches a missing import or a typo in the tags
+npm run build                 # a mistake in guides.tsx stops here; the live site is untouched
+sudo systemctl restart prafi-frontend
+```
+
+Then check `/panduan` (and **Bantuan & Ketentuan** as a seller). Common mistakes: a tag opened but not closed (`<b>` without `</b>`), a missing `,` after `},`, an icon used but not imported, or an `image` name that doesn't match the file (the step then shows a broken picture).
+
+## 13. Troubleshooting
 
 | problem | check / fix |
 |---|---|
@@ -459,7 +562,7 @@ npm run dev                        # http://localhost:3000
 | Disk full | `df -h`; old logs: `sudo journalctl --vacuum-time=14d` |
 | HTTPS certificate expired | `sudo certbot renew` and check its output |
 
-## 13. Things to improve
+## 14. Things to improve
 
 - **Set `NODE_ENV=production`** in the backend `.env` (then restart): error responses still include internal details.
 - **Automatic daily backups** of the database and `images/`, copied off the server.
