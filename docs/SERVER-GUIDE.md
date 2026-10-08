@@ -267,7 +267,78 @@ sudo certbot renew --dry-run         # test renewal (the website is down for a f
 
 nginx config: `/etc/nginx/sites-enabled/` (`default` = website, `api.transniaga` = API, `core.transniaga` = Webmin). After editing: `sudo nginx -t && sudo systemctl reload nginx`.
 
-## 9. Running locally (development)
+## 9. Webmin (server panel)
+
+Webmin is a web panel for the server: look at the database, manage files and open a terminal from the browser, without an SSH program.
+
+| what | value |
+|---|---|
+| Address | `https://core.transniaga.manokwarikab.go.id` (Webmin 2.670) |
+| Login | A Linux account of this server that has Webmin access (e.g. `prafi`); the same password as SSH |
+| Menu | Left sidebar, grouped (*System*, *Servers*, *Tools*…). Type a module name in the sidebar search to find it quickly |
+
+> Webmin works with **full administrator (root) rights**. A wrong click can delete files or data of the whole server. Read before confirming, back up before changing (section 7), and log out (top-left menu → *Logout*) when done.
+
+### PostgreSQL (database)
+
+Where PostgreSQL keeps its files on the server:
+
+| path | what |
+|---|---|
+| `/etc/postgresql/16/main/postgresql.conf` | Main settings (port, memory, listen address) |
+| `/etc/postgresql/16/main/pg_hba.conf` | Who may connect from where, and how (password rules) |
+| `/var/lib/postgresql/16/main/` | The data files of every database. **Never edit or delete anything here by hand**: use the database tools (and `pg_dump` for backups) |
+| `/var/log/postgresql/postgresql-16-main.log` | PostgreSQL's own log (start, stop, errors, failed logins) |
+
+Open **Servers → PostgreSQL Database Server**:
+
+1. The page lists the databases. The app's database is **`prafi_db`**; `postgres`, `template0` and `template1` belong to PostgreSQL itself, leave them alone.
+2. If Webmin asks for a database login, use user `postgres` and the `DB_PASSWORD` from the backend `.env` (set it once under *Module Config*).
+3. Click **`prafi_db`** to see its tables (section 7 says what each holds). Click a table, then **View Data** to browse its rows.
+4. **Execute SQL** runs a query, e.g. `SELECT name, price FROM products ORDER BY created_at DESC LIMIT 20;`. Use it for reading (`SELECT`). Don't change rows here: the apps keep related data together (an approval with each product, image files with image rows…), and a manual change can break that.
+5. **Backup Database** makes a dump file, the same as the `pg_dump` command in section 7. Choose a file path such as `/home/prafi/backup_prafi_db_YYYY-MM-DD.sql`.
+6. **Restore Database** replaces the data with a backup. Stop the backend first (`sudo systemctl stop prafi-backend`) and only do this to recover from a problem.
+7. To change a PostgreSQL setting, edit the files above (e.g. with the File Manager), then restart PostgreSQL from this page (or `sudo systemctl restart postgresql`). The backend reconnects by itself; restart it if it doesn't.
+
+### File Manager
+
+Open **Tools → File Manager** to browse, edit, upload and download files.
+
+| folder | what you find there |
+|---|---|
+| `/home/prafi/project/prafi-backend` | Backend: `.env`, `src/`, `images/` (uploaded photos), `db/migrations/`, `docs/SERVER-GUIDE.md` |
+| `/home/prafi/project/prafi-frontend` | Frontend: `.env`, `src/`, `public/` |
+| `/home/prafi/` | Home folder, a good place for backups |
+| `/etc/nginx/sites-enabled/` | nginx (HTTPS) config of the three domains |
+| `/etc/systemd/system/` | `prafi-backend.service`, `prafi-frontend.service` |
+| `/etc/postgresql/16/main/`, `/var/log/postgresql/` | PostgreSQL config and log (above) |
+
+Common tasks:
+
+- **Edit a file** (e.g. `.env`): select it, then *Edit*; save. Then do what section 6 says: restart the backend, or rebuild and restart the frontend. Changing `.env` this way is fine; don't edit source code here (changes go through git, section 5).
+- **Download** a backup or a log: select it, then *Download*.
+- **Upload** a file: open the target folder, then *Upload*.
+- **Hidden files** (names starting with a dot, like `.env`): turn on showing hidden files in the File Manager's settings if they don't appear.
+
+> Files created or uploaded through Webmin belong to **root**. The apps run as user `prafi` and can't change root's files: e.g. product photos in `images/` or a new `.env` would fail. After uploading or creating anything inside `/home/prafi/project`, set its owner to `prafi` (select it → *Change ownership* → user and group `prafi`), or in the terminal: `sudo chown -R prafi:prafi /home/prafi/project`.
+
+### Terminal
+
+Open **Tools → Terminal** for a shell on the server, the same as SSH. Every command in this guide works here.
+
+- The terminal starts as **root**. Switch to the app user first, so `node` / `npm` (Node 22 from nvm) and git work and new files get the right owner:
+
+```bash
+su - prafi
+cd /home/prafi/project/prafi-backend
+```
+
+- As `prafi`, commands that change the system still need `sudo` (e.g. `sudo systemctl restart prafi-backend`), with the `prafi` password.
+- `exit` goes back to root, or closes the terminal.
+- A long build (`npm run build`) keeps running only while the tab is open: keep it open until it finishes. For something that must survive closing the browser, use SSH.
+- **Tools → Command Shell** runs a single command and shows its output, handy for a quick check like `systemctl status prafi-backend`.
+
+## 10. Running locally (development)
 
 On your own computer with Node 22 and PostgreSQL:
 
@@ -294,7 +365,7 @@ npm run dev                        # http://localhost:3000
 | `npm run typecheck` / `npm run lint` | type check | lint |
 | `npm run docs` | regenerates the public API docs | |
 
-## 10. Troubleshooting
+## 11. Troubleshooting
 
 | problem | check / fix |
 |---|---|
@@ -308,7 +379,7 @@ npm run dev                        # http://localhost:3000
 | Disk full | `df -h`; old logs: `sudo journalctl --vacuum-time=14d` |
 | HTTPS certificate expired | `sudo certbot renew` and check its output |
 
-## 11. Things to improve
+## 12. Things to improve
 
 - **Set `NODE_ENV=production`** in the backend `.env` (then restart): error responses still include internal details.
 - **Automatic daily backups** of the database and `images/`, copied off the server.
