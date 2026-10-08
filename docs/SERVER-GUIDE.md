@@ -265,9 +265,89 @@ sudo certbot certificates            # domains and expiry dates
 sudo certbot renew --dry-run         # test renewal (the website is down for a few seconds)
 ```
 
-nginx config: `/etc/nginx/sites-enabled/` (`default` = website, `api.transniaga` = API, `core.transniaga` = Webmin). After editing: `sudo nginx -t && sudo systemctl reload nginx`.
+A **new domain** needs its own certificate. certbot's standalone mode needs port 80, so stop the frontend for the moment it takes:
 
-## 9. Webmin (server panel)
+```bash
+sudo systemctl stop prafi-frontend
+sudo certbot certonly --standalone -d new.transniaga.manokwarikab.go.id
+sudo systemctl start prafi-frontend
+```
+
+Then point an nginx site at it (section 9).
+
+## 9. nginx (HTTPS proxy)
+
+nginx receives every HTTPS visit (port **443**), decrypts it with the certificate, and passes it to the right app by domain name (table in section 1). It does not serve any files itself, and it does **not** use port 80: plain HTTP goes straight to the frontend.
+
+### Files
+
+| path | what |
+|---|---|
+| `/etc/nginx/nginx.conf` | Main settings (workers, gzip, TLS versions, log paths). Rarely changed |
+| `/etc/nginx/sites-available/` | One file per site: `default` (website), `api.transniaga` (API), `core.transniaga` (Webmin). The `.bak` files and `core.transniaga.manokwarikab.go.id` are old copies, not in use |
+| `/etc/nginx/sites-enabled/` | **Links** to the sites that are switched on. nginx only loads what is linked here |
+| `/etc/letsencrypt/live/<domain>/` | The certificates each site points to (managed by certbot) |
+| `/var/log/nginx/access.log`, `error.log` | Every request / nginx errors. Rotated daily, older ones end in `.1`, `.2.gz`… |
+| `prafi-frontend/deploy/nginx-default`, `nginx-core.transniaga`, `prafi-backend/deploy/nginx/api.transniaga` | Copies of the site files, kept with the projects. Update them when you change the live files |
+
+### The three sites
+
+| site file | domain | sends to | notable settings |
+|---|---|---|---|
+| `default` | `transniaga.manokwarikab.go.id` | `127.0.0.1:80` (frontend) | `client_max_body_size 10M` (largest request, e.g. a photo upload through the website) |
+| `api.transniaga` | `api.transniaga.manokwarikab.go.id` | `127.0.0.1:4000` (backend) | `client_max_body_size 20M`; `proxy_read_timeout 3600s` so live connections (Socket.IO) stay open |
+| `core.transniaga` | `core.transniaga.manokwarikab.go.id` | `127.0.0.1:10000` (Webmin) | `proxy_ssl_verify off` (Webmin's own certificate is self-signed); `proxy_buffering off` |
+
+Every site passes the visitor's details to the app (`X-Real-IP`, `X-Forwarded-For`, `X-Forwarded-Proto`; the API log shows real visitor IPs because of these) and the `Upgrade` / `Connection` headers that WebSockets need. Keep these lines when editing.
+
+### Changing a site
+
+Always test before reloading: a broken file can take **all three** sites down.
+
+```bash
+sudo cp /etc/nginx/sites-available/default ~/nginx-default.bak     # 1. back up
+sudo nano /etc/nginx/sites-available/default                       # 2. edit (or Webmin File Manager)
+sudo nginx -t                                                      # 3. must say "syntax is ok" and "test is successful"
+sudo systemctl reload nginx                                        # 4. apply, without dropping visitors
+```
+
+If `nginx -t` fails, nothing has changed yet: fix the line it names, or put the backup back (`sudo cp ~/nginx-default.bak /etc/nginx/sites-available/default`). Use `reload`, not `restart`: a reload keeps the old settings running if the new ones are wrong.
+
+Lines ending in `# managed by Certbot` are the certificate settings: leave them as they are.
+
+### Common changes
+
+**Upload size.** A photo upload passes three limits: nginx (`client_max_body_size`, 10M website / 20M API), then the backend's own limit of **5 MB per image** (`MAX_IMAGE_SIZE` in `src/config/upload.ts`). The smallest one wins. To allow bigger photos, raise the backend limit (and rebuild), and keep both nginx limits above it.
+
+**Switch a site off / on.** Remove or re-create its link, then test and reload:
+
+```bash
+sudo rm /etc/nginx/sites-enabled/core.transniaga                                              # off
+sudo ln -s /etc/nginx/sites-available/core.transniaga /etc/nginx/sites-enabled/core.transniaga  # on
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+**Add a domain** (e.g. a new subdomain for another app):
+
+1. Point the domain's DNS (A record) to `156.67.104.230`.
+2. Get its certificate (section 8).
+3. Copy an existing site file as a start, e.g. `sudo cp /etc/nginx/sites-available/api.transniaga /etc/nginx/sites-available/new.transniaga`, and change `server_name`, the `proxy_pass` port and the two `ssl_certificate` paths.
+4. Link it into `sites-enabled`, then `sudo nginx -t && sudo systemctl reload nginx`.
+
+### Checking and logs
+
+```bash
+systemctl status nginx
+sudo nginx -T | less                        # the full configuration nginx is really using
+sudo tail -f /var/log/nginx/error.log       # errors live (Ctrl+C to quit)
+sudo tail -f /var/log/nginx/access.log      # every request
+```
+
+**502 Bad Gateway** comes from nginx: the app behind it isn't answering. Check that app's service (section 4), not nginx.
+
+Good to know: because the frontend (not nginx) holds port 80, `http://` addresses are **not** redirected to `https://`; they are answered by the frontend directly. Even `http://api.transniaga…` works, through the website's `/api` proxy.
+
+## 10. Webmin (server panel)
 
 Webmin is a web panel for the server: look at the database, manage files and open a terminal from the browser, without an SSH program.
 
@@ -338,7 +418,7 @@ cd /home/prafi/project/prafi-backend
 - A long build (`npm run build`) keeps running only while the tab is open: keep it open until it finishes. For something that must survive closing the browser, use SSH.
 - **Tools → Command Shell** runs a single command and shows its output, handy for a quick check like `systemctl status prafi-backend`.
 
-## 10. Running locally (development)
+## 11. Running locally (development)
 
 On your own computer with Node 22 and PostgreSQL:
 
@@ -365,7 +445,7 @@ npm run dev                        # http://localhost:3000
 | `npm run typecheck` / `npm run lint` | type check | lint |
 | `npm run docs` | regenerates the public API docs | |
 
-## 11. Troubleshooting
+## 12. Troubleshooting
 
 | problem | check / fix |
 |---|---|
@@ -379,10 +459,12 @@ npm run dev                        # http://localhost:3000
 | Disk full | `df -h`; old logs: `sudo journalctl --vacuum-time=14d` |
 | HTTPS certificate expired | `sudo certbot renew` and check its output |
 
-## 12. Things to improve
+## 13. Things to improve
 
 - **Set `NODE_ENV=production`** in the backend `.env` (then restart): error responses still include internal details.
 - **Automatic daily backups** of the database and `images/`, copied off the server.
 - **Use a separate database user** for the app instead of the `postgres` superuser.
 - **Limit Webmin** (ports 10000 and 20000 are open to the internet): allow only known IPs, or close them and use `core.transniaga…` only.
 - **Put the backend `deploy/` folder in git**, so the service and nginx files aren't lost with the server.
+- **Redirect HTTP to HTTPS**: let nginx take port 80 again just to redirect to `https://` (the frontend then listens on another local port, e.g. 3000), so no page is ever served unencrypted.
+- **Turn off old TLS versions**: `ssl_protocols` in `/etc/nginx/nginx.conf` still allows TLS 1.0 and 1.1; `TLSv1.2 TLSv1.3` is enough for every current browser.
