@@ -10,13 +10,14 @@ const TEXT_FIELDS = ['name', 'description', 'address', 'area', 'operationalHours
 /** Optional links: a http(s) link, or null / "" for none */
 const OPTIONAL_LINK_FIELDS = ['instagramLink', 'googleBusinessLink', 'shopeeLink'] as const;
 const MAX_LINK = 255;
-const ID_FIELDS = ['logoId', 'tenantCategoryId'] as const;
+const ID_FIELDS = ['logoId'] as const;
 const FIELDS: string[] = [...TEXT_FIELDS, ...OPTIONAL_LINK_FIELDS, ...ID_FIELDS];
 /** On create, `name` may be left out: it defaults to the owner's tenantName. */
 const OPTIONAL_ON_CREATE = ['name'];
 const LOCKED_FIELDS: Record<string, string> = {
   id: 'id tidak dapat diubah',
   userId: 'profil tenant selalu dimiliki oleh tenant yang sedang login',
+  tenantCategoryId: 'tenantCategoryId sudah tidak dipakai: kategori kini dipilih per produk (categoryId pada POST/PATCH /api/products)',
   createdAt: 'createdAt diatur oleh server',
   updatedAt: 'updatedAt diatur oleh server',
 };
@@ -100,9 +101,9 @@ export const deleteMine: RequestHandler = async (req, res) => {
 
 // ---------- superadmin / admin: read all ----------
 
-/** GET /api/tenants?page=&limit=&tenantCategoryId= */
+/** GET /api/tenants?page=&limit= */
 export const list: RequestHandler = async (req, res) => {
-  const { page = '1', limit = String(DEFAULT_LIMIT), tenantCategoryId } = req.query as Record<string, string | undefined>;
+  const { page = '1', limit = String(DEFAULT_LIMIT) } = req.query as Record<string, string | undefined>;
 
   const errors: FieldError[] = [];
   const pageNum = Number(page);
@@ -111,13 +112,9 @@ export const list: RequestHandler = async (req, res) => {
   if (!Number.isInteger(limitNum) || limitNum < 1 || limitNum > MAX_LIMIT) {
     errors.push({ field: 'limit', message: `limit harus berupa bilangan bulat antara 1 dan ${MAX_LIMIT}` });
   }
-  const categoryNum = tenantCategoryId === undefined ? undefined : Number(tenantCategoryId);
-  if (categoryNum !== undefined && !Number.isInteger(categoryNum)) {
-    errors.push({ field: 'tenantCategoryId', message: 'tenantCategoryId harus berupa ID (bilangan bulat)' });
-  }
   if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);
 
-  const { tenants, meta } = await tenantService.list({ page: pageNum, limit: limitNum, tenantCategoryId: categoryNum });
+  const { tenants, meta } = await tenantService.list({ page: pageNum, limit: limitNum });
   res.json({ success: true, data: tenants, meta });
 };
 
@@ -129,9 +126,9 @@ export const getOne: RequestHandler = async (req, res) => {
 
 // ---------- public (landing page, no login) ----------
 
-/** GET /api/landing/tenants?page=&limit=&tenantCategoryId=&q= — UMKM with an active owner, A→Z, with product count and rating. */
+/** GET /api/landing/tenants?page=&limit=&q= — UMKM with an active owner, A→Z, with product count and rating. */
 export const listPublic: RequestHandler = async (req, res) => {
-  const { page = '1', limit = String(DEFAULT_LIMIT), tenantCategoryId, q } = req.query as Record<string, string | undefined>;
+  const { page = '1', limit = String(DEFAULT_LIMIT), q } = req.query as Record<string, string | undefined>;
 
   const errors: FieldError[] = [];
   const pageNum = Number(page);
@@ -140,16 +137,11 @@ export const listPublic: RequestHandler = async (req, res) => {
   if (!Number.isInteger(limitNum) || limitNum < 1 || limitNum > MAX_LIMIT) {
     errors.push({ field: 'limit', message: `limit harus berupa bilangan bulat antara 1 dan ${MAX_LIMIT}` });
   }
-  const categoryNum = tenantCategoryId === undefined ? undefined : Number(tenantCategoryId);
-  if (categoryNum !== undefined && !Number.isInteger(categoryNum)) {
-    errors.push({ field: 'tenantCategoryId', message: 'tenantCategoryId harus berupa ID (bilangan bulat)' });
-  }
   if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);
 
   const { tenants, meta } = await tenantService.listPublic({
     page: pageNum,
     limit: limitNum,
-    tenantCategoryId: categoryNum,
     q: q?.trim() || undefined,
   });
   res.json({ success: true, data: tenants, meta });

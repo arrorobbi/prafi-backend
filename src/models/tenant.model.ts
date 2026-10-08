@@ -10,7 +10,6 @@ import {
 import { sequelize } from '../config/database';
 import type { DbModels } from '.';
 import type { Image } from './image.model';
-import type { TenantCategory } from './tenantCategory.model';
 import type { User } from './user.model';
 
 /** A tenant user's tenant profile. Products belong to the tenant user, not to this profile. */
@@ -30,22 +29,17 @@ export class Tenant extends Model<InferAttributes<Tenant>, InferCreationAttribut
   declare shopeeLink: string | null;
   /** Required: upload the logo first via POST /api/images. */
   declare logoId: ForeignKey<Image['id']>;
-  /** Required: the tenant category (created by an admin). */
-  declare tenantCategoryId: ForeignKey<TenantCategory['id']>;
   declare userId: ForeignKey<User['id']>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
   // Relations (populated when loaded with `include`)
   declare logo?: NonAttribute<Image>;
-  declare category?: NonAttribute<TenantCategory>;
   declare owner?: NonAttribute<User>;
 
-  static associate({ Image, TenantCategory, User }: DbModels) {
+  static associate({ Image, User }: DbModels) {
     // tenants.logo_id - images.id (one-to-one; the logo is required, so an image in use as a logo can't be deleted)
     Tenant.belongsTo(Image, { as: 'logo', foreignKey: 'logoId', onDelete: 'RESTRICT' });
-    // tenants.tenant_category_id > tenant_categories.id (many tenants per category; a category in use can't be deleted)
-    Tenant.belongsTo(TenantCategory, { as: 'category', foreignKey: 'tenantCategoryId', onDelete: 'RESTRICT' });
     // tenants.user_id - users.id (one-to-one; deleting the user deletes the tenant)
     Tenant.belongsTo(User, { as: 'owner', foreignKey: 'userId', onDelete: 'CASCADE' });
   }
@@ -70,11 +64,6 @@ Tenant.init(
       allowNull: false,
       unique: true,
       references: { model: 'images', key: 'id' },
-    },
-    tenantCategoryId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: { model: 'tenant_categories', key: 'id' },
     },
     userId: {
       type: DataTypes.UUID,

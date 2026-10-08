@@ -43,7 +43,7 @@ export class ApiLog extends Model<InferAttributes<ApiLog>, InferCreationAttribut
   declare errorMessage: string | null;
   declare errorDetails: unknown;
   declare errorStack: string | null;
-  /** Names of the fields sent in the body (never their values), e.g. ["price","isRecommended"] */
+  /** Names of the fields sent in the body (never their values), e.g. ["price","categoryId"] */
   declare requestFields: string[] | null;
   /** A safe extract of a successful response: id, name, email, role, isActive… (allowlisted keys only) */
   declare responseSummary: Record<string, unknown> | null;

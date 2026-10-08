@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Prafi API",
-    "description": "Backend API for Prafi (Express + Sequelize + PostgreSQL), with realtime notifications over Socket.IO and emails (nodemailer).\n\n## Setup (once)\n1. Import this collection and `Prafi-Local.postman_environment.json`, then select **Prafi Local** (environment dropdown, top right).\n2. In **Prafi Local** set `loginEmail` / `loginPassword` (Current value) to the superadmin from `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`), then Ctrl+S.\n3. Start the server (`npm run dev` or `npm run build && npm start`). `baseUrl` is `http://localhost:4000`.\n4. Email: set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` in `.env` to send real emails. Set `FRONTEND_URL` to the frontend's address: the forgot-password email links to `<FRONTEND_URL>/reset-password`. Without `SMTP_HOST` (development) emails are printed in the server log and the OTP / activation token is returned in `meta.verification` and saved as `{{otp}}` / `{{verifyToken}}`.\n\n## Login and roles\n- Every request uses **Bearer `{{token}}`** (set on the collection; requests inherit it). Public requests have *No Auth*.\n- **Auth → Login** saves the token to `{{token}}` (valid **1 hour**). To switch role, change `loginEmail` / `loginPassword` (or the Login body) and send Login again.\n- The **name of each request says who can call it**: `(All roles)` = superadmin, disnakertrans, admin and tenant; `(superadmin, disnakertrans, admin)`, `(admin)`, `(tenant)`… = only those roles; `(Public)` = no login. Any other role gets **403**.\n- Every account must have a **verified email** (`mailActive: true`) and an **active approval** (`approval.isActive: true`) to log in and use the API.\n\n| role | created by | email verification | approval at start | can |\n|---|---|---|---|---|\n| superadmin | seed (`npm run db:seed`) | already verified | active | create disnakertrans accounts; **read-only** for everything else (users, products, tenants, tenant categories); notified of every new account and product |\n| disnakertrans | superadmin (*Register Disnakertrans*) | activation link (24 h) | active | view and activate/deactivate **admin** accounts and **products**, view all products and tenants |\n| admin | self sign-up (*Register Admin*) | OTP (15 min) | **inactive** until a disnakertrans activates it | activate tenant accounts **and products**, read users (tenants)/products/tenants, manage tenant categories |\n| tenant | self sign-up (*Register Tenant*) | OTP (15 min) | active | manage their own products and tenant profile |\n\n## Endpoints\n| folder | endpoint | access |\n|---|---|---|\n| Health | `GET /api/health` | Public |\n| Auth | `POST /api/auth/login` | Public |\n| Auth | `POST /api/auth/logout` | All roles |\n| Auth | `POST /api/auth/register/disnakertrans` | superadmin |\n| Auth | `POST /api/auth/register/admin` | Public |\n| Auth | `POST /api/auth/register/tenant` | Public |\n| Auth | `POST /api/auth/verify-otp/{{userId}}` | Public |\n| Auth | `GET /api/auth/verify-email/{{userId}}` | Public |\n| Auth | `POST /api/auth/resend-verification/{{userId}}` | Public |\n| Auth | `POST /api/auth/forgot-password` | Public |\n| Auth | `POST /api/auth/reset-password/check` | Public |\n| Auth | `POST /api/auth/reset-password` | Public |\n| Auth | `GET /api/auth/me` | All roles |\n| Auth | `PATCH /api/auth/me` | All roles |\n| Images | `POST /api/images` | All roles |\n| Images | `GET {{imagePath}}` | Public |\n| Images | `DELETE /api/images/{{imageId}}` | tenant |\n| Users | `GET /api/users` | superadmin, disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{userId}}` | disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{productId}}` | disnakertrans, admin |\n| Products | `GET /api/products` | All roles |\n| Products | `GET /api/products/{{productId}}` | All roles |\n| Products | `POST /api/products` | tenant |\n| Products | `PATCH /api/products/{{productId}}` | tenant |\n| Products | `DELETE /api/products/{{productId}}` | tenant |\n| Landing | `GET /api/landing/products` | Public |\n| Landing | `GET /api/landing/products/{{productId}}` | Public |\n| Landing | `GET /api/landing/products/{{productId}}/reviews` | Public |\n| Landing | `POST /api/landing/products/{{productId}}/reviews` | Public |\n| Landing | `GET /api/landing/tenants` | Public |\n| Landing | `GET /api/landing/tenants/{{tenantProfileId}}` | Public |\n| Tenant Categories | `GET /api/tenant-categories` | superadmin, admin, tenant |\n| Tenant Categories | `GET /api/tenant-categories/{{categoryId}}` | superadmin, admin, tenant |\n| Tenant Categories | `POST /api/tenant-categories` | admin |\n| Tenant Categories | `PATCH /api/tenant-categories/{{categoryId}}` | admin |\n| Tenant Categories | `DELETE /api/tenant-categories/{{categoryId}}` | admin |\n| Tenants | `GET /api/tenants/me` | tenant |\n| Tenants | `POST /api/tenants/me` | tenant |\n| Tenants | `PATCH /api/tenants/me` | tenant |\n| Tenants | `DELETE /api/tenants/me` | tenant |\n| Tenants | `GET /api/tenants` | superadmin, disnakertrans, admin |\n| Tenants | `GET /api/tenants/{{tenantProfileId}}` | superadmin, disnakertrans, admin |\n| Notifications | `GET /api/notifications` | All roles |\n| Notifications | `GET /api/notifications/unread-count` | All roles |\n| Notifications | `PATCH /api/notifications/{{notificationId}}/read` | All roles |\n| Notifications | `PATCH /api/notifications/read-all` | All roles |\n| Notifications | `DELETE /api/notifications/{{notificationId}}` | All roles |\n| Stats | `GET /api/stats/overview` | superadmin, disnakertrans, admin |\n| Logs | `GET /api/logs` | superadmin |\n| Logs | `GET /api/logs/stats` | superadmin |\n| Logs | `GET /api/logs/{{logId}}` | superadmin |\n| Examples | `GET /api/admin/ping` | superadmin, admin |\n| Examples | `GET /api/tenant/ping` | All roles |\n| Realtime (WebSocket) | Socket.IO at `{{baseUrl}}` | All roles (Bearer token) |\n\n## Saved variables\nRequests save what the next ones need: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `tenantCategoryId` · `tenantProfileId` · `notificationId` · `logId`. Each save is printed in the Postman Console.\n\n## Example walkthrough\n1. **Login** as superadmin → **Register Disnakertrans** → **Verify Email Link** (or open the link from the email).\n2. **Register Admin** → **Verify OTP** (code from the email, or `{{otp}}` in development).\n3. Set `loginEmail` = the disnakertrans email, `loginPassword` = `{{newUserPassword}}` → **Login** → **Activate / Deactivate User** with `userId` = the admin's id and `userRole` = `admin`.\n4. **Login** as the admin → **Create Tenant Category**.\n5. **Register Tenant** → **Verify OTP** → **Login** as the tenant → **Upload Image** → **Create My Tenant** → **Upload Image** again → **Create Product**.\n6. **Login** as the admin → **List Notifications** → **Activate / Deactivate Product** → **Landing Products** shows it.\n\n## Responses\n- Success: `{ \"success\": true, \"data\": …, \"meta\"?: { page, limit, total, totalPages } | { verification } }`\n- Error: `{ \"success\": false, \"error\": { \"code\", \"message\", \"details\"? } }`\n- `message` and `details[].message` are in **Bahasa Indonesia** (ready to show in the frontend). `code` and `field` stay in English; frontend logic should switch on `code`.\n\n| status | code (examples) | meaning |\n|---|---|---|\n| 400 | `VALIDATION_ERROR`, `BAD_REQUEST`, `ID_NOT_PROVIDED` | invalid input (`details` lists the fields) |\n| 400 | `OTP_INVALID`, `OTP_EXPIRED`, `LINK_INVALID`, `LINK_EXPIRED`, `RESET_LINK_INVALID`, `RESET_LINK_EXPIRED` | wrong or expired verification code / link / password reset link |\n| 401 | `UNAUTHORIZED` | no/invalid/expired/logged-out token, or the password was reset → log in again |\n| 403 | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `USER_NOT_ACTIVATED` | wrong role, email not verified yet, or account not activated |\n| 404 | `NOT_FOUND` | not found, or not yours |\n| 409 | `UNIQUE_CONSTRAINT`, `STILL_IN_USE`, `CONFLICT`, `EMAIL_ALREADY_VERIFIED` | duplicate value, record still in use, already verified |\n| 413 | `FILE_TOO_LARGE` | image over 5 MB |\n| 429 | `TOO_MANY_REQUESTS` | a new verification code was requested less than 60 seconds ago |\n\n## Notifications and realtime\nEvery role gets notifications for the events that concern them (see **Notifications**); activation notifications include the `approval` with `userId` and the `user`. They arrive live over Socket.IO as `notification:new` (see **Realtime (WebSocket)** for connecting in Postman and in the frontend).",
+    "description": "Backend API for Prafi (Express + Sequelize + PostgreSQL), with realtime notifications over Socket.IO and emails (nodemailer).\n\n## Setup (once)\n1. Import this collection and `Prafi-Local.postman_environment.json`, then select **Prafi Local** (environment dropdown, top right).\n2. In **Prafi Local** set `loginEmail` / `loginPassword` (Current value) to the superadmin from `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`), then Ctrl+S.\n3. Start the server (`npm run dev` or `npm run build && npm start`). `baseUrl` is `http://localhost:4000`.\n4. Email: set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` in `.env` to send real emails. Set `FRONTEND_URL` to the frontend's address: the forgot-password email links to `<FRONTEND_URL>/reset-password`. Without `SMTP_HOST` (development) emails are printed in the server log and the OTP / activation token is returned in `meta.verification` and saved as `{{otp}}` / `{{verifyToken}}`.\n\n## Login and roles\n- Every request uses **Bearer `{{token}}`** (set on the collection; requests inherit it). Public requests have *No Auth*.\n- **Auth → Login** saves the token to `{{token}}` (valid **1 hour**). To switch role, change `loginEmail` / `loginPassword` (or the Login body) and send Login again.\n- The **name of each request says who can call it**: `(All roles)` = superadmin, disnakertrans, admin and tenant; `(superadmin, disnakertrans, admin)`, `(admin)`, `(tenant)`… = only those roles; `(Public)` = no login. Any other role gets **403**.\n- Every account must have a **verified email** (`mailActive: true`) and an **active approval** (`approval.isActive: true`) to log in and use the API.\n\n| role | created by | email verification | approval at start | can |\n|---|---|---|---|---|\n| superadmin | seed (`npm run db:seed`) | already verified | active | create disnakertrans accounts; **read-only** for everything else (users, products, tenants, product categories); notified of every new account and product |\n| disnakertrans | superadmin (*Register Disnakertrans*) | activation link (24 h) | active | view and activate/deactivate **admin** accounts and **products**, view all products and tenants, manage product categories |\n| admin | self sign-up (*Register Admin*) | OTP (15 min) | **inactive** until a disnakertrans activates it | activate tenant accounts **and products**, read users (tenants)/products/tenants, manage product categories |\n| tenant | self sign-up (*Register Tenant*) | OTP (15 min) | active | manage their own products and tenant profile |\n\n## Endpoints\n| folder | endpoint | access |\n|---|---|---|\n| Health | `GET /api/health` | Public |\n| Auth | `POST /api/auth/login` | Public |\n| Auth | `POST /api/auth/logout` | All roles |\n| Auth | `POST /api/auth/register/disnakertrans` | superadmin |\n| Auth | `POST /api/auth/register/admin` | Public |\n| Auth | `POST /api/auth/register/tenant` | Public |\n| Auth | `POST /api/auth/verify-otp/{{userId}}` | Public |\n| Auth | `GET /api/auth/verify-email/{{userId}}` | Public |\n| Auth | `POST /api/auth/resend-verification/{{userId}}` | Public |\n| Auth | `POST /api/auth/forgot-password` | Public |\n| Auth | `POST /api/auth/reset-password/check` | Public |\n| Auth | `POST /api/auth/reset-password` | Public |\n| Auth | `GET /api/auth/me` | All roles |\n| Auth | `PATCH /api/auth/me` | All roles |\n| Images | `POST /api/images` | All roles |\n| Images | `GET {{imagePath}}` | Public |\n| Images | `DELETE /api/images/{{imageId}}` | tenant |\n| Users | `GET /api/users` | superadmin, disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{userId}}` | disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{productId}}` | disnakertrans, admin |\n| Products | `GET /api/products` | All roles |\n| Products | `GET /api/products/{{productId}}` | All roles |\n| Products | `POST /api/products` | tenant |\n| Products | `PATCH /api/products/{{productId}}` | tenant |\n| Products | `DELETE /api/products/{{productId}}` | tenant |\n| Landing | `GET /api/landing/categories` | Public |\n| Landing | `GET /api/landing/products` | Public |\n| Landing | `GET /api/landing/products/{{productId}}` | Public |\n| Landing | `GET /api/landing/products/{{productId}}/reviews` | Public |\n| Landing | `POST /api/landing/products/{{productId}}/reviews` | Public |\n| Landing | `GET /api/landing/tenants` | Public |\n| Landing | `GET /api/landing/tenants/{{tenantProfileId}}` | Public |\n| Product Categories | `GET /api/product-categories` | All roles |\n| Product Categories | `GET /api/product-categories/{{categoryId}}` | All roles |\n| Product Categories | `POST /api/product-categories` | disnakertrans, admin |\n| Product Categories | `PATCH /api/product-categories/{{categoryId}}` | disnakertrans, admin |\n| Product Categories | `DELETE /api/product-categories/{{categoryId}}` | disnakertrans, admin |\n| Tenants | `GET /api/tenants/me` | tenant |\n| Tenants | `POST /api/tenants/me` | tenant |\n| Tenants | `PATCH /api/tenants/me` | tenant |\n| Tenants | `DELETE /api/tenants/me` | tenant |\n| Tenants | `GET /api/tenants` | superadmin, disnakertrans, admin |\n| Tenants | `GET /api/tenants/{{tenantProfileId}}` | superadmin, disnakertrans, admin |\n| Notifications | `GET /api/notifications` | All roles |\n| Notifications | `GET /api/notifications/unread-count` | All roles |\n| Notifications | `PATCH /api/notifications/{{notificationId}}/read` | All roles |\n| Notifications | `PATCH /api/notifications/read-all` | All roles |\n| Notifications | `DELETE /api/notifications/{{notificationId}}` | All roles |\n| Stats | `GET /api/stats/overview` | superadmin, disnakertrans, admin |\n| Logs | `GET /api/logs` | superadmin |\n| Logs | `GET /api/logs/stats` | superadmin |\n| Logs | `GET /api/logs/{{logId}}` | superadmin |\n| Examples | `GET /api/admin/ping` | superadmin, admin |\n| Examples | `GET /api/tenant/ping` | All roles |\n| Realtime (WebSocket) | Socket.IO at `{{baseUrl}}` | All roles (Bearer token) |\n\n## Saved variables\nRequests save what the next ones need: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `categoryId` · `tenantProfileId` · `notificationId` · `logId`. Each save is printed in the Postman Console.\n\n## Example walkthrough\n1. **Login** as superadmin → **Register Disnakertrans** → **Verify Email Link** (or open the link from the email).\n2. **Register Admin** → **Verify OTP** (code from the email, or `{{otp}}` in development).\n3. Set `loginEmail` = the disnakertrans email, `loginPassword` = `{{newUserPassword}}` → **Login** → **Activate / Deactivate User** with `userId` = the admin's id and `userRole` = `admin`.\n4. **Login** as the admin → **Create Product Category**.\n5. **Register Tenant** → **Verify OTP** → **Login** as the tenant → **Upload Image** → **Create My Tenant** → **Upload Image** again → **Create Product**.\n6. **Login** as the admin → **List Notifications** → **Activate / Deactivate Product** → **Landing Products** shows it.\n\n## Responses\n- Success: `{ \"success\": true, \"data\": …, \"meta\"?: { page, limit, total, totalPages } | { verification } }`\n- Error: `{ \"success\": false, \"error\": { \"code\", \"message\", \"details\"? } }`\n- `message` and `details[].message` are in **Bahasa Indonesia** (ready to show in the frontend). `code` and `field` stay in English; frontend logic should switch on `code`.\n\n| status | code (examples) | meaning |\n|---|---|---|\n| 400 | `VALIDATION_ERROR`, `BAD_REQUEST`, `ID_NOT_PROVIDED` | invalid input (`details` lists the fields) |\n| 400 | `OTP_INVALID`, `OTP_EXPIRED`, `LINK_INVALID`, `LINK_EXPIRED`, `RESET_LINK_INVALID`, `RESET_LINK_EXPIRED` | wrong or expired verification code / link / password reset link |\n| 401 | `UNAUTHORIZED` | no/invalid/expired/logged-out token, or the password was reset → log in again |\n| 403 | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `USER_NOT_ACTIVATED` | wrong role, email not verified yet, or account not activated |\n| 404 | `NOT_FOUND` | not found, or not yours |\n| 409 | `UNIQUE_CONSTRAINT`, `STILL_IN_USE`, `CONFLICT`, `EMAIL_ALREADY_VERIFIED` | duplicate value, record still in use, already verified |\n| 413 | `FILE_TOO_LARGE` | image over 5 MB |\n| 429 | `TOO_MANY_REQUESTS` | a new verification code was requested less than 60 seconds ago |\n\n## Notifications and realtime\nEvery role gets notifications for the events that concern them (see **Notifications**); activation notifications include the `approval` with `userId` and the `user`. They arrive live over Socket.IO as `notification:new` (see **Realtime (WebSocket)** for connecting in Postman and in the frontend).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -2596,7 +2596,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"type\": \"product\",\n    \"id\": \"f34da3d5-bc0c-4dbd-93df-f2596f7f93ba\",\n    \"name\": \"Keripik Uji\",\n    \"approval\": {\n      \"id\": 15,\n      \"reason\": \"Activated by disnakertrans\",\n      \"isActive\": true,\n      \"type\": \"product\",\n      \"userId\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n      \"createdAt\": \"2026-10-07T17:19:58.598Z\",\n      \"updatedAt\": \"2026-10-07T17:33:05.566Z\"\n    },\n    \"user\": {\n      \"id\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n      \"firstName\": \"Uji\",\n      \"lastName\": \"tenant\",\n      \"email\": \"tenant.test@example.com\",\n      \"phoneNumber\": \"081200000000\",\n      \"tenantName\": \"Toko Uji\",\n      \"tenant\": {\n        \"id\": \"5eda1254-b8a9-4393-92c0-20d1717d45a9\",\n        \"name\": \"Toko Uji\",\n        \"description\": \"Toko uji coba\",\n        \"address\": \"Jl. Uji 1\",\n        \"area\": \"Prafi\",\n        \"operationalHours\": \"08.00-17.00\",\n        \"fbLink\": \"https://facebook.com/uji\",\n        \"whatsappLink\": \"https://wa.me/6281200000000\",\n        \"gmapsLink\": \"https://maps.google.com/?q=prafi\",\n        \"instagramLink\": \"https://instagram.com/tokouji\",\n        \"logoId\": 12,\n        \"tenantCategoryId\": 4,\n        \"userId\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n        \"createdAt\": \"2026-10-07T17:19:58.491Z\",\n        \"updatedAt\": \"2026-10-07T17:19:58.491Z\",\n        \"category\": {\n          \"id\": 4,\n          \"name\": \"Kuliner Uji\",\n          \"createdAt\": \"2026-10-07T17:19:11.325Z\",\n          \"updatedAt\": \"2026-10-07T17:19:11.325Z\"\n        },\n        \"logo\": {\n          \"url\": \"https://api.transniaga.manokwarikab.go.id/images/4d816874-04a5-461e-b4bd-54d00c82e636.png\",\n          \"id\": 12,\n          \"name\": \"logo.png\",\n          \"imgUrl\": \"/images/4d816874-04a5-461e-b4bd-54d00c82e636.png\",\n          \"altText\": \"logo\",\n          \"createdAt\": \"2026-10-07T17:19:58.384Z\",\n          \"updatedAt\": \"2026-10-07T17:19:58.384Z\"\n        }\n      },\n      \"productId\": \"f34da3d5-bc0c-4dbd-93df-f2596f7f93ba\",\n      \"product\": {\n        \"id\": \"f34da3d5-bc0c-4dbd-93df-f2596f7f93ba\",\n        \"name\": \"Keripik Uji\",\n        \"description\": \"Renyah\",\n        \"details\": \"200 gram\",\n        \"price\": 30000,\n        \"isRecommended\": true,\n        \"imageId\": 13,\n        \"approvalId\": 15,\n        \"tenantId\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n        \"createdAt\": \"2026-10-07T17:19:58.601Z\",\n        \"updatedAt\": \"2026-10-07T17:19:58.766Z\",\n        \"image\": {\n          \"url\": \"https://api.transniaga.manokwarikab.go.id/images/eb779271-157f-4361-9fdc-795ddb593419.png\",\n          \"id\": 13,\n          \"name\": \"p.png\",\n          \"imgUrl\": \"/images/eb779271-157f-4361-9fdc-795ddb593419.png\",\n          \"altText\": \"p\",\n          \"createdAt\": \"2026-10-07T17:19:58.403Z\",\n          \"updatedAt\": \"2026-10-07T17:19:58.403Z\"\n        }\n      }\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"type\": \"product\",\n    \"id\": \"f34da3d5-bc0c-4dbd-93df-f2596f7f93ba\",\n    \"name\": \"Keripik Uji\",\n    \"approval\": {\n      \"id\": 15,\n      \"reason\": \"Activated by disnakertrans\",\n      \"isActive\": true,\n      \"type\": \"product\",\n      \"userId\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n      \"createdAt\": \"2026-10-07T17:19:58.598Z\",\n      \"updatedAt\": \"2026-10-07T17:33:05.566Z\"\n    },\n    \"user\": {\n      \"id\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n      \"firstName\": \"Uji\",\n      \"lastName\": \"tenant\",\n      \"email\": \"tenant.test@example.com\",\n      \"phoneNumber\": \"081200000000\",\n      \"tenantName\": \"Toko Uji\",\n      \"tenant\": {\n        \"id\": \"5eda1254-b8a9-4393-92c0-20d1717d45a9\",\n        \"name\": \"Toko Uji\",\n        \"description\": \"Toko uji coba\",\n        \"address\": \"Jl. Uji 1\",\n        \"area\": \"Prafi\",\n        \"operationalHours\": \"08.00-17.00\",\n        \"fbLink\": \"https://facebook.com/uji\",\n        \"whatsappLink\": \"https://wa.me/6281200000000\",\n        \"gmapsLink\": \"https://maps.google.com/?q=prafi\",\n        \"instagramLink\": \"https://instagram.com/tokouji\",\n        \"logoId\": 12,\n        \"userId\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n        \"createdAt\": \"2026-10-07T17:19:58.491Z\",\n        \"updatedAt\": \"2026-10-07T17:19:58.491Z\",\n        \"logo\": {\n          \"url\": \"https://api.transniaga.manokwarikab.go.id/images/4d816874-04a5-461e-b4bd-54d00c82e636.png\",\n          \"id\": 12,\n          \"name\": \"logo.png\",\n          \"imgUrl\": \"/images/4d816874-04a5-461e-b4bd-54d00c82e636.png\",\n          \"altText\": \"logo\",\n          \"createdAt\": \"2026-10-07T17:19:58.384Z\",\n          \"updatedAt\": \"2026-10-07T17:19:58.384Z\"\n        }\n      },\n      \"productId\": \"f34da3d5-bc0c-4dbd-93df-f2596f7f93ba\",\n      \"product\": {\n        \"id\": \"f34da3d5-bc0c-4dbd-93df-f2596f7f93ba\",\n        \"name\": \"Keripik Uji\",\n        \"description\": \"Renyah\",\n        \"details\": \"200 gram\",\n        \"price\": 30000,\n        \"isRecommended\": true,\n        \"imageId\": 13,\n        \"approvalId\": 15,\n        \"tenantId\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n        \"createdAt\": \"2026-10-07T17:19:58.601Z\",\n        \"updatedAt\": \"2026-10-07T17:19:58.766Z\",\n        \"image\": {\n          \"url\": \"https://api.transniaga.manokwarikab.go.id/images/eb779271-157f-4361-9fdc-795ddb593419.png\",\n          \"id\": 13,\n          \"name\": \"p.png\",\n          \"imgUrl\": \"/images/eb779271-157f-4361-9fdc-795ddb593419.png\",\n          \"altText\": \"p\",\n          \"createdAt\": \"2026-10-07T17:19:58.403Z\",\n          \"updatedAt\": \"2026-10-07T17:19:58.403Z\"\n        },\n        \"categoryId\": 1\n      }\n    }\n  }\n}"
             },
             {
               "name": "403 Error",
@@ -2683,10 +2683,15 @@
                   "key": "isActive",
                   "value": "false",
                   "disabled": true
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{categoryId}}",
+                  "disabled": true
                 }
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nsuperadmin/disnakertrans/admin: every product. tenant: only their own. Optional `isActive` filter (e.g. `false` = waiting for approval)."
+            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nsuperadmin/disnakertrans/admin: every product. tenant: only their own. Each with its `category` (`id`, `name`). Optional filters `isActive` (e.g. `false` = waiting for approval) and `categoryId`."
           },
           "event": [
             {
@@ -2727,10 +2732,15 @@
                       "key": "isActive",
                       "value": "false",
                       "disabled": true
+                    },
+                    {
+                      "key": "categoryId",
+                      "value": "{{categoryId}}",
+                      "disabled": true
                     }
                   ]
                 },
-                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nsuperadmin/disnakertrans/admin: every product. tenant: only their own. Optional `isActive` filter (e.g. `false` = waiting for approval)."
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nsuperadmin/disnakertrans/admin: every product. tenant: only their own. Each with its `category` (`id`, `name`). Optional filters `isActive` (e.g. `false` = waiting for approval) and `categoryId`."
               },
               "status": "OK",
               "code": 200,
@@ -2742,7 +2752,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"560406d6-c5d6-4551-9e6f-e6fae5fd0221\",\n      \"name\": \"Kopi Susu Gula Aren\",\n      \"description\": \"Kopi susu dengan gula aren asli\",\n      \"details\": \"250 ml, es\",\n      \"price\": 20000,\n      \"isRecommended\": false,\n      \"imageId\": 16,\n      \"approvalId\": 17,\n      \"tenantId\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n      \"createdAt\": \"2026-10-07T17:35:29.270Z\",\n      \"updatedAt\": \"2026-10-07T17:35:29.472Z\",\n      \"ratingAverage\": null,\n      \"reviewCount\": 0,\n      \"image\": {\n        \"url\": \"https://api.transniaga.manokwarikab.go.id/images/63432df3-c058-4059-9e4c-d03bb12620d4.png\",\n        \"id\": 16,\n        \"name\": \"logo.png\",\n        \"imgUrl\": \"/images/63432df3-c058-4059-9e4c-d03bb12620d4.png\",\n        \"altText\": \"logo\",\n        \"createdAt\": \"2026-10-07T17:35:29.230Z\",\n        \"updatedAt\": \"2026-10-07T17:35:29.230Z\"\n      },\n      \"approval\": {\n        \"id\": 17,\n        \"isActive\": false,\n        \"reason\": \"Waiting for approval\",\n        \"updatedAt\": \"2026-10-07T17:35:29.262Z\"\n      },\n      \"tenant\": {\n        \"id\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n        \"tenantName\": \"Toko Uji\",\n        \"firstName\": \"Uji\",\n        \"lastName\": \"tenant\",\n        \"email\": \"tenant.test@example.com\"\n      }\n    },\n    {\n      \"id\": \"f34da3d5-bc0c-4dbd-93df-f2596f7f93ba\",\n      \"name\": \"Keripik Uji\",\n      \"description\": \"Renyah\",\n      \"details\": \"200 gram\",\n      \"price\": 30000,\n      \"isRecommended\": true,\n      \"imageId\": 13,\n      \"approvalId\": 15,\n      \"tenantId\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n      \"createdAt\": \"2026-10-07T17:19:58.601Z\",\n      \"updatedAt\": \"2026-10-07T17:19:58.766Z\",\n      \"ratingAverage\": 2.9,\n      \"reviewCount\": 7,\n      \"image\": {\n        \"url\": \"https://api.transniaga.manokwarikab.go.id/images/eb779271-157f-4361-9fdc-795ddb593419.png\",\n        \"id\": 13,\n        \"name\": \"p.png\",\n        \"imgUrl\": \"/images/eb779271-157f-4361-9fdc-795ddb593419.png\",\n        \"altText\": \"p\",\n        \"createdAt\": \"2026-10-07T17:19:58.403Z\",\n        \"updatedAt\": \"2026-10-07T17:19:58.403Z\"\n      },\n      \"approval\": {\n        \"id\": 15,\n        \"isActive\": true,\n        \"reason\": \"Activated by disnakertrans\",\n        \"updatedAt\": \"2026-10-07T17:33:05.566Z\"\n      },\n      \"tenant\": {\n        \"id\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n        \"tenantName\": \"Toko Uji\",\n        \"firstName\": \"Uji\",\n        \"lastName\": \"tenant\",\n        \"email\": \"tenant.test@example.com\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 2,\n    \"totalPages\": 1\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"19252eb6-e787-453e-af1b-e7fc3e920863\",\n      \"name\": \"Tes\",\n      \"description\": \"d\",\n      \"details\": \"d\",\n      \"price\": 1000,\n      \"isRecommended\": false,\n      \"imageId\": 23,\n      \"categoryId\": 4,\n      \"approvalId\": 14,\n      \"tenantId\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n      \"createdAt\": \"2026-10-08T13:28:23.696Z\",\n      \"updatedAt\": \"2026-10-08T13:28:24.467Z\",\n      \"ratingAverage\": 4.7,\n      \"reviewCount\": 3,\n      \"image\": {\n        \"url\": \"https://api.transniaga.manokwarikab.go.id/images/9f57fce0-4481-49cd-a393-e7192d13a13f.png\",\n        \"id\": 23,\n        \"name\": \"a.png\",\n        \"imgUrl\": \"/images/9f57fce0-4481-49cd-a393-e7192d13a13f.png\",\n        \"altText\": \"a\",\n        \"uploaderId\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n        \"createdAt\": \"2026-10-08T13:28:23.547Z\",\n        \"updatedAt\": \"2026-10-08T13:28:23.547Z\"\n      },\n      \"category\": {\n        \"id\": 4,\n        \"name\": \"BUMDES\"\n      },\n      \"approval\": {\n        \"id\": 14,\n        \"isActive\": true,\n        \"reason\": \"Waiting for approval\",\n        \"updatedAt\": \"2026-10-08T13:28:23.691Z\"\n      },\n      \"tenant\": {\n        \"id\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n        \"tenantName\": \"WARUNG TUK-TUK RACING\",\n        \"firstName\": \"Yohan\",\n        \"lastName\": \"Dwi\",\n        \"email\": \"dwiyohan32@gmail.com\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 1,\n    \"total\": 6,\n    \"totalPages\": 6\n  }\n}"
             },
             {
               "name": "400 Error",
@@ -2771,10 +2781,15 @@
                       "key": "isActive",
                       "value": "false",
                       "disabled": true
+                    },
+                    {
+                      "key": "categoryId",
+                      "value": "{{categoryId}}",
+                      "disabled": true
                     }
                   ]
                 },
-                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nsuperadmin/disnakertrans/admin: every product. tenant: only their own. Optional `isActive` filter (e.g. `false` = waiting for approval)."
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nsuperadmin/disnakertrans/admin: every product. tenant: only their own. Each with its `category` (`id`, `name`). Optional filters `isActive` (e.g. `false` = waiting for approval) and `categoryId`."
               },
               "status": "Bad Request",
               "code": 400,
@@ -2848,7 +2863,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"f34da3d5-bc0c-4dbd-93df-f2596f7f93ba\",\n    \"name\": \"Keripik Uji\",\n    \"description\": \"Renyah\",\n    \"details\": \"200 gram\",\n    \"price\": 30000,\n    \"isRecommended\": true,\n    \"imageId\": 13,\n    \"approvalId\": 15,\n    \"tenantId\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n    \"createdAt\": \"2026-10-07T17:19:58.601Z\",\n    \"updatedAt\": \"2026-10-07T17:19:58.766Z\",\n    \"ratingAverage\": 2.9,\n    \"reviewCount\": 7,\n    \"image\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/eb779271-157f-4361-9fdc-795ddb593419.png\",\n      \"id\": 13,\n      \"name\": \"p.png\",\n      \"imgUrl\": \"/images/eb779271-157f-4361-9fdc-795ddb593419.png\",\n      \"altText\": \"p\",\n      \"createdAt\": \"2026-10-07T17:19:58.403Z\",\n      \"updatedAt\": \"2026-10-07T17:19:58.403Z\"\n    },\n    \"approval\": {\n      \"id\": 15,\n      \"isActive\": true,\n      \"reason\": \"Activated by disnakertrans\",\n      \"updatedAt\": \"2026-10-07T17:33:05.566Z\"\n    },\n    \"tenant\": {\n      \"id\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n      \"tenantName\": \"Toko Uji\",\n      \"firstName\": \"Uji\",\n      \"lastName\": \"tenant\",\n      \"email\": \"tenant.test@example.com\"\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"19252eb6-e787-453e-af1b-e7fc3e920863\",\n    \"name\": \"Tes\",\n    \"description\": \"d\",\n    \"details\": \"d\",\n    \"price\": 1000,\n    \"isRecommended\": false,\n    \"imageId\": 23,\n    \"categoryId\": 4,\n    \"approvalId\": 14,\n    \"tenantId\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n    \"createdAt\": \"2026-10-08T13:28:23.696Z\",\n    \"updatedAt\": \"2026-10-08T13:28:24.467Z\",\n    \"ratingAverage\": 4.7,\n    \"reviewCount\": 3,\n    \"image\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/9f57fce0-4481-49cd-a393-e7192d13a13f.png\",\n      \"id\": 23,\n      \"name\": \"a.png\",\n      \"imgUrl\": \"/images/9f57fce0-4481-49cd-a393-e7192d13a13f.png\",\n      \"altText\": \"a\",\n      \"uploaderId\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n      \"createdAt\": \"2026-10-08T13:28:23.547Z\",\n      \"updatedAt\": \"2026-10-08T13:28:23.547Z\"\n    },\n    \"category\": {\n      \"id\": 4,\n      \"name\": \"BUMDES\"\n    },\n    \"approval\": {\n      \"id\": 14,\n      \"isActive\": true,\n      \"reason\": \"Waiting for approval\",\n      \"updatedAt\": \"2026-10-08T13:28:23.691Z\"\n    },\n    \"tenant\": {\n      \"id\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n      \"tenantName\": \"WARUNG TUK-TUK RACING\",\n      \"firstName\": \"Yohan\",\n      \"lastName\": \"Dwi\",\n      \"email\": \"dwiyohan32@gmail.com\"\n    }\n  }\n}"
             },
             {
               "name": "404 Error",
@@ -2902,10 +2917,10 @@
                 "products"
               ]
             },
-            "description": "**Access:** tenant\n\nYour tenant profile must be **complete** first (*Tenants → Create My Tenant*) and your account needs a **profile photo** (`faceImageId`, *Auth → Update Me*); otherwise 403 `TENANT_PROFILE_INCOMPLETE` with `details.missingFields` (e.g. `[\"faceImageId\"]`). Upload the image first (*Images → Upload Image*); `imageId` is required. Saves `{{productId}}`. Superadmins, admins and disnakertrans get `PRODUCT_SUBMITTED`, the tenant gets `PRODUCT_UNDER_REVIEW`.",
+            "description": "**Access:** tenant\n\nYour tenant profile must be **complete** first (*Tenants → Create My Tenant*) and your account needs a **profile photo** (`faceImageId`, *Auth → Update Me*); otherwise 403 `TENANT_PROFILE_INCOMPLETE` with `details.missingFields` (e.g. `[\"faceImageId\"]`). Upload the image first (*Images → Upload Image*); `imageId` is required. `categoryId` is required: a product category (*Product Categories → List*). `isRecommended` cannot be sent: the server sets it (true while the reviews average 4.8 stars or more, see *Landing → Create Review*). Saves `{{productId}}`. Superadmins, admins and disnakertrans get `PRODUCT_SUBMITTED`, the tenant gets `PRODUCT_UNDER_REVIEW`.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Kopi Susu Gula Aren\",\n  \"description\": \"Kopi susu dengan gula aren asli\",\n  \"details\": \"250 ml, es\",\n  \"price\": 18000,\n  \"isRecommended\": true,\n  \"imageId\": {{imageId}}\n}",
+              "raw": "{\n  \"name\": \"Kopi Susu Gula Aren\",\n  \"description\": \"Kopi susu dengan gula aren asli\",\n  \"details\": \"250 ml, es\",\n  \"price\": 18000,\n  \"categoryId\": {{categoryId}},\n  \"imageId\": {{imageId}}\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2946,10 +2961,10 @@
                     "products"
                   ]
                 },
-                "description": "**Access:** tenant\n\nYour tenant profile must be **complete** first (*Tenants → Create My Tenant*), otherwise 403 `TENANT_PROFILE_INCOMPLETE` with `details.missingFields`. Upload the image first (*Images → Upload Image*); `imageId` is required. Saves `{{productId}}`. Superadmins, admins and disnakertrans get `PRODUCT_SUBMITTED`, the tenant gets `PRODUCT_UNDER_REVIEW`.",
+                "description": "**Access:** tenant\n\nYour tenant profile must be **complete** first (*Tenants → Create My Tenant*) and your account needs a **profile photo** (`faceImageId`, *Auth → Update Me*); otherwise 403 `TENANT_PROFILE_INCOMPLETE` with `details.missingFields` (e.g. `[\"faceImageId\"]`). Upload the image first (*Images → Upload Image*); `imageId` is required. `categoryId` is required: a product category (*Product Categories → List*). `isRecommended` cannot be sent: the server sets it (true while the reviews average 4.8 stars or more, see *Landing → Create Review*). Saves `{{productId}}`. Superadmins, admins and disnakertrans get `PRODUCT_SUBMITTED`, the tenant gets `PRODUCT_UNDER_REVIEW`.",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"Kopi Susu Gula Aren\",\n  \"description\": \"Kopi susu dengan gula aren asli\",\n  \"details\": \"250 ml, es\",\n  \"price\": 18000,\n  \"isRecommended\": true,\n  \"imageId\": {{imageId}}\n}",
+                  "raw": "{\n  \"name\": \"Kopi Susu Gula Aren\",\n  \"description\": \"Kopi susu dengan gula aren asli\",\n  \"details\": \"250 ml, es\",\n  \"price\": 18000,\n  \"categoryId\": {{categoryId}},\n  \"imageId\": {{imageId}}\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -2967,7 +2982,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"560406d6-c5d6-4551-9e6f-e6fae5fd0221\",\n    \"name\": \"Kopi Susu Gula Aren\",\n    \"description\": \"Kopi susu dengan gula aren asli\",\n    \"details\": \"250 ml, es\",\n    \"price\": 18000,\n    \"isRecommended\": true,\n    \"imageId\": 16,\n    \"approvalId\": 17,\n    \"tenantId\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n    \"createdAt\": \"2026-10-07T17:35:29.270Z\",\n    \"updatedAt\": \"2026-10-07T17:35:29.270Z\",\n    \"ratingAverage\": null,\n    \"reviewCount\": 0,\n    \"image\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/63432df3-c058-4059-9e4c-d03bb12620d4.png\",\n      \"id\": 16,\n      \"name\": \"logo.png\",\n      \"imgUrl\": \"/images/63432df3-c058-4059-9e4c-d03bb12620d4.png\",\n      \"altText\": \"logo\",\n      \"createdAt\": \"2026-10-07T17:35:29.230Z\",\n      \"updatedAt\": \"2026-10-07T17:35:29.230Z\"\n    },\n    \"approval\": {\n      \"id\": 17,\n      \"isActive\": false,\n      \"reason\": \"Waiting for approval\",\n      \"updatedAt\": \"2026-10-07T17:35:29.262Z\"\n    },\n    \"tenant\": {\n      \"id\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n      \"tenantName\": \"Toko Uji\",\n      \"firstName\": \"Uji\",\n      \"lastName\": \"tenant\",\n      \"email\": \"tenant.test@example.com\"\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"92bbc929-c7b1-4a83-8fa9-8a64510d46d1\",\n    \"name\": \"Kopi Susu Gula Aren\",\n    \"description\": \"Kopi susu dengan gula aren asli\",\n    \"details\": \"250 ml, es\",\n    \"price\": 18000,\n    \"isRecommended\": false,\n    \"imageId\": 32,\n    \"categoryId\": 3,\n    \"approvalId\": 17,\n    \"tenantId\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n    \"createdAt\": \"2026-10-08T13:29:56.965Z\",\n    \"updatedAt\": \"2026-10-08T13:29:56.965Z\",\n    \"ratingAverage\": null,\n    \"reviewCount\": 0,\n    \"image\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/7dfa0991-5c26-4cca-ae3f-5dae5198ce18.png\",\n      \"id\": 32,\n      \"name\": \"kuliner.png\",\n      \"imgUrl\": \"/images/7dfa0991-5c26-4cca-ae3f-5dae5198ce18.png\",\n      \"altText\": \"kuliner\",\n      \"uploaderId\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n      \"createdAt\": \"2026-10-08T13:29:56.914Z\",\n      \"updatedAt\": \"2026-10-08T13:29:56.914Z\"\n    },\n    \"category\": {\n      \"id\": 3,\n      \"name\": \"makanan ringan\"\n    },\n    \"approval\": {\n      \"id\": 17,\n      \"isActive\": false,\n      \"reason\": \"Waiting for approval\",\n      \"updatedAt\": \"2026-10-08T13:29:56.962Z\"\n    },\n    \"tenant\": {\n      \"id\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n      \"tenantName\": \"WARUNG TUK-TUK RACING\",\n      \"firstName\": \"Yohan\",\n      \"lastName\": \"Dwi\",\n      \"email\": \"dwiyohan32@gmail.com\"\n    }\n  }\n}"
             },
             {
               "name": "403 Error",
@@ -2989,10 +3004,10 @@
                     "products"
                   ]
                 },
-                "description": "**Access:** tenant\n\nYour tenant profile must be **complete** first (*Tenants → Create My Tenant*), otherwise 403 `TENANT_PROFILE_INCOMPLETE` with `details.missingFields`. Upload the image first (*Images → Upload Image*); `imageId` is required. Saves `{{productId}}`. Superadmins, admins and disnakertrans get `PRODUCT_SUBMITTED`, the tenant gets `PRODUCT_UNDER_REVIEW`.",
+                "description": "**Access:** tenant\n\nYour tenant profile must be **complete** first (*Tenants → Create My Tenant*) and your account needs a **profile photo** (`faceImageId`, *Auth → Update Me*); otherwise 403 `TENANT_PROFILE_INCOMPLETE` with `details.missingFields` (e.g. `[\"faceImageId\"]`). Upload the image first (*Images → Upload Image*); `imageId` is required. `categoryId` is required: a product category (*Product Categories → List*). `isRecommended` cannot be sent: the server sets it (true while the reviews average 4.8 stars or more, see *Landing → Create Review*). Saves `{{productId}}`. Superadmins, admins and disnakertrans get `PRODUCT_SUBMITTED`, the tenant gets `PRODUCT_UNDER_REVIEW`.",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"Kopi Susu Gula Aren\",\n  \"description\": \"Kopi susu dengan gula aren asli\",\n  \"details\": \"250 ml, es\",\n  \"price\": 18000,\n  \"isRecommended\": true,\n  \"imageId\": {{imageId}}\n}",
+                  "raw": "{\n  \"name\": \"Kopi Susu Gula Aren\",\n  \"description\": \"Kopi susu dengan gula aren asli\",\n  \"details\": \"250 ml, es\",\n  \"price\": 18000,\n  \"categoryId\": {{categoryId}},\n  \"imageId\": {{imageId}}\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -3035,10 +3050,10 @@
                 "{{productId}}"
               ]
             },
-            "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `price`, `isRecommended`, `imageId`. Activation cannot be changed here. Admins and disnakertrans get `PRODUCT_UPDATED`. Replacing `imageId` deletes the old image and its file.",
+            "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `price`, `categoryId`, `imageId`. Activation and `isRecommended` cannot be changed here. Admins and disnakertrans get `PRODUCT_UPDATED`. Replacing `imageId` deletes the old image and its file.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"price\": 20000,\n  \"isRecommended\": false\n}",
+              "raw": "{\n  \"price\": 20000,\n  \"categoryId\": {{categoryId}}\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -3079,10 +3094,10 @@
                     "{{productId}}"
                   ]
                 },
-                "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `price`, `isRecommended`, `imageId`. Activation cannot be changed here. Admins and disnakertrans get `PRODUCT_UPDATED`. Replacing `imageId` deletes the old image and its file.",
+                "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `price`, `categoryId`, `imageId`. Activation and `isRecommended` cannot be changed here. Admins and disnakertrans get `PRODUCT_UPDATED`. Replacing `imageId` deletes the old image and its file.",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"price\": 20000,\n  \"isRecommended\": false\n}",
+                  "raw": "{\n  \"price\": 20000,\n  \"categoryId\": {{categoryId}}\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -3100,7 +3115,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"560406d6-c5d6-4551-9e6f-e6fae5fd0221\",\n    \"name\": \"Kopi Susu Gula Aren\",\n    \"description\": \"Kopi susu dengan gula aren asli\",\n    \"details\": \"250 ml, es\",\n    \"price\": 20000,\n    \"isRecommended\": false,\n    \"imageId\": 16,\n    \"approvalId\": 17,\n    \"tenantId\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n    \"createdAt\": \"2026-10-07T17:35:29.270Z\",\n    \"updatedAt\": \"2026-10-07T17:35:29.472Z\",\n    \"ratingAverage\": null,\n    \"reviewCount\": 0,\n    \"image\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/63432df3-c058-4059-9e4c-d03bb12620d4.png\",\n      \"id\": 16,\n      \"name\": \"logo.png\",\n      \"imgUrl\": \"/images/63432df3-c058-4059-9e4c-d03bb12620d4.png\",\n      \"altText\": \"logo\",\n      \"createdAt\": \"2026-10-07T17:35:29.230Z\",\n      \"updatedAt\": \"2026-10-07T17:35:29.230Z\"\n    },\n    \"approval\": {\n      \"id\": 17,\n      \"isActive\": false,\n      \"reason\": \"Waiting for approval\",\n      \"updatedAt\": \"2026-10-07T17:35:29.262Z\"\n    },\n    \"tenant\": {\n      \"id\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n      \"tenantName\": \"Toko Uji\",\n      \"firstName\": \"Uji\",\n      \"lastName\": \"tenant\",\n      \"email\": \"tenant.test@example.com\"\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"92bbc929-c7b1-4a83-8fa9-8a64510d46d1\",\n    \"name\": \"Kopi Susu Gula Aren\",\n    \"description\": \"Kopi susu dengan gula aren asli\",\n    \"details\": \"250 ml, es\",\n    \"price\": 20000,\n    \"isRecommended\": false,\n    \"imageId\": 32,\n    \"categoryId\": 1,\n    \"approvalId\": 17,\n    \"tenantId\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n    \"createdAt\": \"2026-10-08T13:29:56.965Z\",\n    \"updatedAt\": \"2026-10-08T13:29:57.033Z\",\n    \"ratingAverage\": null,\n    \"reviewCount\": 0,\n    \"image\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/7dfa0991-5c26-4cca-ae3f-5dae5198ce18.png\",\n      \"id\": 32,\n      \"name\": \"kuliner.png\",\n      \"imgUrl\": \"/images/7dfa0991-5c26-4cca-ae3f-5dae5198ce18.png\",\n      \"altText\": \"kuliner\",\n      \"uploaderId\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n      \"createdAt\": \"2026-10-08T13:29:56.914Z\",\n      \"updatedAt\": \"2026-10-08T13:29:56.914Z\"\n    },\n    \"category\": {\n      \"id\": 1,\n      \"name\": \"makanan berat\"\n    },\n    \"approval\": {\n      \"id\": 17,\n      \"isActive\": false,\n      \"reason\": \"Waiting for approval\",\n      \"updatedAt\": \"2026-10-08T13:29:56.962Z\"\n    },\n    \"tenant\": {\n      \"id\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n      \"tenantName\": \"WARUNG TUK-TUK RACING\",\n      \"firstName\": \"Yohan\",\n      \"lastName\": \"Dwi\",\n      \"email\": \"dwiyohan32@gmail.com\"\n    }\n  }\n}"
             },
             {
               "name": "400 Error",
@@ -3123,10 +3138,10 @@
                     "{{productId}}"
                   ]
                 },
-                "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `price`, `isRecommended`, `imageId`. Activation cannot be changed here. Admins and disnakertrans get `PRODUCT_UPDATED`. Replacing `imageId` deletes the old image and its file.",
+                "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `price`, `categoryId`, `imageId`. Activation and `isRecommended` cannot be changed here. Admins and disnakertrans get `PRODUCT_UPDATED`. Replacing `imageId` deletes the old image and its file.",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"price\": 20000,\n  \"isRecommended\": false\n}",
+                  "raw": "{\n  \"price\": 20000,\n  \"categoryId\": {{categoryId}}\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -3247,6 +3262,74 @@
       "description": "Public pages for visitors: no token, no private data (no owner email/phone, no approval reason). Only **approved** products and UMKM whose owner account is active are shown.\n\n**Reviews** are public too: anyone can read them and write one without logging in (`name`, `stars` 1–5, `review`), only for approved products. At most 5 reviews per visitor (IP) per 10 minutes (429 `TOO_MANY_REQUESTS`). Products carry `ratingAverage` (1 decimal, `null` without reviews) and `reviewCount`; UMKM carry `productCount`, `ratingAverage` and `reviewCount` over their approved products.",
       "item": [
         {
+          "name": "Landing Categories (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/landing/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "landing",
+                "categories"
+              ]
+            },
+            "description": "**Access:** public, no token\n\nEvery product category A→Z with its `image` (or null) and `productCount` (approved products only), for the home page carousel: each slide is a category image, and next to it *Landing Products* with `categoryId` shows that category's products.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/landing/categories",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "landing",
+                    "categories"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nEvery product category A→Z with its `image` (or null) and `productCount` (approved products only), for the home page carousel: each slide is a category image, and next to it *Landing Products* with `categoryId` shows that category's products.",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": 4,\n      \"name\": \"BUMDES\",\n      \"imageId\": null,\n      \"createdAt\": \"2026-10-08T07:24:37.592Z\",\n      \"updatedAt\": \"2026-10-08T07:24:37.592Z\",\n      \"productCount\": 1,\n      \"image\": null\n    },\n    {\n      \"id\": 1,\n      \"name\": \"makanan berat\",\n      \"imageId\": null,\n      \"createdAt\": \"2026-10-07T09:26:48.278Z\",\n      \"updatedAt\": \"2026-10-07T09:27:07.335Z\",\n      \"productCount\": 1,\n      \"image\": null\n    },\n    {\n      \"id\": 3,\n      \"name\": \"makanan ringan\",\n      \"imageId\": null,\n      \"createdAt\": \"2026-10-07T09:27:17.359Z\",\n      \"updatedAt\": \"2026-10-07T09:27:17.359Z\",\n      \"productCount\": 0,\n      \"image\": null\n    },\n    {\n      \"id\": 2,\n      \"name\": \"minuman\",\n      \"imageId\": null,\n      \"createdAt\": \"2026-10-07T09:26:55.872Z\",\n      \"updatedAt\": \"2026-10-07T09:26:55.872Z\",\n      \"productCount\": 1,\n      \"image\": null\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
           "name": "Landing Products (Public)",
           "request": {
             "method": "GET",
@@ -3274,17 +3357,29 @@
                   "key": "recommended",
                   "value": "true",
                   "disabled": true,
-                  "description": "Only the products their tenant marked as recommended"
+                  "description": "Only recommended products (reviews average 4.8 or more)"
                 },
                 {
                   "key": "tenantId",
                   "value": "{{currentUserId}}",
                   "disabled": true,
                   "description": "One owner's products (the owner's user id, product.tenant.id)"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{categoryId}}",
+                  "disabled": true,
+                  "description": "One product category"
+                },
+                {
+                  "key": "sort",
+                  "value": "rating",
+                  "disabled": true,
+                  "description": "newest (default) or rating (best rated first)"
                 }
               ]
             },
-            "description": "**Access:** public, no token\n\nApproved products only, newest first. Optional `recommended=true` (the tenant's recommended products) and `tenantId` (one owner's products). Each product's `tenant.tenant` is the owner's UMKM profile (`id`, `name`, and its public links `whatsappLink`, `instagramLink`, `shopeeLink`, `googleBusinessLink`, `fbLink`, `gmapsLink`; empty ones are `null` or `\"-\"`) for *Landing Tenant* and the product page's contact buttons.",
+            "description": "**Access:** public, no token\n\nApproved products only, newest first. Each has its `category` (`id`, `name`). Optional filters: `recommended=true` (products whose reviews average **4.8 stars or more**; set by the server), `tenantId` (one owner's products), `categoryId` (one category, e.g. the carousel's current slide) and `sort` (`newest`, the default, or `rating`: best average first, products without reviews last). Each product's `tenant.tenant` is the owner's UMKM profile (`id`, `name`, and its public links `whatsappLink`, `instagramLink`, `shopeeLink`, `googleBusinessLink`, `fbLink`, `gmapsLink`; empty ones are `null` or `\"-\"`) for *Landing Tenant* and the product page's contact buttons.",
             "auth": {
               "type": "noauth"
             }
@@ -3329,17 +3424,29 @@
                       "key": "recommended",
                       "value": "true",
                       "disabled": true,
-                      "description": "Only the products their tenant marked as recommended"
+                      "description": "Only recommended products (reviews average 4.8 or more)"
                     },
                     {
                       "key": "tenantId",
                       "value": "{{currentUserId}}",
                       "disabled": true,
                       "description": "One owner's products (the owner's user id, product.tenant.id)"
+                    },
+                    {
+                      "key": "categoryId",
+                      "value": "{{categoryId}}",
+                      "disabled": true,
+                      "description": "One product category"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "rating",
+                      "disabled": true,
+                      "description": "newest (default) or rating (best rated first)"
                     }
                   ]
                 },
-                "description": "**Access:** public, no token\n\nApproved products only, newest first. Optional `recommended=true` (the tenant's recommended products) and `tenantId` (one owner's products). Each product's `tenant.tenant` is the owner's UMKM profile (`id`, `name`) for *Landing Tenant*.",
+                "description": "**Access:** public, no token\n\nApproved products only, newest first. Each has its `category` (`id`, `name`). Optional filters: `recommended=true` (products whose reviews average **4.8 stars or more**; set by the server), `tenantId` (one owner's products), `categoryId` (one category, e.g. the carousel's current slide) and `sort` (`newest`, the default, or `rating`: best average first, products without reviews last). Each product's `tenant.tenant` is the owner's UMKM profile (`id`, `name`, and its public links `whatsappLink`, `instagramLink`, `shopeeLink`, `googleBusinessLink`, `fbLink`, `gmapsLink`; empty ones are `null` or `\"-\"`) for *Landing Tenant* and the product page's contact buttons.",
                 "auth": {
                   "type": "noauth"
                 }
@@ -3354,7 +3461,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"f34da3d5-bc0c-4dbd-93df-f2596f7f93ba\",\n      \"name\": \"Keripik Uji\",\n      \"description\": \"Renyah\",\n      \"details\": \"200 gram\",\n      \"price\": 30000,\n      \"isRecommended\": true,\n      \"imageId\": 13,\n      \"tenantId\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n      \"createdAt\": \"2026-10-07T17:19:58.601Z\",\n      \"updatedAt\": \"2026-10-07T17:19:58.766Z\",\n      \"ratingAverage\": 2.9,\n      \"reviewCount\": 7,\n      \"image\": {\n        \"url\": \"https://api.transniaga.manokwarikab.go.id/images/eb779271-157f-4361-9fdc-795ddb593419.png\",\n        \"id\": 13,\n        \"imgUrl\": \"/images/eb779271-157f-4361-9fdc-795ddb593419.png\",\n        \"altText\": \"p\"\n      },\n      \"tenant\": {\n        \"id\": \"d7ef971c-b652-40f5-a7fb-1147f7c3e57e\",\n        \"tenantName\": \"Toko Uji\",\n        \"firstName\": \"Uji\",\n        \"lastName\": \"tenant\",\n        \"tenant\": {\n          \"id\": \"5eda1254-b8a9-4393-92c0-20d1717d45a9\",\n          \"name\": \"Toko Uji\"\n        }\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"totalPages\": 1\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"19252eb6-e787-453e-af1b-e7fc3e920863\",\n    \"name\": \"Tes\",\n    \"description\": \"d\",\n    \"details\": \"d\",\n    \"price\": 1000,\n    \"isRecommended\": false,\n    \"imageId\": 23,\n    \"categoryId\": 4,\n    \"tenantId\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n    \"createdAt\": \"2026-10-08T13:28:23.696Z\",\n    \"updatedAt\": \"2026-10-08T13:28:24.467Z\",\n    \"ratingAverage\": 4.7,\n    \"reviewCount\": 3,\n    \"image\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/9f57fce0-4481-49cd-a393-e7192d13a13f.png\",\n      \"id\": 23,\n      \"imgUrl\": \"/images/9f57fce0-4481-49cd-a393-e7192d13a13f.png\",\n      \"altText\": \"a\"\n    },\n    \"category\": {\n      \"id\": 4,\n      \"name\": \"BUMDES\"\n    },\n    \"tenant\": {\n      \"id\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n      \"tenantName\": \"WARUNG TUK-TUK RACING\",\n      \"firstName\": \"Yohan\",\n      \"lastName\": \"Dwi\",\n      \"tenant\": {\n        \"id\": \"4d4a96ac-641f-4fb0-beb2-117a165851c3\",\n        \"name\": \"WARUNG TUK-TUK RACING\",\n        \"whatsappLink\": \"https://wa.me/62882003684243\",\n        \"instagramLink\": \"https://instagram.com/enakk\",\n        \"shopeeLink\": null,\n        \"googleBusinessLink\": null,\n        \"fbLink\": \"-\",\n        \"gmapsLink\": \"-\"\n      }\n    }\n  }\n}"
             },
             {
               "name": "400 Error",
@@ -3384,17 +3491,29 @@
                       "key": "recommended",
                       "value": "true",
                       "disabled": true,
-                      "description": "Only the products their tenant marked as recommended"
+                      "description": "Only recommended products (reviews average 4.8 or more)"
                     },
                     {
                       "key": "tenantId",
                       "value": "{{currentUserId}}",
                       "disabled": true,
                       "description": "One owner's products (the owner's user id, product.tenant.id)"
+                    },
+                    {
+                      "key": "categoryId",
+                      "value": "{{categoryId}}",
+                      "disabled": true,
+                      "description": "One product category"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "rating",
+                      "disabled": true,
+                      "description": "newest (default) or rating (best rated first)"
                     }
                   ]
                 },
-                "description": "**Access:** public, no token\n\nApproved products only, newest first. Optional `recommended=true` (the tenant's recommended products) and `tenantId` (one owner's products). Each product's `tenant.tenant` is the owner's UMKM profile (`id`, `name`) for *Landing Tenant*.",
+                "description": "**Access:** public, no token\n\nApproved products only, newest first. Each has its `category` (`id`, `name`). Optional filters: `recommended=true` (products whose reviews average **4.8 stars or more**; set by the server), `tenantId` (one owner's products), `categoryId` (one category, e.g. the carousel's current slide) and `sort` (`newest`, the default, or `rating`: best average first, products without reviews last). Each product's `tenant.tenant` is the owner's UMKM profile (`id`, `name`, and its public links `whatsappLink`, `instagramLink`, `shopeeLink`, `googleBusinessLink`, `fbLink`, `gmapsLink`; empty ones are `null` or `\"-\"`) for *Landing Tenant* and the product page's contact buttons.",
                 "auth": {
                   "type": "noauth"
                 }
@@ -3672,7 +3791,7 @@
                 "reviews"
               ]
             },
-            "description": "**Access:** public, no token\n\nNo login. `name` (max 100), `stars` (whole number 1–5), `review` (max 1000). Approved products only. Returns the review, with the product's new `meta.ratingAverage` / `meta.reviewCount`. At most 5 per visitor per 10 minutes (429).",
+            "description": "**Access:** public, no token\n\nNo login. `name` (max 100), `stars` (whole number 1–5), `review` (max 1000). Approved products only. Returns the review, with the product's new `meta.ratingAverage` / `meta.reviewCount`. At most 5 per visitor per 10 minutes (429).\n\nAfter every review the product's `isRecommended` is recomputed: `true` while its average rating (1 decimal, as shown) is **4.8 or more**.",
             "auth": {
               "type": "noauth"
             },
@@ -3716,7 +3835,7 @@
                     "reviews"
                   ]
                 },
-                "description": "**Access:** public, no token\n\nNo login. `name` (max 100), `stars` (whole number 1–5), `review` (max 1000). Approved products only. Returns the review, with the product's new `meta.ratingAverage` / `meta.reviewCount`. At most 5 per visitor per 10 minutes (429).",
+                "description": "**Access:** public, no token\n\nNo login. `name` (max 100), `stars` (whole number 1–5), `review` (max 1000). Approved products only. Returns the review, with the product's new `meta.ratingAverage` / `meta.reviewCount`. At most 5 per visitor per 10 minutes (429).\n\nAfter every review the product's `isRecommended` is recomputed: `true` while its average rating (1 decimal, as shown) is **4.8 or more**.",
                 "auth": {
                   "type": "noauth"
                 },
@@ -3760,7 +3879,7 @@
                     "reviews"
                   ]
                 },
-                "description": "**Access:** public, no token\n\nNo login. `name` (max 100), `stars` (whole number 1–5), `review` (max 1000). Approved products only. Returns the review, with the product's new `meta.ratingAverage` / `meta.reviewCount`. At most 5 per visitor per 10 minutes (429).",
+                "description": "**Access:** public, no token\n\nNo login. `name` (max 100), `stars` (whole number 1–5), `review` (max 1000). Approved products only. Returns the review, with the product's new `meta.ratingAverage` / `meta.reviewCount`. At most 5 per visitor per 10 minutes (429).\n\nAfter every review the product's `isRecommended` is recomputed: `true` while its average rating (1 decimal, as shown) is **4.8 or more**.",
                 "auth": {
                   "type": "noauth"
                 },
@@ -3817,15 +3936,10 @@
                   "value": "warung",
                   "disabled": true,
                   "description": "Part of the UMKM name"
-                },
-                {
-                  "key": "tenantCategoryId",
-                  "value": "{{categoryId}}",
-                  "disabled": true
                 }
               ]
             },
-            "description": "**Access:** public, no token\n\nUMKM (tenant profiles) whose owner account is active, A→Z, each with its category, logo, `productCount` (approved products), `ratingAverage` and `reviewCount`. Optional `q` (name search) and `tenantCategoryId`. Saves the first one as `{{tenantProfileId}}`.",
+            "description": "**Access:** public, no token\n\nUMKM (tenant profiles) whose owner account is active, A→Z, each with its logo, `productCount` (approved products), `ratingAverage` and `reviewCount`. Optional `q` (name search). Saves the first one as `{{tenantProfileId}}`.",
             "auth": {
               "type": "noauth"
             }
@@ -3872,15 +3986,10 @@
                       "value": "warung",
                       "disabled": true,
                       "description": "Part of the UMKM name"
-                    },
-                    {
-                      "key": "tenantCategoryId",
-                      "value": "{{categoryId}}",
-                      "disabled": true
                     }
                   ]
                 },
-                "description": "**Access:** public, no token\n\nUMKM (tenant profiles) whose owner account is active, A→Z, each with its category, logo, `productCount` (approved products), `ratingAverage` and `reviewCount`. Optional `q` (name search) and `tenantCategoryId`. Saves the first one as `{{tenantProfileId}}`.",
+                "description": "**Access:** public, no token\n\nUMKM (tenant profiles) whose owner account is active, A→Z, each with its logo, `productCount` (approved products), `ratingAverage` and `reviewCount`. Optional `q` (name search). Saves the first one as `{{tenantProfileId}}`.",
                 "auth": {
                   "type": "noauth"
                 }
@@ -3895,7 +4004,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"93ce5eee-d07f-4025-95dc-76ee1589403e\",\n      \"name\": \"Toko Uji\",\n      \"description\": \"Toko uji coba\",\n      \"address\": \"Jl. Uji 1\",\n      \"area\": \"Wilayah SP 1\",\n      \"operationalHours\": \"08:00 - 17:00 WIT\",\n      \"fbLink\": \"-\",\n      \"whatsappLink\": \"https://wa.me/6281200000000\",\n      \"gmapsLink\": \"-\",\n      \"instagramLink\": null,\n      \"googleBusinessLink\": \"https://g.page/tokouji\",\n      \"shopeeLink\": \"https://shopee.co.id/tokouji\",\n      \"logoId\": 15,\n      \"tenantCategoryId\": 4,\n      \"userId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n      \"createdAt\": \"2026-10-08T03:08:25.725Z\",\n      \"updatedAt\": \"2026-10-08T03:08:56.434Z\",\n      \"productCount\": 0,\n      \"ratingAverage\": null,\n      \"reviewCount\": 0,\n      \"logo\": {\n        \"url\": \"https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n        \"id\": 15,\n        \"imgUrl\": \"/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n        \"altText\": \"a\"\n      },\n      \"category\": {\n        \"id\": 4,\n        \"name\": \"Kuliner Uji\"\n      },\n      \"owner\": {\n        \"id\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n        \"tenantName\": \"Toko Uji\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"totalPages\": 1\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"4d4a96ac-641f-4fb0-beb2-117a165851c3\",\n    \"name\": \"WARUNG TUK-TUK RACING\",\n    \"description\": \"penjual racing\",\n    \"address\": \"msurabaya\",\n    \"area\": \"Wilayah SP 1\",\n    \"operationalHours\": \"Senin - Jumat, 08:00 - 17:00 WIT\",\n    \"fbLink\": \"-\",\n    \"whatsappLink\": \"https://wa.me/62882003684243\",\n    \"gmapsLink\": \"-\",\n    \"instagramLink\": \"https://instagram.com/enakk\",\n    \"googleBusinessLink\": null,\n    \"shopeeLink\": null,\n    \"logoId\": 10,\n    \"userId\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n    \"createdAt\": \"2026-10-07T11:39:37.720Z\",\n    \"updatedAt\": \"2026-10-07T17:57:07.765Z\",\n    \"productCount\": 2,\n    \"ratingAverage\": 4.8,\n    \"reviewCount\": 4,\n    \"logo\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/7ad41508-ba91-4f54-a188-dc270a56dbb1.jpg\",\n      \"id\": 10,\n      \"imgUrl\": \"/images/7ad41508-ba91-4f54-a188-dc270a56dbb1.jpg\",\n      \"altText\": \"Logo WARUNG TUK-TUK RACING\"\n    },\n    \"owner\": {\n      \"id\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n      \"tenantName\": \"WARUNG TUK-TUK RACING\"\n    }\n  }\n}"
             },
             {
               "name": "400 Error",
@@ -3926,15 +4035,10 @@
                       "value": "warung",
                       "disabled": true,
                       "description": "Part of the UMKM name"
-                    },
-                    {
-                      "key": "tenantCategoryId",
-                      "value": "{{categoryId}}",
-                      "disabled": true
                     }
                   ]
                 },
-                "description": "**Access:** public, no token\n\nUMKM (tenant profiles) whose owner account is active, A→Z, each with its category, logo, `productCount` (approved products), `ratingAverage` and `reviewCount`. Optional `q` (name search) and `tenantCategoryId`. Saves the first one as `{{tenantProfileId}}`.",
+                "description": "**Access:** public, no token\n\nUMKM (tenant profiles) whose owner account is active, A→Z, each with its logo, `productCount` (approved products), `ratingAverage` and `reviewCount`. Optional `q` (name search). Saves the first one as `{{tenantProfileId}}`.",
                 "auth": {
                   "type": "noauth"
                 }
@@ -4019,7 +4123,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"93ce5eee-d07f-4025-95dc-76ee1589403e\",\n    \"name\": \"Toko Uji\",\n    \"description\": \"Toko uji coba\",\n    \"address\": \"Jl. Uji 1\",\n    \"area\": \"Wilayah SP 1\",\n    \"operationalHours\": \"08:00 - 17:00 WIT\",\n    \"fbLink\": \"-\",\n    \"whatsappLink\": \"https://wa.me/6281200000000\",\n    \"gmapsLink\": \"-\",\n    \"instagramLink\": null,\n    \"googleBusinessLink\": \"https://g.page/tokouji\",\n    \"shopeeLink\": \"https://shopee.co.id/tokouji\",\n    \"logoId\": 15,\n    \"tenantCategoryId\": 4,\n    \"userId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n    \"createdAt\": \"2026-10-08T03:08:25.725Z\",\n    \"updatedAt\": \"2026-10-08T03:08:56.434Z\",\n    \"productCount\": 0,\n    \"ratingAverage\": null,\n    \"reviewCount\": 0,\n    \"logo\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"id\": 15,\n      \"imgUrl\": \"/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"altText\": \"a\"\n    },\n    \"category\": {\n      \"id\": 4,\n      \"name\": \"Kuliner Uji\"\n    },\n    \"owner\": {\n      \"id\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n      \"tenantName\": \"Toko Uji\"\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"93ce5eee-d07f-4025-95dc-76ee1589403e\",\n    \"name\": \"Toko Uji\",\n    \"description\": \"Toko uji coba\",\n    \"address\": \"Jl. Uji 1\",\n    \"area\": \"Wilayah SP 1\",\n    \"operationalHours\": \"08:00 - 17:00 WIT\",\n    \"fbLink\": \"-\",\n    \"whatsappLink\": \"https://wa.me/6281200000000\",\n    \"gmapsLink\": \"-\",\n    \"instagramLink\": null,\n    \"googleBusinessLink\": \"https://g.page/tokouji\",\n    \"shopeeLink\": \"https://shopee.co.id/tokouji\",\n    \"logoId\": 15,\n    \"userId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n    \"createdAt\": \"2026-10-08T03:08:25.725Z\",\n    \"updatedAt\": \"2026-10-08T03:08:56.434Z\",\n    \"productCount\": 0,\n    \"ratingAverage\": null,\n    \"reviewCount\": 0,\n    \"logo\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"id\": 15,\n      \"imgUrl\": \"/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"altText\": \"a\"\n    },\n    \"category\": {\n      \"id\": 4,\n      \"name\": \"Kuliner Uji\"\n    },\n    \"owner\": {\n      \"id\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n      \"tenantName\": \"Toko Uji\"\n    }\n  }\n}"
             },
             {
               "name": "404 Error",
@@ -4060,22 +4164,22 @@
       ]
     },
     {
-      "name": "Tenant Categories",
-      "description": "Categories a tenant profile belongs to (e.g. Kuliner, Fashion). Managed by admin; the superadmin and tenants can read them (read-only). A tenant picks one for its tenant profile (`tenantCategoryId`).",
+      "name": "Product Categories",
+      "description": "Product categories (e.g. Kuliner, Kerajinan). Managed by disnakertrans and admin; every signed-in role can read them (superadmin and tenants read-only). A tenant picks one for each product (`categoryId`). Each category may have an image (`imageId`, upload it first via *Images → Upload Image*): the landing page carousel shows it, with the category's products next to it. Visitors read the list through *Landing → Landing Categories*. Each category carries `productCount`.",
       "item": [
         {
-          "name": "List Tenant Categories (superadmin, admin, tenant)",
+          "name": "List Product Categories (All roles)",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/tenant-categories?page=1&limit=20",
+              "raw": "{{baseUrl}}/api/product-categories?page=1&limit=20",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
-                "tenant-categories"
+                "product-categories"
               ],
               "query": [
                 {
@@ -4088,7 +4192,7 @@
                 }
               ]
             },
-            "description": "**Access:** superadmin, admin, tenant\n\nSorted by name."
+            "description": "**Access:** superadmin, disnakertrans, admin, tenant\n\nSorted by name, each with its `image` (or null) and `productCount` (all its products, any status)."
           },
           "event": [
             {
@@ -4108,13 +4212,13 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/tenant-categories?page=1&limit=20",
+                  "raw": "{{baseUrl}}/api/product-categories?page=1&limit=20",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
-                    "tenant-categories"
+                    "product-categories"
                   ],
                   "query": [
                     {
@@ -4127,7 +4231,7 @@
                     }
                   ]
                 },
-                "description": "**Access:** superadmin, admin\n\nSorted by name."
+                "description": "**Access:** superadmin, disnakertrans, admin, tenant\n\nSorted by name, each with its `image` (or null) and `productCount` (all its products, any status)."
               },
               "status": "OK",
               "code": 200,
@@ -4139,7 +4243,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": 3,\n      \"name\": \"Kuliner 1791170022812\",\n      \"createdAt\": \"2026-10-05T03:13:45.438Z\",\n      \"updatedAt\": \"2026-10-05T03:13:45.438Z\"\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"totalPages\": 1\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": 4,\n      \"name\": \"BUMDES\",\n      \"imageId\": null,\n      \"createdAt\": \"2026-10-08T07:24:37.592Z\",\n      \"updatedAt\": \"2026-10-08T07:24:37.592Z\",\n      \"productCount\": 1,\n      \"image\": null\n    },\n    {\n      \"id\": 1,\n      \"name\": \"makanan berat\",\n      \"imageId\": null,\n      \"createdAt\": \"2026-10-07T09:26:48.278Z\",\n      \"updatedAt\": \"2026-10-07T09:27:07.335Z\",\n      \"productCount\": 3,\n      \"image\": null\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 2,\n    \"total\": 4,\n    \"totalPages\": 2\n  }\n}"
             },
             {
               "name": "403 Error",
@@ -4147,13 +4251,13 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/tenant-categories?page=1&limit=20",
+                  "raw": "{{baseUrl}}/api/product-categories?page=1&limit=20",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
-                    "tenant-categories"
+                    "product-categories"
                   ],
                   "query": [
                     {
@@ -4166,7 +4270,7 @@
                     }
                   ]
                 },
-                "description": "**Access:** superadmin, admin\n\nSorted by name."
+                "description": "**Access:** superadmin, disnakertrans, admin, tenant\n\nSorted by name, each with its `image` (or null) and `productCount` (all its products, any status)."
               },
               "status": "Forbidden",
               "code": 403,
@@ -4183,22 +4287,22 @@
           ]
         },
         {
-          "name": "Get Tenant Category (superadmin, admin, tenant)",
+          "name": "Get Product Category (All roles)",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+              "raw": "{{baseUrl}}/api/product-categories/{{categoryId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
-                "tenant-categories",
+                "product-categories",
                 "{{categoryId}}"
               ]
             },
-            "description": "**Access:** superadmin, admin, tenant"
+            "description": "**Access:** superadmin, disnakertrans, admin, tenant"
           },
           "event": [
             {
@@ -4218,17 +4322,17 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+                  "raw": "{{baseUrl}}/api/product-categories/{{categoryId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
-                    "tenant-categories",
+                    "product-categories",
                     "{{categoryId}}"
                   ]
                 },
-                "description": "**Access:** superadmin, admin"
+                "description": "**Access:** superadmin, disnakertrans, admin, tenant"
               },
               "status": "OK",
               "code": 200,
@@ -4240,7 +4344,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 3,\n    \"name\": \"Kuliner 1791170022812\",\n    \"createdAt\": \"2026-10-05T03:13:45.438Z\",\n    \"updatedAt\": \"2026-10-05T03:13:45.438Z\"\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 8,\n    \"name\": \"Kuliner 1791170022812\",\n    \"imageId\": 30,\n    \"createdAt\": \"2026-10-08T13:29:56.653Z\",\n    \"updatedAt\": \"2026-10-08T13:29:56.653Z\",\n    \"productCount\": 0,\n    \"image\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/866bd545-4777-476a-8cc6-b0af8905987a.png\",\n      \"id\": 30,\n      \"imgUrl\": \"/images/866bd545-4777-476a-8cc6-b0af8905987a.png\",\n      \"altText\": \"kuliner\"\n    }\n  }\n}"
             },
             {
               "name": "404 Error",
@@ -4248,17 +4352,17 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+                  "raw": "{{baseUrl}}/api/product-categories/{{categoryId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
-                    "tenant-categories",
+                    "product-categories",
                     "{{categoryId}}"
                   ]
                 },
-                "description": "**Access:** superadmin, admin"
+                "description": "**Access:** superadmin, disnakertrans, admin, tenant"
               },
               "status": "Not Found",
               "code": 404,
@@ -4275,7 +4379,7 @@
           ]
         },
         {
-          "name": "Create Tenant Category (admin)",
+          "name": "Create Product Category (disnakertrans, admin)",
           "request": {
             "method": "POST",
             "header": [
@@ -4285,19 +4389,19 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/tenant-categories",
+              "raw": "{{baseUrl}}/api/product-categories",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
-                "tenant-categories"
+                "product-categories"
               ]
             },
-            "description": "**Access:** admin\n\nNames are unique. Saves `{{categoryId}}`.",
+            "description": "**Access:** disnakertrans, admin\n\nNames are unique. `imageId` is optional (upload the image first; one image per category): the carousel on the landing page shows it. Saves `{{categoryId}}`.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\"\n}",
+              "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -4329,19 +4433,19 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/tenant-categories",
+                  "raw": "{{baseUrl}}/api/product-categories",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
-                    "tenant-categories"
+                    "product-categories"
                   ]
                 },
-                "description": "**Access:** admin\n\nNames are unique. Saves `{{categoryId}}`.",
+                "description": "**Access:** disnakertrans, admin\n\nNames are unique. `imageId` is optional (upload the image first; one image per category): the carousel on the landing page shows it. Saves `{{categoryId}}`.",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\"\n}",
+                  "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -4359,7 +4463,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 3,\n    \"name\": \"Kuliner 1791170022812\",\n    \"updatedAt\": \"2026-10-05T03:13:45.438Z\",\n    \"createdAt\": \"2026-10-05T03:13:45.438Z\"\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 8,\n    \"name\": \"Kuliner 1791170022812\",\n    \"imageId\": 30,\n    \"createdAt\": \"2026-10-08T13:29:56.653Z\",\n    \"updatedAt\": \"2026-10-08T13:29:56.653Z\",\n    \"productCount\": 0,\n    \"image\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/866bd545-4777-476a-8cc6-b0af8905987a.png\",\n      \"id\": 30,\n      \"imgUrl\": \"/images/866bd545-4777-476a-8cc6-b0af8905987a.png\",\n      \"altText\": \"kuliner\"\n    }\n  }\n}"
             },
             {
               "name": "403 Error",
@@ -4372,19 +4476,19 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/tenant-categories",
+                  "raw": "{{baseUrl}}/api/product-categories",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
-                    "tenant-categories"
+                    "product-categories"
                   ]
                 },
-                "description": "**Access:** admin\n\nNames are unique. Saves `{{categoryId}}`.",
+                "description": "**Access:** disnakertrans, admin\n\nNames are unique. `imageId` is optional (upload the image first; one image per category): the carousel on the landing page shows it. Saves `{{categoryId}}`.",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\"\n}",
+                  "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -4407,7 +4511,7 @@
           ]
         },
         {
-          "name": "Update Tenant Category (admin)",
+          "name": "Update Product Category (disnakertrans, admin)",
           "request": {
             "method": "PATCH",
             "header": [
@@ -4417,20 +4521,20 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+              "raw": "{{baseUrl}}/api/product-categories/{{categoryId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
-                "tenant-categories",
+                "product-categories",
                 "{{categoryId}}"
               ]
             },
-            "description": "**Access:** admin",
+            "description": "**Access:** disnakertrans, admin\n\nSend `name` and/or `imageId`. A new `imageId` replaces the image (the old one and its file are deleted); `null` removes it.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\"\n}",
+              "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -4461,20 +4565,20 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+                  "raw": "{{baseUrl}}/api/product-categories/{{categoryId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
-                    "tenant-categories",
+                    "product-categories",
                     "{{categoryId}}"
                   ]
                 },
-                "description": "**Access:** admin",
+                "description": "**Access:** disnakertrans, admin\n\nSend `name` and/or `imageId`. A new `imageId` replaces the image (the old one and its file are deleted); `null` removes it.",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\"\n}",
+                  "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -4492,7 +4596,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 3,\n    \"name\": \"Kuliner & Minuman 1791170022812\",\n    \"createdAt\": \"2026-10-05T03:13:45.438Z\",\n    \"updatedAt\": \"2026-10-05T03:13:45.472Z\"\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 8,\n    \"name\": \"Kuliner & Minuman 1791170022812\",\n    \"imageId\": 31,\n    \"createdAt\": \"2026-10-08T13:29:56.653Z\",\n    \"updatedAt\": \"2026-10-08T13:29:56.746Z\",\n    \"productCount\": 0,\n    \"image\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/88863808-4d90-4c82-82c7-dc9db6521283.png\",\n      \"id\": 31,\n      \"imgUrl\": \"/images/88863808-4d90-4c82-82c7-dc9db6521283.png\",\n      \"altText\": \"kuliner\"\n    }\n  }\n}"
             },
             {
               "name": "400 Error",
@@ -4505,20 +4609,20 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+                  "raw": "{{baseUrl}}/api/product-categories/{{categoryId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
-                    "tenant-categories",
+                    "product-categories",
                     "{{categoryId}}"
                   ]
                 },
-                "description": "**Access:** admin",
+                "description": "**Access:** disnakertrans, admin\n\nSend `name` and/or `imageId`. A new `imageId` replaces the image (the old one and its file are deleted); `null` removes it.",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\"\n}",
+                  "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -4541,22 +4645,22 @@
           ]
         },
         {
-          "name": "Delete Tenant Category (admin)",
+          "name": "Delete Product Category (disnakertrans, admin)",
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+              "raw": "{{baseUrl}}/api/product-categories/{{categoryId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
-                "tenant-categories",
+                "product-categories",
                 "{{categoryId}}"
               ]
             },
-            "description": "**Access:** admin\n\nA category still used by a tenant profile cannot be deleted (409 `STILL_IN_USE`)."
+            "description": "**Access:** disnakertrans, admin\n\nA category still used by products cannot be deleted (409 `STILL_IN_USE`, `details.productCount`): move its products to another category first. Its image (and file) is deleted with it."
           },
           "event": [
             {
@@ -4576,17 +4680,17 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+                  "raw": "{{baseUrl}}/api/product-categories/{{categoryId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
-                    "tenant-categories",
+                    "product-categories",
                     "{{categoryId}}"
                   ]
                 },
-                "description": "**Access:** admin\n\nA category still used by a tenant profile cannot be deleted (409 `STILL_IN_USE`)."
+                "description": "**Access:** disnakertrans, admin\n\nA category still used by products cannot be deleted (409 `STILL_IN_USE`, `details.productCount`): move its products to another category first. Its image (and file) is deleted with it."
               },
               "status": "OK",
               "code": 200,
@@ -4606,17 +4710,17 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/tenant-categories/{{categoryId}}",
+                  "raw": "{{baseUrl}}/api/product-categories/{{categoryId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
-                    "tenant-categories",
+                    "product-categories",
                     "{{categoryId}}"
                   ]
                 },
-                "description": "**Access:** admin\n\nA category still used by a tenant profile cannot be deleted (409 `STILL_IN_USE`)."
+                "description": "**Access:** disnakertrans, admin\n\nA category still used by products cannot be deleted (409 `STILL_IN_USE`, `details.productCount`): move its products to another category first. Its image (and file) is deleted with it."
               },
               "status": "Conflict",
               "code": 409,
@@ -4696,7 +4800,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"93ce5eee-d07f-4025-95dc-76ee1589403e\",\n    \"name\": \"Toko Uji\",\n    \"description\": \"Toko uji coba\",\n    \"address\": \"Jl. Uji 1\",\n    \"area\": \"Wilayah SP 1\",\n    \"operationalHours\": \"08:00 - 17:00 WIT\",\n    \"fbLink\": \"-\",\n    \"whatsappLink\": \"https://wa.me/6281200000000\",\n    \"gmapsLink\": \"-\",\n    \"instagramLink\": null,\n    \"googleBusinessLink\": \"https://g.page/tokouji\",\n    \"shopeeLink\": null,\n    \"logoId\": 15,\n    \"tenantCategoryId\": 4,\n    \"userId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n    \"createdAt\": \"2026-10-08T03:08:25.725Z\",\n    \"updatedAt\": \"2026-10-08T03:08:25.796Z\",\n    \"logo\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"id\": 15,\n      \"name\": \"a.png\",\n      \"imgUrl\": \"/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"altText\": \"a\",\n      \"uploaderId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n      \"createdAt\": \"2026-10-08T03:08:25.666Z\",\n      \"updatedAt\": \"2026-10-08T03:08:25.666Z\"\n    },\n    \"category\": {\n      \"id\": 4,\n      \"name\": \"Kuliner Uji\"\n    },\n    \"isComplete\": true,\n    \"missingFields\": []\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"4d4a96ac-641f-4fb0-beb2-117a165851c3\",\n    \"name\": \"WARUNG TUK-TUK RACING\",\n    \"description\": \"penjual racing\",\n    \"address\": \"msurabaya\",\n    \"area\": \"Wilayah SP 1\",\n    \"operationalHours\": \"Senin - Jumat, 08:00 - 17:00 WIT\",\n    \"fbLink\": \"-\",\n    \"whatsappLink\": \"https://wa.me/62882003684243\",\n    \"gmapsLink\": \"-\",\n    \"instagramLink\": \"https://instagram.com/enakk\",\n    \"googleBusinessLink\": null,\n    \"shopeeLink\": null,\n    \"logoId\": 10,\n    \"userId\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n    \"createdAt\": \"2026-10-07T11:39:37.720Z\",\n    \"updatedAt\": \"2026-10-07T17:57:07.765Z\",\n    \"logo\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/7ad41508-ba91-4f54-a188-dc270a56dbb1.jpg\",\n      \"id\": 10,\n      \"name\": \"18234.jpg\",\n      \"imgUrl\": \"/images/7ad41508-ba91-4f54-a188-dc270a56dbb1.jpg\",\n      \"altText\": \"Logo WARUNG TUK-TUK RACING\",\n      \"uploaderId\": null,\n      \"createdAt\": \"2026-10-07T11:43:46.559Z\",\n      \"updatedAt\": \"2026-10-07T11:43:46.559Z\"\n    },\n    \"isComplete\": true,\n    \"missingFields\": []\n  }\n}"
             },
             {
               "name": "404 Error",
@@ -4751,10 +4855,10 @@
                 "me"
               ]
             },
-            "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and the optional links `instagramLink`, `googleBusinessLink`, `shopeeLink`. `logoId`: upload the logo first. `tenantCategoryId` (**required**): a tenant category, created by an admin (*Tenant Categories → Create*). Saves `{{tenantProfileId}}`.",
+            "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and the optional links `instagramLink`, `googleBusinessLink`, `shopeeLink`. `logoId`: upload the logo first. The profile has no category any more: each product has one (`categoryId`). Saves `{{tenantProfileId}}`.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Warung Budi\",\n  \"description\": \"Kopi dan makanan ringan\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00 - 22:00\",\n  \"fbLink\": \"https://facebook.com/warungbudi\",\n  \"whatsappLink\": \"https://wa.me/6281298765432\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"instagramLink\": \"https://instagram.com/warungbudi\",\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": null,\n  \"logoId\": {{imageId}},\n  \"tenantCategoryId\": {{categoryId}}\n}",
+              "raw": "{\n  \"name\": \"Warung Budi\",\n  \"description\": \"Kopi dan makanan ringan\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00 - 22:00\",\n  \"fbLink\": \"https://facebook.com/warungbudi\",\n  \"whatsappLink\": \"https://wa.me/6281298765432\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"instagramLink\": \"https://instagram.com/warungbudi\",\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": null,\n  \"logoId\": {{imageId}}\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -4768,7 +4872,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "['imageId', 'categoryId'].forEach((k) => { if (!pm.environment.get(k)) throw new Error('{{' + k + '}} is empty: ' + (k === 'imageId' ? 'upload the logo first (Images → Upload Image)' : 'create a category first as superadmin/admin (Tenant Categories → Create)')); });"
+                  "['imageId', 'categoryId'].forEach((k) => { if (!pm.environment.get(k)) throw new Error('{{' + k + '}} is empty: ' + (k === 'imageId' ? 'upload the logo first (Images → Upload Image)' : 'create a category first as superadmin/admin (Product Categories → Create)')); });"
                 ]
               }
             },
@@ -4805,10 +4909,10 @@
                     "me"
                   ]
                 },
-                "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and the optional links `instagramLink`, `googleBusinessLink`, `shopeeLink`. `logoId`: upload the logo first. `tenantCategoryId` (**required**): a tenant category, created by an admin (*Tenant Categories → Create*). Saves `{{tenantProfileId}}`.",
+                "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and the optional links `instagramLink`, `googleBusinessLink`, `shopeeLink`. `logoId`: upload the logo first. The profile has no category any more: each product has one (`categoryId`). Saves `{{tenantProfileId}}`.",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"Warung Budi\",\n  \"description\": \"Kopi dan makanan ringan\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00 - 22:00\",\n  \"fbLink\": \"https://facebook.com/warungbudi\",\n  \"whatsappLink\": \"https://wa.me/6281298765432\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"instagramLink\": \"https://instagram.com/warungbudi\",\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": null,\n  \"logoId\": {{imageId}},\n  \"tenantCategoryId\": {{categoryId}}\n}",
+                  "raw": "{\n  \"name\": \"Warung Budi\",\n  \"description\": \"Kopi dan makanan ringan\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00 - 22:00\",\n  \"fbLink\": \"https://facebook.com/warungbudi\",\n  \"whatsappLink\": \"https://wa.me/6281298765432\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"instagramLink\": \"https://instagram.com/warungbudi\",\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": null,\n  \"logoId\": {{imageId}}\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -4826,7 +4930,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"93ce5eee-d07f-4025-95dc-76ee1589403e\",\n    \"name\": \"Toko Uji\",\n    \"description\": \"Toko uji coba\",\n    \"address\": \"Jl. Uji 1\",\n    \"area\": \"Wilayah SP 1\",\n    \"operationalHours\": \"08:00 - 17:00 WIT\",\n    \"fbLink\": \"-\",\n    \"whatsappLink\": \"https://wa.me/6281200000000\",\n    \"gmapsLink\": \"-\",\n    \"instagramLink\": null,\n    \"googleBusinessLink\": \"https://g.page/tokouji\",\n    \"shopeeLink\": null,\n    \"logoId\": 15,\n    \"tenantCategoryId\": 4,\n    \"userId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n    \"createdAt\": \"2026-10-08T03:08:25.725Z\",\n    \"updatedAt\": \"2026-10-08T03:08:25.796Z\",\n    \"logo\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"id\": 15,\n      \"name\": \"a.png\",\n      \"imgUrl\": \"/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"altText\": \"a\",\n      \"uploaderId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n      \"createdAt\": \"2026-10-08T03:08:25.666Z\",\n      \"updatedAt\": \"2026-10-08T03:08:25.666Z\"\n    },\n    \"category\": {\n      \"id\": 4,\n      \"name\": \"Kuliner Uji\"\n    },\n    \"isComplete\": true,\n    \"missingFields\": []\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"93ce5eee-d07f-4025-95dc-76ee1589403e\",\n    \"name\": \"Toko Uji\",\n    \"description\": \"Toko uji coba\",\n    \"address\": \"Jl. Uji 1\",\n    \"area\": \"Wilayah SP 1\",\n    \"operationalHours\": \"08:00 - 17:00 WIT\",\n    \"fbLink\": \"-\",\n    \"whatsappLink\": \"https://wa.me/6281200000000\",\n    \"gmapsLink\": \"-\",\n    \"instagramLink\": null,\n    \"googleBusinessLink\": \"https://g.page/tokouji\",\n    \"shopeeLink\": null,\n    \"logoId\": 15,\n    \"userId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n    \"createdAt\": \"2026-10-08T03:08:25.725Z\",\n    \"updatedAt\": \"2026-10-08T03:08:25.796Z\",\n    \"logo\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"id\": 15,\n      \"name\": \"a.png\",\n      \"imgUrl\": \"/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"altText\": \"a\",\n      \"uploaderId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n      \"createdAt\": \"2026-10-08T03:08:25.666Z\",\n      \"updatedAt\": \"2026-10-08T03:08:25.666Z\"\n    },\n    \"isComplete\": true,\n    \"missingFields\": []\n  }\n}"
             },
             {
               "name": "400 Error",
@@ -4849,10 +4953,10 @@
                     "me"
                   ]
                 },
-                "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and the optional links `instagramLink`, `googleBusinessLink`, `shopeeLink`. `logoId`: upload the logo first. `tenantCategoryId` (**required**): a tenant category, created by an admin (*Tenant Categories → Create*). Saves `{{tenantProfileId}}`.",
+                "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and the optional links `instagramLink`, `googleBusinessLink`, `shopeeLink`. `logoId`: upload the logo first. The profile has no category any more: each product has one (`categoryId`). Saves `{{tenantProfileId}}`.",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"Warung Budi\",\n  \"description\": \"Kopi dan makanan ringan\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00 - 22:00\",\n  \"fbLink\": \"https://facebook.com/warungbudi\",\n  \"whatsappLink\": \"https://wa.me/6281298765432\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"instagramLink\": \"https://instagram.com/warungbudi\",\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": null,\n  \"logoId\": {{imageId}},\n  \"tenantCategoryId\": {{categoryId}}\n}",
+                  "raw": "{\n  \"name\": \"Warung Budi\",\n  \"description\": \"Kopi dan makanan ringan\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00 - 22:00\",\n  \"fbLink\": \"https://facebook.com/warungbudi\",\n  \"whatsappLink\": \"https://wa.me/6281298765432\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"instagramLink\": \"https://instagram.com/warungbudi\",\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": null,\n  \"logoId\": {{imageId}}\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -4960,7 +5064,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"93ce5eee-d07f-4025-95dc-76ee1589403e\",\n    \"name\": \"Toko Uji\",\n    \"description\": \"Toko uji coba\",\n    \"address\": \"Jl. Uji 1\",\n    \"area\": \"Wilayah SP 1\",\n    \"operationalHours\": \"08:00 - 17:00 WIT\",\n    \"fbLink\": \"-\",\n    \"whatsappLink\": \"https://wa.me/6281200000000\",\n    \"gmapsLink\": \"-\",\n    \"instagramLink\": null,\n    \"googleBusinessLink\": \"https://g.page/tokouji\",\n    \"shopeeLink\": \"https://shopee.co.id/tokouji\",\n    \"logoId\": 15,\n    \"tenantCategoryId\": 4,\n    \"userId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n    \"createdAt\": \"2026-10-08T03:08:25.725Z\",\n    \"updatedAt\": \"2026-10-08T03:08:56.434Z\",\n    \"logo\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"id\": 15,\n      \"name\": \"a.png\",\n      \"imgUrl\": \"/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"altText\": \"a\",\n      \"uploaderId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n      \"createdAt\": \"2026-10-08T03:08:25.666Z\",\n      \"updatedAt\": \"2026-10-08T03:08:25.666Z\"\n    },\n    \"category\": {\n      \"id\": 4,\n      \"name\": \"Kuliner Uji\"\n    },\n    \"isComplete\": true,\n    \"missingFields\": []\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"93ce5eee-d07f-4025-95dc-76ee1589403e\",\n    \"name\": \"Toko Uji\",\n    \"description\": \"Toko uji coba\",\n    \"address\": \"Jl. Uji 1\",\n    \"area\": \"Wilayah SP 1\",\n    \"operationalHours\": \"08:00 - 17:00 WIT\",\n    \"fbLink\": \"-\",\n    \"whatsappLink\": \"https://wa.me/6281200000000\",\n    \"gmapsLink\": \"-\",\n    \"instagramLink\": null,\n    \"googleBusinessLink\": \"https://g.page/tokouji\",\n    \"shopeeLink\": \"https://shopee.co.id/tokouji\",\n    \"logoId\": 15,\n    \"userId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n    \"createdAt\": \"2026-10-08T03:08:25.725Z\",\n    \"updatedAt\": \"2026-10-08T03:08:56.434Z\",\n    \"logo\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"id\": 15,\n      \"name\": \"a.png\",\n      \"imgUrl\": \"/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"altText\": \"a\",\n      \"uploaderId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n      \"createdAt\": \"2026-10-08T03:08:25.666Z\",\n      \"updatedAt\": \"2026-10-08T03:08:25.666Z\"\n    },\n    \"isComplete\": true,\n    \"missingFields\": []\n  }\n}"
             },
             {
               "name": "400 Error",
@@ -5122,15 +5226,10 @@
                 {
                   "key": "limit",
                   "value": "20"
-                },
-                {
-                  "key": "tenantCategoryId",
-                  "value": "{{categoryId}}",
-                  "disabled": true
                 }
               ]
             },
-            "description": "**Access:** superadmin, disnakertrans, admin\n\nEvery tenant profile with its owner, logo and category. Optional `tenantCategoryId` filter."
+            "description": "**Access:** superadmin, disnakertrans, admin\n\nEvery tenant profile with its owner and logo."
           },
           "event": [
             {
@@ -5167,15 +5266,10 @@
                     {
                       "key": "limit",
                       "value": "20"
-                    },
-                    {
-                      "key": "tenantCategoryId",
-                      "value": "{{categoryId}}",
-                      "disabled": true
                     }
                   ]
                 },
-                "description": "**Access:** superadmin, disnakertrans, admin\n\nEvery tenant profile with its owner, logo and category. Optional `tenantCategoryId` filter."
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nEvery tenant profile with its owner and logo."
               },
               "status": "OK",
               "code": 200,
@@ -5187,7 +5281,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"93ce5eee-d07f-4025-95dc-76ee1589403e\",\n      \"name\": \"Toko Uji\",\n      \"description\": \"Toko uji coba\",\n      \"address\": \"Jl. Uji 1\",\n      \"area\": \"Wilayah SP 1\",\n      \"operationalHours\": \"08:00 - 17:00 WIT\",\n      \"fbLink\": \"-\",\n      \"whatsappLink\": \"https://wa.me/6281200000000\",\n      \"gmapsLink\": \"-\",\n      \"instagramLink\": null,\n      \"googleBusinessLink\": \"https://g.page/tokouji\",\n      \"shopeeLink\": \"https://shopee.co.id/tokouji\",\n      \"logoId\": 15,\n      \"tenantCategoryId\": 4,\n      \"userId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n      \"createdAt\": \"2026-10-08T03:08:25.725Z\",\n      \"updatedAt\": \"2026-10-08T03:08:56.434Z\",\n      \"logo\": {\n        \"url\": \"https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n        \"id\": 15,\n        \"name\": \"a.png\",\n        \"imgUrl\": \"/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n        \"altText\": \"a\",\n        \"uploaderId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n        \"createdAt\": \"2026-10-08T03:08:25.666Z\",\n        \"updatedAt\": \"2026-10-08T03:08:25.666Z\"\n      },\n      \"category\": {\n        \"id\": 4,\n        \"name\": \"Kuliner Uji\"\n      },\n      \"owner\": {\n        \"id\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n        \"firstName\": \"Uji\",\n        \"lastName\": \"tenant\",\n        \"email\": \"tenant.test@example.com\",\n        \"tenantName\": \"Toko Uji\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"totalPages\": 1\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"4d4a96ac-641f-4fb0-beb2-117a165851c3\",\n      \"name\": \"WARUNG TUK-TUK RACING\",\n      \"description\": \"penjual racing\",\n      \"address\": \"msurabaya\",\n      \"area\": \"Wilayah SP 1\",\n      \"operationalHours\": \"Senin - Jumat, 08:00 - 17:00 WIT\",\n      \"fbLink\": \"-\",\n      \"whatsappLink\": \"https://wa.me/62882003684243\",\n      \"gmapsLink\": \"-\",\n      \"instagramLink\": \"https://instagram.com/enakk\",\n      \"googleBusinessLink\": null,\n      \"shopeeLink\": null,\n      \"logoId\": 10,\n      \"userId\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n      \"createdAt\": \"2026-10-07T11:39:37.720Z\",\n      \"updatedAt\": \"2026-10-07T17:57:07.765Z\",\n      \"logo\": {\n        \"url\": \"https://api.transniaga.manokwarikab.go.id/images/7ad41508-ba91-4f54-a188-dc270a56dbb1.jpg\",\n        \"id\": 10,\n        \"name\": \"18234.jpg\",\n        \"imgUrl\": \"/images/7ad41508-ba91-4f54-a188-dc270a56dbb1.jpg\",\n        \"altText\": \"Logo WARUNG TUK-TUK RACING\",\n        \"uploaderId\": null,\n        \"createdAt\": \"2026-10-07T11:43:46.559Z\",\n        \"updatedAt\": \"2026-10-07T11:43:46.559Z\"\n      },\n      \"owner\": {\n        \"id\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n        \"firstName\": \"Yohan\",\n        \"lastName\": \"Dwi\",\n        \"email\": \"dwiyohan32@gmail.com\",\n        \"tenantName\": \"WARUNG TUK-TUK RACING\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 1,\n    \"total\": 2,\n    \"totalPages\": 2\n  }\n}"
             },
             {
               "name": "403 Error",
@@ -5211,15 +5305,10 @@
                     {
                       "key": "limit",
                       "value": "20"
-                    },
-                    {
-                      "key": "tenantCategoryId",
-                      "value": "{{categoryId}}",
-                      "disabled": true
                     }
                   ]
                 },
-                "description": "**Access:** superadmin, disnakertrans, admin\n\nEvery tenant profile with its owner, logo and category. Optional `tenantCategoryId` filter."
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nEvery tenant profile with its owner and logo."
               },
               "status": "Forbidden",
               "code": 403,
@@ -5293,7 +5382,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"93ce5eee-d07f-4025-95dc-76ee1589403e\",\n    \"name\": \"Toko Uji\",\n    \"description\": \"Toko uji coba\",\n    \"address\": \"Jl. Uji 1\",\n    \"area\": \"Wilayah SP 1\",\n    \"operationalHours\": \"08:00 - 17:00 WIT\",\n    \"fbLink\": \"-\",\n    \"whatsappLink\": \"https://wa.me/6281200000000\",\n    \"gmapsLink\": \"-\",\n    \"instagramLink\": null,\n    \"googleBusinessLink\": \"https://g.page/tokouji\",\n    \"shopeeLink\": \"https://shopee.co.id/tokouji\",\n    \"logoId\": 15,\n    \"tenantCategoryId\": 4,\n    \"userId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n    \"createdAt\": \"2026-10-08T03:08:25.725Z\",\n    \"updatedAt\": \"2026-10-08T03:08:56.434Z\",\n    \"logo\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"id\": 15,\n      \"name\": \"a.png\",\n      \"imgUrl\": \"/images/99479aee-c58a-434c-8442-81bbedc041a5.png\",\n      \"altText\": \"a\",\n      \"uploaderId\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n      \"createdAt\": \"2026-10-08T03:08:25.666Z\",\n      \"updatedAt\": \"2026-10-08T03:08:25.666Z\"\n    },\n    \"category\": {\n      \"id\": 4,\n      \"name\": \"Kuliner Uji\"\n    },\n    \"owner\": {\n      \"id\": \"3983b347-fc9a-4a26-bffc-5eb85e24bb64\",\n      \"firstName\": \"Uji\",\n      \"lastName\": \"tenant\",\n      \"email\": \"tenant.test@example.com\",\n      \"tenantName\": \"Toko Uji\"\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"4d4a96ac-641f-4fb0-beb2-117a165851c3\",\n    \"name\": \"WARUNG TUK-TUK RACING\",\n    \"description\": \"penjual racing\",\n    \"address\": \"msurabaya\",\n    \"area\": \"Wilayah SP 1\",\n    \"operationalHours\": \"Senin - Jumat, 08:00 - 17:00 WIT\",\n    \"fbLink\": \"-\",\n    \"whatsappLink\": \"https://wa.me/62882003684243\",\n    \"gmapsLink\": \"-\",\n    \"instagramLink\": \"https://instagram.com/enakk\",\n    \"googleBusinessLink\": null,\n    \"shopeeLink\": null,\n    \"logoId\": 10,\n    \"userId\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n    \"createdAt\": \"2026-10-07T11:39:37.720Z\",\n    \"updatedAt\": \"2026-10-07T17:57:07.765Z\",\n    \"logo\": {\n      \"url\": \"https://api.transniaga.manokwarikab.go.id/images/7ad41508-ba91-4f54-a188-dc270a56dbb1.jpg\",\n      \"id\": 10,\n      \"name\": \"18234.jpg\",\n      \"imgUrl\": \"/images/7ad41508-ba91-4f54-a188-dc270a56dbb1.jpg\",\n      \"altText\": \"Logo WARUNG TUK-TUK RACING\",\n      \"uploaderId\": null,\n      \"createdAt\": \"2026-10-07T11:43:46.559Z\",\n      \"updatedAt\": \"2026-10-07T11:43:46.559Z\"\n    },\n    \"owner\": {\n      \"id\": \"5dc9b118-6576-42be-9844-adb04013d65e\",\n      \"firstName\": \"Yohan\",\n      \"lastName\": \"Dwi\",\n      \"email\": \"dwiyohan32@gmail.com\",\n      \"tenantName\": \"WARUNG TUK-TUK RACING\"\n    }\n  }\n}"
             },
             {
               "name": "404 Error",
@@ -5868,7 +5957,7 @@
                 }
               ]
             },
-            "description": "**Access:** superadmin, disnakertrans, admin\n\nNumbers for the dashboard charts. `products.byStatus` (active / pending / rejected / inactive, the same rule as the frontend's product status), `tenants.byCategory` and `byArea`, `users.byRole` (active / inactive) **only for the roles the caller may list** (superadmin: all, disnakertrans: admin, admin: tenant), and `perDay` (new products, UMKM and accounts per day, zeros included). Days are counted in WIT (`Asia/Jayapura`)."
+            "description": "**Access:** superadmin, disnakertrans, admin\n\nNumbers for the dashboard charts. `products.byStatus` (active / pending / rejected / inactive, the same rule as the frontend's product status), `products.byCategory` (products per product category, plus \"Tanpa kategori\" for older products without one), `tenants.byArea`, `users.byRole` (active / inactive) **only for the roles the caller may list** (superadmin: all, disnakertrans: admin, admin: tenant), and `perDay` (new products, UMKM and accounts per day, zeros included). Days are counted in WIT (`Asia/Jayapura`)."
           },
           "event": [
             {
@@ -5905,7 +5994,7 @@
                     }
                   ]
                 },
-                "description": "**Access:** superadmin, disnakertrans, admin\n\nNumbers for the dashboard charts. `products.byStatus` (active / pending / rejected / inactive, the same rule as the frontend's product status), `tenants.byCategory` and `byArea`, `users.byRole` (active / inactive) **only for the roles the caller may list** (superadmin: all, disnakertrans: admin, admin: tenant), and `perDay` (new products, UMKM and accounts per day, zeros included). Days are counted in WIT (`Asia/Jayapura`)."
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nNumbers for the dashboard charts. `products.byStatus` (active / pending / rejected / inactive, the same rule as the frontend's product status), `products.byCategory` (products per product category, plus \"Tanpa kategori\" for older products without one), `tenants.byArea`, `users.byRole` (active / inactive) **only for the roles the caller may list** (superadmin: all, disnakertrans: admin, admin: tenant), and `perDay` (new products, UMKM and accounts per day, zeros included). Days are counted in WIT (`Asia/Jayapura`)."
               },
               "status": "OK",
               "code": 200,
@@ -5917,7 +6006,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"days\": 7,\n    \"timezone\": \"Asia/Jayapura\",\n    \"products\": {\n      \"total\": 5,\n      \"byStatus\": {\n        \"active\": 2,\n        \"pending\": 0,\n        \"rejected\": 0,\n        \"inactive\": 3\n      }\n    },\n    \"tenants\": {\n      \"total\": 2,\n      \"byCategory\": [\n        {\n          \"name\": \"makanan berat\",\n          \"count\": 1\n        },\n        {\n          \"name\": \"minuman\",\n          \"count\": 1\n        },\n        {\n          \"name\": \"BUMDES\",\n          \"count\": 0\n        },\n        {\n          \"name\": \"makanan ringan\",\n          \"count\": 0\n        }\n      ],\n      \"byArea\": [\n        {\n          \"area\": \"Wilayah SP 1\",\n          \"count\": 1\n        },\n        {\n          \"area\": \"Wilayah SP 3\",\n          \"count\": 1\n        }\n      ]\n    },\n    \"users\": {\n      \"roles\": [\n        \"tenant\"\n      ],\n      \"total\": 3,\n      \"byRole\": [\n        {\n          \"role\": \"tenant\",\n          \"active\": 3,\n          \"inactive\": 0\n        }\n      ]\n    },\n    \"perDay\": [\n      {\n        \"date\": \"2026-10-02\",\n        \"products\": 0,\n        \"tenants\": 0,\n        \"users\": 0\n      },\n      {\n        \"date\": \"2026-10-03\",\n        \"products\": 0,\n        \"tenants\": 0,\n        \"users\": 0\n      },\n      {\n        \"date\": \"2026-10-04\",\n        \"products\": 0,\n        \"tenants\": 0,\n        \"users\": 0\n      },\n      {\n        \"date\": \"2026-10-05\",\n        \"products\": 0,\n        \"tenants\": 0,\n        \"users\": 0\n      },\n      {\n        \"date\": \"2026-10-06\",\n        \"products\": 0,\n        \"tenants\": 0,\n        \"users\": 0\n      },\n      {\n        \"date\": \"2026-10-07\",\n        \"products\": 4,\n        \"tenants\": 2,\n        \"users\": 2\n      },\n      {\n        \"date\": \"2026-10-08\",\n        \"products\": 1,\n        \"tenants\": 0,\n        \"users\": 1\n      }\n    ]\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"days\": 7,\n    \"timezone\": \"Asia/Jayapura\",\n    \"products\": {\n      \"total\": 6,\n      \"byStatus\": {\n        \"active\": 3,\n        \"pending\": 0,\n        \"rejected\": 0,\n        \"inactive\": 3\n      },\n      \"byCategory\": [\n        {\n          \"name\": \"makanan berat\",\n          \"count\": 3\n        },\n        {\n          \"name\": \"minuman\",\n          \"count\": 2\n        },\n        {\n          \"name\": \"BUMDES\",\n          \"count\": 1\n        },\n        {\n          \"name\": \"makanan ringan\",\n          \"count\": 0\n        }\n      ]\n    },\n    \"tenants\": {\n      \"total\": 2,\n      \"byArea\": [\n        {\n          \"area\": \"Wilayah SP 1\",\n          \"count\": 1\n        },\n        {\n          \"area\": \"Wilayah SP 3\",\n          \"count\": 1\n        }\n      ]\n    },\n    \"users\": {\n      \"roles\": [\n        \"tenant\"\n      ],\n      \"total\": 2,\n      \"byRole\": [\n        {\n          \"role\": \"tenant\",\n          \"active\": 2,\n          \"inactive\": 0\n        }\n      ]\n    },\n    \"perDay\": [\n      {\n        \"date\": \"2026-10-02\",\n        \"products\": 0,\n        \"tenants\": 0,\n        \"users\": 0\n      },\n      {\n        \"date\": \"2026-10-03\",\n        \"products\": 0,\n        \"tenants\": 0,\n        \"users\": 0\n      },\n      {\n        \"date\": \"2026-10-04\",\n        \"products\": 0,\n        \"tenants\": 0,\n        \"users\": 0\n      },\n      {\n        \"date\": \"2026-10-05\",\n        \"products\": 0,\n        \"tenants\": 0,\n        \"users\": 0\n      },\n      {\n        \"date\": \"2026-10-06\",\n        \"products\": 0,\n        \"tenants\": 0,\n        \"users\": 0\n      },\n      {\n        \"date\": \"2026-10-07\",\n        \"products\": 4,\n        \"tenants\": 2,\n        \"users\": 2\n      },\n      {\n        \"date\": \"2026-10-08\",\n        \"products\": 2,\n        \"tenants\": 0,\n        \"users\": 0\n      }\n    ]\n  }\n}"
             },
             {
               "name": "403 Error",
@@ -5942,7 +6031,7 @@
                     }
                   ]
                 },
-                "description": "**Access:** superadmin, disnakertrans, admin\n\nNumbers for the dashboard charts. `products.byStatus` (active / pending / rejected / inactive, the same rule as the frontend's product status), `tenants.byCategory` and `byArea`, `users.byRole` (active / inactive) **only for the roles the caller may list** (superadmin: all, disnakertrans: admin, admin: tenant), and `perDay` (new products, UMKM and accounts per day, zeros included). Days are counted in WIT (`Asia/Jayapura`)."
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nNumbers for the dashboard charts. `products.byStatus` (active / pending / rejected / inactive, the same rule as the frontend's product status), `products.byCategory` (products per product category, plus \"Tanpa kategori\" for older products without one), `tenants.byArea`, `users.byRole` (active / inactive) **only for the roles the caller may list** (superadmin: all, disnakertrans: admin, admin: tenant), and `perDay` (new products, UMKM and accounts per day, zeros included). Days are counted in WIT (`Asia/Jayapura`)."
               },
               "status": "Forbidden",
               "code": 403,
@@ -6327,7 +6416,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"days\": 7,\n    \"timezone\": \"Asia/Jayapura\",\n    \"total\": 144,\n    \"success\": 139,\n    \"failed\": 5,\n    \"perDay\": [\n      {\n        \"date\": \"2026-10-02\",\n        \"success\": 0,\n        \"failed\": 0\n      },\n      {\n        \"date\": \"2026-10-03\",\n        \"success\": 0,\n        \"failed\": 0\n      },\n      {\n        \"date\": \"2026-10-04\",\n        \"success\": 0,\n        \"failed\": 0\n      },\n      {\n        \"date\": \"2026-10-05\",\n        \"success\": 0,\n        \"failed\": 0\n      },\n      {\n        \"date\": \"2026-10-06\",\n        \"success\": 0,\n        \"failed\": 0\n      },\n      {\n        \"date\": \"2026-10-07\",\n        \"success\": 57,\n        \"failed\": 2\n      },\n      {\n        \"date\": \"2026-10-08\",\n        \"success\": 82,\n        \"failed\": 3\n      }\n    ],\n    \"byMethod\": [\n      {\n        \"method\": \"POST\",\n        \"count\": 98\n      },\n      {\n        \"method\": \"PATCH\",\n        \"count\": 44\n      },\n      {\n        \"method\": \"DELETE\",\n        \"count\": 2\n      }\n    ],\n    \"byRole\": [\n      {\n        \"role\": \"admin\",\n        \"count\": 53\n      },\n      {\n        \"role\": \"tenant\",\n        \"count\": 37\n      },\n      {\n        \"role\": \"disnakertrans\",\n        \"count\": 21\n      },\n      {\n        \"role\": \"guest\",\n        \"count\": 18\n      },\n      {\n        \"role\": \"superadmin\",\n        \"count\": 15\n      }\n    ],\n    \"topEndpoints\": [\n      {\n        \"endpoint\": \"POST /api/auth/logout\",\n        \"count\": 48,\n        \"failed\": 0\n      },\n      {\n        \"endpoint\": \"POST /api/auth/login\",\n        \"count\": 18,\n        \"failed\": 3\n      },\n      {\n        \"endpoint\": \"POST /api/images\",\n        \"count\": 17,\n        \"failed\": 0\n      },\n      {\n        \"endpoint\": \"PATCH /api/approvals/:id\",\n        \"count\": 15,\n        \"failed\": 2\n      },\n      {\n        \"endpoint\": \"PATCH /api/auth/me\",\n        \"count\": 10,\n        \"failed\": 0\n      },\n      {\n        \"endpoint\": \"PATCH /api/notifications/:id/read\",\n        \"count\": 9,\n        \"failed\": 0\n      },\n      {\n        \"endpoint\": \"POST /api/products\",\n        \"count\": 7,\n        \"failed\": 0\n      },\n      {\n        \"endpoint\": \"POST /api/tenant-categories\",\n        \"count\": 4,\n        \"failed\": 0\n      }\n    ],\n    \"topErrors\": [\n      {\n        \"errorCode\": \"UNAUTHORIZED\",\n        \"count\": 3\n      },\n      {\n        \"errorCode\": \"FORBIDDEN\",\n        \"count\": 2\n      }\n    ]\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"days\": 7,\n    \"timezone\": \"Asia/Jayapura\",\n    \"total\": 144,\n    \"success\": 139,\n    \"failed\": 5,\n    \"perDay\": [\n      {\n        \"date\": \"2026-10-02\",\n        \"success\": 0,\n        \"failed\": 0\n      },\n      {\n        \"date\": \"2026-10-03\",\n        \"success\": 0,\n        \"failed\": 0\n      },\n      {\n        \"date\": \"2026-10-04\",\n        \"success\": 0,\n        \"failed\": 0\n      },\n      {\n        \"date\": \"2026-10-05\",\n        \"success\": 0,\n        \"failed\": 0\n      },\n      {\n        \"date\": \"2026-10-06\",\n        \"success\": 0,\n        \"failed\": 0\n      },\n      {\n        \"date\": \"2026-10-07\",\n        \"success\": 57,\n        \"failed\": 2\n      },\n      {\n        \"date\": \"2026-10-08\",\n        \"success\": 82,\n        \"failed\": 3\n      }\n    ],\n    \"byMethod\": [\n      {\n        \"method\": \"POST\",\n        \"count\": 98\n      },\n      {\n        \"method\": \"PATCH\",\n        \"count\": 44\n      },\n      {\n        \"method\": \"DELETE\",\n        \"count\": 2\n      }\n    ],\n    \"byRole\": [\n      {\n        \"role\": \"admin\",\n        \"count\": 53\n      },\n      {\n        \"role\": \"tenant\",\n        \"count\": 37\n      },\n      {\n        \"role\": \"disnakertrans\",\n        \"count\": 21\n      },\n      {\n        \"role\": \"guest\",\n        \"count\": 18\n      },\n      {\n        \"role\": \"superadmin\",\n        \"count\": 15\n      }\n    ],\n    \"topEndpoints\": [\n      {\n        \"endpoint\": \"POST /api/auth/logout\",\n        \"count\": 48,\n        \"failed\": 0\n      },\n      {\n        \"endpoint\": \"POST /api/auth/login\",\n        \"count\": 18,\n        \"failed\": 3\n      },\n      {\n        \"endpoint\": \"POST /api/images\",\n        \"count\": 17,\n        \"failed\": 0\n      },\n      {\n        \"endpoint\": \"PATCH /api/approvals/:id\",\n        \"count\": 15,\n        \"failed\": 2\n      },\n      {\n        \"endpoint\": \"PATCH /api/auth/me\",\n        \"count\": 10,\n        \"failed\": 0\n      },\n      {\n        \"endpoint\": \"PATCH /api/notifications/:id/read\",\n        \"count\": 9,\n        \"failed\": 0\n      },\n      {\n        \"endpoint\": \"POST /api/products\",\n        \"count\": 7,\n        \"failed\": 0\n      },\n      {\n        \"endpoint\": \"POST /api/product-categories\",\n        \"count\": 4,\n        \"failed\": 0\n      }\n    ],\n    \"topErrors\": [\n      {\n        \"errorCode\": \"UNAUTHORIZED\",\n        \"count\": 3\n      },\n      {\n        \"errorCode\": \"FORBIDDEN\",\n        \"count\": 2\n      }\n    ]\n  }\n}"
             },
             {
               "name": "400 Error",

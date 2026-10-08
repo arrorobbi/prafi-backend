@@ -10,7 +10,7 @@ import notificationRoutes from './notification.routes';
 import productRoutes from './product.routes';
 import statsRoutes from './stats.routes';
 import tenantRoutes from './tenant.routes';
-import tenantCategoryRoutes from './tenantCategory.routes';
+import productCategoryRoutes from './productCategory.routes';
 import userRoutes from './user.routes';
 
 const router = Router();
@@ -25,7 +25,7 @@ router.use('/users', userRoutes);
 router.use('/approvals', approvalRoutes);
 router.use('/products', productRoutes);
 router.use('/tenants', tenantRoutes);
-router.use('/tenant-categories', tenantCategoryRoutes);
+router.use('/product-categories', productCategoryRoutes);
 router.use('/landing', landingRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/logs', apiLogRoutes);

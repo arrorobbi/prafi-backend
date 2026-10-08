@@ -45,6 +45,7 @@ const SUMMARY_KEYS = [
   'reason',
   'price',
   'isRecommended',
+  'categoryId',
   'stars',
   'message',
   'updated',

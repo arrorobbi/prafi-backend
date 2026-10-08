@@ -5,17 +5,17 @@ import { Image } from './image.model';
 import { Notification } from './notification.model';
 import { Otp } from './otp.model';
 import { Product } from './product.model';
+import { ProductCategory } from './productCategory.model';
 import { Review } from './review.model';
 import { RevokedToken } from './revokedToken.model';
 import { Tenant } from './tenant.model';
-import { TenantCategory } from './tenantCategory.model';
 import { User } from './user.model';
 
-const models = { ApiLog, Approval, Image, Notification, Otp, Product, Review, RevokedToken, Tenant, TenantCategory, User };
+const models = { ApiLog, Approval, Image, Notification, Otp, Product, ProductCategory, Review, RevokedToken, Tenant, User };
 
 export type DbModels = typeof models;
 
 // Relations are defined in each model's static associate()
 Object.values(models).forEach((model) => model.associate(models));
 
-export { sequelize, ApiLog, Approval, Image, Notification, Otp, Product, Review, RevokedToken, Tenant, TenantCategory, User };
+export { sequelize, ApiLog, Approval, Image, Notification, Otp, Product, ProductCategory, Review, RevokedToken, Tenant, User };

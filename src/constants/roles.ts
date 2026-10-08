@@ -86,11 +86,14 @@ export const TENANT_OWNER_ROLES: Role[] = [ROLES.TENANT];
 /** Roles that can read every tenant profile (GET /api/tenants, GET /api/tenants/:id). */
 export const TENANT_READ_ALL_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.DISNAKERTRANS, ROLES.ADMIN];
 
-/** Roles that read tenant categories (the superadmin is read-only; tenants pick one for their tenant profile). */
-export const TENANT_CATEGORY_READER_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.TENANT];
+/**
+ * Roles that read product categories: every signed-in role (tenants pick one for each product). Visitors get the
+ * public list through GET /api/landing/categories.
+ */
+export const PRODUCT_CATEGORY_READER_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.DISNAKERTRANS, ROLES.ADMIN, ROLES.TENANT];
 
-/** Roles that create/update/delete tenant categories. */
-export const TENANT_CATEGORY_MANAGER_ROLES: Role[] = [ROLES.ADMIN];
+/** Roles that create/update/delete product categories. */
+export const PRODUCT_CATEGORY_MANAGER_ROLES: Role[] = [ROLES.DISNAKERTRANS, ROLES.ADMIN];
 
 /** Only the superadmin reads the API request/error logs (GET /api/logs). */
 export const LOG_READER_ROLES: Role[] = [ROLES.SUPERADMIN];

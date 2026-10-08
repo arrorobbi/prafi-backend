@@ -34,7 +34,7 @@ const PG_CLIENT_ERRORS: Record<string, { status: number; code: string; message: 
   '22003': { status: 400, code: 'NUMERIC_OUT_OF_RANGE', message: 'Nilai angka di luar batas yang diizinkan' },
   '22007': { status: 400, code: 'INVALID_DATETIME', message: 'Format tanggal/waktu tidak valid' },
   '23502': { status: 400, code: 'NOT_NULL_VIOLATION', message: 'Ada field wajib yang belum diisi' },
-  // ON DELETE RESTRICT (e.g. deleting a tenant's logo or a category that tenants still use)
+  // ON DELETE RESTRICT (e.g. deleting a tenant's logo or a category that products still use)
   '23001': { status: 409, code: 'STILL_IN_USE', message: 'Data ini masih digunakan sehingga tidak dapat dihapus' },
   '23514': { status: 400, code: 'CHECK_VIOLATION', message: 'Nilai tidak memenuhi aturan pada database' },
 };

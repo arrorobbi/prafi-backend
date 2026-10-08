@@ -51,7 +51,6 @@ const auth = (roles?: Text): Node[] => [
   ...(roles ? [check({ en: `Role is ${pick(roles, 'en')}?`, id: `Role adalah ${pick(roles, 'id')}?` }, '403 Forbidden')] : []),
 ];
 const SA_ADMIN: Text = { en: 'superadmin or admin', id: 'superadmin atau admin' };
-const CATEGORY_READERS: Text = { en: 'superadmin, admin or tenant', id: 'superadmin, admin atau tenant' };
 const DK_ADMIN: Text = { en: 'disnakertrans or admin', id: 'disnakertrans atau admin' };
 const READERS: Text = { en: 'superadmin, disnakertrans or admin', id: 'superadmin, disnakertrans atau admin' };
 const SEND_OTP = effect({ en: 'Email (Bahasa Indonesia): account created + 6-digit OTP, valid 15 min', id: 'Email: akun dibuat + OTP 6 digit, berlaku 15 menit' });
@@ -337,7 +336,7 @@ export const FLOWS: Record<string, Chart[]> = {
           note({ en: 'tenant → own products only', id: 'tenant → hanya produk sendiri' }),
         ),
         check({ en: 'Found? (single product)', id: 'Ditemukan? (satu produk)' }, { en: '404, also for another tenant\'s product', id: '404, juga untuk produk tenant lain' }),
-        end({ en: '200 product, or paginated list (?isActive)', id: '200 produk, atau daftar berhalaman (?isActive)' }),
+        end({ en: '200 product with category, or paginated list (?isActive, ?categoryId)', id: '200 produk dengan kategori, atau daftar berhalaman (?isActive, ?categoryId)' }),
       ],
     },
     {
@@ -349,7 +348,11 @@ export const FLOWS: Record<string, Chart[]> = {
           { en: 'Tenant profile complete + account photo? (optional links don\'t count)', id: 'Profil tenant lengkap + foto akun? (tautan opsional tidak dihitung)' },
           { en: '403 TENANT_PROFILE_INCOMPLETE + missingFields', id: '403 TENANT_PROFILE_INCOMPLETE + missingFields' },
         ),
-        check({ en: 'Body valid? (price in rupiah, isRecommended)', id: 'Body valid? (price dalam Rupiah, isRecommended)' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
+        check(
+          { en: 'Body valid? (price in rupiah, categoryId; no isRecommended)', id: 'Body valid? (price dalam Rupiah, categoryId; tanpa isRecommended)' },
+          { en: '400 Validation failed', id: '400 Validasi gagal' },
+        ),
+        check({ en: '`categoryId` exists?', id: '`categoryId` ada?' }, '400'),
         check({ en: '`imageId` exists?', id: '`imageId` ada?' }, { en: '400 upload it first: POST /api/images', id: '400 unggah dulu: POST /api/images' }),
         check({ en: 'Image not used by another product?', id: 'Gambar belum dipakai produk lain?' }, '409 Conflict'),
         step(
@@ -369,7 +372,7 @@ export const FLOWS: Record<string, Chart[]> = {
         start('PATCH /api/products/:id'),
         ...auth('tenant'),
         check({ en: 'Your own product?', id: 'Produk milik Anda?' }, '404'),
-        check({ en: 'New `imageId` exists? (if sent)', id: '`imageId` baru ada? (jika dikirim)' }, '400'),
+        check({ en: 'New `categoryId` / `imageId` exist? (if sent)', id: '`categoryId` / `imageId` baru ada? (jika dikirim)' }, '400'),
         step(
           { en: 'Save changes', id: 'Simpan perubahan' },
           effect({ en: 'Replaced image: record + file deleted', id: 'Gambar lama: data + file dihapus' }),
@@ -395,13 +398,24 @@ export const FLOWS: Record<string, Chart[]> = {
 
   Landing: [
     {
+      title: { en: 'Landing Categories (carousel)', id: 'Kategori Landing (carousel)' },
+      nodes: [
+        start('GET /api/landing/categories'),
+        step({ en: 'No token needed', id: 'Tanpa token' }),
+        end(
+          { en: '200 every category A→Z with image + productCount (approved)', id: '200 semua kategori A→Z dengan gambar + productCount (disetujui)' },
+          note({ en: 'Slide = category image; its products: /api/landing/products?categoryId=', id: 'Slide = gambar kategori; produknya: /api/landing/products?categoryId=' }),
+        ),
+      ],
+    },
+    {
       title: { en: 'Landing Products', id: 'Produk Landing' },
       nodes: [
         start('GET /api/landing/products'),
         step({ en: 'No token needed', id: 'Tanpa token' }),
         step({ en: 'Only products whose approval is active', id: 'Hanya produk dengan approval aktif' }),
         step({ en: 'Public fields only (no owner email/phone, no reason)', id: 'Hanya field publik (tanpa email/telepon pemilik, tanpa reason)' }),
-        step({ en: 'Optional: ?recommended=true, ?tenantId=', id: 'Opsional: ?recommended=true, ?tenantId=' }),
+        step({ en: 'Optional: ?recommended=true, ?tenantId=, ?categoryId=, ?sort=newest|rating', id: 'Opsional: ?recommended=true, ?tenantId=, ?categoryId=, ?sort=newest|rating' }),
         end(
           { en: '200 paginated list, newest first', id: '200 daftar berhalaman, terbaru dulu' },
           note({ en: 'Each with ratingAverage + reviewCount', id: 'Masing-masing dengan ratingAverage + reviewCount' }),
@@ -416,6 +430,11 @@ export const FLOWS: Record<string, Chart[]> = {
         check({ en: 'Product approved?', id: 'Produk sudah disetujui?' }, '404'),
         check({ en: 'POST: name, stars 1-5, review valid?', id: 'POST: name, stars 1-5, review valid?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
         check({ en: 'POST: under 5 reviews per visitor in 10 min?', id: 'POST: kurang dari 5 ulasan per pengunjung dalam 10 menit?' }, '429 TOO_MANY_REQUESTS'),
+        step(
+          { en: 'POST: save the review', id: 'POST: simpan ulasan' },
+          effect({ en: 'isRecommended = average (1 decimal) ≥ 4.8', id: 'isRecommended = rata-rata (1 desimal) ≥ 4,8' }),
+          effect({ en: 'Notify the owner: new review', id: 'Notifikasi ke pemilik: ulasan baru' }),
+        ),
         end(
           { en: '200 reviews / 201 review', id: '200 ulasan / 201 ulasan' },
           note({ en: 'meta: the product\'s ratingAverage + reviewCount', id: 'meta: ratingAverage + reviewCount produk' }),
@@ -437,17 +456,25 @@ export const FLOWS: Record<string, Chart[]> = {
     },
   ],
 
-  'Tenant Categories': [
+  'Product Categories': [
     {
-      title: { en: 'Manage Tenant Categories', id: 'Kelola Kategori Tenant' },
+      title: { en: 'Manage Product Categories', id: 'Kelola Kategori Produk' },
       nodes: [
-        start('GET · POST · PATCH · DELETE /api/tenant-categories'),
-        ...auth(CATEGORY_READERS),
-        check({ en: 'Changing? (POST, PATCH, DELETE) only admin', id: 'Mengubah? (POST, PATCH, DELETE) hanya admin' }, { en: '403 superadmin and tenant only read', id: '403 superadmin dan tenant hanya membaca' }),
+        start('GET · POST · PATCH · DELETE /api/product-categories'),
+        ...auth(),
+        check(
+          { en: 'Changing? (POST, PATCH, DELETE) only disnakertrans or admin', id: 'Mengubah? (POST, PATCH, DELETE) hanya disnakertrans atau admin' },
+          { en: '403 superadmin and tenant only read', id: '403 superadmin dan tenant hanya membaca' },
+        ),
         check({ en: 'Category exists? (routes with :id)', id: 'Kategori ada? (route dengan :id)' }, '404'),
-        check({ en: 'Name not taken? (POST, PATCH)', id: 'Nama belum dipakai? (POST, PATCH)' }, '409 Conflict'),
-        check({ en: 'No tenant uses it? (DELETE)', id: 'Tidak dipakai tenant? (DELETE)' }, '409 STILL_IN_USE'),
-        end({ en: '200 / 201 category, or list sorted by name', id: '200 / 201 kategori, atau daftar urut nama' }),
+        check({ en: '`imageId` exists? (if sent)', id: '`imageId` ada? (jika dikirim)' }, '400'),
+        check({ en: 'Name / image not taken? (POST, PATCH)', id: 'Nama / gambar belum dipakai? (POST, PATCH)' }, '409 Conflict'),
+        check({ en: 'No product uses it? (DELETE)', id: 'Tidak dipakai produk? (DELETE)' }, '409 STILL_IN_USE'),
+        step(
+          { en: 'Save', id: 'Simpan' },
+          effect({ en: 'Replaced / removed image: record + file deleted', id: 'Gambar lama / dihapus: data + file dihapus' }),
+        ),
+        end({ en: '200 / 201 category with image + productCount, or list sorted by name', id: '200 / 201 kategori dengan gambar + productCount, atau daftar urut nama' }),
       ],
     },
   ],
@@ -459,7 +486,7 @@ export const FLOWS: Record<string, Chart[]> = {
         start('POST /api/tenants/me'),
         ...auth('tenant'),
         check({ en: 'No profile yet?', id: 'Belum punya profil?' }, { en: '409 already exists, use PATCH', id: '409 sudah ada, pakai PATCH' }),
-        check({ en: '`logoId` and `tenantCategoryId` exist?', id: '`logoId` dan `tenantCategoryId` ada?' }, '400'),
+        check({ en: '`logoId` exists?', id: '`logoId` ada?' }, '400'),
         step({ en: 'Create profile (name defaults to your tenantName)', id: 'Buat profil (name default: tenantName Anda)' }),
         end({ en: '201 profile', id: '201 profil' }),
       ],
@@ -470,7 +497,7 @@ export const FLOWS: Record<string, Chart[]> = {
         start('PATCH /api/tenants/me'),
         ...auth('tenant'),
         check({ en: 'Profile exists?', id: 'Profil ada?' }, { en: '404 create it first: POST', id: '404 buat dulu: POST' }),
-        check({ en: 'New logo / category exist? (if sent)', id: 'Logo / kategori baru ada? (jika dikirim)' }, '400'),
+        check({ en: 'New logo exists? (if sent)', id: 'Logo baru ada? (jika dikirim)' }, '400'),
         step(
           { en: 'Save changes', id: 'Simpan perubahan' },
           effect({ en: 'Replaced logo: record + file deleted', id: 'Logo lama: data + file dihapus' }),
@@ -497,9 +524,8 @@ export const FLOWS: Record<string, Chart[]> = {
       nodes: [
         start('GET /api/tenants[/:id]'),
         ...auth(READERS),
-        step({ en: 'List: optional ?tenantCategoryId filter', id: 'Daftar: filter opsional ?tenantCategoryId' }),
         check({ en: 'Tenant exists? (single tenant)', id: 'Tenant ada? (satu tenant)' }, '404'),
-        end({ en: '200 tenant(s) with owner, logo, category', id: '200 tenant dengan pemilik, logo, kategori' }),
+        end({ en: '200 tenant(s) with owner and logo', id: '200 tenant dengan pemilik dan logo' }),
       ],
     },
   ],

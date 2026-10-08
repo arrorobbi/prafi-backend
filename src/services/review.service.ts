@@ -1,4 +1,5 @@
-import { fn, col } from 'sequelize';
+import { col, fn } from 'sequelize';
+import { RECOMMENDED_MIN_RATING } from '../constants/products';
 import { HttpError } from '../errors/HttpError';
 import { Product, Review } from '../models';
 import { notify } from './notification.service';
@@ -33,6 +34,17 @@ export async function summary(productId: string) {
     ratingAverage: row?.average != null ? Number(row.average) : null,
     reviewCount: Number(row?.count ?? 0),
   };
+}
+
+/**
+ * products.is_recommended follows the reviews: true while their average, as shown to visitors (1 decimal), is
+ * RECOMMENDED_MIN_RATING stars or more; false without reviews. Called after every new review.
+ */
+export async function refreshRecommended(productId: string) {
+  const { ratingAverage } = await summary(productId);
+  const isRecommended = ratingAverage !== null && ratingAverage >= RECOMMENDED_MIN_RATING;
+  await Product.update({ isRecommended }, { where: { id: productId } });
+  return isRecommended;
 }
 
 export async function list(productId: string, { page, limit }: { page: number; limit: number }) {
@@ -74,6 +86,7 @@ export async function create(productId: string, input: ReviewInput, ip: string |
   const product = await findActiveProduct(productId);
   checkRateLimit(ip);
   const review = await Review.create({ ...input, productId });
+  await refreshRecommended(productId);
   await notify.productReviewed(product, input);
   return { review, ...(await summary(productId)) };
 }
