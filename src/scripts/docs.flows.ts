@@ -579,6 +579,23 @@ export const FLOWS: Record<string, Chart[]> = {
     },
   ],
 
+  'Server Guide': [
+    {
+      title: { en: 'Read the server guide', id: 'Membaca panduan server' },
+      nodes: [
+        start('GET /api/docs/server'),
+        step({ en: 'Public page: superadmin login form', id: 'Halaman publik: form login superadmin' }),
+        check({ en: 'Logged in as superadmin?', id: 'Login sebagai superadmin?' }, { en: 'Refused, other roles logged out again', id: 'Ditolak, role lain langsung dikeluarkan' }),
+        step({ en: 'GET /api/docs/server/content with the Bearer token', id: 'GET /api/docs/server/content dengan token Bearer' }),
+        ...auth('superadmin'),
+        end(
+          { en: '200 guide as HTML + updatedAt', id: '200 panduan dalam HTML + updatedAt' },
+          note({ en: 'Read from docs/SERVER-GUIDE.md; no-store', id: 'Dibaca dari docs/SERVER-GUIDE.md; no-store' }),
+        ),
+      ],
+    },
+  ],
+
   Logs: [
     {
       title: { en: 'How a request is logged', id: 'Cara permintaan dicatat' },

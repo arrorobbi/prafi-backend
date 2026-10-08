@@ -11,6 +11,7 @@ import productRoutes from './product.routes';
 import statsRoutes from './stats.routes';
 import tenantRoutes from './tenant.routes';
 import productCategoryRoutes from './productCategory.routes';
+import serverDocsRoutes from './serverDocs.routes';
 import userRoutes from './user.routes';
 
 const router = Router();
@@ -30,6 +31,8 @@ router.use('/landing', landingRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/logs', apiLogRoutes);
 router.use('/stats', statsRoutes);
+// Server guide (docs/SERVER-GUIDE.md): the page is public, its content is superadmin only
+router.use('/docs', serverDocsRoutes);
 
 // Example of role-protected routes — replace with real feature routes
 router.get('/admin/ping', authenticate, authorize(ROLES.SUPERADMIN, ROLES.ADMIN), (req, res) => {

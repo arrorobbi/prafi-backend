@@ -82,6 +82,8 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Log | `GET /api/logs` | superadmin |
 | Log | `GET /api/logs/stats` | superadmin |
 | Log | `GET /api/logs/{{logId}}` | superadmin |
+| Panduan Server | `GET /api/docs/server` | Publik (halaman; isi superadmin) |
+| Panduan Server | `GET /api/docs/server/content` | superadmin |
 | Contoh | `GET /api/admin/ping` | superadmin, admin |
 | Contoh | `GET /api/tenant/ping` | Semua role |
 | Realtime (WebSocket) | Socket.IO di `{{baseUrl}}` | Semua role (Bearer token) |
@@ -410,6 +412,15 @@ Angka untuk grafik log API selama `days` hari terakhir (WIT): `total`, `success`
 
 === REQ Get Log (superadmin) => Detail Log
 Satu log lengkap, termasuk `errorStack` untuk error 5xx. 404 jika tidak ada (atau sudah dihapus).
+
+=== FOLDER Server Guide => Panduan Server
+Cara server disiapkan dan dirawat (service, deploy, database, backup), untuk pengelola server. Buka `{{baseUrl}}/api/docs/server` di browser lalu masuk sebagai **superadmin**. Sumber panduan: `docs/SERVER-GUIDE.md` di repository ini.
+
+=== REQ Server Guide Page (Public) => Halaman Panduan Server
+Buka di browser. Halaman meminta login **superadmin** (*Auth → Login*), menyimpan token hanya untuk tab tersebut, lalu memuat *Isi Panduan Server*. Role lain ditolak dan langsung dikeluarkan lagi. Halaman ini sendiri tidak berisi informasi server. Script: `/api/docs/server/app.js`.
+
+=== REQ Server Guide Content (superadmin) => Isi Panduan Server
+Panduan server (`docs/SERVER-GUIDE.md`) dalam bentuk HTML, beserta `updatedAt` (kapan file terakhir diubah). Dibaca dari file setiap request, sehingga mengubahnya tidak perlu restart. Dikirim dengan `Cache-Control: no-store`. Role lain mendapat 403.
 
 === FOLDER Realtime (WebSocket) => Realtime (WebSocket)
 Notifikasi realtime (dan, untuk superadmin, log API langsung) melalui **Socket.IO** (host dan port yang sama dengan API).
