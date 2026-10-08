@@ -393,12 +393,12 @@ Terbaru di atas, berhalaman (`limit` maksimal 100). Semua filter opsional dan da
 Satu log lengkap, termasuk `errorStack` untuk error 5xx. 404 jika tidak ada (atau sudah dihapus).
 
 === FOLDER Realtime (WebSocket) => Realtime (WebSocket)
-Notifikasi realtime melalui **Socket.IO** (host dan port yang sama dengan API).
+Notifikasi realtime (dan, untuk superadmin, log API langsung) melalui **Socket.IO** (host dan port yang sama dengan API).
 
 > File koleksi Postman tidak bisa memuat request Socket.IO, jadi buat satu secara manual (sekali saja):
 > 1. **New → Socket.IO**, URL `{{baseUrl}}` (versi client: **v4**).
 > 2. **Headers**: `Authorization` = `Bearer {{token}}` (atau **Settings → Handshake auth**: `{ "token": "{{token}}" }`).
-> 3. Tab **Events**: tambahkan listener `notification:new`, `notification:unread-count`, `session:ended` lalu aktifkan.
+> 3. Tab **Events**: tambahkan listener `notification:new`, `notification:unread-count`, `session:ended` (superadmin juga `log:new`) lalu aktifkan.
 > 4. **Connect**. Lalu jalankan request dari koleksi ini di tab lain (mis. buat produk sebagai tenant) dan lihat event yang masuk.
 > 5. Simpan ke koleksi ini (Save → Prafi API) agar berada di samping request REST.
 
@@ -411,8 +411,9 @@ Notifikasi realtime melalui **Socket.IO** (host dan port yang sama dengan API).
 | `notification:unread-count` | `{ count }` | tepat setelah terhubung, dan setelah tandai dibaca / tandai semua / hapus (menyinkronkan semua tab) |
 | `notification:new` | `{ notification, unreadCount }` | notifikasi baru dibuat untuk user ini (bentuknya sama dengan item `GET /api/notifications`) |
 | `session:ended` | `{ reason, message }` | `reason`: `logged_out` (token ini logout), `deactivated` (akun dinonaktifkan), `token_expired` (token 1 jam kedaluwarsa), `password_reset` (kata sandi diatur ulang). Server lalu memutus koneksi; frontend sebaiknya me-logout user. |
+| `log:new` | `{ log }` | **hanya superadmin**: satu baris baru tersimpan di log API (bentuknya sama dengan item `GET /api/logs`, tanpa `errorStack`) |
 
-Setiap user hanya menerima event miliknya; semua tab/perangkat milik user tersebut ikut menerimanya.
+Setiap user hanya menerima event miliknya (ditambah event untuk role-nya, mis. `log:new` untuk superadmin); semua tab/perangkat milik user tersebut ikut menerimanya.
 
 **Frontend (socket.io-client v4)**
 ```js

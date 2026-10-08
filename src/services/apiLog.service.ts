@@ -1,9 +1,12 @@
 import { Op, type WhereOptions } from 'sequelize';
 import { env } from '../config/env';
+import { LOG_READER_ROLES } from '../constants/roles';
+import { REALTIME_EVENTS as E } from '../constants/realtime';
 import { HttpError } from '../errors/HttpError';
 import { ApiLog } from '../models';
 import type { LogLevel } from '../models/apiLog.model';
 import type { InferCreationAttributes } from 'sequelize';
+import { emitToRoles } from '../realtime/socket';
 
 type NewLog = Omit<InferCreationAttributes<ApiLog>, 'id' | 'createdAt'>;
 
@@ -12,9 +15,15 @@ type NewLog = Omit<InferCreationAttributes<ApiLog>, 'id' | 'createdAt'>;
 /**
  * Logging must never break or slow down the request it describes:
  * the insert isn't awaited by the response, and failures only go to the console.
+ * Saved rows are pushed live to signed-in superadmins (log:new), like the list (no errorStack).
  */
 export function record(entry: NewLog) {
-  ApiLog.create(entry).catch((err) => console.error('[api-logs] failed to save a log row:', err));
+  ApiLog.create(entry)
+    .then((row) => {
+      const { errorStack: _stack, ...log } = row.toJSON();
+      emitToRoles(LOG_READER_ROLES, E.LOG_NEW, { log });
+    })
+    .catch((err) => console.error('[api-logs] failed to save a log row:', err));
 }
 
 // ---------- retention ----------

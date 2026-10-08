@@ -5,6 +5,7 @@ import { REALTIME_EVENTS as E, type SessionEndReason } from '../constants/realti
 import { HttpError } from '../errors/HttpError';
 import { verifyAccess } from '../middlewares/auth';
 import { Notification } from '../models';
+import type { Role } from '../constants/roles';
 import type { AuthUser } from '../types/express';
 
 interface SocketData {
@@ -15,6 +16,8 @@ interface SocketData {
 let io: Server | null = null;
 
 const roomOf = (userId: string) => `user:${userId}`;
+/** Every connection of a role, e.g. all superadmins (for the live API log) */
+const roleRoom = (role: Role) => `role:${role}`;
 
 /** Token from the Socket.IO auth payload (`io(url, { auth: { token } })`) or an `Authorization: Bearer` header (Postman). */
 function tokenFrom(socket: Socket) {
@@ -55,7 +58,7 @@ export function initRealtime(httpServer: HttpServer) {
 
   io.on('connection', async (socket) => {
     const { user } = socket.data as SocketData;
-    await socket.join(roomOf(user.id));
+    await socket.join([roomOf(user.id), roleRoom(user.role)]);
     // Initial sync so the badge is correct right after connecting
     socket.emit(E.NOTIFICATION_UNREAD_COUNT, { count: await Notification.count({ where: { userId: user.id, readAt: null } }) });
   });
@@ -78,6 +81,12 @@ function endSession(socket: Socket, reason: SessionEndReason) {
 /** Sends an event to every open connection (tab/device) of one user. No-op if realtime isn't started (e.g. scripts). */
 export function emitToUser(userId: string, event: string, payload: unknown) {
   io?.to(roomOf(userId)).emit(event, payload);
+}
+
+/** Sends an event to every open connection of users with these roles. No-op if realtime isn't started. */
+export function emitToRoles(roles: Role[], event: string, payload: unknown) {
+  if (!io || !roles.length) return;
+  io.to(roles.map(roleRoom)).emit(event, payload);
 }
 
 /** Ends a user's open connections: all of them, or only those using one token (logout of one session). */

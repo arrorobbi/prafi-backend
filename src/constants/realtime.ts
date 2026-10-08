@@ -2,7 +2,7 @@
  * Socket.IO event names shared with the frontend.
  *
  * Connect:  io(API_URL, { auth: { token: accessToken } })   (or header `Authorization: Bearer <token>`)
- * Each user only receives their own events.
+ * Each user only receives their own events, plus events for their role (e.g. the superadmin's API logs).
  */
 export const REALTIME_EVENTS = {
   /** server → client: a new notification for you. Payload: { notification, unreadCount } */
@@ -14,6 +14,11 @@ export const REALTIME_EVENTS = {
    * reason: 'token_expired' | 'logged_out' | 'deactivated' | 'password_reset' — log in again (or stop) instead of reconnecting with the same token.
    */
   SESSION_ENDED: 'session:ended',
+  /**
+   * server → superadmins: a new API log row was saved (same shape as GET /api/logs, without errorStack).
+   * Payload: { log }
+   */
+  LOG_NEW: 'log:new',
 } as const;
 
 export type SessionEndReason = 'token_expired' | 'logged_out' | 'deactivated' | 'password_reset';
