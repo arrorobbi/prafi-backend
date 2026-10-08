@@ -42,8 +42,9 @@ async function toUsers(userIds: string[], payload: Payload) {
     userIds.map((userId) => ({
       userId,
       type: payload.type,
-      name: payload.name,
-      description: payload.description,
+      name: payload.name.slice(0, 255),
+      // The column holds 255 characters: a long product name + reason or review must not make the insert fail
+      description: payload.description.length > 255 ? `${payload.description.slice(0, 252)}...` : payload.description,
       entityType: payload.entityType ?? null,
       entityId: payload.entityId ?? null,
       approvalId: payload.approvalId ?? null,
@@ -172,15 +173,45 @@ export const notify = {
       });
     }),
 
-  /** admin + disnakertrans: a tenant changed a product */
-  productUpdated: (product: { id: string; name: string }, owner: { tenantName?: string | null }) =>
-    safely('productUpdated', () =>
-      toRole(PRODUCT_APPROVER_ROLES, {
+  /** admin + disnakertrans: a tenant changed a product; the tenant: their changes were saved */
+  productUpdated: (
+    product: { id: string; name: string; tenantId: string; approvalId: number | null },
+    owner: { tenantName?: string | null },
+    isActive: boolean,
+  ) =>
+    safely('productUpdated', async () => {
+      await toRole(PRODUCT_APPROVER_ROLES, {
         type: T.PRODUCT_UPDATED,
         name: 'Product updated',
         description: `${owner.tenantName ?? 'A tenant'} updated "${product.name}".`,
         entityType: 'product',
         entityId: product.id,
+      });
+      await toUsers([product.tenantId], {
+        type: T.PRODUCT_CHANGES_SAVED,
+        name: 'Product changes saved',
+        description: isActive
+          ? `Your changes to "${product.name}" were saved. It stays on the landing page.`
+          : `Your changes to "${product.name}" were saved. It waits for an admin or disnakertrans to review it.`,
+        entityType: 'product',
+        entityId: product.id,
+        approvalId: product.approvalId,
+      });
+    }),
+
+  /** the tenant: a visitor reviewed their product */
+  productReviewed: (
+    product: { id: string; name: string; tenantId: string; approvalId: number | null },
+    review: { name: string; stars: number; review: string },
+  ) =>
+    safely('productReviewed', () =>
+      toUsers([product.tenantId], {
+        type: T.PRODUCT_REVIEWED,
+        name: 'New review',
+        description: `${review.name} gave "${product.name}" ${review.stars} stars: ${review.review.length > 120 ? `${review.review.slice(0, 117)}...` : review.review}`,
+        entityType: 'product',
+        entityId: product.id,
+        approvalId: product.approvalId,
       }),
     ),
 
@@ -199,12 +230,14 @@ export const notify = {
   /**
    * A product's activation changed (only real changes notify, not re-sending the same value).
    * activated → admin + disnakertrans: it is on the landing page; tenant: it is approved.
-   * deactivated by an admin or disnakertrans → superadmin.
+   * deactivated or rejected → tenant: with the reason; superadmin: only when a live product was taken down.
    */
   productActivationChanged: (
     actor: AuthUser,
     product: { id: string; name: string; tenantId: string; approvalId: number | null },
     isActive: boolean,
+    reason: string,
+    wasActive: boolean,
   ) =>
     safely('productActivationChanged', async () => {
       const link = { entityType: 'product' as const, entityId: product.id, approvalId: product.approvalId };
@@ -222,12 +255,21 @@ export const notify = {
           ...link,
         });
       } else if (PRODUCT_APPROVER_ROLES.includes(actor.role)) {
-        await toRole(ROLES.SUPERADMIN, {
-          type: T.PRODUCT_DEACTIVATED,
-          name: `Product deactivated by ${actor.role === ROLES.ADMIN ? 'an admin' : 'a disnakertrans'}`,
-          description: `${actor.email} deactivated the product "${product.name}".`,
+        await toUsers([product.tenantId], {
+          type: T.PRODUCT_TAKEN_DOWN,
+          name: 'Product taken down',
+          description: `"${product.name}" was taken down by ${actor.role}. Reason: ${reason}`,
           ...link,
         });
+        // Superadmins oversee live products being taken down, not every rejection of a new one
+        if (wasActive) {
+          await toRole(ROLES.SUPERADMIN, {
+            type: T.PRODUCT_DEACTIVATED,
+            name: `Product deactivated by ${actor.role === ROLES.ADMIN ? 'an admin' : 'a disnakertrans'}`,
+            description: `${actor.email} deactivated the product "${product.name}".`,
+            ...link,
+          });
+        }
       }
     }),
 

@@ -314,7 +314,8 @@ export const FLOWS: Record<string, Chart[]> = {
         step(
           { en: 'Save approval (created + linked the first time)', id: 'Simpan approval (dibuat + ditautkan jika belum ada)' },
           effect({ en: 'Activated → notify admins + disnakertrans + the owning tenant', id: 'Diaktifkan → notifikasi ke admin + disnakertrans + tenant pemilik' }),
-          effect({ en: 'Deactivated → notify superadmins', id: 'Dinonaktifkan → notifikasi ke superadmin' }),
+          effect({ en: 'Rejected / deactivated (or a new reason) → notify the owning tenant with the reason', id: 'Ditolak / dinonaktifkan (atau alasan baru) → notifikasi ke tenant pemilik beserta alasan' }),
+          effect({ en: 'A live product taken down → notify superadmins', id: 'Produk tayang diturunkan → notifikasi ke superadmin' }),
         ),
         end(
           { en: '200 product + approval + owner', id: '200 produk + approval + pemilik' },
@@ -539,11 +540,11 @@ export const FLOWS: Record<string, Chart[]> = {
     {
       title: { en: 'How a request is logged', id: 'Cara permintaan dicatat' },
       nodes: [
-        start({ en: 'Any request reaches the API', id: 'Permintaan apa pun masuk ke API' }),
+        start({ en: 'A create / update / delete request (not GET)', id: 'Permintaan tambah / ubah / hapus (bukan GET)' }),
         step({ en: 'Handled as usual (success or error)', id: 'Diproses seperti biasa (berhasil atau error)' }),
         step(
           { en: 'Response sent → one row in api_logs', id: 'Respons terkirim → satu baris di api_logs' },
-          note({ en: 'No body; token/otp/password in the query saved as ***', id: 'Tanpa body; token/otp/password di query disimpan sebagai ***' }),
+          note({ en: 'Field names only + a safe summary of the result; no token/password', id: 'Hanya nama field + ringkasan hasil yang aman; tanpa token/password' }),
           note({ en: '5xx also keeps the real stack trace', id: '5xx juga menyimpan stack trace aslinya' }),
         ),
         end(

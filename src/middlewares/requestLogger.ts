@@ -24,24 +24,91 @@ function maskedQuery(originalUrl: string) {
   return decodeURIComponent(params.toString());
 }
 
-const levelOf = (status: number): LogLevel => (status >= 500 ? 'error' : status >= 400 ? 'warn' : 'info');
+/** Only changes are stored: reads would be most rows and say little. */
+const STORED_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 /**
- * Not saved to the database: reading the logs (it would log itself on every page of the log viewer),
- * and successful static files (every image on a page would be a row). Their failures are still saved.
+ * The response keys a log may keep. An allowlist on purpose: anything else (tokens, passwords, OTPs, phone
+ * numbers, long texts) can never end up in the logs.
  */
-function skipDb(path: string, status: number) {
-  if (path === '/api/logs' || path.startsWith('/api/logs/')) return true;
-  return status < 400 && (path.startsWith('/images/') || path === '/docs' || path.startsWith('/docs/'));
+const SUMMARY_KEYS = [
+  'id',
+  'name',
+  'email',
+  'role',
+  'firstName',
+  'lastName',
+  'tenantName',
+  'type',
+  'isActive',
+  'reason',
+  'price',
+  'isRecommended',
+  'stars',
+  'message',
+  'updated',
+];
+/** Nested objects worth a line of their own (e.g. who an approval belongs to) */
+const NESTED_KEYS = ['user', 'approval', 'product', 'tenant', 'category'];
+const MAX_TEXT = 200;
+
+function pick(value: Record<string, unknown>) {
+  const out: Record<string, unknown> = {};
+  for (const key of SUMMARY_KEYS) {
+    const v = value[key];
+    if (typeof v === 'string') out[key] = v.length > MAX_TEXT ? `${v.slice(0, MAX_TEXT)}...` : v;
+    else if (typeof v === 'number' || typeof v === 'boolean' || v === null) out[key] = v;
+  }
+  return out;
 }
+
+const isObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
+
+/** `data` of a successful JSON response → its allowlisted fields (lists: just the count), or null. */
+function summarize(body: unknown): Record<string, unknown> | null {
+  if (!isObject(body) || body.success !== true) return null;
+  const data = body.data;
+  if (Array.isArray(data)) return { count: data.length };
+  if (!isObject(data)) return null;
+  const summary = pick(data);
+  for (const key of NESTED_KEYS) {
+    if (isObject(data[key])) {
+      const nested = pick(data[key] as Record<string, unknown>);
+      if (Object.keys(nested).length) summary[key] = nested;
+    }
+  }
+  return Object.keys(summary).length ? summary : null;
+}
+
+/** Names of the sent fields, never their values (plus "image" for an uploaded file). */
+function sentFields(body: unknown, hasFile: boolean) {
+  const fields = isObject(body) ? Object.keys(body) : [];
+  if (hasFile) fields.push('image');
+  return fields.length ? fields.slice(0, 50) : null;
+}
+
+const levelOf = (status: number): LogLevel => (status >= 500 ? 'error' : status >= 400 ? 'warn' : 'info');
+
+/** Saved to the database: create/update/delete requests only (the console still shows every request). */
+const skipDb = (method: string) => !STORED_METHODS.has(method);
 
 /**
  * Logs one line per request when the response finishes, e.g.
  *   [14:05:12] POST /api/auth/register 201 254ms - admin admin1@prafi.test
- * and saves it to api_logs (GET /api/logs). Request bodies are never logged (they contain passwords).
+ * and saves create/update/delete requests to api_logs (GET /api/logs), with the names of the sent fields
+ * and a safe summary of the response. Request body values are never logged (they contain passwords).
  */
 export const requestLogger: RequestHandler = (req, res, next) => {
   const start = process.hrtime.bigint();
+
+  // Keep the JSON response body for the summary (only for requests that are stored)
+  if (STORED_METHODS.has(req.method)) {
+    const json = res.json.bind(res);
+    res.json = (body: unknown) => {
+      res.locals.responseBody = body;
+      return json(body);
+    };
+  }
 
   res.on('finish', () => {
     const ms = Number(process.hrtime.bigint() - start) / 1e6;
@@ -56,7 +123,7 @@ export const requestLogger: RequestHandler = (req, res, next) => {
     else if (status >= 400) console.warn(line);
     else console.log(line);
 
-    if (skipDb(path, status)) return;
+    if (skipDb(req.method)) return;
     const error = res.locals.apiError as LoggedError | undefined;
     apiLogService.record({
       level: levelOf(status),
@@ -74,6 +141,8 @@ export const requestLogger: RequestHandler = (req, res, next) => {
       errorMessage: error?.message ?? null,
       errorDetails: error?.details ?? null,
       errorStack: error?.stack ?? null,
+      requestFields: sentFields(req.body, !!req.file),
+      responseSummary: summarize(res.locals.responseBody),
     });
   });
 

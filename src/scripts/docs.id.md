@@ -246,7 +246,7 @@ Setiap approval memiliki `type` (`user` = approval akun, `product` = approval pr
 disnakertrans mengaktifkan/menonaktifkan akun **admin**; admin mengaktifkan/menonaktifkan akun **tenant**. Memakai `{{userId}}` / `{{userRole}}` yang disimpan oleh request Register. Menonaktifkan akun mengakhiri sesi user tersebut (`session:ended`, reason `deactivated`) dan memberi tahu superadmin.
 
 === REQ Activate / Deactivate Product (disnakertrans, admin) => Aktifkan / Nonaktifkan Produk
-Menyetujui produk (tampil di halaman landing) atau menurunkannya. Pemilik menerima `PRODUCT_APPROVED`; admin dan disnakertrans menerima `PRODUCT_PUBLISHED`; penonaktifan (oleh keduanya) memberi tahu superadmin.
+Menyetujui produk (tampil di halaman landing) atau menurunkannya. Pemilik menerima `PRODUCT_APPROVED` saat produk tayang, atau `PRODUCT_TAKEN_DOWN` beserta `reason` saat ditolak atau dinonaktifkan (juga untuk produk baru yang ditolak, dan lagi untuk alasan baru); admin dan disnakertrans menerima `PRODUCT_PUBLISHED`; menurunkan produk yang sedang tayang memberi tahu superadmin. Mengirim status dan alasan yang sama lagi tidak mengirim notifikasi.
 
 Respons menyertakan pemilik produk:
 ```json
@@ -344,17 +344,20 @@ Notifikasi untuk setiap role (`/api/notifications`, Bearer `{{token}}`). Notifik
 | `ADMIN_PENDING_ACTIVATION` | disnakertrans | admin baru mendaftar (perlu diaktifkan) |
 | `PRODUCT_SUBMITTED` | superadmin, admin, disnakertrans | tenant membuat produk |
 | `USER_DEACTIVATED` | superadmin | disnakertrans atau admin menonaktifkan akun user |
-| `PRODUCT_DEACTIVATED` | superadmin | admin atau disnakertrans menonaktifkan produk |
+| `PRODUCT_DEACTIVATED` | superadmin | admin atau disnakertrans menurunkan produk yang **sedang tayang** |
 | `PRODUCT_PUBLISHED` | admin, disnakertrans | admin atau disnakertrans mengaktifkan produk (kini tampil di landing) |
 | `PRODUCT_UPDATED` | admin, disnakertrans | tenant mengubah produk |
 | `TENANT_PROFILE_UPDATED` | admin | tenant mengubah profil tenantnya |
 | `TENANT_REGISTERED` | admin | tenant baru mendaftar |
 | `PRODUCT_UNDER_REVIEW` | tenant (pemilik) | tenant membuat produk |
-| `PRODUCT_APPROVED` | tenant (pemilik) | produknya diaktifkan |
+| `PRODUCT_APPROVED` | tenant (pemilik) | produknya diaktifkan (juga saat diaktifkan kembali) |
+| `PRODUCT_TAKEN_DOWN` | tenant (pemilik) | admin atau disnakertrans menolak atau menonaktifkan produknya; deskripsi diakhiri `Reason: <alasan>` |
+| `PRODUCT_CHANGES_SAVED` | tenant (pemilik) | tenant mengubah produknya (menyebutkan apakah tetap tayang atau menunggu peninjauan) |
+| `PRODUCT_REVIEWED` | tenant (pemilik) | pengunjung memberi ulasan pada produknya |
 
 Setiap notifikasi: `id`, `type` (dipakai frontend untuk menentukan tampilan), `name` (judul), `description` (pesan), `entityType` + `entityId` (data yang dibuka: `user`, `product`, atau `tenant`), `approvalId` + `approval`, `isRead`, `readAt`, `createdAt`.
 
-**Notifikasi aktivasi** (`USER_REGISTERED`, `ADMIN_PENDING_ACTIVATION`, `TENANT_REGISTERED`, `PRODUCT_SUBMITTED`, `PRODUCT_UNDER_REVIEW`, `PRODUCT_PUBLISHED`, `PRODUCT_APPROVED`, `PRODUCT_DEACTIVATED`, `USER_DEACTIVATED`) menyertakan approval dari user/produk yang dibahas:
+**Notifikasi aktivasi** (`USER_REGISTERED`, `ADMIN_PENDING_ACTIVATION`, `TENANT_REGISTERED`, `PRODUCT_SUBMITTED`, `PRODUCT_UNDER_REVIEW`, `PRODUCT_PUBLISHED`, `PRODUCT_APPROVED`, `PRODUCT_DEACTIVATED`, `USER_DEACTIVATED`, `PRODUCT_TAKEN_DOWN`, `PRODUCT_CHANGES_SAVED`, `PRODUCT_REVIEWED`) menyertakan approval dari user/produk yang dibahas:
 ```json
 "approval": { "id": 137, "type": "user", "userId": "<id>", "isActive": false, "reason": "Waiting for activation by disnakertrans", "updatedAt": "...",
   "user": { "id": "<id>", "firstName": "Andi", "lastName": "Wijaya", "email": "...", "phoneNumber": "...", "role": "admin", "tenantName": null, ... } }
@@ -378,10 +381,9 @@ Mengembalikan `{ updated }` (jumlah yang ditandai).
 === FOLDER Logs => Log
 Log permintaan dan error API (`/api/logs`, Bearer `{{token}}`), **hanya superadmin**, hanya-baca.
 
-Setiap permintaan menghasilkan satu baris saat responsnya dikirim: `method`, `path`, `query`, `statusCode`, `durationMs`, `level` (`info` < 400, `warn` 4xx, `error` 5xx), siapa yang memanggil (`userId`, `userEmail`, `userRole`; null untuk tamu), `ip`, `userAgent`. Permintaan yang gagal juga menyimpan error yang diterima klien (`errorCode`, `errorMessage`, `errorDetails`); error 5xx juga menyimpan stack trace error aslinya di `errorStack` (hanya di *Get Log*; klien tidak pernah melihatnya).
+Setiap permintaan **tambah / ubah / hapus** (POST, PUT, PATCH, DELETE) menghasilkan satu baris saat responsnya dikirim; permintaan baca (GET) tidak disimpan. Satu baris berisi: `method`, `path`, `query`, `statusCode`, `durationMs`, `level` (`info` < 400, `warn` 4xx, `error` 5xx), siapa yang memanggil (`userId`, `userEmail`, `userRole`; null untuk tamu), `ip`, `userAgent`. `requestFields` (**nama** field yang dikirim, tidak pernah isinya, ditambah `image` untuk unggahan) dan `responseSummary` (ringkasan aman dari respons yang berhasil: hanya kunci yang diizinkan seperti `id`, `name`, `email`, `role`, `isActive`, `price`, `stars`, juga di dalam `user` / `approval` / `product` / `tenant`; daftar menjadi `{ count }`; token dan password tidak mungkin tersimpan). Permintaan yang gagal juga menyimpan error yang diterima klien (`errorCode`, `errorMessage`, `errorDetails`); error 5xx juga menyimpan stack trace error aslinya di `errorStack` (hanya di *Get Log*; klien tidak pernah melihatnya).
 
 - Body permintaan tidak pernah disimpan, dan nilai query rahasia (`token`, `otp`, `password`, `code`) disimpan sebagai `***`.
-- Tidak disimpan: permintaan ke `/api/logs` sendiri, serta file `/images/…` dan `/docs` yang berhasil (yang gagal tetap disimpan).
 - Baris yang lebih lama dari `LOG_RETENTION_DAYS` (bawaan 30 hari) dihapus setiap hari.
 
 === REQ List Logs (superadmin) => Daftar Log

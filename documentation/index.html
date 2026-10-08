@@ -3324,7 +3324,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 </figure>
 <figure class="flow">
   <figcaption>Activate / Deactivate Product</figcaption>
-  <svg class="fc" viewBox="0 0 480 774" width="480" height="774" role="img" aria-label="Activate / Deactivate Product">
+  <svg class="fc" viewBox="0 0 480 846" width="480" height="846" role="img" aria-label="Activate / Deactivate Product">
     <defs><marker id="fc-arrow-67" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
     <rect class="fc-box fc-start" x="8" y="8" width="224" height="48" rx="18"/>
     <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">PATCH</text><text class="fc-text fc-text-start" x="120" y="45" text-anchor="middle">/api/approvals/:id?type=product</text>
@@ -3383,22 +3383,25 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <text class="fc-label" x="237" y="517">no</text>
     <rect class="fc-box fc-error" x="276" y="506" width="196" height="32" rx="8"/>
     <text class="fc-text fc-text-error" x="374" y="527" text-anchor="middle">404</text>
-    <line class="fc-line" x1="120" y1="538" x2="120" y2="603" marker-end="url(#fc-arrow-67)"/>
-    <text class="fc-label" x="126" y="575">yes</text>
-    <rect class="fc-box fc-step" x="8" y="604" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="625" text-anchor="middle">Save approval (created + linked the</text><text class="fc-text fc-text-step" x="120" y="641" text-anchor="middle">first time)</text>
-    <path class="fc-line fc-line-effect" d="M232,628 H254 V600 H275" fill="none" marker-end="url(#fc-arrow-67)"/>
+    <line class="fc-line" x1="120" y1="538" x2="120" y2="639" marker-end="url(#fc-arrow-67)"/>
+    <text class="fc-label" x="126" y="593">yes</text>
+    <rect class="fc-box fc-step" x="8" y="640" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="661" text-anchor="middle">Save approval (created + linked the</text><text class="fc-text fc-text-step" x="120" y="677" text-anchor="middle">first time)</text>
+    <path class="fc-line fc-line-effect" d="M232,664 H254 V600 H275" fill="none" marker-end="url(#fc-arrow-67)"/>
     <rect class="fc-box fc-effect" x="276" y="568" width="196" height="64" rx="8"/>
     <text class="fc-text fc-text-effect" x="374" y="589" text-anchor="middle">Activated → notify admins +</text><text class="fc-text fc-text-effect" x="374" y="605" text-anchor="middle">disnakertrans + the owning</text><text class="fc-text fc-text-effect" x="374" y="621" text-anchor="middle">tenant</text>
-    <path class="fc-line fc-line-effect" d="M232,628 H254 V664 H275" fill="none" marker-end="url(#fc-arrow-67)"/>
-    <rect class="fc-box fc-effect" x="276" y="640" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-effect" x="374" y="661" text-anchor="middle">Deactivated → notify</text><text class="fc-text fc-text-effect" x="374" y="677" text-anchor="middle">superadmins</text>
-    <line class="fc-line" x1="120" y1="652" x2="120" y2="725" marker-end="url(#fc-arrow-67)"/>
-    <rect class="fc-box fc-end" x="8" y="726" width="224" height="32" rx="16"/>
-    <text class="fc-text fc-text-end" x="120" y="747" text-anchor="middle">200 product + approval + owner</text>
-    <path class="fc-line fc-line-note" d="M232,742 H275" fill="none"/>
-    <rect class="fc-box fc-note" x="276" y="718" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-note" x="374" y="739" text-anchor="middle">Active products show on</text><text class="fc-text fc-text-note" x="374" y="755" text-anchor="middle">/api/landing/products</text>
+    <path class="fc-line fc-line-effect" d="M232,664 H254 V672 H275" fill="none" marker-end="url(#fc-arrow-67)"/>
+    <rect class="fc-box fc-effect" x="276" y="640" width="196" height="64" rx="8"/>
+    <text class="fc-text fc-text-effect" x="374" y="661" text-anchor="middle">Rejected / deactivated (or a</text><text class="fc-text fc-text-effect" x="374" y="677" text-anchor="middle">new reason) → notify the</text><text class="fc-text fc-text-effect" x="374" y="693" text-anchor="middle">owning tenant with the reason</text>
+    <path class="fc-line fc-line-effect" d="M232,664 H254 V736 H275" fill="none" marker-end="url(#fc-arrow-67)"/>
+    <rect class="fc-box fc-effect" x="276" y="712" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-effect" x="374" y="733" text-anchor="middle">A live product taken down →</text><text class="fc-text fc-text-effect" x="374" y="749" text-anchor="middle">notify superadmins</text>
+    <line class="fc-line" x1="120" y1="688" x2="120" y2="797" marker-end="url(#fc-arrow-67)"/>
+    <rect class="fc-box fc-end" x="8" y="798" width="224" height="32" rx="16"/>
+    <text class="fc-text fc-text-end" x="120" y="819" text-anchor="middle">200 product + approval + owner</text>
+    <path class="fc-line fc-line-note" d="M232,814 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="790" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="811" text-anchor="middle">Active products show on</text><text class="fc-text fc-text-note" x="374" y="827" text-anchor="middle">/api/landing/products</text>
   </svg>
 </figure></div>
   <div class="flow-grid" data-l="id"><figure class="flow">
@@ -3495,7 +3498,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 </figure>
 <figure class="flow">
   <figcaption>Aktifkan / Nonaktifkan Produk</figcaption>
-  <svg class="fc" viewBox="0 0 480 790" width="480" height="790" role="img" aria-label="Aktifkan / Nonaktifkan Produk">
+  <svg class="fc" viewBox="0 0 480 862" width="480" height="862" role="img" aria-label="Aktifkan / Nonaktifkan Produk">
     <defs><marker id="fc-arrow-69" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
     <rect class="fc-box fc-start" x="8" y="8" width="224" height="48" rx="18"/>
     <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">PATCH</text><text class="fc-text fc-text-start" x="120" y="45" text-anchor="middle">/api/approvals/:id?type=product</text>
@@ -3554,22 +3557,25 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <text class="fc-label" x="237" y="533">tidak</text>
     <rect class="fc-box fc-error" x="276" y="522" width="196" height="32" rx="8"/>
     <text class="fc-text fc-text-error" x="374" y="543" text-anchor="middle">404</text>
-    <line class="fc-line" x1="120" y1="554" x2="120" y2="619" marker-end="url(#fc-arrow-69)"/>
-    <text class="fc-label" x="126" y="591">ya</text>
-    <rect class="fc-box fc-step" x="8" y="620" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="641" text-anchor="middle">Simpan approval (dibuat +</text><text class="fc-text fc-text-step" x="120" y="657" text-anchor="middle">ditautkan jika belum ada)</text>
-    <path class="fc-line fc-line-effect" d="M232,644 H254 V616 H275" fill="none" marker-end="url(#fc-arrow-69)"/>
+    <line class="fc-line" x1="120" y1="554" x2="120" y2="655" marker-end="url(#fc-arrow-69)"/>
+    <text class="fc-label" x="126" y="609">ya</text>
+    <rect class="fc-box fc-step" x="8" y="656" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="677" text-anchor="middle">Simpan approval (dibuat +</text><text class="fc-text fc-text-step" x="120" y="693" text-anchor="middle">ditautkan jika belum ada)</text>
+    <path class="fc-line fc-line-effect" d="M232,680 H254 V616 H275" fill="none" marker-end="url(#fc-arrow-69)"/>
     <rect class="fc-box fc-effect" x="276" y="584" width="196" height="64" rx="8"/>
     <text class="fc-text fc-text-effect" x="374" y="605" text-anchor="middle">Diaktifkan → notifikasi ke</text><text class="fc-text fc-text-effect" x="374" y="621" text-anchor="middle">admin + disnakertrans +</text><text class="fc-text fc-text-effect" x="374" y="637" text-anchor="middle">tenant pemilik</text>
-    <path class="fc-line fc-line-effect" d="M232,644 H254 V680 H275" fill="none" marker-end="url(#fc-arrow-69)"/>
-    <rect class="fc-box fc-effect" x="276" y="656" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-effect" x="374" y="677" text-anchor="middle">Dinonaktifkan → notifikasi ke</text><text class="fc-text fc-text-effect" x="374" y="693" text-anchor="middle">superadmin</text>
-    <line class="fc-line" x1="120" y1="668" x2="120" y2="741" marker-end="url(#fc-arrow-69)"/>
-    <rect class="fc-box fc-end" x="8" y="742" width="224" height="32" rx="16"/>
-    <text class="fc-text fc-text-end" x="120" y="763" text-anchor="middle">200 produk + approval + pemilik</text>
-    <path class="fc-line fc-line-note" d="M232,758 H275" fill="none"/>
-    <rect class="fc-box fc-note" x="276" y="734" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-note" x="374" y="755" text-anchor="middle">Produk aktif tampil di</text><text class="fc-text fc-text-note" x="374" y="771" text-anchor="middle">/api/landing/products</text>
+    <path class="fc-line fc-line-effect" d="M232,680 H254 V688 H275" fill="none" marker-end="url(#fc-arrow-69)"/>
+    <rect class="fc-box fc-effect" x="276" y="656" width="196" height="64" rx="8"/>
+    <text class="fc-text fc-text-effect" x="374" y="677" text-anchor="middle">Ditolak / dinonaktifkan (atau</text><text class="fc-text fc-text-effect" x="374" y="693" text-anchor="middle">alasan baru) → notifikasi ke</text><text class="fc-text fc-text-effect" x="374" y="709" text-anchor="middle">tenant pemilik beserta alasan</text>
+    <path class="fc-line fc-line-effect" d="M232,680 H254 V752 H275" fill="none" marker-end="url(#fc-arrow-69)"/>
+    <rect class="fc-box fc-effect" x="276" y="728" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-effect" x="374" y="749" text-anchor="middle">Produk tayang diturunkan →</text><text class="fc-text fc-text-effect" x="374" y="765" text-anchor="middle">notifikasi ke superadmin</text>
+    <line class="fc-line" x1="120" y1="704" x2="120" y2="813" marker-end="url(#fc-arrow-69)"/>
+    <rect class="fc-box fc-end" x="8" y="814" width="224" height="32" rx="16"/>
+    <text class="fc-text fc-text-end" x="120" y="835" text-anchor="middle">200 produk + approval + pemilik</text>
+    <path class="fc-line fc-line-note" d="M232,830 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="806" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="827" text-anchor="middle">Produk aktif tampil di</text><text class="fc-text fc-text-note" x="374" y="843" text-anchor="middle">/api/landing/products</text>
   </svg>
 </figure></div>
 </details>
@@ -3661,10 +3667,10 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   </div>
   <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <div data-l="en"><p>Approves a product (shown on the landing page) or takes it down. The owner gets <code>PRODUCT_APPROVED</code>; admins and disnakertrans get <code>PRODUCT_PUBLISHED</code>; deactivation (by either) notifies superadmins.</p>
+    <div data-l="en"><p>Approves a product (shown on the landing page) or takes it down. The owner gets <code>PRODUCT_APPROVED</code> when it goes live, or <code>PRODUCT_TAKEN_DOWN</code> with the <code>reason</code> when it is rejected or deactivated (also for a new product that is rejected, and again for a new reason); admins and disnakertrans get <code>PRODUCT_PUBLISHED</code>; taking down a live product notifies superadmins. Sending the same status and reason again notifies nobody.</p>
 <p>The response includes who owns it:</p>
 <pre><code class="lang-json">{ &quot;type&quot;: &quot;product&quot;, &quot;id&quot;: &quot;…&quot;, &quot;name&quot;: &quot;…&quot;, &quot;approval&quot;: { &quot;type&quot;: &quot;product&quot;, &quot;userId&quot;: &quot;…&quot;, &quot;isActive&quot;: true, … },
-  &quot;user&quot;: { &quot;firstName&quot;: &quot;Budi&quot;, &quot;lastName&quot;: &quot;Santoso&quot;, …, &quot;tenant&quot;: { … } | null, &quot;productId&quot;: &quot;…&quot;, &quot;product&quot;: { … } } }</code></pre></div><div data-l="id"><p>Menyetujui produk (tampil di halaman landing) atau menurunkannya. Pemilik menerima <code>PRODUCT_APPROVED</code>; admin dan disnakertrans menerima <code>PRODUCT_PUBLISHED</code>; penonaktifan (oleh keduanya) memberi tahu superadmin.</p>
+  &quot;user&quot;: { &quot;firstName&quot;: &quot;Budi&quot;, &quot;lastName&quot;: &quot;Santoso&quot;, …, &quot;tenant&quot;: { … } | null, &quot;productId&quot;: &quot;…&quot;, &quot;product&quot;: { … } } }</code></pre></div><div data-l="id"><p>Menyetujui produk (tampil di halaman landing) atau menurunkannya. Pemilik menerima <code>PRODUCT_APPROVED</code> saat produk tayang, atau <code>PRODUCT_TAKEN_DOWN</code> beserta <code>reason</code> saat ditolak atau dinonaktifkan (juga untuk produk baru yang ditolak, dan lagi untuk alasan baru); admin dan disnakertrans menerima <code>PRODUCT_PUBLISHED</code>; menurunkan produk yang sedang tayang memberi tahu superadmin. Mengirim status dan alasan yang sama lagi tidak mengirim notifikasi.</p>
 <p>Respons menyertakan pemilik produk:</p>
 <pre><code class="lang-json">{ &quot;type&quot;: &quot;product&quot;, &quot;id&quot;: &quot;…&quot;, &quot;name&quot;: &quot;…&quot;, &quot;approval&quot;: { &quot;type&quot;: &quot;product&quot;, &quot;userId&quot;: &quot;…&quot;, &quot;isActive&quot;: true, … },
   &quot;user&quot;: { &quot;firstName&quot;: &quot;Budi&quot;, &quot;lastName&quot;: &quot;Santoso&quot;, …, &quot;tenant&quot;: { … } | null, &quot;productId&quot;: &quot;…&quot;, &quot;product&quot;: { … } } }</code></pre></div>
@@ -7608,16 +7614,16 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 <section class="folder" id="notifications">
   <div class="folder-title"><h2><span data-l="en">Notifications</span><span data-l="id">Notifikasi</span></h2><span class="pill">5 <span data-l="en">endpoints</span><span data-l="id">endpoint</span></span></div>
   <div class="folder-desc" data-l="en"><p>Notifications for every role (<code>/api/notifications</code>, Bearer <code>{{token}}</code>). They are created automatically by actions in the other folders.</p>
-<div class="table-wrap"><table><thead><tr><th>type</th><th>who gets it</th><th>when</th></tr></thead><tbody><tr><td><code>USER_REGISTERED</code></td><td>superadmin</td><td>any new account (disnakertrans, admin, tenant)</td></tr><tr><td><code>ADMIN_PENDING_ACTIVATION</code></td><td>disnakertrans</td><td>a new admin signed up (needs activation)</td></tr><tr><td><code>PRODUCT_SUBMITTED</code></td><td>superadmin, admin, disnakertrans</td><td>a tenant creates a product</td></tr><tr><td><code>USER_DEACTIVATED</code></td><td>superadmin</td><td>a disnakertrans or admin deactivates a user account</td></tr><tr><td><code>PRODUCT_DEACTIVATED</code></td><td>superadmin</td><td>an admin or disnakertrans deactivates a product</td></tr><tr><td><code>PRODUCT_PUBLISHED</code></td><td>admin, disnakertrans</td><td>an admin or disnakertrans activates a product (now on the landing page)</td></tr><tr><td><code>PRODUCT_UPDATED</code></td><td>admin, disnakertrans</td><td>a tenant updates a product</td></tr><tr><td><code>TENANT_PROFILE_UPDATED</code></td><td>admin</td><td>a tenant updates their tenant profile</td></tr><tr><td><code>TENANT_REGISTERED</code></td><td>admin</td><td>a new tenant signs up</td></tr><tr><td><code>PRODUCT_UNDER_REVIEW</code></td><td>tenant (owner)</td><td>they create a product</td></tr><tr><td><code>PRODUCT_APPROVED</code></td><td>tenant (owner)</td><td>their product is activated</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>type</th><th>who gets it</th><th>when</th></tr></thead><tbody><tr><td><code>USER_REGISTERED</code></td><td>superadmin</td><td>any new account (disnakertrans, admin, tenant)</td></tr><tr><td><code>ADMIN_PENDING_ACTIVATION</code></td><td>disnakertrans</td><td>a new admin signed up (needs activation)</td></tr><tr><td><code>PRODUCT_SUBMITTED</code></td><td>superadmin, admin, disnakertrans</td><td>a tenant creates a product</td></tr><tr><td><code>USER_DEACTIVATED</code></td><td>superadmin</td><td>a disnakertrans or admin deactivates a user account</td></tr><tr><td><code>PRODUCT_DEACTIVATED</code></td><td>superadmin</td><td>an admin or disnakertrans takes down a <strong>live</strong> product</td></tr><tr><td><code>PRODUCT_PUBLISHED</code></td><td>admin, disnakertrans</td><td>an admin or disnakertrans activates a product (now on the landing page)</td></tr><tr><td><code>PRODUCT_UPDATED</code></td><td>admin, disnakertrans</td><td>a tenant updates a product</td></tr><tr><td><code>TENANT_PROFILE_UPDATED</code></td><td>admin</td><td>a tenant updates their tenant profile</td></tr><tr><td><code>TENANT_REGISTERED</code></td><td>admin</td><td>a new tenant signs up</td></tr><tr><td><code>PRODUCT_UNDER_REVIEW</code></td><td>tenant (owner)</td><td>they create a product</td></tr><tr><td><code>PRODUCT_APPROVED</code></td><td>tenant (owner)</td><td>their product is activated (also when re-activated)</td></tr><tr><td><code>PRODUCT_TAKEN_DOWN</code></td><td>tenant (owner)</td><td>an admin or disnakertrans rejects or deactivates their product; the description ends with <code>Reason: &lt;reason&gt;</code></td></tr><tr><td><code>PRODUCT_CHANGES_SAVED</code></td><td>tenant (owner)</td><td>they edit their product (says whether it stays live or waits for review)</td></tr><tr><td><code>PRODUCT_REVIEWED</code></td><td>tenant (owner)</td><td>a visitor reviews their product (<code>&lt;name&gt; gave &quot;&lt;product&gt;&quot; &lt;stars&gt; stars: &lt;review&gt;</code>)</td></tr></tbody></table></div>
 <p>Each notification: <code>id</code>, <code>type</code> (switch on it in the frontend), <code>name</code> (title), <code>description</code> (message), <code>entityType</code> + <code>entityId</code> (what to open: <code>user</code>, <code>product</code> or <code>tenant</code>), <code>approvalId</code> + <code>approval</code>, <code>isRead</code>, <code>readAt</code>, <code>createdAt</code>.</p>
-<p><strong>Activation notifications</strong> (<code>USER_REGISTERED</code>, <code>ADMIN_PENDING_ACTIVATION</code>, <code>TENANT_REGISTERED</code>, <code>PRODUCT_SUBMITTED</code>, <code>PRODUCT_UNDER_REVIEW</code>, <code>PRODUCT_PUBLISHED</code>, <code>PRODUCT_APPROVED</code>, <code>PRODUCT_DEACTIVATED</code>, <code>USER_DEACTIVATED</code>) include the approval of the user/product they are about:</p>
+<p><strong>Activation notifications</strong> (<code>USER_REGISTERED</code>, <code>ADMIN_PENDING_ACTIVATION</code>, <code>TENANT_REGISTERED</code>, <code>PRODUCT_SUBMITTED</code>, <code>PRODUCT_UNDER_REVIEW</code>, <code>PRODUCT_PUBLISHED</code>, <code>PRODUCT_APPROVED</code>, <code>PRODUCT_DEACTIVATED</code>, <code>PRODUCT_TAKEN_DOWN</code>, <code>PRODUCT_CHANGES_SAVED</code>, <code>PRODUCT_REVIEWED</code>, <code>USER_DEACTIVATED</code>) include the approval of the user/product they are about:</p>
 <pre><code class="lang-json">&quot;approval&quot;: { &quot;id&quot;: 137, &quot;type&quot;: &quot;user&quot;, &quot;userId&quot;: &quot;&lt;id&gt;&quot;, &quot;isActive&quot;: false, &quot;reason&quot;: &quot;Waiting for activation by disnakertrans&quot;, &quot;updatedAt&quot;: &quot;...&quot;,
   &quot;user&quot;: { &quot;id&quot;: &quot;&lt;id&gt;&quot;, &quot;firstName&quot;: &quot;Andi&quot;, &quot;lastName&quot;: &quot;Wijaya&quot;, &quot;email&quot;: &quot;...&quot;, &quot;phoneNumber&quot;: &quot;...&quot;, &quot;role&quot;: &quot;admin&quot;, &quot;tenantName&quot;: null, ... } }</code></pre>
 <p><code>approval.isActive</code> is the <strong>current</strong> status (not a copy from when it was sent), so the frontend can show an <em>Activate</em> button only while it is still <code>false</code>. To activate: <code>PATCH /api/approvals/{entityId}?type={entityType}</code> (body <code>{ &quot;isActive&quot;: true, &quot;role&quot;: &quot;admin&quot; }</code> for users, <code>{ &quot;isActive&quot;: true }</code> for products). Other notifications (<code>PRODUCT_UPDATED</code>, <code>TENANT_PROFILE_UPDATED</code>) have <code>approvalId: null</code>, <code>approval: null</code>. If the product is deleted, <code>approval</code> becomes <code>null</code>. Every user only ever sees their own notifications (others → 404).</p>
 <p>Endpoints: <code>GET /api/notifications?page=&amp;limit=&amp;unread=true</code> (newest first, <code>meta.unreadCount</code> for the badge), <code>GET /api/notifications/unread-count</code>, <code>PATCH /api/notifications/:id/read</code>, <code>PATCH /api/notifications/read-all</code>, <code>DELETE /api/notifications/:id</code>. <code>approval.user</code> is whose approval it is (the account owner, or the tenant who owns the product); it never contains the password.</p></div><div class="folder-desc" data-l="id"><p>Notifikasi untuk setiap role (<code>/api/notifications</code>, Bearer <code>{{token}}</code>). Notifikasi dibuat otomatis oleh aksi di folder lain.</p>
-<div class="table-wrap"><table><thead><tr><th>type</th><th>penerima</th><th>kapan</th></tr></thead><tbody><tr><td><code>USER_REGISTERED</code></td><td>superadmin</td><td>setiap akun baru (disnakertrans, admin, tenant)</td></tr><tr><td><code>ADMIN_PENDING_ACTIVATION</code></td><td>disnakertrans</td><td>admin baru mendaftar (perlu diaktifkan)</td></tr><tr><td><code>PRODUCT_SUBMITTED</code></td><td>superadmin, admin, disnakertrans</td><td>tenant membuat produk</td></tr><tr><td><code>USER_DEACTIVATED</code></td><td>superadmin</td><td>disnakertrans atau admin menonaktifkan akun user</td></tr><tr><td><code>PRODUCT_DEACTIVATED</code></td><td>superadmin</td><td>admin atau disnakertrans menonaktifkan produk</td></tr><tr><td><code>PRODUCT_PUBLISHED</code></td><td>admin, disnakertrans</td><td>admin atau disnakertrans mengaktifkan produk (kini tampil di landing)</td></tr><tr><td><code>PRODUCT_UPDATED</code></td><td>admin, disnakertrans</td><td>tenant mengubah produk</td></tr><tr><td><code>TENANT_PROFILE_UPDATED</code></td><td>admin</td><td>tenant mengubah profil tenantnya</td></tr><tr><td><code>TENANT_REGISTERED</code></td><td>admin</td><td>tenant baru mendaftar</td></tr><tr><td><code>PRODUCT_UNDER_REVIEW</code></td><td>tenant (pemilik)</td><td>tenant membuat produk</td></tr><tr><td><code>PRODUCT_APPROVED</code></td><td>tenant (pemilik)</td><td>produknya diaktifkan</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>type</th><th>penerima</th><th>kapan</th></tr></thead><tbody><tr><td><code>USER_REGISTERED</code></td><td>superadmin</td><td>setiap akun baru (disnakertrans, admin, tenant)</td></tr><tr><td><code>ADMIN_PENDING_ACTIVATION</code></td><td>disnakertrans</td><td>admin baru mendaftar (perlu diaktifkan)</td></tr><tr><td><code>PRODUCT_SUBMITTED</code></td><td>superadmin, admin, disnakertrans</td><td>tenant membuat produk</td></tr><tr><td><code>USER_DEACTIVATED</code></td><td>superadmin</td><td>disnakertrans atau admin menonaktifkan akun user</td></tr><tr><td><code>PRODUCT_DEACTIVATED</code></td><td>superadmin</td><td>admin atau disnakertrans menurunkan produk yang <strong>sedang tayang</strong></td></tr><tr><td><code>PRODUCT_PUBLISHED</code></td><td>admin, disnakertrans</td><td>admin atau disnakertrans mengaktifkan produk (kini tampil di landing)</td></tr><tr><td><code>PRODUCT_UPDATED</code></td><td>admin, disnakertrans</td><td>tenant mengubah produk</td></tr><tr><td><code>TENANT_PROFILE_UPDATED</code></td><td>admin</td><td>tenant mengubah profil tenantnya</td></tr><tr><td><code>TENANT_REGISTERED</code></td><td>admin</td><td>tenant baru mendaftar</td></tr><tr><td><code>PRODUCT_UNDER_REVIEW</code></td><td>tenant (pemilik)</td><td>tenant membuat produk</td></tr><tr><td><code>PRODUCT_APPROVED</code></td><td>tenant (pemilik)</td><td>produknya diaktifkan (juga saat diaktifkan kembali)</td></tr><tr><td><code>PRODUCT_TAKEN_DOWN</code></td><td>tenant (pemilik)</td><td>admin atau disnakertrans menolak atau menonaktifkan produknya; deskripsi diakhiri <code>Reason: &lt;alasan&gt;</code></td></tr><tr><td><code>PRODUCT_CHANGES_SAVED</code></td><td>tenant (pemilik)</td><td>tenant mengubah produknya (menyebutkan apakah tetap tayang atau menunggu peninjauan)</td></tr><tr><td><code>PRODUCT_REVIEWED</code></td><td>tenant (pemilik)</td><td>pengunjung memberi ulasan pada produknya</td></tr></tbody></table></div>
 <p>Setiap notifikasi: <code>id</code>, <code>type</code> (dipakai frontend untuk menentukan tampilan), <code>name</code> (judul), <code>description</code> (pesan), <code>entityType</code> + <code>entityId</code> (data yang dibuka: <code>user</code>, <code>product</code>, atau <code>tenant</code>), <code>approvalId</code> + <code>approval</code>, <code>isRead</code>, <code>readAt</code>, <code>createdAt</code>.</p>
-<p><strong>Notifikasi aktivasi</strong> (<code>USER_REGISTERED</code>, <code>ADMIN_PENDING_ACTIVATION</code>, <code>TENANT_REGISTERED</code>, <code>PRODUCT_SUBMITTED</code>, <code>PRODUCT_UNDER_REVIEW</code>, <code>PRODUCT_PUBLISHED</code>, <code>PRODUCT_APPROVED</code>, <code>PRODUCT_DEACTIVATED</code>, <code>USER_DEACTIVATED</code>) menyertakan approval dari user/produk yang dibahas:</p>
+<p><strong>Notifikasi aktivasi</strong> (<code>USER_REGISTERED</code>, <code>ADMIN_PENDING_ACTIVATION</code>, <code>TENANT_REGISTERED</code>, <code>PRODUCT_SUBMITTED</code>, <code>PRODUCT_UNDER_REVIEW</code>, <code>PRODUCT_PUBLISHED</code>, <code>PRODUCT_APPROVED</code>, <code>PRODUCT_DEACTIVATED</code>, <code>USER_DEACTIVATED</code>, <code>PRODUCT_TAKEN_DOWN</code>, <code>PRODUCT_CHANGES_SAVED</code>, <code>PRODUCT_REVIEWED</code>) menyertakan approval dari user/produk yang dibahas:</p>
 <pre><code class="lang-json">&quot;approval&quot;: { &quot;id&quot;: 137, &quot;type&quot;: &quot;user&quot;, &quot;userId&quot;: &quot;&lt;id&gt;&quot;, &quot;isActive&quot;: false, &quot;reason&quot;: &quot;Waiting for activation by disnakertrans&quot;, &quot;updatedAt&quot;: &quot;...&quot;,
   &quot;user&quot;: { &quot;id&quot;: &quot;&lt;id&gt;&quot;, &quot;firstName&quot;: &quot;Andi&quot;, &quot;lastName&quot;: &quot;Wijaya&quot;, &quot;email&quot;: &quot;...&quot;, &quot;phoneNumber&quot;: &quot;...&quot;, &quot;role&quot;: &quot;admin&quot;, &quot;tenantName&quot;: null, ... } }</code></pre>
 <p><code>approval.isActive</code> adalah status <strong>terkini</strong> (bukan salinan saat notifikasi dikirim), sehingga frontend bisa menampilkan tombol <em>Aktifkan</em> hanya selama nilainya masih <code>false</code>. Untuk mengaktifkan: <code>PATCH /api/approvals/{entityId}?type={entityType}</code> (body <code>{ &quot;isActive&quot;: true, &quot;role&quot;: &quot;admin&quot; }</code> untuk user, <code>{ &quot;isActive&quot;: true }</code> untuk produk). Notifikasi lain (<code>PRODUCT_UPDATED</code>, <code>TENANT_PROFILE_UPDATED</code>) memiliki <code>approvalId: null</code>, <code>approval: null</code>. Jika produk dihapus, <code>approval</code> menjadi <code>null</code>. Setiap user hanya bisa melihat notifikasinya sendiri (milik orang lain → 404).</p>
@@ -8226,37 +8232,37 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 <section class="folder" id="logs">
   <div class="folder-title"><h2><span data-l="en">Logs</span><span data-l="id">Log</span></h2><span class="pill">2 <span data-l="en">endpoints</span><span data-l="id">endpoint</span></span></div>
   <div class="folder-desc" data-l="en"><p>Request and error logs of the API (<code>/api/logs</code>, Bearer <code>{{token}}</code>), <strong>superadmin only</strong>, read-only.</p>
-<p>Every request gets one row when its response is sent: <code>method</code>, <code>path</code>, <code>query</code>, <code>statusCode</code>, <code>durationMs</code>, <code>level</code> (<code>info</code> &lt; 400, <code>warn</code> 4xx, <code>error</code> 5xx), who made it (<code>userId</code>, <code>userEmail</code>, <code>userRole</code>; null for guests), <code>ip</code>, <code>userAgent</code>. A failed request also has the error the client got (<code>errorCode</code>, <code>errorMessage</code>, <code>errorDetails</code>); a 5xx also keeps the real error's stack trace in <code>errorStack</code> (only in <em>Get Log</em>; the client never sees it).</p>
-<ul><li>Request bodies are never stored, and secret query values (<code>token</code>, <code>otp</code>, <code>password</code>, <code>code</code>) are saved as <code>***</code>.</li><li>Not stored: requests to <code>/api/logs</code> itself, and successful <code>/images/…</code> and <code>/docs</code> files (their failures are).</li><li>Rows older than <code>LOG_RETENTION_DAYS</code> (default 30) are deleted daily.</li></ul></div><div class="folder-desc" data-l="id"><p>Log permintaan dan error API (<code>/api/logs</code>, Bearer <code>{{token}}</code>), <strong>hanya superadmin</strong>, hanya-baca.</p>
-<p>Setiap permintaan menghasilkan satu baris saat responsnya dikirim: <code>method</code>, <code>path</code>, <code>query</code>, <code>statusCode</code>, <code>durationMs</code>, <code>level</code> (<code>info</code> &lt; 400, <code>warn</code> 4xx, <code>error</code> 5xx), siapa yang memanggil (<code>userId</code>, <code>userEmail</code>, <code>userRole</code>; null untuk tamu), <code>ip</code>, <code>userAgent</code>. Permintaan yang gagal juga menyimpan error yang diterima klien (<code>errorCode</code>, <code>errorMessage</code>, <code>errorDetails</code>); error 5xx juga menyimpan stack trace error aslinya di <code>errorStack</code> (hanya di <em>Get Log</em>; klien tidak pernah melihatnya).</p>
-<ul><li>Body permintaan tidak pernah disimpan, dan nilai query rahasia (<code>token</code>, <code>otp</code>, <code>password</code>, <code>code</code>) disimpan sebagai <code>***</code>.</li><li>Tidak disimpan: permintaan ke <code>/api/logs</code> sendiri, serta file <code>/images/…</code> dan <code>/docs</code> yang berhasil (yang gagal tetap disimpan).</li><li>Baris yang lebih lama dari <code>LOG_RETENTION_DAYS</code> (bawaan 30 hari) dihapus setiap hari.</li></ul></div>
+<p>Every <strong>create / update / delete</strong> request (POST, PUT, PATCH, DELETE) gets one row when its response is sent; reads (GET) are not stored. A row has: <code>method</code>, <code>path</code>, <code>query</code>, <code>statusCode</code>, <code>durationMs</code>, <code>level</code> (<code>info</code> &lt; 400, <code>warn</code> 4xx, <code>error</code> 5xx), who made it (<code>userId</code>, <code>userEmail</code>, <code>userRole</code>; null for guests), <code>ip</code>, <code>userAgent</code>. <code>requestFields</code> (the <strong>names</strong> of the sent fields, never their values, plus <code>image</code> for an upload) and <code>responseSummary</code> (a safe extract of a successful response: allowlisted keys such as <code>id</code>, <code>name</code>, <code>email</code>, <code>role</code>, <code>isActive</code>, <code>price</code>, <code>stars</code>, also inside <code>user</code> / <code>approval</code> / <code>product</code> / <code>tenant</code>; a list gives <code>{ count }</code>; tokens and passwords can never appear). A failed request also has the error the client got (<code>errorCode</code>, <code>errorMessage</code>, <code>errorDetails</code>); a 5xx also keeps the real error's stack trace in <code>errorStack</code> (only in <em>Get Log</em>; the client never sees it).</p>
+<ul><li>Request bodies are never stored, and secret query values (<code>token</code>, <code>otp</code>, <code>password</code>, <code>code</code>) are saved as <code>***</code>.</li><li>Rows older than <code>LOG_RETENTION_DAYS</code> (default 30) are deleted daily.</li></ul></div><div class="folder-desc" data-l="id"><p>Log permintaan dan error API (<code>/api/logs</code>, Bearer <code>{{token}}</code>), <strong>hanya superadmin</strong>, hanya-baca.</p>
+<p>Setiap permintaan <strong>tambah / ubah / hapus</strong> (POST, PUT, PATCH, DELETE) menghasilkan satu baris saat responsnya dikirim; permintaan baca (GET) tidak disimpan. Satu baris berisi: <code>method</code>, <code>path</code>, <code>query</code>, <code>statusCode</code>, <code>durationMs</code>, <code>level</code> (<code>info</code> &lt; 400, <code>warn</code> 4xx, <code>error</code> 5xx), siapa yang memanggil (<code>userId</code>, <code>userEmail</code>, <code>userRole</code>; null untuk tamu), <code>ip</code>, <code>userAgent</code>. <code>requestFields</code> (<strong>nama</strong> field yang dikirim, tidak pernah isinya, ditambah <code>image</code> untuk unggahan) dan <code>responseSummary</code> (ringkasan aman dari respons yang berhasil: hanya kunci yang diizinkan seperti <code>id</code>, <code>name</code>, <code>email</code>, <code>role</code>, <code>isActive</code>, <code>price</code>, <code>stars</code>, juga di dalam <code>user</code> / <code>approval</code> / <code>product</code> / <code>tenant</code>; daftar menjadi <code>{ count }</code>; token dan password tidak mungkin tersimpan). Permintaan yang gagal juga menyimpan error yang diterima klien (<code>errorCode</code>, <code>errorMessage</code>, <code>errorDetails</code>); error 5xx juga menyimpan stack trace error aslinya di <code>errorStack</code> (hanya di <em>Get Log</em>; klien tidak pernah melihatnya).</p>
+<ul><li>Body permintaan tidak pernah disimpan, dan nilai query rahasia (<code>token</code>, <code>otp</code>, <code>password</code>, <code>code</code>) disimpan sebagai <code>***</code>.</li><li>Baris yang lebih lama dari <code>LOG_RETENTION_DAYS</code> (bawaan 30 hari) dihapus setiap hari.</li></ul></div>
   <details class="flows" open>
   <summary><span data-l="en">Flowchart</span><span data-l="id">Diagram alur</span></summary>
   <div class="legend"><span class="lg lg-start">Request</span><span class="lg lg-check"><span data-l="en">Check</span><span data-l="id">Pengecekan</span></span><span class="lg lg-error"><span data-l="en">Error response</span><span data-l="id">Respons error</span></span><span class="lg lg-end"><span data-l="en">Success</span><span data-l="id">Berhasil</span></span><span class="lg lg-effect"><span data-l="en">Side effect</span><span data-l="id">Efek samping</span></span><span class="lg lg-note"><span data-l="en">Note</span><span data-l="id">Catatan</span></span></div>
   <div class="flow-grid" data-l="en"><figure class="flow">
   <figcaption>How a request is logged</figcaption>
-  <svg class="fc" viewBox="0 0 480 338" width="480" height="338" role="img" aria-label="How a request is logged">
+  <svg class="fc" viewBox="0 0 480 370" width="480" height="370" role="img" aria-label="How a request is logged">
     <defs><marker id="fc-arrow-98" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
-    <rect class="fc-box fc-start" x="8" y="8" width="224" height="32" rx="16"/>
-    <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">Any request reaches the API</text>
-    <line class="fc-line" x1="120" y1="40" x2="120" y2="69" marker-end="url(#fc-arrow-98)"/>
-    <rect class="fc-box fc-step" x="8" y="70" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="91" text-anchor="middle">Handled as usual (success or</text><text class="fc-text fc-text-step" x="120" y="107" text-anchor="middle">error)</text>
-    <line class="fc-line" x1="120" y1="118" x2="120" y2="175" marker-end="url(#fc-arrow-98)"/>
-    <rect class="fc-box fc-step" x="8" y="176" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="197" text-anchor="middle">Response sent → one row in</text><text class="fc-text fc-text-step" x="120" y="213" text-anchor="middle">api_logs</text>
-    <path class="fc-line fc-line-note" d="M232,200 H254 V172 H275" fill="none"/>
-    <rect class="fc-box fc-note" x="276" y="148" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-note" x="374" y="169" text-anchor="middle">No body; token/otp/password</text><text class="fc-text fc-text-note" x="374" y="185" text-anchor="middle">in the query saved as ***</text>
-    <path class="fc-line fc-line-note" d="M232,200 H254 V228 H275" fill="none"/>
-    <rect class="fc-box fc-note" x="276" y="204" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-note" x="374" y="225" text-anchor="middle">5xx also keeps the real stack</text><text class="fc-text fc-text-note" x="374" y="241" text-anchor="middle">trace</text>
-    <line class="fc-line" x1="120" y1="224" x2="120" y2="289" marker-end="url(#fc-arrow-98)"/>
-    <rect class="fc-box fc-end" x="8" y="290" width="224" height="32" rx="16"/>
-    <text class="fc-text fc-text-end" x="120" y="311" text-anchor="middle">Done</text>
-    <path class="fc-line fc-line-note" d="M232,306 H275" fill="none"/>
-    <rect class="fc-box fc-note" x="276" y="282" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-note" x="374" y="303" text-anchor="middle">A failed log write never fails</text><text class="fc-text fc-text-note" x="374" y="319" text-anchor="middle">the request</text>
+    <rect class="fc-box fc-start" x="8" y="8" width="224" height="48" rx="18"/>
+    <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">A create / update / delete request</text><text class="fc-text fc-text-start" x="120" y="45" text-anchor="middle">(not GET)</text>
+    <line class="fc-line" x1="120" y1="56" x2="120" y2="85" marker-end="url(#fc-arrow-98)"/>
+    <rect class="fc-box fc-step" x="8" y="86" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="107" text-anchor="middle">Handled as usual (success or</text><text class="fc-text fc-text-step" x="120" y="123" text-anchor="middle">error)</text>
+    <line class="fc-line" x1="120" y1="134" x2="120" y2="199" marker-end="url(#fc-arrow-98)"/>
+    <rect class="fc-box fc-step" x="8" y="200" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="221" text-anchor="middle">Response sent → one row in</text><text class="fc-text fc-text-step" x="120" y="237" text-anchor="middle">api_logs</text>
+    <path class="fc-line fc-line-note" d="M232,224 H254 V196 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="164" width="196" height="64" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="185" text-anchor="middle">Field names only + a safe</text><text class="fc-text fc-text-note" x="374" y="201" text-anchor="middle">summary of the result; no</text><text class="fc-text fc-text-note" x="374" y="217" text-anchor="middle">token/password</text>
+    <path class="fc-line fc-line-note" d="M232,224 H254 V260 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="236" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="257" text-anchor="middle">5xx also keeps the real stack</text><text class="fc-text fc-text-note" x="374" y="273" text-anchor="middle">trace</text>
+    <line class="fc-line" x1="120" y1="248" x2="120" y2="321" marker-end="url(#fc-arrow-98)"/>
+    <rect class="fc-box fc-end" x="8" y="322" width="224" height="32" rx="16"/>
+    <text class="fc-text fc-text-end" x="120" y="343" text-anchor="middle">Done</text>
+    <path class="fc-line fc-line-note" d="M232,338 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="314" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="335" text-anchor="middle">A failed log write never fails</text><text class="fc-text fc-text-note" x="374" y="351" text-anchor="middle">the request</text>
   </svg>
 </figure>
 <figure class="flow">
@@ -8328,28 +8334,28 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 </figure></div>
   <div class="flow-grid" data-l="id"><figure class="flow">
   <figcaption>Cara permintaan dicatat</figcaption>
-  <svg class="fc" viewBox="0 0 480 354" width="480" height="354" role="img" aria-label="Cara permintaan dicatat">
+  <svg class="fc" viewBox="0 0 480 370" width="480" height="370" role="img" aria-label="Cara permintaan dicatat">
     <defs><marker id="fc-arrow-100" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
-    <rect class="fc-box fc-start" x="8" y="8" width="224" height="32" rx="16"/>
-    <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">Permintaan apa pun masuk ke API</text>
-    <line class="fc-line" x1="120" y1="40" x2="120" y2="69" marker-end="url(#fc-arrow-100)"/>
-    <rect class="fc-box fc-step" x="8" y="70" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="91" text-anchor="middle">Diproses seperti biasa (berhasil</text><text class="fc-text fc-text-step" x="120" y="107" text-anchor="middle">atau error)</text>
-    <line class="fc-line" x1="120" y1="118" x2="120" y2="183" marker-end="url(#fc-arrow-100)"/>
-    <rect class="fc-box fc-step" x="8" y="184" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="205" text-anchor="middle">Respons terkirim → satu baris di</text><text class="fc-text fc-text-step" x="120" y="221" text-anchor="middle">api_logs</text>
-    <path class="fc-line fc-line-note" d="M232,208 H254 V180 H275" fill="none"/>
-    <rect class="fc-box fc-note" x="276" y="148" width="196" height="64" rx="8"/>
-    <text class="fc-text fc-text-note" x="374" y="169" text-anchor="middle">Tanpa body;</text><text class="fc-text fc-text-note" x="374" y="185" text-anchor="middle">token/otp/password di query</text><text class="fc-text fc-text-note" x="374" y="201" text-anchor="middle">disimpan sebagai ***</text>
-    <path class="fc-line fc-line-note" d="M232,208 H254 V244 H275" fill="none"/>
-    <rect class="fc-box fc-note" x="276" y="220" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-note" x="374" y="241" text-anchor="middle">5xx juga menyimpan stack</text><text class="fc-text fc-text-note" x="374" y="257" text-anchor="middle">trace aslinya</text>
-    <line class="fc-line" x1="120" y1="232" x2="120" y2="305" marker-end="url(#fc-arrow-100)"/>
-    <rect class="fc-box fc-end" x="8" y="306" width="224" height="32" rx="16"/>
-    <text class="fc-text fc-text-end" x="120" y="327" text-anchor="middle">Selesai</text>
-    <path class="fc-line fc-line-note" d="M232,322 H275" fill="none"/>
-    <rect class="fc-box fc-note" x="276" y="298" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-note" x="374" y="319" text-anchor="middle">Gagal menyimpan log tidak</text><text class="fc-text fc-text-note" x="374" y="335" text-anchor="middle">menggagalkan permintaan</text>
+    <rect class="fc-box fc-start" x="8" y="8" width="224" height="48" rx="18"/>
+    <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">Permintaan tambah / ubah / hapus</text><text class="fc-text fc-text-start" x="120" y="45" text-anchor="middle">(bukan GET)</text>
+    <line class="fc-line" x1="120" y1="56" x2="120" y2="85" marker-end="url(#fc-arrow-100)"/>
+    <rect class="fc-box fc-step" x="8" y="86" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="107" text-anchor="middle">Diproses seperti biasa (berhasil</text><text class="fc-text fc-text-step" x="120" y="123" text-anchor="middle">atau error)</text>
+    <line class="fc-line" x1="120" y1="134" x2="120" y2="199" marker-end="url(#fc-arrow-100)"/>
+    <rect class="fc-box fc-step" x="8" y="200" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="221" text-anchor="middle">Respons terkirim → satu baris di</text><text class="fc-text fc-text-step" x="120" y="237" text-anchor="middle">api_logs</text>
+    <path class="fc-line fc-line-note" d="M232,224 H254 V196 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="164" width="196" height="64" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="185" text-anchor="middle">Hanya nama field + ringkasan</text><text class="fc-text fc-text-note" x="374" y="201" text-anchor="middle">hasil yang aman; tanpa</text><text class="fc-text fc-text-note" x="374" y="217" text-anchor="middle">token/password</text>
+    <path class="fc-line fc-line-note" d="M232,224 H254 V260 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="236" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="257" text-anchor="middle">5xx juga menyimpan stack</text><text class="fc-text fc-text-note" x="374" y="273" text-anchor="middle">trace aslinya</text>
+    <line class="fc-line" x1="120" y1="248" x2="120" y2="321" marker-end="url(#fc-arrow-100)"/>
+    <rect class="fc-box fc-end" x="8" y="322" width="224" height="32" rx="16"/>
+    <text class="fc-text fc-text-end" x="120" y="343" text-anchor="middle">Selesai</text>
+    <path class="fc-line fc-line-note" d="M232,338 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="314" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="335" text-anchor="middle">Gagal menyimpan log tidak</text><text class="fc-text fc-text-note" x="374" y="351" text-anchor="middle">menggagalkan permintaan</text>
   </svg>
 </figure>
 <figure class="flow">
@@ -8434,73 +8440,201 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
     <div data-l="en"><p>Newest first, paginated (<code>limit</code> up to 100). Every filter is optional and they combine. Leaves out <code>errorStack</code>. Saves the newest log as <code>{{logId}}</code>.</p></div><div data-l="id"><p>Terbaru di atas, berhalaman (<code>limit</code> maksimal 100). Semua filter opsional dan dapat digabung. Tanpa <code>errorStack</code>. Menyimpan log terbaru sebagai <code>{{logId}}</code>.</p></div>
-    <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>level</code></td><td><code>error</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>method</code></td><td><code>GET</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>status</code></td><td><code>4xx</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>path</code></td><td><code>/api/tenants</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>email</code></td><td><code>admin</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>userId</code></td><td><code>{{currentUserId}}</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>errorCode</code></td><td><code>NOT_FOUND</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>from</code></td><td><code>2026-10-01</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>to</code></td><td><code>2026-10-31</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr></tbody></table></div>
+    <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>page</code></td><td><code>1</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>limit</code></td><td><code>20</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr><tr><td><code>level</code></td><td><code>error</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>method</code></td><td><code>POST</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>status</code></td><td><code>4xx</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>path</code></td><td><code>/api/tenants</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>email</code></td><td><code>admin</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>userId</code></td><td><code>{{currentUserId}}</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>errorCode</code></td><td><code>NOT_FOUND</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>from</code></td><td><code>2026-10-01</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr><tr><td><code>to</code></td><td><code>2026-10-31</code></td><td><span class="muted"><span data-l="en">optional</span><span data-l="id">opsional</span></span></td></tr></tbody></table></div>
     
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: 75,
+      &quot;id&quot;: 31261,
       &quot;level&quot;: &quot;warn&quot;,
-      &quot;method&quot;: &quot;GET&quot;,
+      &quot;method&quot;: &quot;POST&quot;,
       &quot;path&quot;: &quot;/api/products&quot;,
-      &quot;query&quot;: &quot;page=0&quot;,
+      &quot;query&quot;: null,
       &quot;statusCode&quot;: 400,
-      &quot;durationMs&quot;: 12,
-      &quot;userId&quot;: &quot;d05ac765-9491-49a2-9ee0-6611a2226f71&quot;,
-      &quot;userEmail&quot;: &quot;transmigrasiprafitep@gmail.com&quot;,
-      &quot;userRole&quot;: &quot;superadmin&quot;,
+      &quot;durationMs&quot;: 17,
+      &quot;userId&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
+      &quot;userEmail&quot;: &quot;tenant.test@example.com&quot;,
+      &quot;userRole&quot;: &quot;tenant&quot;,
       &quot;ip&quot;: &quot;203.0.113.10&quot;,
       &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
       &quot;errorCode&quot;: &quot;BAD_REQUEST&quot;,
       &quot;errorMessage&quot;: &quot;Validasi gagal&quot;,
       &quot;errorDetails&quot;: [
         {
-          &quot;field&quot;: &quot;page&quot;,
-          &quot;message&quot;: &quot;page harus berupa bilangan bulat positif&quot;
+          &quot;field&quot;: &quot;name&quot;,
+          &quot;message&quot;: &quot;name tidak boleh kosong&quot;
+        },
+        {
+          &quot;field&quot;: &quot;description&quot;,
+          &quot;message&quot;: &quot;description wajib diisi&quot;
+        },
+        {
+          &quot;field&quot;: &quot;details&quot;,
+          &quot;message&quot;: &quot;details wajib diisi&quot;
+        },
+        {
+          &quot;field&quot;: &quot;price&quot;,
+          &quot;message&quot;: &quot;price harus berupa angka Rupiah tanpa desimal, antara 0 dan 2.000.000.000&quot;
+        },
+        {
+          &quot;field&quot;: &quot;imageId&quot;,
+          &quot;message&quot;: &quot;imageId wajib diisi, unggah gambar terlebih dahulu melalui POST /api/images&quot;
         }
       ],
-      &quot;createdAt&quot;: &quot;2026-10-07T05:46:21.234Z&quot;
+      &quot;requestFields&quot;: [
+        &quot;name&quot;,
+        &quot;price&quot;
+      ],
+      &quot;responseSummary&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:47:23.889Z&quot;
+    },
+    {
+      &quot;id&quot;: 31259,
+      &quot;level&quot;: &quot;info&quot;,
+      &quot;method&quot;: &quot;POST&quot;,
+      &quot;path&quot;: &quot;/api/products&quot;,
+      &quot;query&quot;: null,
+      &quot;statusCode&quot;: 201,
+      &quot;durationMs&quot;: 127,
+      &quot;userId&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
+      &quot;userEmail&quot;: &quot;tenant.test@example.com&quot;,
+      &quot;userRole&quot;: &quot;tenant&quot;,
+      &quot;ip&quot;: &quot;203.0.113.10&quot;,
+      &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
+      &quot;errorCode&quot;: null,
+      &quot;errorMessage&quot;: null,
+      &quot;errorDetails&quot;: null,
+      &quot;requestFields&quot;: [
+        &quot;name&quot;,
+        &quot;description&quot;,
+        &quot;details&quot;,
+        &quot;price&quot;,
+        &quot;imageId&quot;
+      ],
+      &quot;responseSummary&quot;: {
+        &quot;id&quot;: &quot;0b9076c5-2aaf-45d1-94d4-d514fa65727a&quot;,
+        &quot;name&quot;: &quot;Kue Bolu&quot;,
+        &quot;price&quot;: 20000,
+        &quot;tenant&quot;: {
+          &quot;id&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
+          &quot;email&quot;: &quot;tenant.test@example.com&quot;,
+          &quot;lastName&quot;: &quot;tenant&quot;,
+          &quot;firstName&quot;: &quot;Uji&quot;,
+          &quot;tenantName&quot;: &quot;Toko Uji&quot;
+        },
+        &quot;approval&quot;: {
+          &quot;id&quot;: 16,
+          &quot;reason&quot;: &quot;Waiting for approval&quot;,
+          &quot;isActive&quot;: false
+        },
+        &quot;isRecommended&quot;: false
+      },
+      &quot;createdAt&quot;: &quot;2026-10-08T03:47:23.816Z&quot;
     }
   ],
   &quot;meta&quot;: {
     &quot;page&quot;: 1,
     &quot;limit&quot;: 2,
-    &quot;total&quot;: 1,
-    &quot;totalPages&quot;: 1
+    &quot;total&quot;: 199,
+    &quot;totalPages&quot;: 100
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: 75,
+      &quot;id&quot;: 31261,
       &quot;level&quot;: &quot;warn&quot;,
-      &quot;method&quot;: &quot;GET&quot;,
+      &quot;method&quot;: &quot;POST&quot;,
       &quot;path&quot;: &quot;/api/products&quot;,
-      &quot;query&quot;: &quot;page=0&quot;,
+      &quot;query&quot;: null,
       &quot;statusCode&quot;: 400,
-      &quot;durationMs&quot;: 12,
-      &quot;userId&quot;: &quot;d05ac765-9491-49a2-9ee0-6611a2226f71&quot;,
-      &quot;userEmail&quot;: &quot;transmigrasiprafitep@gmail.com&quot;,
-      &quot;userRole&quot;: &quot;superadmin&quot;,
+      &quot;durationMs&quot;: 17,
+      &quot;userId&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
+      &quot;userEmail&quot;: &quot;tenant.test@example.com&quot;,
+      &quot;userRole&quot;: &quot;tenant&quot;,
       &quot;ip&quot;: &quot;203.0.113.10&quot;,
       &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
       &quot;errorCode&quot;: &quot;BAD_REQUEST&quot;,
       &quot;errorMessage&quot;: &quot;Validasi gagal&quot;,
       &quot;errorDetails&quot;: [
         {
-          &quot;field&quot;: &quot;page&quot;,
-          &quot;message&quot;: &quot;page harus berupa bilangan bulat positif&quot;
+          &quot;field&quot;: &quot;name&quot;,
+          &quot;message&quot;: &quot;name tidak boleh kosong&quot;
+        },
+        {
+          &quot;field&quot;: &quot;description&quot;,
+          &quot;message&quot;: &quot;description wajib diisi&quot;
+        },
+        {
+          &quot;field&quot;: &quot;details&quot;,
+          &quot;message&quot;: &quot;details wajib diisi&quot;
+        },
+        {
+          &quot;field&quot;: &quot;price&quot;,
+          &quot;message&quot;: &quot;price harus berupa angka Rupiah tanpa desimal, antara 0 dan 2.000.000.000&quot;
+        },
+        {
+          &quot;field&quot;: &quot;imageId&quot;,
+          &quot;message&quot;: &quot;imageId wajib diisi, unggah gambar terlebih dahulu melalui POST /api/images&quot;
         }
       ],
-      &quot;createdAt&quot;: &quot;2026-10-07T05:46:21.234Z&quot;
+      &quot;requestFields&quot;: [
+        &quot;name&quot;,
+        &quot;price&quot;
+      ],
+      &quot;responseSummary&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-08T03:47:23.889Z&quot;
+    },
+    {
+      &quot;id&quot;: 31259,
+      &quot;level&quot;: &quot;info&quot;,
+      &quot;method&quot;: &quot;POST&quot;,
+      &quot;path&quot;: &quot;/api/products&quot;,
+      &quot;query&quot;: null,
+      &quot;statusCode&quot;: 201,
+      &quot;durationMs&quot;: 127,
+      &quot;userId&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
+      &quot;userEmail&quot;: &quot;tenant.test@example.com&quot;,
+      &quot;userRole&quot;: &quot;tenant&quot;,
+      &quot;ip&quot;: &quot;203.0.113.10&quot;,
+      &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
+      &quot;errorCode&quot;: null,
+      &quot;errorMessage&quot;: null,
+      &quot;errorDetails&quot;: null,
+      &quot;requestFields&quot;: [
+        &quot;name&quot;,
+        &quot;description&quot;,
+        &quot;details&quot;,
+        &quot;price&quot;,
+        &quot;imageId&quot;
+      ],
+      &quot;responseSummary&quot;: {
+        &quot;id&quot;: &quot;0b9076c5-2aaf-45d1-94d4-d514fa65727a&quot;,
+        &quot;name&quot;: &quot;Kue Bolu&quot;,
+        &quot;price&quot;: 20000,
+        &quot;tenant&quot;: {
+          &quot;id&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
+          &quot;email&quot;: &quot;tenant.test@example.com&quot;,
+          &quot;lastName&quot;: &quot;tenant&quot;,
+          &quot;firstName&quot;: &quot;Uji&quot;,
+          &quot;tenantName&quot;: &quot;Toko Uji&quot;
+        },
+        &quot;approval&quot;: {
+          &quot;id&quot;: 16,
+          &quot;reason&quot;: &quot;Waiting for approval&quot;,
+          &quot;isActive&quot;: false
+        },
+        &quot;isRecommended&quot;: false
+      },
+      &quot;createdAt&quot;: &quot;2026-10-08T03:47:23.816Z&quot;
     }
   ],
   &quot;meta&quot;: {
     &quot;page&quot;: 1,
     &quot;limit&quot;: 2,
-    &quot;total&quot;: 1,
-    &quot;totalPages&quot;: 1
+    &quot;total&quot;: 199,
+    &quot;totalPages&quot;: 100
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: false,
@@ -8558,54 +8692,96 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: 75,
+    &quot;id&quot;: 31261,
     &quot;level&quot;: &quot;warn&quot;,
-    &quot;method&quot;: &quot;GET&quot;,
+    &quot;method&quot;: &quot;POST&quot;,
     &quot;path&quot;: &quot;/api/products&quot;,
-    &quot;query&quot;: &quot;page=0&quot;,
+    &quot;query&quot;: null,
     &quot;statusCode&quot;: 400,
-    &quot;durationMs&quot;: 12,
-    &quot;userId&quot;: &quot;d05ac765-9491-49a2-9ee0-6611a2226f71&quot;,
-    &quot;userEmail&quot;: &quot;transmigrasiprafitep@gmail.com&quot;,
-    &quot;userRole&quot;: &quot;superadmin&quot;,
+    &quot;durationMs&quot;: 17,
+    &quot;userId&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
+    &quot;userEmail&quot;: &quot;tenant.test@example.com&quot;,
+    &quot;userRole&quot;: &quot;tenant&quot;,
     &quot;ip&quot;: &quot;203.0.113.10&quot;,
     &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
     &quot;errorCode&quot;: &quot;BAD_REQUEST&quot;,
     &quot;errorMessage&quot;: &quot;Validasi gagal&quot;,
     &quot;errorDetails&quot;: [
       {
-        &quot;field&quot;: &quot;page&quot;,
-        &quot;message&quot;: &quot;page harus berupa bilangan bulat positif&quot;
+        &quot;field&quot;: &quot;name&quot;,
+        &quot;message&quot;: &quot;name tidak boleh kosong&quot;
+      },
+      {
+        &quot;field&quot;: &quot;description&quot;,
+        &quot;message&quot;: &quot;description wajib diisi&quot;
+      },
+      {
+        &quot;field&quot;: &quot;details&quot;,
+        &quot;message&quot;: &quot;details wajib diisi&quot;
+      },
+      {
+        &quot;field&quot;: &quot;price&quot;,
+        &quot;message&quot;: &quot;price harus berupa angka Rupiah tanpa desimal, antara 0 dan 2.000.000.000&quot;
+      },
+      {
+        &quot;field&quot;: &quot;imageId&quot;,
+        &quot;message&quot;: &quot;imageId wajib diisi, unggah gambar terlebih dahulu melalui POST /api/images&quot;
       }
     ],
     &quot;errorStack&quot;: null,
-    &quot;createdAt&quot;: &quot;2026-10-07T05:46:21.234Z&quot;
+    &quot;requestFields&quot;: [
+      &quot;name&quot;,
+      &quot;price&quot;
+    ],
+    &quot;responseSummary&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-08T03:47:23.889Z&quot;
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: 75,
+    &quot;id&quot;: 31261,
     &quot;level&quot;: &quot;warn&quot;,
-    &quot;method&quot;: &quot;GET&quot;,
+    &quot;method&quot;: &quot;POST&quot;,
     &quot;path&quot;: &quot;/api/products&quot;,
-    &quot;query&quot;: &quot;page=0&quot;,
+    &quot;query&quot;: null,
     &quot;statusCode&quot;: 400,
-    &quot;durationMs&quot;: 12,
-    &quot;userId&quot;: &quot;d05ac765-9491-49a2-9ee0-6611a2226f71&quot;,
-    &quot;userEmail&quot;: &quot;transmigrasiprafitep@gmail.com&quot;,
-    &quot;userRole&quot;: &quot;superadmin&quot;,
+    &quot;durationMs&quot;: 17,
+    &quot;userId&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
+    &quot;userEmail&quot;: &quot;tenant.test@example.com&quot;,
+    &quot;userRole&quot;: &quot;tenant&quot;,
     &quot;ip&quot;: &quot;203.0.113.10&quot;,
     &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
     &quot;errorCode&quot;: &quot;BAD_REQUEST&quot;,
     &quot;errorMessage&quot;: &quot;Validasi gagal&quot;,
     &quot;errorDetails&quot;: [
       {
-        &quot;field&quot;: &quot;page&quot;,
-        &quot;message&quot;: &quot;page harus berupa bilangan bulat positif&quot;
+        &quot;field&quot;: &quot;name&quot;,
+        &quot;message&quot;: &quot;name tidak boleh kosong&quot;
+      },
+      {
+        &quot;field&quot;: &quot;description&quot;,
+        &quot;message&quot;: &quot;description wajib diisi&quot;
+      },
+      {
+        &quot;field&quot;: &quot;details&quot;,
+        &quot;message&quot;: &quot;details wajib diisi&quot;
+      },
+      {
+        &quot;field&quot;: &quot;price&quot;,
+        &quot;message&quot;: &quot;price harus berupa angka Rupiah tanpa desimal, antara 0 dan 2.000.000.000&quot;
+      },
+      {
+        &quot;field&quot;: &quot;imageId&quot;,
+        &quot;message&quot;: &quot;imageId wajib diisi, unggah gambar terlebih dahulu melalui POST /api/images&quot;
       }
     ],
     &quot;errorStack&quot;: null,
-    &quot;createdAt&quot;: &quot;2026-10-07T05:46:21.234Z&quot;
+    &quot;requestFields&quot;: [
+      &quot;name&quot;,
+      &quot;price&quot;
+    ],
+    &quot;responseSummary&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-08T03:47:23.889Z&quot;
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: false,

@@ -74,7 +74,7 @@ async function setProductApproval(actor: AuthUser, productId: string, values: { 
   }
 
   // Creating the approval and linking it to the product must succeed or fail together
-  const { result, product, wasActive, approvalId } = await sequelize.transaction(async (transaction) => {
+  const { result, product, wasActive, previousReason, approvalId } = await sequelize.transaction(async (transaction) => {
     const product = await Product.findByPk(productId, {
       attributes: ['id', 'name', 'approvalId', 'tenantId'],
       include: [{ association: 'approval' }],
@@ -84,6 +84,7 @@ async function setProductApproval(actor: AuthUser, productId: string, values: { 
 
     let approval = product.approval;
     const wasActive = approval?.isActive === true;
+    const previousReason = approval?.reason ?? null;
     if (approval) {
       // Older product approvals may not have their owner recorded yet
       await approval.update({ ...values, type: 'product', userId: product.tenantId }, { transaction });
@@ -92,12 +93,15 @@ async function setProductApproval(actor: AuthUser, productId: string, values: { 
       await product.update({ approvalId: approval.id }, { transaction });
     }
 
-    return { result: { type: 'product' as const, id: product.id, name: product.name }, product, wasActive, approvalId: approval.id };
+    return { result: { type: 'product' as const, id: product.id, name: product.name }, product, wasActive, previousReason, approvalId: approval.id };
   });
 
-  // Notify only on a real change, after it is saved (re-sending the same value notifies nobody)
-  if (wasActive !== values.isActive) {
-    await notify.productActivationChanged(actor, { ...product.get(), approvalId }, values.isActive);
+  // Notify after it is saved, on a real change: the status changed, or a new decision on an inactive product
+  // (rejecting a new product keeps it inactive, but the owner must still hear why). Re-sending the same
+  // status and reason notifies nobody.
+  const decided = !values.isActive && values.reason !== previousReason;
+  if (wasActive !== values.isActive || decided) {
+    await notify.productActivationChanged(actor, { ...product.get(), approvalId }, values.isActive, values.reason, wasActive);
   }
   return { ...result, ...(await productApprovalView(approvalId)) };
 }

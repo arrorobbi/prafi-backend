@@ -164,7 +164,7 @@ export async function update(user: AuthUser, id: string, changes: Partial<Produc
   // A new image replaces the old one: its record and file are deleted
   if (changes.imageId !== undefined) await imageService.removeReplaced(oldImageId, changes.imageId);
   const updated = await getById(user, product.id);
-  await notify.productUpdated(updated, { tenantName: updated.tenant?.tenantName });
+  await notify.productUpdated(updated, { tenantName: updated.tenant?.tenantName }, updated.approval?.isActive === true);
   return updated;
 }
 

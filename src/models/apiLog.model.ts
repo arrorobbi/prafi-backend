@@ -14,7 +14,8 @@ export const LOG_LEVELS = ['info', 'warn', 'error'] as const;
 export type LogLevel = (typeof LOG_LEVELS)[number];
 
 /**
- * One row per API request, written by the requestLogger middleware when the response finishes.
+ * One row per create/update/delete API request (POST, PUT, PATCH, DELETE; reads are not stored),
+ * written by the requestLogger middleware when the response finishes.
  * A failed request carries its error on the same row (errorStack only for 5xx). Request bodies are never stored.
  * Read by the superadmin through GET /api/logs; rows older than LOG_RETENTION_DAYS are purged.
  */
@@ -39,6 +40,10 @@ export class ApiLog extends Model<InferAttributes<ApiLog>, InferCreationAttribut
   declare errorMessage: string | null;
   declare errorDetails: unknown;
   declare errorStack: string | null;
+  /** Names of the fields sent in the body (never their values), e.g. ["price","isRecommended"] */
+  declare requestFields: string[] | null;
+  /** A safe extract of a successful response: id, name, email, role, isActive… (allowlisted keys only) */
+  declare responseSummary: Record<string, unknown> | null;
   declare createdAt: CreationOptional<Date>;
 
   static associate({ User }: DbModels) {
@@ -69,6 +74,8 @@ ApiLog.init(
     errorMessage: { type: DataTypes.TEXT, allowNull: true },
     errorDetails: { type: DataTypes.JSONB, allowNull: true },
     errorStack: { type: DataTypes.TEXT, allowNull: true },
+    requestFields: { type: DataTypes.JSONB, allowNull: true },
+    responseSummary: { type: DataTypes.JSONB, allowNull: true },
     createdAt: DataTypes.DATE,
   },
   {

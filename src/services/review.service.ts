@@ -1,6 +1,7 @@
 import { fn, col } from 'sequelize';
 import { HttpError } from '../errors/HttpError';
 import { Product, Review } from '../models';
+import { notify } from './notification.service';
 
 export interface ReviewInput {
   name: string;
@@ -11,7 +12,7 @@ export interface ReviewInput {
 /** Reviews are only for products visitors can see: approved ones. */
 async function findActiveProduct(productId: string) {
   const product = await Product.findByPk(productId, {
-    attributes: ['id'],
+    attributes: ['id', 'name', 'tenantId', 'approvalId'],
     include: [{ association: 'approval', attributes: [], where: { isActive: true }, required: true }],
   });
   if (!product) throw HttpError.notFound('Produk tidak ditemukan');
@@ -70,8 +71,9 @@ function checkRateLimit(ip: string | null) {
 }
 
 export async function create(productId: string, input: ReviewInput, ip: string | null) {
-  await findActiveProduct(productId);
+  const product = await findActiveProduct(productId);
   checkRateLimit(ip);
   const review = await Review.create({ ...input, productId });
+  await notify.productReviewed(product, input);
   return { review, ...(await summary(productId)) };
 }

@@ -4,9 +4,10 @@
  *
  * Recipients:
  *   superadmin    — USER_REGISTERED (every new account), PRODUCT_SUBMITTED, USER_DEACTIVATED, PRODUCT_DEACTIVATED
- *   disnakertrans — ADMIN_PENDING_ACTIVATION
+ *   disnakertrans — ADMIN_PENDING_ACTIVATION, PRODUCT_SUBMITTED, PRODUCT_PUBLISHED, PRODUCT_UPDATED
  *   admin         — PRODUCT_SUBMITTED, PRODUCT_PUBLISHED, PRODUCT_UPDATED, TENANT_PROFILE_UPDATED, TENANT_REGISTERED
- *   tenant        — PRODUCT_UNDER_REVIEW, PRODUCT_APPROVED
+ *   tenant        — about their own products: PRODUCT_UNDER_REVIEW, PRODUCT_APPROVED, PRODUCT_TAKEN_DOWN,
+ *                   PRODUCT_CHANGES_SAVED, PRODUCT_REVIEWED
  */
 export const NOTIFICATION_TYPES = {
   /** To superadmins: a new account of any role was created. */
@@ -31,6 +32,12 @@ export const NOTIFICATION_TYPES = {
   PRODUCT_UNDER_REVIEW: 'PRODUCT_UNDER_REVIEW',
   /** To the tenant: their product was approved and is live. */
   PRODUCT_APPROVED: 'PRODUCT_APPROVED',
+  /** To the tenant: an admin or disnakertrans rejected / deactivated their product (with the reason). */
+  PRODUCT_TAKEN_DOWN: 'PRODUCT_TAKEN_DOWN',
+  /** To the tenant: their edit of a product was saved (and whether it waits for review). */
+  PRODUCT_CHANGES_SAVED: 'PRODUCT_CHANGES_SAVED',
+  /** To the tenant: a visitor reviewed their product. */
+  PRODUCT_REVIEWED: 'PRODUCT_REVIEWED',
 } as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[keyof typeof NOTIFICATION_TYPES];
