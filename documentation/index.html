@@ -8232,37 +8232,37 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 <section class="folder" id="logs">
   <div class="folder-title"><h2><span data-l="en">Logs</span><span data-l="id">Log</span></h2><span class="pill">2 <span data-l="en">endpoints</span><span data-l="id">endpoint</span></span></div>
   <div class="folder-desc" data-l="en"><p>Request and error logs of the API (<code>/api/logs</code>, Bearer <code>{{token}}</code>), <strong>superadmin only</strong>, read-only.</p>
-<p>Every <strong>create / update / delete</strong> request (POST, PUT, PATCH, DELETE) <strong>from a signed-in user</strong> gets one row when its response is sent (a request with an expired or invalid token is stored too, without a user). Reads (GET) and guests' requests (public sign-up, login, reviews, bots) are not stored. A row has: <code>method</code>, <code>path</code>, <code>query</code>, <code>statusCode</code>, <code>durationMs</code>, <code>level</code> (<code>info</code> &lt; 400, <code>warn</code> 4xx, <code>error</code> 5xx), who made it (<code>userId</code>, <code>userEmail</code>, <code>userRole</code>; null for guests), <code>ip</code>, <code>userAgent</code>. <code>requestFields</code> (the <strong>names</strong> of the sent fields, never their values, plus <code>image</code> for an upload) and <code>responseSummary</code> (a safe extract of a successful response: allowlisted keys such as <code>id</code>, <code>name</code>, <code>email</code>, <code>role</code>, <code>isActive</code>, <code>price</code>, <code>stars</code>, also inside <code>user</code> / <code>approval</code> / <code>product</code> / <code>tenant</code>; a list gives <code>{ count }</code>; tokens and passwords can never appear). A failed request also has the error the client got (<code>errorCode</code>, <code>errorMessage</code>, <code>errorDetails</code>); a 5xx also keeps the real error's stack trace in <code>errorStack</code> (only in <em>Get Log</em>; the client never sees it).</p>
+<p>Stored, one row each when the response is sent: every <strong>create / update / delete</strong> request (POST, PUT, PATCH, DELETE) <strong>from a signed-in user</strong> (a request with an expired or invalid token too, without a user), and <strong>every auth action, also from guests</strong>: login (including a wrong email or password), sign-up, OTP, activation link, resend, forgot / reset password, logout, profile changes (<code>GET /api/auth/me</code>, called by every page, is not). Reads and other guests' requests (reviews, bots) are not stored. A row has: <code>method</code>, <code>path</code>, <code>query</code>, <code>statusCode</code>, <code>durationMs</code>, <code>level</code> (<code>info</code> &lt; 400, <code>warn</code> 4xx, <code>error</code> 5xx), who made it (<code>userId</code>, <code>userEmail</code>, <code>userRole</code>; null for guests), <code>authEmail</code> (auth actions: the email that was given, e.g. for a failed login, or the account of the <code>userId</code> sent), <code>ip</code>, <code>userAgent</code>. <code>requestFields</code> (the <strong>names</strong> of the sent fields, never their values, plus <code>image</code> for an upload) and <code>responseSummary</code> (a safe extract of a successful response: allowlisted keys such as <code>id</code>, <code>name</code>, <code>email</code>, <code>role</code>, <code>isActive</code>, <code>price</code>, <code>stars</code>, also inside <code>user</code> / <code>approval</code> / <code>product</code> / <code>tenant</code>; a list gives <code>{ count }</code>; tokens and passwords can never appear). A failed request also has the error the client got (<code>errorCode</code>, <code>errorMessage</code>, <code>errorDetails</code>); a 5xx also keeps the real error's stack trace in <code>errorStack</code> (only in <em>Get Log</em>; the client never sees it).</p>
 <ul><li>Request bodies are never stored, and secret query values (<code>token</code>, <code>otp</code>, <code>password</code>, <code>code</code>) are saved as <code>***</code>.</li><li>Rows older than <code>LOG_RETENTION_DAYS</code> (default 30) are deleted daily.</li></ul></div><div class="folder-desc" data-l="id"><p>Log permintaan dan error API (<code>/api/logs</code>, Bearer <code>{{token}}</code>), <strong>hanya superadmin</strong>, hanya-baca.</p>
-<p>Setiap permintaan <strong>tambah / ubah / hapus</strong> (POST, PUT, PATCH, DELETE) <strong>dari pengguna yang login</strong> menghasilkan satu baris saat responsnya dikirim (permintaan dengan token kedaluwarsa atau tidak valid juga disimpan, tanpa pengguna). Permintaan baca (GET) dan permintaan tamu (pendaftaran, login, ulasan, bot) tidak disimpan. Satu baris berisi: <code>method</code>, <code>path</code>, <code>query</code>, <code>statusCode</code>, <code>durationMs</code>, <code>level</code> (<code>info</code> &lt; 400, <code>warn</code> 4xx, <code>error</code> 5xx), siapa yang memanggil (<code>userId</code>, <code>userEmail</code>, <code>userRole</code>; null untuk tamu), <code>ip</code>, <code>userAgent</code>. <code>requestFields</code> (<strong>nama</strong> field yang dikirim, tidak pernah isinya, ditambah <code>image</code> untuk unggahan) dan <code>responseSummary</code> (ringkasan aman dari respons yang berhasil: hanya kunci yang diizinkan seperti <code>id</code>, <code>name</code>, <code>email</code>, <code>role</code>, <code>isActive</code>, <code>price</code>, <code>stars</code>, juga di dalam <code>user</code> / <code>approval</code> / <code>product</code> / <code>tenant</code>; daftar menjadi <code>{ count }</code>; token dan password tidak mungkin tersimpan). Permintaan yang gagal juga menyimpan error yang diterima klien (<code>errorCode</code>, <code>errorMessage</code>, <code>errorDetails</code>); error 5xx juga menyimpan stack trace error aslinya di <code>errorStack</code> (hanya di <em>Get Log</em>; klien tidak pernah melihatnya).</p>
+<p>Yang disimpan, satu baris saat responsnya dikirim: setiap permintaan <strong>tambah / ubah / hapus</strong> (POST, PUT, PATCH, DELETE) <strong>dari pengguna yang login</strong> (permintaan dengan token kedaluwarsa atau tidak valid juga, tanpa pengguna), dan <strong>setiap aktivitas akun, juga dari tamu</strong>: login (termasuk email atau password salah), daftar, OTP, tautan aktivasi, kirim ulang, lupa / reset password, logout, ubah profil (<code>GET /api/auth/me</code> yang dipanggil setiap halaman tidak). Permintaan baca dan permintaan tamu lainnya (ulasan, bot) tidak disimpan. Satu baris berisi: <code>method</code>, <code>path</code>, <code>query</code>, <code>statusCode</code>, <code>durationMs</code>, <code>level</code> (<code>info</code> &lt; 400, <code>warn</code> 4xx, <code>error</code> 5xx), siapa yang memanggil (<code>userId</code>, <code>userEmail</code>, <code>userRole</code>; null untuk tamu), <code>authEmail</code> (aktivitas akun: email yang diberikan, mis. untuk login yang gagal, atau email akun dari <code>userId</code> yang dikirim), <code>ip</code>, <code>userAgent</code>. <code>requestFields</code> (<strong>nama</strong> field yang dikirim, tidak pernah isinya, ditambah <code>image</code> untuk unggahan) dan <code>responseSummary</code> (ringkasan aman dari respons yang berhasil: hanya kunci yang diizinkan seperti <code>id</code>, <code>name</code>, <code>email</code>, <code>role</code>, <code>isActive</code>, <code>price</code>, <code>stars</code>, juga di dalam <code>user</code> / <code>approval</code> / <code>product</code> / <code>tenant</code>; daftar menjadi <code>{ count }</code>; token dan password tidak mungkin tersimpan). Permintaan yang gagal juga menyimpan error yang diterima klien (<code>errorCode</code>, <code>errorMessage</code>, <code>errorDetails</code>); error 5xx juga menyimpan stack trace error aslinya di <code>errorStack</code> (hanya di <em>Get Log</em>; klien tidak pernah melihatnya).</p>
 <ul><li>Body permintaan tidak pernah disimpan, dan nilai query rahasia (<code>token</code>, <code>otp</code>, <code>password</code>, <code>code</code>) disimpan sebagai <code>***</code>.</li><li>Baris yang lebih lama dari <code>LOG_RETENTION_DAYS</code> (bawaan 30 hari) dihapus setiap hari.</li></ul></div>
   <details class="flows" open>
   <summary><span data-l="en">Flowchart</span><span data-l="id">Diagram alur</span></summary>
   <div class="legend"><span class="lg lg-start">Request</span><span class="lg lg-check"><span data-l="en">Check</span><span data-l="id">Pengecekan</span></span><span class="lg lg-error"><span data-l="en">Error response</span><span data-l="id">Respons error</span></span><span class="lg lg-end"><span data-l="en">Success</span><span data-l="id">Berhasil</span></span><span class="lg lg-effect"><span data-l="en">Side effect</span><span data-l="id">Efek samping</span></span><span class="lg lg-note"><span data-l="en">Note</span><span data-l="id">Catatan</span></span></div>
   <div class="flow-grid" data-l="en"><figure class="flow">
   <figcaption>How a request is logged</figcaption>
-  <svg class="fc" viewBox="0 0 480 370" width="480" height="370" role="img" aria-label="How a request is logged">
+  <svg class="fc" viewBox="0 0 480 386" width="480" height="386" role="img" aria-label="How a request is logged">
     <defs><marker id="fc-arrow-98" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
-    <rect class="fc-box fc-start" x="8" y="8" width="224" height="48" rx="18"/>
-    <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">A signed-in user's create / update</text><text class="fc-text fc-text-start" x="120" y="45" text-anchor="middle">/ delete request</text>
-    <line class="fc-line" x1="120" y1="56" x2="120" y2="85" marker-end="url(#fc-arrow-98)"/>
-    <rect class="fc-box fc-step" x="8" y="86" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="107" text-anchor="middle">Handled as usual (success or</text><text class="fc-text fc-text-step" x="120" y="123" text-anchor="middle">error)</text>
-    <line class="fc-line" x1="120" y1="134" x2="120" y2="199" marker-end="url(#fc-arrow-98)"/>
-    <rect class="fc-box fc-step" x="8" y="200" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="221" text-anchor="middle">Response sent → one row in</text><text class="fc-text fc-text-step" x="120" y="237" text-anchor="middle">api_logs</text>
-    <path class="fc-line fc-line-note" d="M232,224 H254 V196 H275" fill="none"/>
-    <rect class="fc-box fc-note" x="276" y="164" width="196" height="64" rx="8"/>
-    <text class="fc-text fc-text-note" x="374" y="185" text-anchor="middle">Field names only + a safe</text><text class="fc-text fc-text-note" x="374" y="201" text-anchor="middle">summary of the result; no</text><text class="fc-text fc-text-note" x="374" y="217" text-anchor="middle">token/password</text>
-    <path class="fc-line fc-line-note" d="M232,224 H254 V260 H275" fill="none"/>
-    <rect class="fc-box fc-note" x="276" y="236" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-note" x="374" y="257" text-anchor="middle">5xx also keeps the real stack</text><text class="fc-text fc-text-note" x="374" y="273" text-anchor="middle">trace</text>
-    <line class="fc-line" x1="120" y1="248" x2="120" y2="321" marker-end="url(#fc-arrow-98)"/>
-    <rect class="fc-box fc-end" x="8" y="322" width="224" height="32" rx="16"/>
-    <text class="fc-text fc-text-end" x="120" y="343" text-anchor="middle">Done</text>
-    <path class="fc-line fc-line-note" d="M232,338 H275" fill="none"/>
-    <rect class="fc-box fc-note" x="276" y="314" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-note" x="374" y="335" text-anchor="middle">A failed log write never fails</text><text class="fc-text fc-text-note" x="374" y="351" text-anchor="middle">the request</text>
+    <rect class="fc-box fc-start" x="8" y="8" width="224" height="64" rx="18"/>
+    <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">A signed-in user's create / update</text><text class="fc-text fc-text-start" x="120" y="45" text-anchor="middle">/ delete, or any auth action (also</text><text class="fc-text fc-text-start" x="120" y="61" text-anchor="middle">guests)</text>
+    <line class="fc-line" x1="120" y1="72" x2="120" y2="101" marker-end="url(#fc-arrow-98)"/>
+    <rect class="fc-box fc-step" x="8" y="102" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="123" text-anchor="middle">Handled as usual (success or</text><text class="fc-text fc-text-step" x="120" y="139" text-anchor="middle">error)</text>
+    <line class="fc-line" x1="120" y1="150" x2="120" y2="215" marker-end="url(#fc-arrow-98)"/>
+    <rect class="fc-box fc-step" x="8" y="216" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="237" text-anchor="middle">Response sent → one row in</text><text class="fc-text fc-text-step" x="120" y="253" text-anchor="middle">api_logs</text>
+    <path class="fc-line fc-line-note" d="M232,240 H254 V212 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="180" width="196" height="64" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="201" text-anchor="middle">Field names only + a safe</text><text class="fc-text fc-text-note" x="374" y="217" text-anchor="middle">summary of the result; no</text><text class="fc-text fc-text-note" x="374" y="233" text-anchor="middle">token/password</text>
+    <path class="fc-line fc-line-note" d="M232,240 H254 V276 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="252" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="273" text-anchor="middle">5xx also keeps the real stack</text><text class="fc-text fc-text-note" x="374" y="289" text-anchor="middle">trace</text>
+    <line class="fc-line" x1="120" y1="264" x2="120" y2="337" marker-end="url(#fc-arrow-98)"/>
+    <rect class="fc-box fc-end" x="8" y="338" width="224" height="32" rx="16"/>
+    <text class="fc-text fc-text-end" x="120" y="359" text-anchor="middle">Done</text>
+    <path class="fc-line fc-line-note" d="M232,354 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="330" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="351" text-anchor="middle">A failed log write never fails</text><text class="fc-text fc-text-note" x="374" y="367" text-anchor="middle">the request</text>
   </svg>
 </figure>
 <figure class="flow">
@@ -8334,28 +8334,28 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 </figure></div>
   <div class="flow-grid" data-l="id"><figure class="flow">
   <figcaption>Cara permintaan dicatat</figcaption>
-  <svg class="fc" viewBox="0 0 480 370" width="480" height="370" role="img" aria-label="Cara permintaan dicatat">
+  <svg class="fc" viewBox="0 0 480 386" width="480" height="386" role="img" aria-label="Cara permintaan dicatat">
     <defs><marker id="fc-arrow-100" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
-    <rect class="fc-box fc-start" x="8" y="8" width="224" height="48" rx="18"/>
-    <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">Permintaan tambah / ubah / hapus</text><text class="fc-text fc-text-start" x="120" y="45" text-anchor="middle">dari pengguna yang login</text>
-    <line class="fc-line" x1="120" y1="56" x2="120" y2="85" marker-end="url(#fc-arrow-100)"/>
-    <rect class="fc-box fc-step" x="8" y="86" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="107" text-anchor="middle">Diproses seperti biasa (berhasil</text><text class="fc-text fc-text-step" x="120" y="123" text-anchor="middle">atau error)</text>
-    <line class="fc-line" x1="120" y1="134" x2="120" y2="199" marker-end="url(#fc-arrow-100)"/>
-    <rect class="fc-box fc-step" x="8" y="200" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="221" text-anchor="middle">Respons terkirim → satu baris di</text><text class="fc-text fc-text-step" x="120" y="237" text-anchor="middle">api_logs</text>
-    <path class="fc-line fc-line-note" d="M232,224 H254 V196 H275" fill="none"/>
-    <rect class="fc-box fc-note" x="276" y="164" width="196" height="64" rx="8"/>
-    <text class="fc-text fc-text-note" x="374" y="185" text-anchor="middle">Hanya nama field + ringkasan</text><text class="fc-text fc-text-note" x="374" y="201" text-anchor="middle">hasil yang aman; tanpa</text><text class="fc-text fc-text-note" x="374" y="217" text-anchor="middle">token/password</text>
-    <path class="fc-line fc-line-note" d="M232,224 H254 V260 H275" fill="none"/>
-    <rect class="fc-box fc-note" x="276" y="236" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-note" x="374" y="257" text-anchor="middle">5xx juga menyimpan stack</text><text class="fc-text fc-text-note" x="374" y="273" text-anchor="middle">trace aslinya</text>
-    <line class="fc-line" x1="120" y1="248" x2="120" y2="321" marker-end="url(#fc-arrow-100)"/>
-    <rect class="fc-box fc-end" x="8" y="322" width="224" height="32" rx="16"/>
-    <text class="fc-text fc-text-end" x="120" y="343" text-anchor="middle">Selesai</text>
-    <path class="fc-line fc-line-note" d="M232,338 H275" fill="none"/>
-    <rect class="fc-box fc-note" x="276" y="314" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-note" x="374" y="335" text-anchor="middle">Gagal menyimpan log tidak</text><text class="fc-text fc-text-note" x="374" y="351" text-anchor="middle">menggagalkan permintaan</text>
+    <rect class="fc-box fc-start" x="8" y="8" width="224" height="64" rx="18"/>
+    <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">Tambah / ubah / hapus dari</text><text class="fc-text fc-text-start" x="120" y="45" text-anchor="middle">pengguna yang login, atau aktivitas</text><text class="fc-text fc-text-start" x="120" y="61" text-anchor="middle">akun apa pun (juga tamu)</text>
+    <line class="fc-line" x1="120" y1="72" x2="120" y2="101" marker-end="url(#fc-arrow-100)"/>
+    <rect class="fc-box fc-step" x="8" y="102" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="123" text-anchor="middle">Diproses seperti biasa (berhasil</text><text class="fc-text fc-text-step" x="120" y="139" text-anchor="middle">atau error)</text>
+    <line class="fc-line" x1="120" y1="150" x2="120" y2="215" marker-end="url(#fc-arrow-100)"/>
+    <rect class="fc-box fc-step" x="8" y="216" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="237" text-anchor="middle">Respons terkirim → satu baris di</text><text class="fc-text fc-text-step" x="120" y="253" text-anchor="middle">api_logs</text>
+    <path class="fc-line fc-line-note" d="M232,240 H254 V212 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="180" width="196" height="64" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="201" text-anchor="middle">Hanya nama field + ringkasan</text><text class="fc-text fc-text-note" x="374" y="217" text-anchor="middle">hasil yang aman; tanpa</text><text class="fc-text fc-text-note" x="374" y="233" text-anchor="middle">token/password</text>
+    <path class="fc-line fc-line-note" d="M232,240 H254 V276 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="252" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="273" text-anchor="middle">5xx juga menyimpan stack</text><text class="fc-text fc-text-note" x="374" y="289" text-anchor="middle">trace aslinya</text>
+    <line class="fc-line" x1="120" y1="264" x2="120" y2="337" marker-end="url(#fc-arrow-100)"/>
+    <rect class="fc-box fc-end" x="8" y="338" width="224" height="32" rx="16"/>
+    <text class="fc-text fc-text-end" x="120" y="359" text-anchor="middle">Selesai</text>
+    <path class="fc-line fc-line-note" d="M232,354 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="330" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="351" text-anchor="middle">Gagal menyimpan log tidak</text><text class="fc-text fc-text-note" x="374" y="367" text-anchor="middle">menggagalkan permintaan</text>
   </svg>
 </figure>
 <figure class="flow">
@@ -8446,195 +8446,117 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: 31261,
+      &quot;id&quot;: 31346,
       &quot;level&quot;: &quot;warn&quot;,
       &quot;method&quot;: &quot;POST&quot;,
-      &quot;path&quot;: &quot;/api/products&quot;,
+      &quot;path&quot;: &quot;/api/auth/login&quot;,
       &quot;query&quot;: null,
-      &quot;statusCode&quot;: 400,
-      &quot;durationMs&quot;: 17,
-      &quot;userId&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
-      &quot;userEmail&quot;: &quot;tenant.test@example.com&quot;,
-      &quot;userRole&quot;: &quot;tenant&quot;,
+      &quot;statusCode&quot;: 401,
+      &quot;durationMs&quot;: 469,
+      &quot;userId&quot;: null,
+      &quot;userEmail&quot;: null,
+      &quot;userRole&quot;: null,
+      &quot;authEmail&quot;: &quot;tidak.ada@example.com&quot;,
       &quot;ip&quot;: &quot;203.0.113.10&quot;,
       &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
-      &quot;errorCode&quot;: &quot;BAD_REQUEST&quot;,
-      &quot;errorMessage&quot;: &quot;Validasi gagal&quot;,
-      &quot;errorDetails&quot;: [
-        {
-          &quot;field&quot;: &quot;name&quot;,
-          &quot;message&quot;: &quot;name tidak boleh kosong&quot;
-        },
-        {
-          &quot;field&quot;: &quot;description&quot;,
-          &quot;message&quot;: &quot;description wajib diisi&quot;
-        },
-        {
-          &quot;field&quot;: &quot;details&quot;,
-          &quot;message&quot;: &quot;details wajib diisi&quot;
-        },
-        {
-          &quot;field&quot;: &quot;price&quot;,
-          &quot;message&quot;: &quot;price harus berupa angka Rupiah tanpa desimal, antara 0 dan 2.000.000.000&quot;
-        },
-        {
-          &quot;field&quot;: &quot;imageId&quot;,
-          &quot;message&quot;: &quot;imageId wajib diisi, unggah gambar terlebih dahulu melalui POST /api/images&quot;
-        }
-      ],
-      &quot;requestFields&quot;: [
-        &quot;name&quot;,
-        &quot;price&quot;
-      ],
-      &quot;responseSummary&quot;: null,
-      &quot;createdAt&quot;: &quot;2026-10-08T03:47:23.889Z&quot;
-    },
-    {
-      &quot;id&quot;: 31259,
-      &quot;level&quot;: &quot;info&quot;,
-      &quot;method&quot;: &quot;POST&quot;,
-      &quot;path&quot;: &quot;/api/products&quot;,
-      &quot;query&quot;: null,
-      &quot;statusCode&quot;: 201,
-      &quot;durationMs&quot;: 127,
-      &quot;userId&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
-      &quot;userEmail&quot;: &quot;tenant.test@example.com&quot;,
-      &quot;userRole&quot;: &quot;tenant&quot;,
-      &quot;ip&quot;: &quot;203.0.113.10&quot;,
-      &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
-      &quot;errorCode&quot;: null,
-      &quot;errorMessage&quot;: null,
+      &quot;errorCode&quot;: &quot;UNAUTHORIZED&quot;,
+      &quot;errorMessage&quot;: &quot;Email atau password salah&quot;,
       &quot;errorDetails&quot;: null,
       &quot;requestFields&quot;: [
-        &quot;name&quot;,
-        &quot;description&quot;,
-        &quot;details&quot;,
-        &quot;price&quot;,
-        &quot;imageId&quot;
+        &quot;email&quot;,
+        &quot;password&quot;
       ],
-      &quot;responseSummary&quot;: {
-        &quot;id&quot;: &quot;0b9076c5-2aaf-45d1-94d4-d514fa65727a&quot;,
-        &quot;name&quot;: &quot;Kue Bolu&quot;,
-        &quot;price&quot;: 20000,
-        &quot;tenant&quot;: {
-          &quot;id&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
-          &quot;email&quot;: &quot;tenant.test@example.com&quot;,
-          &quot;lastName&quot;: &quot;tenant&quot;,
-          &quot;firstName&quot;: &quot;Uji&quot;,
-          &quot;tenantName&quot;: &quot;Toko Uji&quot;
-        },
-        &quot;approval&quot;: {
-          &quot;id&quot;: 16,
-          &quot;reason&quot;: &quot;Waiting for approval&quot;,
-          &quot;isActive&quot;: false
-        },
-        &quot;isRecommended&quot;: false
-      },
-      &quot;createdAt&quot;: &quot;2026-10-08T03:47:23.816Z&quot;
+      &quot;responseSummary&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-08T04:22:46.673Z&quot;
+    },
+    {
+      &quot;id&quot;: 31345,
+      &quot;level&quot;: &quot;warn&quot;,
+      &quot;method&quot;: &quot;POST&quot;,
+      &quot;path&quot;: &quot;/api/auth/login&quot;,
+      &quot;query&quot;: null,
+      &quot;statusCode&quot;: 401,
+      &quot;durationMs&quot;: 460,
+      &quot;userId&quot;: null,
+      &quot;userEmail&quot;: null,
+      &quot;userRole&quot;: null,
+      &quot;authEmail&quot;: &quot;tenant.test@example.com&quot;,
+      &quot;ip&quot;: &quot;203.0.113.10&quot;,
+      &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
+      &quot;errorCode&quot;: &quot;UNAUTHORIZED&quot;,
+      &quot;errorMessage&quot;: &quot;Email atau password salah&quot;,
+      &quot;errorDetails&quot;: null,
+      &quot;requestFields&quot;: [
+        &quot;email&quot;,
+        &quot;password&quot;
+      ],
+      &quot;responseSummary&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-08T04:22:46.190Z&quot;
     }
   ],
   &quot;meta&quot;: {
     &quot;page&quot;: 1,
     &quot;limit&quot;: 2,
-    &quot;total&quot;: 199,
-    &quot;totalPages&quot;: 100
+    &quot;total&quot;: 2,
+    &quot;totalPages&quot;: 1
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: [
     {
-      &quot;id&quot;: 31261,
+      &quot;id&quot;: 31346,
       &quot;level&quot;: &quot;warn&quot;,
       &quot;method&quot;: &quot;POST&quot;,
-      &quot;path&quot;: &quot;/api/products&quot;,
+      &quot;path&quot;: &quot;/api/auth/login&quot;,
       &quot;query&quot;: null,
-      &quot;statusCode&quot;: 400,
-      &quot;durationMs&quot;: 17,
-      &quot;userId&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
-      &quot;userEmail&quot;: &quot;tenant.test@example.com&quot;,
-      &quot;userRole&quot;: &quot;tenant&quot;,
+      &quot;statusCode&quot;: 401,
+      &quot;durationMs&quot;: 469,
+      &quot;userId&quot;: null,
+      &quot;userEmail&quot;: null,
+      &quot;userRole&quot;: null,
+      &quot;authEmail&quot;: &quot;tidak.ada@example.com&quot;,
       &quot;ip&quot;: &quot;203.0.113.10&quot;,
       &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
-      &quot;errorCode&quot;: &quot;BAD_REQUEST&quot;,
-      &quot;errorMessage&quot;: &quot;Validasi gagal&quot;,
-      &quot;errorDetails&quot;: [
-        {
-          &quot;field&quot;: &quot;name&quot;,
-          &quot;message&quot;: &quot;name tidak boleh kosong&quot;
-        },
-        {
-          &quot;field&quot;: &quot;description&quot;,
-          &quot;message&quot;: &quot;description wajib diisi&quot;
-        },
-        {
-          &quot;field&quot;: &quot;details&quot;,
-          &quot;message&quot;: &quot;details wajib diisi&quot;
-        },
-        {
-          &quot;field&quot;: &quot;price&quot;,
-          &quot;message&quot;: &quot;price harus berupa angka Rupiah tanpa desimal, antara 0 dan 2.000.000.000&quot;
-        },
-        {
-          &quot;field&quot;: &quot;imageId&quot;,
-          &quot;message&quot;: &quot;imageId wajib diisi, unggah gambar terlebih dahulu melalui POST /api/images&quot;
-        }
-      ],
-      &quot;requestFields&quot;: [
-        &quot;name&quot;,
-        &quot;price&quot;
-      ],
-      &quot;responseSummary&quot;: null,
-      &quot;createdAt&quot;: &quot;2026-10-08T03:47:23.889Z&quot;
-    },
-    {
-      &quot;id&quot;: 31259,
-      &quot;level&quot;: &quot;info&quot;,
-      &quot;method&quot;: &quot;POST&quot;,
-      &quot;path&quot;: &quot;/api/products&quot;,
-      &quot;query&quot;: null,
-      &quot;statusCode&quot;: 201,
-      &quot;durationMs&quot;: 127,
-      &quot;userId&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
-      &quot;userEmail&quot;: &quot;tenant.test@example.com&quot;,
-      &quot;userRole&quot;: &quot;tenant&quot;,
-      &quot;ip&quot;: &quot;203.0.113.10&quot;,
-      &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
-      &quot;errorCode&quot;: null,
-      &quot;errorMessage&quot;: null,
+      &quot;errorCode&quot;: &quot;UNAUTHORIZED&quot;,
+      &quot;errorMessage&quot;: &quot;Email atau password salah&quot;,
       &quot;errorDetails&quot;: null,
       &quot;requestFields&quot;: [
-        &quot;name&quot;,
-        &quot;description&quot;,
-        &quot;details&quot;,
-        &quot;price&quot;,
-        &quot;imageId&quot;
+        &quot;email&quot;,
+        &quot;password&quot;
       ],
-      &quot;responseSummary&quot;: {
-        &quot;id&quot;: &quot;0b9076c5-2aaf-45d1-94d4-d514fa65727a&quot;,
-        &quot;name&quot;: &quot;Kue Bolu&quot;,
-        &quot;price&quot;: 20000,
-        &quot;tenant&quot;: {
-          &quot;id&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
-          &quot;email&quot;: &quot;tenant.test@example.com&quot;,
-          &quot;lastName&quot;: &quot;tenant&quot;,
-          &quot;firstName&quot;: &quot;Uji&quot;,
-          &quot;tenantName&quot;: &quot;Toko Uji&quot;
-        },
-        &quot;approval&quot;: {
-          &quot;id&quot;: 16,
-          &quot;reason&quot;: &quot;Waiting for approval&quot;,
-          &quot;isActive&quot;: false
-        },
-        &quot;isRecommended&quot;: false
-      },
-      &quot;createdAt&quot;: &quot;2026-10-08T03:47:23.816Z&quot;
+      &quot;responseSummary&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-08T04:22:46.673Z&quot;
+    },
+    {
+      &quot;id&quot;: 31345,
+      &quot;level&quot;: &quot;warn&quot;,
+      &quot;method&quot;: &quot;POST&quot;,
+      &quot;path&quot;: &quot;/api/auth/login&quot;,
+      &quot;query&quot;: null,
+      &quot;statusCode&quot;: 401,
+      &quot;durationMs&quot;: 460,
+      &quot;userId&quot;: null,
+      &quot;userEmail&quot;: null,
+      &quot;userRole&quot;: null,
+      &quot;authEmail&quot;: &quot;tenant.test@example.com&quot;,
+      &quot;ip&quot;: &quot;203.0.113.10&quot;,
+      &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
+      &quot;errorCode&quot;: &quot;UNAUTHORIZED&quot;,
+      &quot;errorMessage&quot;: &quot;Email atau password salah&quot;,
+      &quot;errorDetails&quot;: null,
+      &quot;requestFields&quot;: [
+        &quot;email&quot;,
+        &quot;password&quot;
+      ],
+      &quot;responseSummary&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-08T04:22:46.190Z&quot;
     }
   ],
   &quot;meta&quot;: {
     &quot;page&quot;: 1,
     &quot;limit&quot;: 2,
-    &quot;total&quot;: 199,
-    &quot;totalPages&quot;: 100
+    &quot;total&quot;: 2,
+    &quot;totalPages&quot;: 1
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">400 Bad Request</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: false,
@@ -8692,96 +8614,56 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <div class="block-head"><h4><span data-l="en">Response example</span><span data-l="id">Contoh respons</span> <span class="status status-ok">200 OK</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: 31261,
+    &quot;id&quot;: 31346,
     &quot;level&quot;: &quot;warn&quot;,
     &quot;method&quot;: &quot;POST&quot;,
-    &quot;path&quot;: &quot;/api/products&quot;,
+    &quot;path&quot;: &quot;/api/auth/login&quot;,
     &quot;query&quot;: null,
-    &quot;statusCode&quot;: 400,
-    &quot;durationMs&quot;: 17,
-    &quot;userId&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
-    &quot;userEmail&quot;: &quot;tenant.test@example.com&quot;,
-    &quot;userRole&quot;: &quot;tenant&quot;,
+    &quot;statusCode&quot;: 401,
+    &quot;durationMs&quot;: 469,
+    &quot;userId&quot;: null,
+    &quot;userEmail&quot;: null,
+    &quot;userRole&quot;: null,
+    &quot;authEmail&quot;: &quot;tidak.ada@example.com&quot;,
     &quot;ip&quot;: &quot;203.0.113.10&quot;,
     &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
-    &quot;errorCode&quot;: &quot;BAD_REQUEST&quot;,
-    &quot;errorMessage&quot;: &quot;Validasi gagal&quot;,
-    &quot;errorDetails&quot;: [
-      {
-        &quot;field&quot;: &quot;name&quot;,
-        &quot;message&quot;: &quot;name tidak boleh kosong&quot;
-      },
-      {
-        &quot;field&quot;: &quot;description&quot;,
-        &quot;message&quot;: &quot;description wajib diisi&quot;
-      },
-      {
-        &quot;field&quot;: &quot;details&quot;,
-        &quot;message&quot;: &quot;details wajib diisi&quot;
-      },
-      {
-        &quot;field&quot;: &quot;price&quot;,
-        &quot;message&quot;: &quot;price harus berupa angka Rupiah tanpa desimal, antara 0 dan 2.000.000.000&quot;
-      },
-      {
-        &quot;field&quot;: &quot;imageId&quot;,
-        &quot;message&quot;: &quot;imageId wajib diisi, unggah gambar terlebih dahulu melalui POST /api/images&quot;
-      }
-    ],
+    &quot;errorCode&quot;: &quot;UNAUTHORIZED&quot;,
+    &quot;errorMessage&quot;: &quot;Email atau password salah&quot;,
+    &quot;errorDetails&quot;: null,
     &quot;errorStack&quot;: null,
     &quot;requestFields&quot;: [
-      &quot;name&quot;,
-      &quot;price&quot;
+      &quot;email&quot;,
+      &quot;password&quot;
     ],
     &quot;responseSummary&quot;: null,
-    &quot;createdAt&quot;: &quot;2026-10-08T03:47:23.889Z&quot;
+    &quot;createdAt&quot;: &quot;2026-10-08T04:22:46.673Z&quot;
   }
 }"><span data-l="en">Copy</span><span data-l="id">Salin</span></button></div><pre class="example"><code class="lang-json">{
   &quot;success&quot;: true,
   &quot;data&quot;: {
-    &quot;id&quot;: 31261,
+    &quot;id&quot;: 31346,
     &quot;level&quot;: &quot;warn&quot;,
     &quot;method&quot;: &quot;POST&quot;,
-    &quot;path&quot;: &quot;/api/products&quot;,
+    &quot;path&quot;: &quot;/api/auth/login&quot;,
     &quot;query&quot;: null,
-    &quot;statusCode&quot;: 400,
-    &quot;durationMs&quot;: 17,
-    &quot;userId&quot;: &quot;8de031f5-eb0c-4389-a1c2-5850d2bc838a&quot;,
-    &quot;userEmail&quot;: &quot;tenant.test@example.com&quot;,
-    &quot;userRole&quot;: &quot;tenant&quot;,
+    &quot;statusCode&quot;: 401,
+    &quot;durationMs&quot;: 469,
+    &quot;userId&quot;: null,
+    &quot;userEmail&quot;: null,
+    &quot;userRole&quot;: null,
+    &quot;authEmail&quot;: &quot;tidak.ada@example.com&quot;,
     &quot;ip&quot;: &quot;203.0.113.10&quot;,
     &quot;userAgent&quot;: &quot;Python-urllib/3.12&quot;,
-    &quot;errorCode&quot;: &quot;BAD_REQUEST&quot;,
-    &quot;errorMessage&quot;: &quot;Validasi gagal&quot;,
-    &quot;errorDetails&quot;: [
-      {
-        &quot;field&quot;: &quot;name&quot;,
-        &quot;message&quot;: &quot;name tidak boleh kosong&quot;
-      },
-      {
-        &quot;field&quot;: &quot;description&quot;,
-        &quot;message&quot;: &quot;description wajib diisi&quot;
-      },
-      {
-        &quot;field&quot;: &quot;details&quot;,
-        &quot;message&quot;: &quot;details wajib diisi&quot;
-      },
-      {
-        &quot;field&quot;: &quot;price&quot;,
-        &quot;message&quot;: &quot;price harus berupa angka Rupiah tanpa desimal, antara 0 dan 2.000.000.000&quot;
-      },
-      {
-        &quot;field&quot;: &quot;imageId&quot;,
-        &quot;message&quot;: &quot;imageId wajib diisi, unggah gambar terlebih dahulu melalui POST /api/images&quot;
-      }
-    ],
+    &quot;errorCode&quot;: &quot;UNAUTHORIZED&quot;,
+    &quot;errorMessage&quot;: &quot;Email atau password salah&quot;,
+    &quot;errorDetails&quot;: null,
     &quot;errorStack&quot;: null,
     &quot;requestFields&quot;: [
-      &quot;name&quot;,
-      &quot;price&quot;
+      &quot;email&quot;,
+      &quot;password&quot;
     ],
     &quot;responseSummary&quot;: null,
-    &quot;createdAt&quot;: &quot;2026-10-08T03:47:23.889Z&quot;
+    &quot;createdAt&quot;: &quot;2026-10-08T04:22:46.673Z&quot;
   }
 }</code></pre><div class="block-head"><h4><span data-l="en">Error example</span><span data-l="id">Contoh error</span> <span class="status status-err">404 Not Found</span></h4><button class="copy" type="button" data-copy="{
   &quot;success&quot;: false,

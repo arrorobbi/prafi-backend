@@ -540,7 +540,7 @@ export const FLOWS: Record<string, Chart[]> = {
     {
       title: { en: 'How a request is logged', id: 'Cara permintaan dicatat' },
       nodes: [
-        start({ en: 'A signed-in user\'s create / update / delete request', id: 'Permintaan tambah / ubah / hapus dari pengguna yang login' }),
+        start({ en: 'A signed-in user\'s create / update / delete, or any auth action (also guests)', id: 'Tambah / ubah / hapus dari pengguna yang login, atau aktivitas akun apa pun (juga tamu)' }),
         step({ en: 'Handled as usual (success or error)', id: 'Diproses seperti biasa (berhasil atau error)' }),
         step(
           { en: 'Response sent → one row in api_logs', id: 'Respons terkirim → satu baris di api_logs' },

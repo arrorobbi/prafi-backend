@@ -202,6 +202,8 @@ export const verifyEmailLink: RequestHandler = async (req, res) => {
     else res.json({ success: true, data: { message, user: await authService.getProfile(userId) } });
   } catch (err) {
     if (!wantsHtml || !(err instanceof HttpError)) throw err;
+    // Answered here as a page, not by the errorHandler: still give the request's log row its error
+    res.locals.apiError = { code: err.code, message: err.message, details: err.details };
     res.status(err.statusCode).set('Content-Security-Policy', VERIFICATION_PAGE_CSP).type('html').send(verificationResultPage(false, err.message));
   }
 };

@@ -1,4 +1,5 @@
 import type { Request, RequestHandler } from 'express';
+import { User } from '../models';
 import type { LogLevel } from '../models/apiLog.model';
 import * as apiLogService from '../services/apiLog.service';
 import { clientIp } from '../utils/clientIp';
@@ -90,12 +91,39 @@ function sentFields(body: unknown, hasFile: boolean) {
 const levelOf = (status: number): LogLevel => (status >= 500 ? 'error' : status >= 400 ? 'warn' : 'info');
 
 /**
- * Saved to the database: create/update/delete requests from signed-in users only — a valid login, or at least
- * a Bearer token (an expired/invalid one is still a session, not a guest). Guests' requests (public sign-up,
- * login, reviews, bots) are not stored. The console still shows every request.
+ * Auth actions are always stored, even from guests: login (also a wrong email or password), sign-up, OTP,
+ * activation link, resend, forgot / reset password, logout, profile changes. Not GET /api/auth/me, which every
+ * dashboard page calls.
  */
-const skipDb = (req: Request) =>
-  !STORED_METHODS.has(req.method) || (!req.user && !/^Bearer\s+\S+/i.test(req.get('authorization') ?? ''));
+function isAuthAction(method: string, path: string) {
+  if (!path.startsWith('/api/auth/')) return false;
+  return STORED_METHODS.has(method) || (method === 'GET' && path.startsWith('/api/auth/verify-email/'));
+}
+
+/**
+ * Saved to the database: every auth action, plus create/update/delete requests from signed-in users — a valid
+ * login, or at least a Bearer token (an expired/invalid one is still a session, not a guest). Other guest requests
+ * (reviews, bots) and reads are not stored. The console still shows every request.
+ */
+const skipDb = (req: Request, path: string) =>
+  !isAuthAction(req.method, path) &&
+  (!STORED_METHODS.has(req.method) || (!req.user && !/^Bearer\s+\S+/i.test(req.get('authorization') ?? '')));
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * The email an auth action was about: the one typed (login, sign-up, forgot password), or the account of the
+ * userId in the URL / body (OTP, activation link, resend, reset password). Never the password.
+ */
+async function authEmailOf(req: Request, path: string): Promise<string | null> {
+  const body = isObject(req.body) ? req.body : {};
+  if (typeof body.email === 'string' && body.email.trim()) return body.email.trim().toLowerCase().slice(0, 255);
+  const fromPath = path.match(/^\/api\/auth\/(?:verify-otp|verify-email|resend-verification)\/([^/]+)$/)?.[1];
+  const userId = fromPath ?? (typeof body.userId === 'string' ? body.userId : undefined);
+  if (!userId || !UUID.test(userId)) return null;
+  const user = await User.findByPk(userId, { attributes: ['email'] });
+  return user?.email ?? null;
+}
 
 /**
  * Logs one line per request when the response finishes, e.g.
@@ -128,9 +156,9 @@ export const requestLogger: RequestHandler = (req, res, next) => {
     else if (status >= 400) console.warn(line);
     else console.log(line);
 
-    if (skipDb(req)) return;
+    if (skipDb(req, path)) return;
     const error = res.locals.apiError as LoggedError | undefined;
-    apiLogService.record({
+    const entry = {
       level: levelOf(status),
       method: req.method,
       path,
@@ -140,6 +168,7 @@ export const requestLogger: RequestHandler = (req, res, next) => {
       userId: req.user?.id ?? null,
       userEmail: req.user?.email ?? null,
       userRole: req.user?.role ?? null,
+      authEmail: null as string | null,
       ip: clientIp(req),
       userAgent: req.get('user-agent') ?? null,
       errorCode: error?.code ?? null,
@@ -148,7 +177,12 @@ export const requestLogger: RequestHandler = (req, res, next) => {
       errorStack: error?.stack ?? null,
       requestFields: sentFields(req.body, !!req.file),
       responseSummary: summarize(res.locals.responseBody),
-    });
+    };
+    if (!isAuthAction(req.method, path)) return apiLogService.record(entry);
+    // Auth actions also keep the email they were about (looked up for userId-based ones)
+    authEmailOf(req, path)
+      .catch(() => null)
+      .then((authEmail) => apiLogService.record({ ...entry, authEmail }));
   });
 
   next();

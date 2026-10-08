@@ -14,8 +14,8 @@ export const LOG_LEVELS = ['info', 'warn', 'error'] as const;
 export type LogLevel = (typeof LOG_LEVELS)[number];
 
 /**
- * One row per create/update/delete API request (POST, PUT, PATCH, DELETE) from a signed-in user (reads and
- * guests' requests are not stored),
+ * One row per create/update/delete API request (POST, PUT, PATCH, DELETE) from a signed-in user, plus every
+ * auth action even from guests (login, sign-up, OTP, password reset…; reads and other guest requests are not stored),
  * written by the requestLogger middleware when the response finishes.
  * A failed request carries its error on the same row (errorStack only for 5xx). Request bodies are never stored.
  * Read by the superadmin through GET /api/logs; rows older than LOG_RETENTION_DAYS are purged.
@@ -35,6 +35,8 @@ export class ApiLog extends Model<InferAttributes<ApiLog>, InferCreationAttribut
   /** Copied at request time, so the log still says who it was after the account changes or is deleted */
   declare userEmail: string | null;
   declare userRole: string | null;
+  /** Auth actions: the email that was given (login, sign-up, forgot password) or the account of the userId sent */
+  declare authEmail: string | null;
   declare ip: string | null;
   declare userAgent: string | null;
   declare errorCode: string | null;
@@ -69,6 +71,7 @@ ApiLog.init(
     },
     userEmail: { type: DataTypes.STRING, allowNull: true },
     userRole: { type: DataTypes.STRING(20), allowNull: true },
+    authEmail: { type: DataTypes.STRING, allowNull: true },
     ip: { type: DataTypes.STRING(64), allowNull: true },
     userAgent: { type: DataTypes.TEXT, allowNull: true },
     errorCode: { type: DataTypes.STRING(64), allowNull: true },

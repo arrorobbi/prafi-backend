@@ -48,7 +48,7 @@ export interface ListLogsOptions {
   /** Substring of the path, case-insensitive */
   path?: string;
   userId?: string;
-  /** Substring of the user's email, case-insensitive */
+  /** Substring of the user's email or of the email given to an auth endpoint, case-insensitive */
   email?: string;
   errorCode?: string;
   from?: Date;
@@ -69,7 +69,11 @@ export async function list(opts: ListLogsOptions) {
   }
   if (opts.path) where.push({ path: { [Op.iLike]: `%${escapeLike(opts.path)}%` } });
   if (opts.userId) where.push({ userId: opts.userId });
-  if (opts.email) where.push({ userEmail: { [Op.iLike]: `%${escapeLike(opts.email)}%` } });
+  if (opts.email) {
+    // The signed-in user's email, or the email given to an auth endpoint (e.g. a failed login)
+    const like = { [Op.iLike]: `%${escapeLike(opts.email)}%` };
+    where.push({ [Op.or]: [{ userEmail: like }, { authEmail: like }] });
+  }
   if (opts.errorCode) where.push({ errorCode: opts.errorCode });
   if (opts.from) where.push({ createdAt: { [Op.gte]: opts.from } });
   if (opts.to) where.push({ createdAt: { [Op.lte]: opts.to } });
