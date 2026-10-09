@@ -1,9 +1,11 @@
-import { APPROVABLE_ROLES, PRODUCT_APPROVER_ROLES, type Role } from '../constants/roles';
+import { APPROVABLE_ROLES, PRODUCT_APPROVER_ROLES, ROLES, type Role } from '../constants/roles';
 import { HttpError } from '../errors/HttpError';
 import { Approval, Product, sequelize, User } from '../models';
 import type { AuthUser } from '../types/express';
 import { notify } from './notification.service';
 import { endUserSessions } from '../realtime/socket';
+import { adminAccountActivated } from '../mail/templates';
+import { sendMail } from './mail.service';
 
 /** What an approval can belong to. Add a new entry here (and a handler below) to support another model. */
 export const APPROVAL_TYPES = ['user', 'product'] as const;
@@ -37,7 +39,7 @@ async function setUserApproval(
   values: { isActive: boolean; reason: string },
 ) {
   const user = await User.findByPk(userId, {
-    attributes: ['id', 'email', 'role'],
+    attributes: ['id', 'email', 'role', 'firstName', 'lastName', 'mailActive'],
     include: [{ association: 'approval' }],
   });
   if (!user) throw HttpError.notFound('Pengguna tidak ditemukan');
@@ -64,8 +66,21 @@ async function setUserApproval(
   }
   // A deactivated user is disconnected from realtime right away
   if (!values.isActive) await endUserSessions(user.id, 'deactivated');
+  // A self-registered admin just got activated by a disnakertrans: tell them by email that they can log in
+  if (!wasActive && values.isActive && user.role === ROLES.ADMIN) {
+    const note = values.reason === defaultReason(actor, true) ? null : values.reason;
+    sendAdminActivatedEmail(user, note);
+  }
 
   return { type: 'user' as const, id: user.id, email: user.email, role: user.role, approval };
+}
+
+/** In the background: a mail server problem never fails (or slows down) the activation itself. */
+function sendAdminActivatedEmail(user: User, note: string | null) {
+  const content = adminAccountActivated(user, { note, emailVerified: user.mailActive });
+  sendMail({ to: user.email, ...content })
+    .then(() => console.log(`[mail] admin activation email sent to ${user.email}`))
+    .catch((err) => console.error(`[mail] could not send the admin activation email to ${user.email}:`, (err as Error).message));
 }
 
 async function setProductApproval(actor: AuthUser, productId: string, values: { isActive: boolean; reason: string }) {

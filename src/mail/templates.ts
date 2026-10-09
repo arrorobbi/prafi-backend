@@ -170,6 +170,55 @@ export function accountCreatedOtp(user: Recipient, code: string, validMinutes: n
   return { subject, html, text };
 }
 
+/**
+ * To a self-registered admin whose account a disnakertrans has just activated: they can log in now.
+ * `note`: the reason the disnakertrans typed, if any. `emailVerified` false: the OTP step is still to be done first.
+ */
+export function adminAccountActivated(
+  user: Recipient,
+  { note, emailVerified }: { note?: string | null; emailVerified: boolean },
+): Omit<MailMessage, 'to'> {
+  const name = `${user.firstName} ${user.lastName}`;
+  const loginUrl = `${env.frontendUrl}/login`;
+  const subject = `Akun Admin ${BRAND} Anda telah diaktifkan`;
+  const tasks = ['Mengonfirmasi produk yang diajukan penjual', 'Mengaktifkan akun penjual (UMKM)', 'Mengelola kategori produk'];
+  const html = layout(
+    'Akun Anda telah diaktifkan',
+    `<p>Halo <strong>${escape(name)}</strong>,</p>
+     <p>Kabar baik! Akun <strong>Admin</strong> Anda di ${BRAND} dengan email <strong>${escape(user.email)}</strong> telah <strong style="color:${ORANGE};">diaktifkan oleh Disnakertrans</strong>.</p>
+     ${
+       note
+         ? `<p style="margin:18px 0;padding:12px 16px;background:${ORANGE_SOFT};border-left:4px solid ${ORANGE};border-radius:8px;"><strong>Catatan dari Disnakertrans:</strong><br>${escape(note)}</p>`
+         : ''
+     }
+     ${
+       emailVerified
+         ? '<p>Sekarang Anda sudah dapat masuk dan menggunakan dashboard administrator:</p>'
+         : '<p>Satu langkah lagi: selesaikan verifikasi email Anda dengan kode OTP yang telah kami kirim saat pendaftaran (atau minta kode baru di halaman masuk), lalu Anda dapat menggunakan dashboard administrator:</p>'
+     }
+     <ul style="margin:8px 0 0;padding-left:20px;">${tasks.map((t) => `<li>${t}</li>`).join('')}</ul>
+     ${button(loginUrl, 'Masuk ke Trans Niaga')}
+     <p>Masuk menggunakan email dan kata sandi yang Anda buat saat mendaftar. Lupa kata sandi? Gunakan <em>Lupa Password</em> di halaman masuk.</p>
+     ${SIGN_OFF}`,
+  );
+  const text = [
+    `Halo ${name},`,
+    '',
+    `Kabar baik! Akun Admin Anda di ${BRAND} dengan email ${user.email} telah diaktifkan oleh Disnakertrans.`,
+    ...(note ? ['', `Catatan dari Disnakertrans: ${note}`] : []),
+    '',
+    emailVerified
+      ? 'Sekarang Anda sudah dapat masuk dan menggunakan dashboard administrator:'
+      : 'Satu langkah lagi: selesaikan verifikasi email Anda dengan kode OTP yang telah kami kirim saat pendaftaran (atau minta kode baru di halaman masuk), lalu Anda dapat menggunakan dashboard administrator:',
+    ...tasks.map((t) => `- ${t}`),
+    '',
+    `Masuk: ${loginUrl}`,
+    'Masuk menggunakan email dan kata sandi yang Anda buat saat mendaftar. Lupa kata sandi? Gunakan "Lupa Password" di halaman masuk.',
+    ...TEXT_SIGN_OFF,
+  ].join('\n');
+  return { subject, html, text };
+}
+
 /** Forgot password: a link to the frontend's reset page. */
 export function passwordResetRequested(user: Recipient, link: string, validMinutes: number): Omit<MailMessage, 'to'> {
   const name = `${user.firstName} ${user.lastName}`;

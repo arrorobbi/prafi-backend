@@ -297,6 +297,7 @@ export const FLOWS: Record<string, Chart[]> = {
         ),
         step(
           { en: 'Save approval (created the first time)', id: 'Simpan approval (dibuat jika belum ada)' },
+          effect({ en: 'Admin activated by disnakertrans → email to the admin (Bahasa Indonesia)', id: 'Admin diaktifkan disnakertrans → email ke admin tersebut' }),
           effect({ en: 'Deactivated → notify superadmins (USER_DEACTIVATED)', id: 'Dinonaktifkan → notifikasi ke superadmin (USER_DEACTIVATED)' }),
           effect({ en: 'Deactivated → user\'s sockets closed (session:ended)', id: 'Dinonaktifkan → socket pengguna ditutup (session:ended)' }),
         ),

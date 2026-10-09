@@ -2372,7 +2372,7 @@
                 }
               ]
             },
-            "description": "**Access:** disnakertrans, admin\n\n`isActive`: true/false. `role`: the target account's role, as a confirmation (must match). `reason`: optional.\n\ndisnakertrans activates/deactivates **admin** accounts; admin activates/deactivates **tenant** accounts. Uses `{{userId}}` / `{{userRole}}` saved by the Register requests. Deactivating ends the user's sessions (`session:ended`, reason `deactivated`) and notifies superadmins.",
+            "description": "**Access:** disnakertrans, admin\n\n`isActive`: true/false. `role`: the target account's role, as a confirmation (must match). `reason`: optional.\n\ndisnakertrans activates/deactivates **admin** accounts; admin activates/deactivates **tenant** accounts. Uses `{{userId}}` / `{{userRole}}` saved by the Register requests. Deactivating ends the user's sessions (`session:ended`, reason `deactivated`) and notifies superadmins.\n\nWhen a disnakertrans **activates an admin account** (inactive → active), the admin gets an **email** (Bahasa Indonesia) that the account is active, with a button to the website's login; a `reason` sent here is shown in it as a note. If their email isn't verified yet, the email reminds them to finish the OTP first. Sent in the background: a mail failure doesn't fail the activation (it is logged).",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"isActive\": true,\n  \"role\": \"{{userRole}}\",\n  \"reason\": \"Data lengkap\"\n}",
@@ -2422,7 +2422,7 @@
                     }
                   ]
                 },
-                "description": "**Access:** disnakertrans, admin\n\n`isActive`: true/false. `role`: the target account's role, as a confirmation (must match). `reason`: optional.\n\ndisnakertrans activates/deactivates **admin** accounts; admin activates/deactivates **tenant** accounts. Uses `{{userId}}` / `{{userRole}}` saved by the Register requests. Deactivating ends the user's sessions (`session:ended`, reason `deactivated`) and notifies superadmins.",
+                "description": "**Access:** disnakertrans, admin\n\n`isActive`: true/false. `role`: the target account's role, as a confirmation (must match). `reason`: optional.\n\ndisnakertrans activates/deactivates **admin** accounts; admin activates/deactivates **tenant** accounts. Uses `{{userId}}` / `{{userRole}}` saved by the Register requests. Deactivating ends the user's sessions (`session:ended`, reason `deactivated`) and notifies superadmins.\n\nWhen a disnakertrans **activates an admin account** (inactive → active), the admin gets an **email** (Bahasa Indonesia) that the account is active, with a button to the website's login; a `reason` sent here is shown in it as a note. If their email isn't verified yet, the email reminds them to finish the OTP first. Sent in the background: a mail failure doesn't fail the activation (it is logged).",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"isActive\": true,\n  \"role\": \"{{userRole}}\",\n  \"reason\": \"Data lengkap\"\n}",
@@ -2472,7 +2472,7 @@
                     }
                   ]
                 },
-                "description": "**Access:** disnakertrans, admin\n\n`isActive`: true/false. `role`: the target account's role, as a confirmation (must match). `reason`: optional.\n\ndisnakertrans activates/deactivates **admin** accounts; admin activates/deactivates **tenant** accounts. Uses `{{userId}}` / `{{userRole}}` saved by the Register requests. Deactivating ends the user's sessions (`session:ended`, reason `deactivated`) and notifies superadmins.",
+                "description": "**Access:** disnakertrans, admin\n\n`isActive`: true/false. `role`: the target account's role, as a confirmation (must match). `reason`: optional.\n\ndisnakertrans activates/deactivates **admin** accounts; admin activates/deactivates **tenant** accounts. Uses `{{userId}}` / `{{userRole}}` saved by the Register requests. Deactivating ends the user's sessions (`session:ended`, reason `deactivated`) and notifies superadmins.\n\nWhen a disnakertrans **activates an admin account** (inactive → active), the admin gets an **email** (Bahasa Indonesia) that the account is active, with a button to the website's login; a `reason` sent here is shown in it as a note. If their email isn't verified yet, the email reminds them to finish the OTP first. Sent in the background: a mail failure doesn't fail the activation (it is logged).",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"isActive\": true,\n  \"role\": \"{{userRole}}\",\n  \"reason\": \"Data lengkap\"\n}",

@@ -250,6 +250,8 @@ Setiap approval memiliki `type` (`user` = approval akun, `product` = approval pr
 
 disnakertrans mengaktifkan/menonaktifkan akun **admin**; admin mengaktifkan/menonaktifkan akun **tenant**. Memakai `{{userId}}` / `{{userRole}}` yang disimpan oleh request Register. Menonaktifkan akun mengakhiri sesi user tersebut (`session:ended`, reason `deactivated`) dan memberi tahu superadmin.
 
+Saat disnakertrans **mengaktifkan akun admin** (dari tidak aktif menjadi aktif), admin tersebut menerima **email** (Bahasa Indonesia) bahwa akunnya sudah aktif, dengan tombol masuk ke website; `reason` yang diisi ikut ditampilkan sebagai catatan. Jika emailnya belum diverifikasi, email itu mengingatkan untuk menyelesaikan OTP dulu. Email dikirim di latar belakang: kegagalan pengiriman tidak menggagalkan aktivasi (dicatat di log server).
+
 === REQ Activate / Deactivate Product (disnakertrans, admin) => Aktifkan / Nonaktifkan Produk
 Menyetujui produk (tampil di halaman landing) atau menurunkannya. Pemilik menerima `PRODUCT_APPROVED` saat produk tayang, atau `PRODUCT_TAKEN_DOWN` beserta `reason` saat ditolak atau dinonaktifkan (juga untuk produk baru yang ditolak, dan lagi untuk alasan baru); admin dan disnakertrans menerima `PRODUCT_PUBLISHED`; menurunkan produk yang sedang tayang memberi tahu superadmin. Mengirim status dan alasan yang sama lagi tidak mengirim notifikasi.
 

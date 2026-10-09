@@ -3240,7 +3240,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   <div class="legend"><span class="lg lg-start">Request</span><span class="lg lg-check"><span data-l="en">Check</span><span data-l="id">Pengecekan</span></span><span class="lg lg-error"><span data-l="en">Error response</span><span data-l="id">Respons error</span></span><span class="lg lg-end"><span data-l="en">Success</span><span data-l="id">Berhasil</span></span><span class="lg lg-effect"><span data-l="en">Side effect</span><span data-l="id">Efek samping</span></span><span class="lg lg-note"><span data-l="en">Note</span><span data-l="id">Catatan</span></span></div>
   <div class="flow-grid" data-l="en"><figure class="flow">
   <figcaption>Activate / Deactivate User</figcaption>
-  <svg class="fc" viewBox="0 0 480 914" width="480" height="914" role="img" aria-label="Activate / Deactivate User">
+  <svg class="fc" viewBox="0 0 480 986" width="480" height="986" role="img" aria-label="Activate / Deactivate User">
     <defs><marker id="fc-arrow-69" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
     <rect class="fc-box fc-start" x="8" y="8" width="224" height="48" rx="18"/>
     <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">PATCH</text><text class="fc-text fc-text-start" x="120" y="45" text-anchor="middle">/api/approvals/:id?type=user</text>
@@ -3315,19 +3315,22 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <text class="fc-label" x="237" y="649">no</text>
     <rect class="fc-box fc-error" x="276" y="638" width="196" height="32" rx="8"/>
     <text class="fc-text fc-text-error" x="374" y="659" text-anchor="middle">403 Forbidden</text>
-    <line class="fc-line" x1="120" y1="678" x2="120" y2="743" marker-end="url(#fc-arrow-69)"/>
-    <text class="fc-label" x="126" y="715">yes</text>
-    <rect class="fc-box fc-step" x="8" y="744" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="765" text-anchor="middle">Save approval (created the first</text><text class="fc-text fc-text-step" x="120" y="781" text-anchor="middle">time)</text>
-    <path class="fc-line fc-line-effect" d="M232,768 H254 V740 H275" fill="none" marker-end="url(#fc-arrow-69)"/>
+    <line class="fc-line" x1="120" y1="678" x2="120" y2="779" marker-end="url(#fc-arrow-69)"/>
+    <text class="fc-label" x="126" y="733">yes</text>
+    <rect class="fc-box fc-step" x="8" y="780" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="801" text-anchor="middle">Save approval (created the first</text><text class="fc-text fc-text-step" x="120" y="817" text-anchor="middle">time)</text>
+    <path class="fc-line fc-line-effect" d="M232,804 H254 V740 H275" fill="none" marker-end="url(#fc-arrow-69)"/>
     <rect class="fc-box fc-effect" x="276" y="708" width="196" height="64" rx="8"/>
-    <text class="fc-text fc-text-effect" x="374" y="729" text-anchor="middle">Deactivated → notify</text><text class="fc-text fc-text-effect" x="374" y="745" text-anchor="middle">superadmins</text><text class="fc-text fc-text-effect" x="374" y="761" text-anchor="middle">(USER_DEACTIVATED)</text>
-    <path class="fc-line fc-line-effect" d="M232,768 H254 V804 H275" fill="none" marker-end="url(#fc-arrow-69)"/>
-    <rect class="fc-box fc-effect" x="276" y="780" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-effect" x="374" y="801" text-anchor="middle">Deactivated → user's sockets</text><text class="fc-text fc-text-effect" x="374" y="817" text-anchor="middle">closed (session:ended)</text>
-    <line class="fc-line" x1="120" y1="792" x2="120" y2="857" marker-end="url(#fc-arrow-69)"/>
-    <rect class="fc-box fc-end" x="8" y="858" width="224" height="48" rx="18"/>
-    <text class="fc-text fc-text-end" x="120" y="879" text-anchor="middle">200 { type, id, email, role,</text><text class="fc-text fc-text-end" x="120" y="895" text-anchor="middle">approval }</text>
+    <text class="fc-text fc-text-effect" x="374" y="729" text-anchor="middle">Admin activated by</text><text class="fc-text fc-text-effect" x="374" y="745" text-anchor="middle">disnakertrans → email to the</text><text class="fc-text fc-text-effect" x="374" y="761" text-anchor="middle">admin (Bahasa Indonesia)</text>
+    <path class="fc-line fc-line-effect" d="M232,804 H254 V812 H275" fill="none" marker-end="url(#fc-arrow-69)"/>
+    <rect class="fc-box fc-effect" x="276" y="780" width="196" height="64" rx="8"/>
+    <text class="fc-text fc-text-effect" x="374" y="801" text-anchor="middle">Deactivated → notify</text><text class="fc-text fc-text-effect" x="374" y="817" text-anchor="middle">superadmins</text><text class="fc-text fc-text-effect" x="374" y="833" text-anchor="middle">(USER_DEACTIVATED)</text>
+    <path class="fc-line fc-line-effect" d="M232,804 H254 V876 H275" fill="none" marker-end="url(#fc-arrow-69)"/>
+    <rect class="fc-box fc-effect" x="276" y="852" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-effect" x="374" y="873" text-anchor="middle">Deactivated → user's sockets</text><text class="fc-text fc-text-effect" x="374" y="889" text-anchor="middle">closed (session:ended)</text>
+    <line class="fc-line" x1="120" y1="828" x2="120" y2="929" marker-end="url(#fc-arrow-69)"/>
+    <rect class="fc-box fc-end" x="8" y="930" width="224" height="48" rx="18"/>
+    <text class="fc-text fc-text-end" x="120" y="951" text-anchor="middle">200 { type, id, email, role,</text><text class="fc-text fc-text-end" x="120" y="967" text-anchor="middle">approval }</text>
   </svg>
 </figure>
 <figure class="flow">
@@ -3414,7 +3417,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 </figure></div>
   <div class="flow-grid" data-l="id"><figure class="flow">
   <figcaption>Aktifkan / Nonaktifkan Pengguna</figcaption>
-  <svg class="fc" viewBox="0 0 480 946" width="480" height="946" role="img" aria-label="Aktifkan / Nonaktifkan Pengguna">
+  <svg class="fc" viewBox="0 0 480 1018" width="480" height="1018" role="img" aria-label="Aktifkan / Nonaktifkan Pengguna">
     <defs><marker id="fc-arrow-71" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
     <rect class="fc-box fc-start" x="8" y="8" width="224" height="48" rx="18"/>
     <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">PATCH</text><text class="fc-text fc-text-start" x="120" y="45" text-anchor="middle">/api/approvals/:id?type=user</text>
@@ -3489,19 +3492,22 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <text class="fc-label" x="237" y="665">tidak</text>
     <rect class="fc-box fc-error" x="276" y="654" width="196" height="32" rx="8"/>
     <text class="fc-text fc-text-error" x="374" y="675" text-anchor="middle">403 Forbidden</text>
-    <line class="fc-line" x1="120" y1="694" x2="120" y2="767" marker-end="url(#fc-arrow-71)"/>
-    <text class="fc-label" x="126" y="735">ya</text>
-    <rect class="fc-box fc-step" x="8" y="768" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="789" text-anchor="middle">Simpan approval (dibuat jika belum</text><text class="fc-text fc-text-step" x="120" y="805" text-anchor="middle">ada)</text>
-    <path class="fc-line fc-line-effect" d="M232,792 H254 V756 H275" fill="none" marker-end="url(#fc-arrow-71)"/>
+    <line class="fc-line" x1="120" y1="694" x2="120" y2="803" marker-end="url(#fc-arrow-71)"/>
+    <text class="fc-label" x="126" y="753">ya</text>
+    <rect class="fc-box fc-step" x="8" y="804" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="825" text-anchor="middle">Simpan approval (dibuat jika belum</text><text class="fc-text fc-text-step" x="120" y="841" text-anchor="middle">ada)</text>
+    <path class="fc-line fc-line-effect" d="M232,828 H254 V756 H275" fill="none" marker-end="url(#fc-arrow-71)"/>
     <rect class="fc-box fc-effect" x="276" y="724" width="196" height="64" rx="8"/>
-    <text class="fc-text fc-text-effect" x="374" y="745" text-anchor="middle">Dinonaktifkan → notifikasi ke</text><text class="fc-text fc-text-effect" x="374" y="761" text-anchor="middle">superadmin</text><text class="fc-text fc-text-effect" x="374" y="777" text-anchor="middle">(USER_DEACTIVATED)</text>
-    <path class="fc-line fc-line-effect" d="M232,792 H254 V828 H275" fill="none" marker-end="url(#fc-arrow-71)"/>
+    <text class="fc-text fc-text-effect" x="374" y="745" text-anchor="middle">Admin diaktifkan</text><text class="fc-text fc-text-effect" x="374" y="761" text-anchor="middle">disnakertrans → email ke</text><text class="fc-text fc-text-effect" x="374" y="777" text-anchor="middle">admin tersebut</text>
+    <path class="fc-line fc-line-effect" d="M232,828 H275" fill="none" marker-end="url(#fc-arrow-71)"/>
     <rect class="fc-box fc-effect" x="276" y="796" width="196" height="64" rx="8"/>
-    <text class="fc-text fc-text-effect" x="374" y="817" text-anchor="middle">Dinonaktifkan → socket</text><text class="fc-text fc-text-effect" x="374" y="833" text-anchor="middle">pengguna ditutup</text><text class="fc-text fc-text-effect" x="374" y="849" text-anchor="middle">(session:ended)</text>
-    <line class="fc-line" x1="120" y1="816" x2="120" y2="889" marker-end="url(#fc-arrow-71)"/>
-    <rect class="fc-box fc-end" x="8" y="890" width="224" height="48" rx="18"/>
-    <text class="fc-text fc-text-end" x="120" y="911" text-anchor="middle">200 { type, id, email, role,</text><text class="fc-text fc-text-end" x="120" y="927" text-anchor="middle">approval }</text>
+    <text class="fc-text fc-text-effect" x="374" y="817" text-anchor="middle">Dinonaktifkan → notifikasi ke</text><text class="fc-text fc-text-effect" x="374" y="833" text-anchor="middle">superadmin</text><text class="fc-text fc-text-effect" x="374" y="849" text-anchor="middle">(USER_DEACTIVATED)</text>
+    <path class="fc-line fc-line-effect" d="M232,828 H254 V900 H275" fill="none" marker-end="url(#fc-arrow-71)"/>
+    <rect class="fc-box fc-effect" x="276" y="868" width="196" height="64" rx="8"/>
+    <text class="fc-text fc-text-effect" x="374" y="889" text-anchor="middle">Dinonaktifkan → socket</text><text class="fc-text fc-text-effect" x="374" y="905" text-anchor="middle">pengguna ditutup</text><text class="fc-text fc-text-effect" x="374" y="921" text-anchor="middle">(session:ended)</text>
+    <line class="fc-line" x1="120" y1="852" x2="120" y2="961" marker-end="url(#fc-arrow-71)"/>
+    <rect class="fc-box fc-end" x="8" y="962" width="224" height="48" rx="18"/>
+    <text class="fc-text fc-text-end" x="120" y="983" text-anchor="middle">200 { type, id, email, role,</text><text class="fc-text fc-text-end" x="120" y="999" text-anchor="middle">approval }</text>
   </svg>
 </figure>
 <figure class="flow">
@@ -3601,8 +3607,10 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
     <div data-l="en"><p><code>isActive</code>: true/false. <code>role</code>: the target account's role, as a confirmation (must match). <code>reason</code>: optional.</p>
-<p>disnakertrans activates/deactivates <strong>admin</strong> accounts; admin activates/deactivates <strong>tenant</strong> accounts. Uses <code>{{userId}}</code> / <code>{{userRole}}</code> saved by the Register requests. Deactivating ends the user's sessions (<code>session:ended</code>, reason <code>deactivated</code>) and notifies superadmins.</p></div><div data-l="id"><p><code>isActive</code>: true/false. <code>role</code>: role akun yang dituju, sebagai konfirmasi (harus sesuai). <code>reason</code>: opsional.</p>
-<p>disnakertrans mengaktifkan/menonaktifkan akun <strong>admin</strong>; admin mengaktifkan/menonaktifkan akun <strong>tenant</strong>. Memakai <code>{{userId}}</code> / <code>{{userRole}}</code> yang disimpan oleh request Register. Menonaktifkan akun mengakhiri sesi user tersebut (<code>session:ended</code>, reason <code>deactivated</code>) dan memberi tahu superadmin.</p></div>
+<p>disnakertrans activates/deactivates <strong>admin</strong> accounts; admin activates/deactivates <strong>tenant</strong> accounts. Uses <code>{{userId}}</code> / <code>{{userRole}}</code> saved by the Register requests. Deactivating ends the user's sessions (<code>session:ended</code>, reason <code>deactivated</code>) and notifies superadmins.</p>
+<p>When a disnakertrans <strong>activates an admin account</strong> (inactive → active), the admin gets an <strong>email</strong> (Bahasa Indonesia) that the account is active, with a button to the website's login; a <code>reason</code> sent here is shown in it as a note. If their email isn't verified yet, the email reminds them to finish the OTP first. Sent in the background: a mail failure doesn't fail the activation (it is logged).</p></div><div data-l="id"><p><code>isActive</code>: true/false. <code>role</code>: role akun yang dituju, sebagai konfirmasi (harus sesuai). <code>reason</code>: opsional.</p>
+<p>disnakertrans mengaktifkan/menonaktifkan akun <strong>admin</strong>; admin mengaktifkan/menonaktifkan akun <strong>tenant</strong>. Memakai <code>{{userId}}</code> / <code>{{userRole}}</code> yang disimpan oleh request Register. Menonaktifkan akun mengakhiri sesi user tersebut (<code>session:ended</code>, reason <code>deactivated</code>) dan memberi tahu superadmin.</p>
+<p>Saat disnakertrans <strong>mengaktifkan akun admin</strong> (dari tidak aktif menjadi aktif), admin tersebut menerima <strong>email</strong> (Bahasa Indonesia) bahwa akunnya sudah aktif, dengan tombol masuk ke website; <code>reason</code> yang diisi ikut ditampilkan sebagai catatan. Jika emailnya belum diverifikasi, email itu mengingatkan untuk menyelesaikan OTP dulu. Email dikirim di latar belakang: kegagalan pengiriman tidak menggagalkan aktivasi (dicatat di log server).</p></div>
     <h4><span data-l="en">Query parameters</span><span data-l="id">Parameter query</span></h4><div class="table-wrap"><table><thead><tr><th><span data-l="en">name</span><span data-l="id">nama</span></th><th><span data-l="en">example</span><span data-l="id">contoh</span></th><th><span data-l="en">required</span><span data-l="id">wajib</span></th></tr></thead><tbody><tr><td><code>type</code></td><td><code>user</code></td><td><span data-l="en">yes</span><span data-l="id">ya</span></td></tr></tbody></table></div>
     <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;isActive&quot;: true,
@@ -10083,7 +10091,7 @@ socket.on('connect_error', (err) =&gt; { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATE
   </div>
 </article>
 </section>
-  <footer><span data-l="en">Generated from <code>postman/Prafi-API.postman_collection.json</code> on 2026-10-08 · regenerate with <code>npm run docs</code></span><span data-l="id">Dibuat dari <code>postman/Prafi-API.postman_collection.json</code> pada 2026-10-08 · buat ulang dengan <code>npm run docs</code></span></footer>
+  <footer><span data-l="en">Generated from <code>postman/Prafi-API.postman_collection.json</code> on 2026-10-09 · regenerate with <code>npm run docs</code></span><span data-l="id">Dibuat dari <code>postman/Prafi-API.postman_collection.json</code> pada 2026-10-09 · buat ulang dengan <code>npm run docs</code></span></footer>
 </div>
 </main>
 </div>
