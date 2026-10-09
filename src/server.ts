@@ -4,6 +4,7 @@ import { checkMailConnection } from './services/mail.service';
 import { sequelize } from './models';
 import { closeRealtime, initRealtime } from './realtime/socket';
 import { startRetention as startLogRetention } from './services/apiLog.service';
+import { startOrphanImageCleanup } from './services/imageCleanup.service';
 
 async function start() {
   try {
@@ -20,6 +21,7 @@ async function start() {
     console.log(`API docs on http://localhost:${env.port}/docs`);
     void checkMailConnection();
     startLogRetention();
+    startOrphanImageCleanup();
   });
   initRealtime(server);
 

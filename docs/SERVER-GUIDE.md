@@ -255,6 +255,12 @@ Other database commands:
 | `npm run db:seed` | Creates the superadmin from `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` (safe to repeat) |
 | `npm run db:sync` | Creates missing tables only (a fresh, empty database) |
 | `npm run db:sync -- --force` | **Deletes all data** and recreates the tables. Never on the live server (refused when `NODE_ENV=production`) |
+| `npm run images:cleanup -- --dry-run` | Lists unused uploaded images (section below) without deleting anything |
+| `npm run images:cleanup` | Deletes them now, instead of waiting for the night |
+
+**Unused images are cleaned up every night.** A form uploads its photo as soon as it is picked and only links it on *Simpan*; not saving deletes the upload again from the browser, but that can fail (tab closed offline, a crash). At **02:00 WIT** the backend deletes what is left: image rows that no account photo, UMKM logo, product or category uses, with their files, and files in `images/` that have no image row. Only things **older than 24 hours** are touched, so a form being filled in is never affected. It runs inside the backend service (no cron needed) and logs one line, e.g. `[images] nightly cleanup: deleted 1 unused image(s) (ids 35) and 0 stray file(s), 1.3 MB freed` (`journalctl -u prafi-backend | grep images`). Code: `src/services/imageCleanup.service.ts`.
+
+> If a new table ever gets an image column, add it to the list in `imageCleanup.service.ts` (`ORPHAN_WHERE`), or the cleanup would treat those images as unused.
 
 ## 8. HTTPS certificates
 
