@@ -458,7 +458,7 @@ Notifikasi realtime (dan, untuk superadmin, log API langsung) melalui **Socket.I
 > File koleksi Postman tidak bisa memuat request Socket.IO, jadi buat satu secara manual (sekali saja):
 > 1. **New → Socket.IO**, URL `{{baseUrl}}` (versi client: **v4**).
 > 2. **Headers**: `Authorization` = `Bearer {{token}}` (atau **Settings → Handshake auth**: `{ "token": "{{token}}" }`).
-> 3. Tab **Events**: tambahkan listener `notification:new`, `notification:unread-count`, `session:ended` (superadmin juga `log:new`) lalu aktifkan.
+> 3. Tab **Events**: tambahkan listener `notification:new`, `notification:unread-count`, `session:ended`, `review:changed` (superadmin juga `log:new`) lalu aktifkan.
 > 4. **Connect**. Lalu jalankan request dari koleksi ini di tab lain (mis. buat produk sebagai tenant) dan lihat event yang masuk.
 > 5. Simpan ke koleksi ini (Save → Prafi API) agar berada di samping request REST.
 
@@ -472,6 +472,7 @@ Notifikasi realtime (dan, untuk superadmin, log API langsung) melalui **Socket.I
 | `notification:new` | `{ notification, unreadCount }` | notifikasi baru dibuat untuk user ini (bentuknya sama dengan item `GET /api/notifications`) |
 | `session:ended` | `{ reason, message }` | `reason`: `logged_out` (token ini logout), `deactivated` (akun dinonaktifkan), `token_expired` (token 1 jam kedaluwarsa), `password_reset` (kata sandi diatur ulang). Server lalu memutus koneksi; frontend sebaiknya me-logout user. |
 | `log:new` | `{ log }` | **hanya superadmin**: satu baris baru tersimpan di log API (bentuknya sama dengan item `GET /api/logs`, tanpa `errorStack`) |
+| `review:changed` | `{ reviewId, productId, action }` | **penjual** produk tersebut (setiap perubahan ulasan) serta **admin + disnakertrans** (laporan dan keputusan): ulasan `created`, `reported`, `hidden`, `kept`, atau `unhidden`. Halaman Ulasan memuat ulang daftarnya |
 
 Setiap user hanya menerima event miliknya (ditambah event untuk role-nya, mis. `log:new` untuk superadmin); semua tab/perangkat milik user tersebut ikut menerimanya.
 

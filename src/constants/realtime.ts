@@ -19,6 +19,14 @@ export const REALTIME_EVENTS = {
    * Payload: { log }
    */
   LOG_NEW: 'log:new',
+  /**
+   * server → the product's seller (always) and admins + disnakertrans (reports and decisions): a review was posted,
+   * reported, hidden, kept or shown again. The Ulasan pages reload. Payload: { reviewId, productId, action }
+   * action: 'created' | 'reported' | 'hidden' | 'kept' | 'unhidden'
+   */
+  REVIEW_CHANGED: 'review:changed',
 } as const;
+
+export type ReviewChange = 'created' | 'reported' | 'hidden' | 'kept' | 'unhidden';
 
 export type SessionEndReason = 'token_expired' | 'logged_out' | 'deactivated' | 'password_reset';

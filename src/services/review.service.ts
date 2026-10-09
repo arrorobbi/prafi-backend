@@ -6,6 +6,9 @@ import { HttpError } from '../errors/HttpError';
 import { Product, Review } from '../models';
 import type { ReportStatus } from '../models/review.model';
 import type { AuthUser } from '../types/express';
+import { REVIEW_MODERATOR_ROLES } from '../constants/roles';
+import { REALTIME_EVENTS as E, type ReviewChange } from '../constants/realtime';
+import { emitToRoles, emitToUser } from '../realtime/socket';
 import { notify } from './notification.service';
 
 export interface ReviewInput {
@@ -70,6 +73,16 @@ export async function list(productId: string, { page, limit }: { page: number; l
   return { reviews: rows, meta: { page, limit, total: count, totalPages: Math.ceil(count / limit), ...totals } };
 }
 
+/**
+ * Live update for the dashboards' review pages: the seller always (their Ulasan Produk), admins and disnakertrans
+ * for reports and decisions (Laporan Ulasan; a new review isn't reported yet, so it doesn't concern them).
+ */
+function broadcast(review: { id: number; productId: string }, sellerId: string, action: ReviewChange) {
+  const payload = { reviewId: review.id, productId: review.productId, action };
+  emitToUser(sellerId, E.REVIEW_CHANGED, payload);
+  if (action !== 'created') emitToRoles(REVIEW_MODERATOR_ROLES, E.REVIEW_CHANGED, payload);
+}
+
 // ---------- spam guards for the public POST (kept in the database: a restart doesn't reset them) ----------
 
 /** At most this many reviews per visitor (IP) per window, across all products */
@@ -120,6 +133,7 @@ export async function create(productId: string, input: ReviewInput, visitor: { i
   const created = await Review.create({ ...input, productId, clientId: visitor.clientId, ipHash });
   await refreshRecommended(productId);
   await notify.productReviewed(product, input);
+  broadcast(created, product.tenantId, 'created');
   const review = await Review.findByPk(created.id, { attributes: ['id', 'productId', 'name', 'stars', 'review', 'createdAt', 'updatedAt'] });
   return { review, ...(await summary(productId)) };
 }
@@ -205,6 +219,7 @@ export async function report(user: AuthUser, id: number, reason: string) {
   }
   await review.update({ reportStatus: 'pending', reportReason: reason, reportedAt: new Date(), reportedBy: user.id });
   await notify.reviewReported({ id: review.id, stars: review.stars, name: review.name }, review.product!, reason);
+  broadcast(review, review.product!.tenantId, 'reported');
   return findWithProduct(id);
 }
 
@@ -229,5 +244,6 @@ export async function moderate(actor: AuthUser, id: number, action: ModerationAc
   }
   if (action !== 'keep') await refreshRecommended(review.productId);
   await notify.reviewModerated(actor, { id: review.id, stars: review.stars, name: review.name }, review.product!, action, note);
+  broadcast(review, review.product!.tenantId, action === 'hide' ? 'hidden' : action === 'keep' ? 'kept' : 'unhidden');
   return findWithProduct(id);
 }
