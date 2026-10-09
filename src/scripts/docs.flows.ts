@@ -431,10 +431,13 @@ export const FLOWS: Record<string, Chart[]> = {
         step({ en: 'No token needed', id: 'Tanpa token' }),
         check({ en: 'Product approved?', id: 'Produk sudah disetujui?' }, '404'),
         check({ en: 'POST: name, stars 1-5, review valid?', id: 'POST: name, stars 1-5, review valid?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
-        check({ en: 'POST: under 5 reviews per visitor in 10 min?', id: 'POST: kurang dari 5 ulasan per pengunjung dalam 10 menit?' }, '429 TOO_MANY_REQUESTS'),
+        check({ en: 'POST: clientId (browser id) valid?', id: 'POST: clientId (id browser) valid?' }, '400'),
+        check({ en: 'POST: Turnstile token confirmed by Cloudflare?', id: 'POST: token Turnstile dikonfirmasi Cloudflare?' }, '400 TURNSTILE_REQUIRED / TURNSTILE_FAILED'),
+        check({ en: 'POST: under 5 reviews from this IP in 10 min?', id: 'POST: kurang dari 5 ulasan dari IP ini dalam 10 menit?' }, '429 TOO_MANY_REQUESTS'),
+        check({ en: 'POST: same browser + IP not reviewed it in 24 h?', id: 'POST: browser + IP yang sama belum mengulas dalam 24 jam?' }, '429 ALREADY_REVIEWED'),
         step(
-          { en: 'POST: save the review', id: 'POST: simpan ulasan' },
-          effect({ en: 'isRecommended = average (1 decimal) ≥ 4.8', id: 'isRecommended = rata-rata (1 desimal) ≥ 4,8' }),
+          { en: 'POST: save the review (IP stored only as a hash)', id: 'POST: simpan ulasan (IP hanya disimpan sebagai hash)' },
+          effect({ en: 'isRecommended = ≥ 3 visible reviews and average (1 decimal) ≥ 4.8', id: 'isRecommended = ≥ 3 ulasan tampil dan rata-rata (1 desimal) ≥ 4,8' }),
           effect({ en: 'Notify the owner: new review', id: 'Notifikasi ke pemilik: ulasan baru' }),
         ),
         end(
@@ -454,6 +457,29 @@ export const FLOWS: Record<string, Chart[]> = {
           { en: '200 UMKM, A→Z', id: '200 UMKM, urut A→Z' },
           note({ en: 'productCount, ratingAverage, reviewCount of approved products', id: 'productCount, ratingAverage, reviewCount dari produk yang disetujui' }),
         ),
+      ],
+    },
+  ],
+
+  Reviews: [
+    {
+      title: { en: 'Report and moderate reviews', id: 'Laporkan dan putuskan ulasan' },
+      nodes: [
+        start('POST /api/reviews/:id/report · PATCH /api/reviews/:id/moderation'),
+        ...auth({ en: 'tenant (report) · disnakertrans or admin (decide)', id: 'tenant (lapor) · disnakertrans atau admin (putuskan)' }),
+        check({ en: 'Report: a review of your own product?', id: 'Lapor: ulasan pada produk sendiri?' }, '404'),
+        check({ en: 'Report: not reported before?', id: 'Lapor: belum pernah dilaporkan?' }, '409'),
+        step(
+          { en: 'Report: status pending', id: 'Lapor: status pending' },
+          effect({ en: 'Notify admins + disnakertrans (REVIEW_REPORTED)', id: 'Notifikasi ke admin + disnakertrans (REVIEW_REPORTED)' }),
+        ),
+        check({ en: 'Decide: action fits the status? (keep: pending only)', id: 'Putuskan: action sesuai status? (keep: hanya pending)' }, '409'),
+        step(
+          { en: 'Decide: hide / keep / unhide', id: 'Putuskan: hide / keep / unhide' },
+          effect({ en: 'Hide / unhide: rating + recommendation recomputed, landing refreshed', id: 'Hide / unhide: rating + rekomendasi dihitung ulang, landing diperbarui' }),
+          effect({ en: 'Notify the seller (REVIEW_MODERATED)', id: 'Notifikasi ke penjual (REVIEW_MODERATED)' }),
+        ),
+        end({ en: '200 review with its report status', id: '200 ulasan beserta status laporannya' }),
       ],
     },
   ],

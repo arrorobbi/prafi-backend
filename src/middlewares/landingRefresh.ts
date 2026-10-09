@@ -5,10 +5,10 @@ const CHANGES = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 /**
  * Changes visitors can see on the landing pages: products (create, edit, delete), reviews, product categories,
- * UMKM profiles, approvals (a product or account activated / deactivated) and a tenant's own account (its
+ * UMKM profiles, review moderation (hide / show again), approvals (a product or account activated / deactivated) and a tenant's own account (its
  * tenantName is the seller name on product cards).
  */
-const PUBLIC_CHANGE = /^\/api\/(products|product-categories|tenants\/me|approvals|auth\/me|landing\/products\/[^/]+\/reviews)(\/|$)/;
+const PUBLIC_CHANGE = /^\/api\/(products|product-categories|tenants\/me|approvals|auth\/me|landing\/products\/[^/]+\/reviews|reviews\/[^/]+\/moderation)(\/|$)/;
 
 /** After a successful change of public data, the frontend's cached landing pages are refreshed at once. */
 export const landingRefresh: RequestHandler = (req, res, next) => {

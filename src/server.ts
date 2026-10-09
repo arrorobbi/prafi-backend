@@ -5,6 +5,7 @@ import { sequelize } from './models';
 import { closeRealtime, initRealtime } from './realtime/socket';
 import { startRetention as startLogRetention } from './services/apiLog.service';
 import { startOrphanImageCleanup } from './services/imageCleanup.service';
+import { logTurnstileStatus } from './utils/turnstile';
 
 async function start() {
   try {
@@ -20,6 +21,7 @@ async function start() {
     console.log(`WebSocket (Socket.IO) on ws://localhost:${env.port}`);
     console.log(`API docs on http://localhost:${env.port}/docs`);
     void checkMailConnection();
+    logTurnstileStatus();
     startLogRetention();
     startOrphanImageCleanup();
   });

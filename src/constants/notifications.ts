@@ -8,7 +8,8 @@
  *   admin         — PRODUCT_SUBMITTED, PRODUCT_PUBLISHED, PRODUCT_UPDATED, PRODUCT_DELETED, TENANT_PROFILE_UPDATED,
  *                   TENANT_REGISTERED
  *   tenant        — about their own products: PRODUCT_UNDER_REVIEW, PRODUCT_APPROVED, PRODUCT_TAKEN_DOWN,
- *                   PRODUCT_CHANGES_SAVED, PRODUCT_REVIEWED
+ *                   PRODUCT_CHANGES_SAVED, PRODUCT_REVIEWED, REVIEW_MODERATED
+ *   admin + disnakertrans also get REVIEW_REPORTED
  */
 export const NOTIFICATION_TYPES = {
   /** To superadmins: a new account of any role was created. */
@@ -41,6 +42,10 @@ export const NOTIFICATION_TYPES = {
   PRODUCT_CHANGES_SAVED: 'PRODUCT_CHANGES_SAVED',
   /** To the tenant: a visitor reviewed their product. */
   PRODUCT_REVIEWED: 'PRODUCT_REVIEWED',
+  /** To admins and disnakertrans: a seller reported a review of their product (to hide or keep it). */
+  REVIEW_REPORTED: 'REVIEW_REPORTED',
+  /** To the tenant: an admin / disnakertrans hid, kept or showed again a review of their product. */
+  REVIEW_MODERATED: 'REVIEW_MODERATED',
 } as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[keyof typeof NOTIFICATION_TYPES];

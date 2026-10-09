@@ -62,6 +62,10 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Landing | `POST /api/landing/products/{{productId}}/reviews` | Publik |
 | Landing | `GET /api/landing/tenants` | Publik |
 | Landing | `GET /api/landing/tenants/{{tenantProfileId}}` | Publik |
+| Ulasan | `GET /api/reviews/mine` | tenant |
+| Ulasan | `POST /api/reviews/{{reviewId}}/report` | tenant |
+| Ulasan | `GET /api/reviews` | disnakertrans, admin |
+| Ulasan | `PATCH /api/reviews/{{reviewId}}/moderation` | disnakertrans, admin |
 | Kategori Produk | `GET /api/product-categories` | Semua role |
 | Kategori Produk | `GET /api/product-categories/{{categoryId}}` | Semua role |
 | Kategori Produk | `POST /api/product-categories` | disnakertrans, admin |
@@ -89,7 +93,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Realtime (WebSocket) | Socket.IO di `{{baseUrl}}` | Semua role (Bearer token) |
 
 ## Variabel yang disimpan
-Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `categoryId` · `tenantProfileId` · `notificationId` · `logId`. Setiap penyimpanan dicetak di Postman Console.
+Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `reviewId`, `reviewClientId` · `categoryId` · `tenantProfileId` · `notificationId` · `logId`. Setiap penyimpanan dicetak di Postman Console.
 
 ## Contoh alur
 1. **Login** sebagai superadmin → **Register Disnakertrans** → **Verify Email Link** (atau buka link dari email).
@@ -299,15 +303,39 @@ Satu produk yang sudah disetujui beserta `ratingAverage` / `reviewCount`. 404 un
 Ulasan sebuah produk, terbaru di atas. `meta.ratingAverage` dan `meta.reviewCount` untuk ringkasan bintang.
 
 === REQ Create Review (Public) => Tulis Ulasan
-Tanpa login. `name` (maks. 100), `stars` (bilangan bulat 1–5), `review` (maks. 1000). Hanya untuk produk yang sudah disetujui. Mengembalikan ulasan beserta `meta.ratingAverage` / `meta.reviewCount` terbaru produk tersebut. Maksimal 5 per pengunjung per 10 menit (429).
+Tanpa login. `name` (maks. 100), `stars` (bilangan bulat 1–5), `review` (maks. 1000), `clientId` (id acak browser dari halaman, 8–64 huruf/angka/tanda hubung, disimpan di localStorage browser) dan `turnstileToken` (token Cloudflare Turnstile "Saya bukan robot" dari form; wajib bila server memiliki `TURNSTILE_SECRET_KEY`). Hanya untuk produk yang sudah disetujui. Mengembalikan ulasan beserta `meta.ratingAverage` / `meta.reviewCount` terbaru produk tersebut.
 
-Setelah setiap ulasan, `isRecommended` produk dihitung ulang: `true` selama rata-rata ulasannya (1 desimal, seperti yang tampil) **4,8 atau lebih**.
+**Pengaman spam** (disimpan di database, sehingga restart tidak meresetnya):
+- **browser yang sama di IP yang sama** hanya dapat mengulas satu produk **sekali per 24 jam** (429 `ALREADY_REVIEWED`, `details.retryAfterSeconds`);
+- maksimal **5 ulasan per IP per 10 menit** (429 `TOO_MANY_REQUESTS`);
+- Turnstile: 400 `TURNSTILE_REQUIRED` (tanpa token), 400 `TURNSTILE_FAILED` (tidak valid / kedaluwarsa), 503 `TURNSTILE_UNAVAILABLE`.
+
+IP tidak pernah disimpan, hanya hash-nya; hash maupun `clientId` tidak pernah dikembalikan.
+
+Setelah setiap ulasan, `isRecommended` produk dihitung ulang: `true` bila ada **minimal 3** ulasan yang tampil dan rata-ratanya (1 desimal, seperti yang tampil) **4,8 atau lebih**.
 
 === REQ Landing Tenants (Public) => Daftar UMKM Landing
 UMKM (profil tenant) yang akun pemiliknya aktif, urut A→Z, masing-masing dengan logo, `productCount` (produk yang sudah disetujui), `ratingAverage`, dan `reviewCount`. Opsional `q` (cari nama). Menyimpan yang pertama sebagai `{{tenantProfileId}}`.
 
 === REQ Landing Tenant (Public) => Detail UMKM Landing
 Satu UMKM beserta ringkasannya. Id boleh berupa id profil **atau id user pemiliknya** (`product.tenant.id`), sehingga halaman produk dapat langsung menautkan ke UMKM-nya. Produknya: *Produk Landing* dengan `tenantId` = `userId`.
+
+=== FOLDER Reviews => Ulasan
+Menjaga ulasan produk (`/api/reviews`, Bearer `{{token}}`). Pengunjung menulis ulasan tanpa login (*Landing → Tulis Ulasan*); di sini **penjual melaporkan** ulasan pada produknya sendiri dan **admin / disnakertrans memutuskan**: `hide` (tidak lagi tampil dan tidak dihitung dalam rating maupun rekomendasi; datanya tetap tersimpan), `keep` (tetap tampil; penjual tidak dapat melaporkannya lagi) atau `unhide` (menampilkan kembali ulasan yang disembunyikan).
+
+Setiap ulasan memiliki `isHidden`, `reportStatus` (`null` belum pernah dilaporkan, `pending`, `kept`, `hidden`), `reportReason`, `reportedAt`, `moderatedAt`, `moderationNote`. Laporan memberi tahu admin dan disnakertrans (`REVIEW_REPORTED`); keputusan memberi tahu penjual (`REVIEW_MODERATED`). Id browser dan hash IP pengunjung tidak pernah dikembalikan.
+
+=== REQ My Product Reviews (tenant) => Ulasan Produk Saya
+Ulasan pada produk milik sendiri, terbaru di atas, **termasuk yang disembunyikan** (agar penjual melihat keputusannya). `productId` opsional. Menyimpan yang pertama sebagai `{{reviewId}}`.
+
+=== REQ Report Review (tenant) => Laporkan Ulasan
+Hanya ulasan pada produk milik sendiri (lainnya: 404). `reason` (wajib, maks. 500). Ulasan tetap tampil sampai admin atau disnakertrans memutuskan. Sekali per ulasan: melapor lagi mendapat 409 (sedang menunggu, sudah dipertahankan, atau sudah disembunyikan).
+
+=== REQ List Reported Reviews (disnakertrans, admin) => Daftar Ulasan Dilaporkan
+`status`: `pending` (bawaan; laporan terlama di atas), `hidden`, `kept` atau `all`. Setiap ulasan beserta `product` (dan penjualnya), `reporter`, dan `moderator`.
+
+=== REQ Moderate Review (disnakertrans, admin) => Putuskan Ulasan
+`action`: `hide` (ulasan yang dilaporkan atau ulasan mana pun), `keep` (hanya laporan yang menunggu) atau `unhide` (ulasan yang disembunyikan); `note` opsional (maks. 500), ditampilkan kepada penjual. Menyembunyikan / menampilkan kembali langsung memperbarui rating dan rekomendasi produk serta halaman landing.
 
 === FOLDER Product Categories => Kategori Produk
 Kategori produk (mis. Kuliner, Kerajinan). Dikelola oleh disnakertrans dan admin; semua role yang login dapat membacanya (superadmin dan tenant hanya membaca). Tenant memilih salah satunya untuk setiap produk (`categoryId`). Setiap kategori **wajib** memiliki gambar (`imageId`, unggah dulu melalui *Gambar → Unggah Gambar*): carousel halaman landing menampilkannya, dengan produk kategori tersebut di sebelahnya. Pengunjung membaca daftarnya melalui *Landing → Kategori Landing*. Setiap kategori membawa `productCount`.

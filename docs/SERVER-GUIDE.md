@@ -171,6 +171,7 @@ Each app reads its `.env` file at start. The backend reads it when the service s
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | Outgoing email (Gmail; `SMTP_PASS` is a Gmail *app password*). Without `SMTP_HOST`, emails are only printed in the log |
 | `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` | The superadmin account made by `npm run db:seed` |
 | `REVALIDATE_SECRET`, `FRONTEND_REVALIDATE_URL` | Lets the backend refresh the website's cached public pages right after a change; the same secret is in the frontend `.env` |
+| `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile **secret** key: the backend confirms the review form's "not a robot" check with it. Empty = the check is skipped (warning at startup). Keep it secret; the matching *site* key is in the frontend `.env` |
 | `LOG_RETENTION_DAYS` | Days of API logs to keep (default 30) |
 | `DB_LOGGING` | `true` prints every SQL query (debugging only) |
 
@@ -182,6 +183,7 @@ Each app reads its `.env` file at start. The backend reads it when the service s
 | `SITE_URL` | The website's own address (product links in WhatsApp messages). Default `https://transniaga.manokwarikab.go.id` |
 | `NEXT_PUBLIC_ADMIN_WHATSAPP`, `NEXT_PUBLIC_ADMIN_EMAIL` | Contact shown in *Panduan → Hubungi Administrator* |
 | `REVALIDATE_SECRET` | Same value as in the backend `.env` |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile **site** key (public) for the review form's "not a robot" check |
 
 ## 7. Database
 

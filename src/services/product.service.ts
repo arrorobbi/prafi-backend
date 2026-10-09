@@ -47,8 +47,8 @@ const canReadAll = (user: AuthUser) => PRODUCT_READ_ALL_ROLES.includes(user.role
  * and reviewCount. Subqueries, so paging and counting the products stay correct.
  */
 const RATING_ATTRIBUTES: [ReturnType<typeof literal>, string][] = [
-  [literal('(SELECT ROUND(AVG(r.stars)::numeric, 1)::float FROM reviews r WHERE r.product_id = "Product"."id")'), 'ratingAverage'],
-  [literal('(SELECT COUNT(*)::int FROM reviews r WHERE r.product_id = "Product"."id")'), 'reviewCount'],
+  [literal('(SELECT ROUND(AVG(r.stars)::numeric, 1)::float FROM reviews r WHERE r.product_id = "Product"."id" AND NOT r.is_hidden)'), 'ratingAverage'],
+  [literal('(SELECT COUNT(*)::int FROM reviews r WHERE r.product_id = "Product"."id" AND NOT r.is_hidden)'), 'reviewCount'],
 ];
 const withRating = (exclude: string[] = []): FindAttributeOptions => ({ include: RATING_ATTRIBUTES, exclude });
 

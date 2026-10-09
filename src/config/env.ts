@@ -56,6 +56,12 @@ export const env = {
     from: process.env.MAIL_FROM ?? 'Trans Niaga <no-reply@transniaga.local>',
   },
 
+  /**
+   * Cloudflare Turnstile ("not a robot" check on the public review form). The secret key confirms a visitor's
+   * token with Cloudflare; empty = the check is skipped (a warning is logged at startup).
+   */
+  turnstileSecret: process.env.TURNSTILE_SECRET_KEY ?? '',
+
   /** API request/error logs (GET /api/logs) older than this many days are deleted. */
   logRetentionDays: Math.max(1, Number(process.env.LOG_RETENTION_DAYS ?? 30) || 30),
 

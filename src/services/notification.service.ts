@@ -1,5 +1,5 @@
 import { Op, fn, col } from 'sequelize';
-import { PRODUCT_APPROVER_ROLES, ROLES, type Role } from '../constants/roles';
+import { PRODUCT_APPROVER_ROLES, REVIEW_MODERATOR_ROLES, ROLES, type Role } from '../constants/roles';
 import { NOTIFICATION_TYPES as T, type NotificationEntityType, type NotificationType } from '../constants/notifications';
 import { REALTIME_EVENTS as E } from '../constants/realtime';
 import { HttpError } from '../errors/HttpError';
@@ -206,6 +206,43 @@ export const notify = {
         type: T.PRODUCT_DELETED,
         name: 'Product deleted',
         description: `${owner.tenantName ?? 'A tenant'} deleted "${product.name}".`,
+      }),
+    ),
+
+  /** admins + disnakertrans: a seller reported a review of their product */
+  reviewReported: (
+    review: { id: number; stars: number; name: string },
+    product: { id: string; name: string; tenant?: { tenantName: string | null } | null },
+    reason: string,
+  ) =>
+    safely('reviewReported', () =>
+      toRole(REVIEW_MODERATOR_ROLES, {
+        type: T.REVIEW_REPORTED,
+        name: 'Review reported',
+        description: `${product.tenant?.tenantName ?? 'A seller'} reported ${review.name}'s ${review.stars}-star review of "${product.name}"${reason ? `: ${reason}` : '.'}`,
+        entityType: 'product',
+        entityId: product.id,
+      }),
+    ),
+
+  /** the tenant: an admin / disnakertrans decided on a review of their product */
+  reviewModerated: (
+    actor: AuthUser,
+    review: { id: number; stars: number; name: string },
+    product: { id: string; name: string; tenantId: string },
+    action: 'hide' | 'keep' | 'unhide',
+    note: string | null,
+  ) =>
+    safely('reviewModerated', () =>
+      toUsers([product.tenantId], {
+        type: T.REVIEW_MODERATED,
+        name: action === 'keep' ? 'Review kept' : action === 'hide' ? 'Review hidden' : 'Review shown again',
+        description:
+          `${review.name}'s ${review.stars}-star review of "${product.name}" ` +
+          (action === 'hide' ? 'was hidden' : action === 'keep' ? 'stays visible' : 'is visible again') +
+          ` (by ${actor.role})${note ? `. Note: ${note}` : '.'}`,
+        entityType: 'product',
+        entityId: product.id,
       }),
     ),
 

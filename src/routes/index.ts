@@ -11,6 +11,7 @@ import productRoutes from './product.routes';
 import statsRoutes from './stats.routes';
 import tenantRoutes from './tenant.routes';
 import productCategoryRoutes from './productCategory.routes';
+import reviewRoutes from './review.routes';
 import serverDocsRoutes from './serverDocs.routes';
 import userRoutes from './user.routes';
 
@@ -28,6 +29,7 @@ router.use('/products', productRoutes);
 router.use('/tenants', tenantRoutes);
 router.use('/product-categories', productCategoryRoutes);
 router.use('/landing', landingRoutes);
+router.use('/reviews', reviewRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/logs', apiLogRoutes);
 router.use('/stats', statsRoutes);

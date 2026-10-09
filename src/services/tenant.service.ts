@@ -171,8 +171,8 @@ const ACTIVE_PRODUCTS = `FROM products p JOIN approvals a ON a.id = p.approval_i
 const PUBLIC_ATTRIBUTES = {
   include: [
     [literal(`(SELECT COUNT(*)::int ${ACTIVE_PRODUCTS})`), 'productCount'],
-    [literal(`(SELECT ROUND(AVG(r.stars)::numeric, 1)::float FROM reviews r WHERE r.product_id IN (SELECT p.id ${ACTIVE_PRODUCTS}))`), 'ratingAverage'],
-    [literal(`(SELECT COUNT(*)::int FROM reviews r WHERE r.product_id IN (SELECT p.id ${ACTIVE_PRODUCTS}))`), 'reviewCount'],
+    [literal(`(SELECT ROUND(AVG(r.stars)::numeric, 1)::float FROM reviews r WHERE NOT r.is_hidden AND r.product_id IN (SELECT p.id ${ACTIVE_PRODUCTS}))`), 'ratingAverage'],
+    [literal(`(SELECT COUNT(*)::int FROM reviews r WHERE NOT r.is_hidden AND r.product_id IN (SELECT p.id ${ACTIVE_PRODUCTS}))`), 'reviewCount'],
   ] as [ReturnType<typeof literal>, string][],
 };
 
