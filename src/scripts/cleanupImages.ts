@@ -1,5 +1,5 @@
 /**
- * Deletes orphan images now, the same cleanup the backend runs every night at 02:00 WIT.
+ * Deletes orphan images now, the same cleanup the backend runs every night at 00:00 WIB (02:00 WIT).
  *   npm run images:cleanup              -> delete unused images (rows + files) older than 24 hours
  *   npm run images:cleanup -- --dry-run -> only list what would be deleted
  */
