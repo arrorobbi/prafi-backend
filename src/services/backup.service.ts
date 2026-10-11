@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { createWriteStream } from 'node:fs';
+import { createReadStream, createWriteStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -13,7 +13,9 @@ import { mailIsSimulated, sendMail } from './mail.service';
 /**
  * Weekly backup: every Sunday at 00:00 WIB the database is dumped (pg_dump, gzipped) and images/ is archived
  * (tar.gz), both into BACKUP_DIR (default ~/backups/prafi). The newest BACKUP_KEEP runs are kept, older ones deleted.
- * The files are also emailed (the off-server copy) to BACKUP_EMAIL_TO, by default the SMTP account itself.
+ * The files are also emailed (the off-server copy) to BACKUP_EMAIL_TO, by default the SMTP account itself. Gmail takes
+ * 25 MB per message, so a backup that doesn't fit one email is sent as several: a file over the limit is cut into
+ * numbered parts (….part01, ….part02, …; `cat` joins them again).
  *
  * Restore: see docs/SERVER-GUIDE.md (gunzip the dump into psql; untar the images).
  */
@@ -23,8 +25,8 @@ export const BACKUP_DIR = env.backup.dir || path.join(os.homedir(), 'backups', '
 export const BACKUP_WEEKDAY = 0;
 export const BACKUP_HOUR_WIB = 0;
 const WIB_OFFSET_MS = 7 * 3_600_000;
-/** Gmail accepts 25 MB per message; attachments grow by a third when encoded */
-const MAX_ATTACH_BYTES = 17 * 1024 * 1024;
+/** Gmail accepts 25 MB per message; attachments grow by a third when encoded, so this much file data per email */
+const MAX_EMAIL_BYTES = Math.max(1, Number(process.env.BACKUP_EMAIL_MAX_MB ?? 17) || 17) * 1024 * 1024;
 
 const stamp = (d: Date) => new Date(d.getTime() + WIB_OFFSET_MS).toISOString().slice(0, 16).replace('T', '_').replace(':', '');
 
@@ -49,7 +51,9 @@ export interface BackupResult {
   /** Older runs deleted to keep BACKUP_KEEP */
   removed: string[];
   emailedTo: string | null;
-  /** Why the email wasn't sent / what was left out */
+  /** How many emails carried the backup (more than 1 when it didn't fit one) */
+  emails: number;
+  /** Why the email wasn't sent, or what went wrong */
   emailNote: string | null;
 }
 
@@ -59,6 +63,53 @@ async function prune(prefix: string) {
   const old = files.slice(0, Math.max(0, files.length - env.backup.keep));
   await Promise.all(old.map((f) => fs.unlink(path.join(BACKUP_DIR, f)).catch(() => {})));
   return old;
+}
+
+interface Piece {
+  /** File name of the attachment (a part of a split file ends in .partNN) */
+  name: string;
+  path: string;
+  bytes: number;
+  /** The backup file this piece belongs to, and how many pieces it has */
+  original: string;
+  of: number;
+}
+
+/** A file that fits one email as it is; a larger one cut into numbered parts of at most MAX_EMAIL_BYTES in partsDir. */
+export async function splitForEmail(file: string, partsDir: string): Promise<Piece[]> {
+  const { size } = await fs.stat(file);
+  const original = path.basename(file);
+  if (size <= MAX_EMAIL_BYTES) return [{ name: original, path: file, bytes: size, original, of: 1 }];
+  await fs.mkdir(partsDir, { recursive: true, mode: 0o700 });
+  const count = Math.ceil(size / MAX_EMAIL_BYTES);
+  const pieces: Piece[] = [];
+  for (let i = 0; i < count; i++) {
+    const start = i * MAX_EMAIL_BYTES;
+    const end = Math.min(size, start + MAX_EMAIL_BYTES) - 1;
+    const partName = `${original}.part${String(i + 1).padStart(2, '0')}`;
+    const partPath = path.join(partsDir, partName);
+    await pipeline(createReadStream(file, { start, end }), createWriteStream(partPath, { mode: 0o600 }));
+    pieces.push({ name: partName, path: partPath, bytes: end - start + 1, original, of: count });
+  }
+  return pieces;
+}
+
+/** Groups the pieces into emails of at most MAX_EMAIL_BYTES each, keeping their order. */
+export function packIntoEmails(pieces: Piece[]) {
+  const batches: Piece[][] = [];
+  let current: Piece[] = [];
+  let total = 0;
+  for (const piece of pieces) {
+    if (current.length && total + piece.bytes > MAX_EMAIL_BYTES) {
+      batches.push(current);
+      current = [];
+      total = 0;
+    }
+    current.push(piece);
+    total += piece.bytes;
+  }
+  if (current.length) batches.push(current);
+  return batches;
 }
 
 export async function runBackup({ email = true } = {}): Promise<BackupResult> {
@@ -97,32 +148,42 @@ export async function runBackup({ email = true } = {}): Promise<BackupResult> {
   // The off-server copy
   const to = env.backup.emailTo.toLowerCase() === 'off' ? '' : env.backup.emailTo || env.mail.user;
   let emailedTo: string | null = null;
+  let emails = 0;
   let emailNote: string | null = null;
   if (!email) emailNote = 'email skipped (--no-email)';
   else if (!to) emailNote = 'no email address (BACKUP_EMAIL_TO is "off" or SMTP_USER is empty)';
   else {
-    const attachments = [{ filename: path.basename(dbFile), path: dbFile }];
-    let imagesAttached = false;
-    if (images && database.bytes + images.bytes <= MAX_ATTACH_BYTES) {
-      attachments.push({ filename: path.basename(images.file), path: images.file });
-      imagesAttached = true;
-    }
-    if (database.bytes > MAX_ATTACH_BYTES) {
-      emailNote = 'the database dump is too large to email; it is on the server only';
-    } else {
-      try {
-        const content = backupReady({ at, database, images, imagesAttached, keep: env.backup.keep, dir: BACKUP_DIR });
-        await sendMail({ to, ...content, attachments });
-        emailedTo = to;
-        if (images && !imagesAttached) emailNote = 'images archive too large to email; it is on the server only';
-        if (mailIsSimulated) emailNote = 'SMTP_HOST is not set: the email was only printed in the log';
-      } catch (err) {
-        emailNote = `email failed: ${(err as Error).message}`;
+    const partsDir = path.join(BACKUP_DIR, `.parts-${name}`);
+    try {
+      const files = [database.file, ...(images ? [images.file] : [])];
+      const pieces = (await Promise.all(files.map((f) => splitForEmail(f, partsDir)))).flat();
+      const batches = packIntoEmails(pieces);
+      const split = pieces.filter((x) => x.of > 1);
+      for (const [i, batch] of batches.entries()) {
+        const content = backupReady({
+          at,
+          database,
+          images,
+          keep: env.backup.keep,
+          dir: BACKUP_DIR,
+          part: i + 1,
+          parts: batches.length,
+          attached: batch.map((x) => ({ name: x.name, bytes: x.bytes })),
+          splitFiles: [...new Set(split.map((x) => x.original))],
+        });
+        await sendMail({ to, ...content, attachments: batch.map((x) => ({ filename: x.name, path: x.path })) });
+        emails++;
       }
+      emailedTo = to;
+      if (mailIsSimulated) emailNote = 'SMTP_HOST is not set: the email was only printed in the log';
+    } catch (err) {
+      emailNote = `email failed after ${emails} message(s): ${(err as Error).message}`;
+    } finally {
+      await fs.rm(partsDir, { recursive: true, force: true }).catch(() => {});
     }
   }
 
-  return { at, database, images, removed, emailedTo, emailNote };
+  return { at, database, images, removed, emailedTo, emails, emailNote };
 }
 
 const mb = (bytes: number) => (bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`);
@@ -132,7 +193,7 @@ export function describe(r: BackupResult) {
     `database ${path.basename(r.database.file)} (${mb(r.database.bytes)})` +
     (r.images ? `, images ${path.basename(r.images.file)} (${mb(r.images.bytes)})` : ', images NOT archived') +
     (r.removed.length ? `; removed ${r.removed.length} old file(s)` : '') +
-    (r.emailedTo ? `; emailed to ${r.emailedTo}` : '') +
+    (r.emailedTo ? `; emailed to ${r.emailedTo}${r.emails > 1 ? ` in ${r.emails} emails` : ''}` : '') +
     (r.emailNote ? `; ${r.emailNote}` : '')
   );
 }

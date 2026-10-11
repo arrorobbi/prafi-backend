@@ -222,32 +222,58 @@ export function adminAccountActivated(
 const sizeOf = (bytes: number) =>
   bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toFixed(1).replace('.', ',')} MB`;
 
-/** To the site's own mailbox: the weekly backup, attached (the copy kept off the server). */
+/**
+ * To the site's own mailbox: the weekly backup, attached (the copy kept off the server). A backup too large for one
+ * email comes as several (`part` of `parts`); files over the limit are cut into numbered parts (`splitFiles`).
+ */
 export function backupReady(b: {
   at: Date;
   database: { file: string; bytes: number };
   images: { file: string; bytes: number } | null;
-  /** false: too large for an email, kept on the server only */
-  imagesAttached: boolean;
   keep: number;
   dir: string;
+  /** This email's number and the total (1 of 1 when everything fits one email) */
+  part: number;
+  parts: number;
+  /** What is attached to this email */
+  attached: { name: string; bytes: number }[];
+  /** Names of the backup files that were cut into parts (empty when none) */
+  splitFiles: string[];
 }): Omit<MailMessage, 'to'> {
   const date = new Intl.DateTimeFormat('id-ID', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Asia/Jakarta' }).format(b.at);
   const name = (file: string) => file.split('/').pop()!;
-  const subject = `Backup mingguan ${BRAND} - ${new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeZone: 'Asia/Jakarta' }).format(b.at)}`;
-  const imagesLine = !b.images
-    ? 'Arsip gambar <strong>gagal dibuat</strong>; periksa log server.'
-    : b.imagesAttached
-      ? `<strong>${escape(name(b.images.file))}</strong> (${sizeOf(b.images.bytes)}): semua foto yang diunggah (produk, logo, profil, kategori).`
-      : `<strong>${escape(name(b.images.file))}</strong> (${sizeOf(b.images.bytes)}): terlalu besar untuk email, <strong>hanya tersimpan di server</strong>.`;
+  const many = b.parts > 1;
+  const subject =
+    `Backup mingguan ${BRAND} - ${new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeZone: 'Asia/Jakarta' }).format(b.at)}` +
+    (many ? ` (bagian ${b.part} dari ${b.parts})` : '');
+  const imagesText = !b.images
+    ? 'Arsip gambar gagal dibuat; periksa log server.'
+    : `${name(b.images.file)} (${sizeOf(b.images.bytes)}): semua foto yang diunggah (produk, logo, profil, kategori).`;
+  const joinCommands = b.splitFiles.map((f) => `cat ${f}.part* > ${f}`);
+  const manyText = many
+    ? `Backup ini terlalu besar untuk satu email, sehingga dikirim dalam ${b.parts} email. Ini bagian ${b.part} dari ${b.parts}: simpan semuanya.`
+    : '';
+  const splitText = b.splitFiles.length
+    ? 'File yang terlalu besar dipotong menjadi beberapa bagian (.part01, .part02, ...). Untuk menyatukannya kembali, unduh semua bagian ke satu folder lalu jalankan:'
+    : '';
   const html = layout(
-    'Backup mingguan',
+    many ? `Backup mingguan (bagian ${b.part} dari ${b.parts})` : 'Backup mingguan',
     `<p>Backup otomatis ${BRAND} telah dibuat pada <strong>${escape(date)} WIB</strong>.</p>
-     <ul style="margin:8px 0;padding-left:20px;">
+     ${many ? `<p style="margin:14px 0;padding:10px 16px;background:${ORANGE_SOFT};border-left:4px solid ${ORANGE};border-radius:8px;">${escape(manyText)}</p>` : ''}
+     <p style="margin-bottom:4px;"><strong>Isi backup:</strong></p>
+     <ul style="margin:0 0 12px;padding-left:20px;">
        <li><strong>${escape(name(b.database.file))}</strong> (${sizeOf(b.database.bytes)}): seluruh isi database.</li>
-       <li>${imagesLine}</li>
+       <li>${escape(imagesText)}</li>
      </ul>
-     <p>File yang sama tersimpan di server pada <code>${escape(b.dir)}</code> (${b.keep} backup terakhir disimpan, yang lebih lama dihapus otomatis).</p>
+     <p style="margin-bottom:4px;"><strong>Lampiran email ini:</strong></p>
+     <ul style="margin:0 0 12px;padding-left:20px;">${b.attached.map((f) => `<li>${escape(f.name)} (${sizeOf(f.bytes)})</li>`).join('')}</ul>
+     ${
+       b.splitFiles.length
+         ? `<p>${escape(splitText)}</p>
+            <pre style="margin:8px 0 14px;padding:10px 14px;background:#f4f5f7;border-radius:8px;font-family:Consolas,Menlo,monospace;font-size:13px;white-space:pre-wrap;word-break:break-all;">${escape(joinCommands.join('\n'))}</pre>`
+         : ''
+     }
+     <p>File yang sama (utuh) tersimpan di server pada <code>${escape(b.dir)}</code> (${b.keep} backup terakhir disimpan, yang lebih lama dihapus otomatis).</p>
      <p style="margin:18px 0;padding:12px 16px;background:${ORANGE_SOFT};border-left:4px solid ${ORANGE};border-radius:8px;">
        <strong>Simpan email ini.</strong> Lampiran berisi data akun dan data UMKM: jangan diteruskan ke orang lain.
        Cara memulihkan data ada di Panduan Server (bagian Database).
@@ -256,13 +282,17 @@ export function backupReady(b: {
   );
   const text = [
     `Backup otomatis ${BRAND} telah dibuat pada ${date} WIB.`,
+    ...(many ? ['', manyText] : []),
     '',
+    'Isi backup:',
     `- ${name(b.database.file)} (${sizeOf(b.database.bytes)}): seluruh isi database.`,
-    !b.images
-      ? '- Arsip gambar GAGAL dibuat; periksa log server.'
-      : `- ${name(b.images.file)} (${sizeOf(b.images.bytes)}): semua foto yang diunggah${b.imagesAttached ? '.' : ' (terlalu besar untuk email, hanya tersimpan di server).'}`,
+    `- ${imagesText}`,
     '',
-    `File yang sama tersimpan di server pada ${b.dir} (${b.keep} backup terakhir disimpan).`,
+    'Lampiran email ini:',
+    ...b.attached.map((f) => `- ${f.name} (${sizeOf(f.bytes)})`),
+    ...(b.splitFiles.length ? ['', splitText, ...joinCommands.map((c) => `  ${c}`)] : []),
+    '',
+    `File yang sama (utuh) tersimpan di server pada ${b.dir} (${b.keep} backup terakhir disimpan).`,
     'Simpan email ini. Lampiran berisi data akun dan data UMKM: jangan diteruskan ke orang lain.',
     'Cara memulihkan data ada di Panduan Server (bagian Database).',
     ...TEXT_SIGN_OFF,

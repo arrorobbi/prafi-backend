@@ -228,13 +228,13 @@ Inside: `\dt` lists tables, `\d products` shows a table, `\q` quits. Only read (
 | `prafi_images_<date>_<time>.tar.gz` | Every uploaded photo (`images/`). The database only holds their file names, so both files belong together |
 
 - They are saved in **`/home/prafi/backups/prafi/`**, readable only by `prafi`. The newest **8** runs are kept; older ones are deleted automatically.
-- The same files are **emailed as attachments** to the site's own Gmail account (`SMTP_USER` in `.env`), subject *Backup mingguan Trans Niaga*. That is the copy kept **off the server**: if the server is lost, the backups are still in that mailbox. An images archive too large for an email (about 17 MB) stays on the server only; the email says so.
+- The same files are **emailed as attachments** to the site's own Gmail account (`SMTP_USER` in `.env`), subject *Backup mingguan Trans Niaga*. That is the copy kept **off the server**: if the server is lost, the backups are still in that mailbox. Gmail takes 25 MB per email, so a backup that doesn't fit is sent as **several emails** (*bagian 1 dari 3*…): a file over the limit is cut into numbered parts (`….tar.gz.part01`, `.part02`, …). To rebuild it, download every part into one folder and run the `cat` line given in the email, e.g. `cat prafi_images_<date>.tar.gz.part* > prafi_images_<date>.tar.gz`. The copies on the server are always whole.
 - The log shows each run: `journalctl -u prafi-backend | grep backup`.
 - Run one now (e.g. before a risky change): `npm run backup`; without the email: `npm run backup -- --no-email`.
 
 > The email settings can't upload to **Google Drive**: a Gmail app password only works for mail. The emailed copy sits in the same Google account's storage. Real Drive uploads would need a Google Cloud service account or OAuth login.
 
-Settings (optional, backend `.env`): `BACKUP_DIR` (folder, default `~/backups/prafi`), `BACKUP_KEEP` (runs to keep, default 8), `BACKUP_EMAIL_TO` (another address, or `off` for no email).
+Settings (optional, backend `.env`): `BACKUP_DIR` (folder, default `~/backups/prafi`), `BACKUP_KEEP` (runs to keep, default 8), `BACKUP_EMAIL_TO` (another address, or `off` for no email), `BACKUP_EMAIL_MAX_MB` (file data per email, default 17; attachments grow by a third in an email, which keeps it under Gmail's 25 MB).
 
 **Manual backup** (plain SQL, e.g. right before a migration):
 
