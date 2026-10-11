@@ -303,7 +303,7 @@ Satu produk yang sudah disetujui beserta `ratingAverage` / `reviewCount`. 404 un
 Ulasan sebuah produk, terbaru di atas. `meta.ratingAverage` dan `meta.reviewCount` untuk ringkasan bintang.
 
 === REQ Create Review (Public) => Tulis Ulasan
-Tanpa login. `name` (maks. 100), `stars` (bilangan bulat 1–5), `review` (maks. 1000), `clientId` (id acak browser dari halaman, 8–64 huruf/angka/tanda hubung, disimpan di localStorage browser) dan `turnstileToken` (token Cloudflare Turnstile "Saya bukan robot" dari form; wajib bila server memiliki `TURNSTILE_SECRET_KEY`). Hanya untuk produk yang sudah disetujui. Mengembalikan ulasan beserta `meta.ratingAverage` / `meta.reviewCount` terbaru produk tersebut.
+Tanpa login. `name` (maks. 100), `stars` (bilangan bulat 1–5), `review` (**minimal 3 kata**, maks. 1000), `clientId` (id acak browser dari halaman, 8–64 huruf/angka/tanda hubung, disimpan di localStorage browser) dan `turnstileToken` (token Cloudflare Turnstile "Saya bukan robot" dari form; wajib bila server memiliki `TURNSTILE_SECRET_KEY`). Hanya untuk produk yang sudah disetujui. Mengembalikan ulasan beserta `meta.ratingAverage` / `meta.reviewCount` terbaru produk tersebut.
 
 **Pengaman spam** (disimpan di database, sehingga restart tidak meresetnya):
 - **browser yang sama di IP yang sama** hanya dapat mengulas satu produk **sekali per 24 jam** (429 `ALREADY_REVIEWED`, `details.retryAfterSeconds`);

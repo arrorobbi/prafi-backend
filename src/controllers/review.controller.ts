@@ -11,6 +11,9 @@ const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 100;
 const MAX_NAME = 100;
 const MAX_REVIEW = 1000;
+/** A review says something: at least this many words (a word has a letter or a digit, so "!!! ?? .." doesn't count) */
+const MIN_REVIEW_WORDS = 3;
+const countWords = (text: string) => text.split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).length;
 const FIELDS = ['name', 'stars', 'review', 'clientId', 'turnstileToken'];
 /** The page's random browser id: letters, digits, dashes */
 const CLIENT_ID_RE = /^[A-Za-z0-9-]{8,64}$/;
@@ -65,6 +68,7 @@ export const create: RequestHandler = async (req, res) => {
   const review = typeof body.review === 'string' ? body.review.trim() : '';
   if (!review) errors.push({ field: 'review', message: 'review (isi ulasan) wajib diisi' });
   else if (review.length > MAX_REVIEW) errors.push({ field: 'review', message: `review maksimal ${MAX_REVIEW} karakter` });
+  else if (countWords(review) < MIN_REVIEW_WORDS) errors.push({ field: 'review', message: `Ulasan minimal ${MIN_REVIEW_WORDS} kata` });
 
   if (typeof body.clientId !== 'string' || !CLIENT_ID_RE.test(body.clientId)) {
     errors.push({ field: 'clientId', message: 'clientId (id browser, 8-64 huruf/angka/tanda hubung) wajib diisi' });

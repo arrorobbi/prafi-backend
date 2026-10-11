@@ -430,7 +430,7 @@ export const FLOWS: Record<string, Chart[]> = {
         start('GET · POST /api/landing/products/:id/reviews'),
         step({ en: 'No token needed', id: 'Tanpa token' }),
         check({ en: 'Product approved?', id: 'Produk sudah disetujui?' }, '404'),
-        check({ en: 'POST: name, stars 1-5, review valid?', id: 'POST: name, stars 1-5, review valid?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
+        check({ en: 'POST: name, stars 1-5, review (3+ words) valid?', id: 'POST: name, stars 1-5, review (min. 3 kata) valid?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
         check({ en: 'POST: clientId (browser id) valid?', id: 'POST: clientId (id browser) valid?' }, '400'),
         check({ en: 'POST: Turnstile token confirmed by Cloudflare?', id: 'POST: token Turnstile dikonfirmasi Cloudflare?' }, '400 TURNSTILE_REQUIRED / TURNSTILE_FAILED'),
         check({ en: 'POST: under 5 reviews from this IP in 10 min?', id: 'POST: kurang dari 5 ulasan dari IP ini dalam 10 menit?' }, '429 TOO_MANY_REQUESTS'),

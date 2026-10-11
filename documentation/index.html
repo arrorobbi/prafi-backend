@@ -5153,7 +5153,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <line class="fc-line" x1="120" y1="180" x2="120" y2="209" marker-end="url(#fc-arrow-84)"/>
     <text class="fc-label" x="126" y="199">yes</text>
     <polygon class="fc-box fc-check" points="20,210 220,210 232,234 220,258 20,258 8,234"/>
-    <text class="fc-text fc-text-check" x="120" y="231" text-anchor="middle">POST: name, stars 1-5,</text><text class="fc-text fc-text-check" x="120" y="247" text-anchor="middle">review valid?</text>
+    <text class="fc-text fc-text-check" x="120" y="231" text-anchor="middle">POST: name, stars 1-5,</text><text class="fc-text fc-text-check" x="120" y="247" text-anchor="middle">review (3+ words) valid?</text>
     <path class="fc-line fc-line-error" d="M232,234 H275" fill="none" marker-end="url(#fc-arrow-84)"/>
     <text class="fc-label" x="237" y="229">no</text>
     <rect class="fc-box fc-error" x="276" y="218" width="196" height="32" rx="8"/>
@@ -5298,7 +5298,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <line class="fc-line" x1="120" y1="180" x2="120" y2="209" marker-end="url(#fc-arrow-88)"/>
     <text class="fc-label" x="126" y="199">ya</text>
     <polygon class="fc-box fc-check" points="20,210 220,210 232,234 220,258 20,258 8,234"/>
-    <text class="fc-text fc-text-check" x="120" y="231" text-anchor="middle">POST: name, stars 1-5,</text><text class="fc-text fc-text-check" x="120" y="247" text-anchor="middle">review valid?</text>
+    <text class="fc-text fc-text-check" x="120" y="231" text-anchor="middle">POST: name, stars 1-5,</text><text class="fc-text fc-text-check" x="120" y="247" text-anchor="middle">review (min. 3 kata) valid?</text>
     <path class="fc-line fc-line-error" d="M232,234 H275" fill="none" marker-end="url(#fc-arrow-88)"/>
     <text class="fc-label" x="237" y="229">tidak</text>
     <rect class="fc-box fc-error" x="276" y="218" width="196" height="32" rx="8"/>
@@ -5833,11 +5833,11 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   </div>
   <p class="auth"><span class="dot dot-open"></span><span data-l="en">No authentication needed</span><span data-l="id">Tanpa autentikasi</span></p>
   <div class="endpoint-body">
-    <div data-l="en"><p>No login. <code>name</code> (max 100), <code>stars</code> (whole number 1–5), <code>review</code> (max 1000), <code>clientId</code> (the page's random browser id, 8–64 letters/digits/dashes, kept in the browser's localStorage) and <code>turnstileToken</code> (the Cloudflare Turnstile &quot;not a robot&quot; token from the form; required when the server has <code>TURNSTILE_SECRET_KEY</code>). Approved products only. Returns the review, with the product's new <code>meta.ratingAverage</code> / <code>meta.reviewCount</code>.</p>
+    <div data-l="en"><p>No login. <code>name</code> (max 100), <code>stars</code> (whole number 1–5), <code>review</code> (<strong>at least 3 words</strong>, max 1000), <code>clientId</code> (the page's random browser id, 8–64 letters/digits/dashes, kept in the browser's localStorage) and <code>turnstileToken</code> (the Cloudflare Turnstile &quot;not a robot&quot; token from the form; required when the server has <code>TURNSTILE_SECRET_KEY</code>). Approved products only. Returns the review, with the product's new <code>meta.ratingAverage</code> / <code>meta.reviewCount</code>.</p>
 <p><strong>Spam guards</strong> (kept in the database, so a restart doesn't reset them):</p>
 <ul><li>the <strong>same browser on the same IP</strong> reviews a product at most <strong>once per 24 hours</strong> (429 <code>ALREADY_REVIEWED</code>, <code>details.retryAfterSeconds</code>);</li><li>at most <strong>5 reviews per IP per 10 minutes</strong> (429 <code>TOO_MANY_REQUESTS</code>);</li><li>Turnstile: 400 <code>TURNSTILE_REQUIRED</code> (no token), 400 <code>TURNSTILE_FAILED</code> (invalid / expired), 503 <code>TURNSTILE_UNAVAILABLE</code>.</li></ul>
 <p>The IP itself is never stored, only a keyed hash; neither it nor <code>clientId</code> is ever returned.</p>
-<p>After every review the product's <code>isRecommended</code> is recomputed: <code>true</code> with <strong>at least 3</strong> visible reviews and an average (1 decimal, as shown) of <strong>4.8 or more</strong>.</p></div><div data-l="id"><p>Tanpa login. <code>name</code> (maks. 100), <code>stars</code> (bilangan bulat 1–5), <code>review</code> (maks. 1000), <code>clientId</code> (id acak browser dari halaman, 8–64 huruf/angka/tanda hubung, disimpan di localStorage browser) dan <code>turnstileToken</code> (token Cloudflare Turnstile &quot;Saya bukan robot&quot; dari form; wajib bila server memiliki <code>TURNSTILE_SECRET_KEY</code>). Hanya untuk produk yang sudah disetujui. Mengembalikan ulasan beserta <code>meta.ratingAverage</code> / <code>meta.reviewCount</code> terbaru produk tersebut.</p>
+<p>After every review the product's <code>isRecommended</code> is recomputed: <code>true</code> with <strong>at least 3</strong> visible reviews and an average (1 decimal, as shown) of <strong>4.8 or more</strong>.</p></div><div data-l="id"><p>Tanpa login. <code>name</code> (maks. 100), <code>stars</code> (bilangan bulat 1–5), <code>review</code> (<strong>minimal 3 kata</strong>, maks. 1000), <code>clientId</code> (id acak browser dari halaman, 8–64 huruf/angka/tanda hubung, disimpan di localStorage browser) dan <code>turnstileToken</code> (token Cloudflare Turnstile &quot;Saya bukan robot&quot; dari form; wajib bila server memiliki <code>TURNSTILE_SECRET_KEY</code>). Hanya untuk produk yang sudah disetujui. Mengembalikan ulasan beserta <code>meta.ratingAverage</code> / <code>meta.reviewCount</code> terbaru produk tersebut.</p>
 <p><strong>Pengaman spam</strong> (disimpan di database, sehingga restart tidak meresetnya):</p>
 <ul><li><strong>browser yang sama di IP yang sama</strong> hanya dapat mengulas satu produk <strong>sekali per 24 jam</strong> (429 <code>ALREADY_REVIEWED</code>, <code>details.retryAfterSeconds</code>);</li><li>maksimal <strong>5 ulasan per IP per 10 menit</strong> (429 <code>TOO_MANY_REQUESTS</code>);</li><li>Turnstile: 400 <code>TURNSTILE_REQUIRED</code> (tanpa token), 400 <code>TURNSTILE_FAILED</code> (tidak valid / kedaluwarsa), 503 <code>TURNSTILE_UNAVAILABLE</code>.</li></ul>
 <p>IP tidak pernah disimpan, hanya hash-nya; hash maupun <code>clientId</code> tidak pernah dikembalikan.</p>
@@ -10808,7 +10808,7 @@ socket.on('connect_error', (err) =&gt; { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATE
   </div>
 </article>
 </section>
-  <footer><span data-l="en">Generated from <code>postman/Prafi-API.postman_collection.json</code> on 2026-10-09 · regenerate with <code>npm run docs</code></span><span data-l="id">Dibuat dari <code>postman/Prafi-API.postman_collection.json</code> pada 2026-10-09 · buat ulang dengan <code>npm run docs</code></span></footer>
+  <footer><span data-l="en">Generated from <code>postman/Prafi-API.postman_collection.json</code> on 2026-10-11 · regenerate with <code>npm run docs</code></span><span data-l="id">Dibuat dari <code>postman/Prafi-API.postman_collection.json</code> pada 2026-10-11 · buat ulang dengan <code>npm run docs</code></span></footer>
 </div>
 </main>
 </div>
