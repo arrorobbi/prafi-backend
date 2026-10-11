@@ -11,6 +11,7 @@
     "db:sync": "tsx src/scripts/sync.ts",
     "db:seed": "tsx src/scripts/seed.ts",
     "images:cleanup": "tsx src/scripts/cleanupImages.ts",
+    "backup": "tsx src/scripts/backup.ts",
     "docs": "tsx src/scripts/docs.ts"
   },
   "author": "",

@@ -219,6 +219,57 @@ export function adminAccountActivated(
   return { subject, html, text };
 }
 
+const sizeOf = (bytes: number) =>
+  bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toFixed(1).replace('.', ',')} MB`;
+
+/** To the site's own mailbox: the weekly backup, attached (the copy kept off the server). */
+export function backupReady(b: {
+  at: Date;
+  database: { file: string; bytes: number };
+  images: { file: string; bytes: number } | null;
+  /** false: too large for an email, kept on the server only */
+  imagesAttached: boolean;
+  keep: number;
+  dir: string;
+}): Omit<MailMessage, 'to'> {
+  const date = new Intl.DateTimeFormat('id-ID', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Asia/Jakarta' }).format(b.at);
+  const name = (file: string) => file.split('/').pop()!;
+  const subject = `Backup mingguan ${BRAND} - ${new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeZone: 'Asia/Jakarta' }).format(b.at)}`;
+  const imagesLine = !b.images
+    ? 'Arsip gambar <strong>gagal dibuat</strong>; periksa log server.'
+    : b.imagesAttached
+      ? `<strong>${escape(name(b.images.file))}</strong> (${sizeOf(b.images.bytes)}): semua foto yang diunggah (produk, logo, profil, kategori).`
+      : `<strong>${escape(name(b.images.file))}</strong> (${sizeOf(b.images.bytes)}): terlalu besar untuk email, <strong>hanya tersimpan di server</strong>.`;
+  const html = layout(
+    'Backup mingguan',
+    `<p>Backup otomatis ${BRAND} telah dibuat pada <strong>${escape(date)} WIB</strong>.</p>
+     <ul style="margin:8px 0;padding-left:20px;">
+       <li><strong>${escape(name(b.database.file))}</strong> (${sizeOf(b.database.bytes)}): seluruh isi database.</li>
+       <li>${imagesLine}</li>
+     </ul>
+     <p>File yang sama tersimpan di server pada <code>${escape(b.dir)}</code> (${b.keep} backup terakhir disimpan, yang lebih lama dihapus otomatis).</p>
+     <p style="margin:18px 0;padding:12px 16px;background:${ORANGE_SOFT};border-left:4px solid ${ORANGE};border-radius:8px;">
+       <strong>Simpan email ini.</strong> Lampiran berisi data akun dan data UMKM: jangan diteruskan ke orang lain.
+       Cara memulihkan data ada di Panduan Server (bagian Database).
+     </p>
+     ${SIGN_OFF}`,
+  );
+  const text = [
+    `Backup otomatis ${BRAND} telah dibuat pada ${date} WIB.`,
+    '',
+    `- ${name(b.database.file)} (${sizeOf(b.database.bytes)}): seluruh isi database.`,
+    !b.images
+      ? '- Arsip gambar GAGAL dibuat; periksa log server.'
+      : `- ${name(b.images.file)} (${sizeOf(b.images.bytes)}): semua foto yang diunggah${b.imagesAttached ? '.' : ' (terlalu besar untuk email, hanya tersimpan di server).'}`,
+    '',
+    `File yang sama tersimpan di server pada ${b.dir} (${b.keep} backup terakhir disimpan).`,
+    'Simpan email ini. Lampiran berisi data akun dan data UMKM: jangan diteruskan ke orang lain.',
+    'Cara memulihkan data ada di Panduan Server (bagian Database).',
+    ...TEXT_SIGN_OFF,
+  ].join('\n');
+  return { subject, html, text };
+}
+
 /** Forgot password: a link to the frontend's reset page. */
 export function passwordResetRequested(user: Recipient, link: string, validMinutes: number): Omit<MailMessage, 'to'> {
   const name = `${user.firstName} ${user.lastName}`;

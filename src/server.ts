@@ -4,6 +4,7 @@ import { checkMailConnection } from './services/mail.service';
 import { sequelize } from './models';
 import { closeRealtime, initRealtime } from './realtime/socket';
 import { startRetention as startLogRetention } from './services/apiLog.service';
+import { startWeeklyBackup } from './services/backup.service';
 import { startOrphanImageCleanup } from './services/imageCleanup.service';
 import { logTurnstileStatus } from './utils/turnstile';
 
@@ -24,6 +25,7 @@ async function start() {
     logTurnstileStatus();
     startLogRetention();
     startOrphanImageCleanup();
+    startWeeklyBackup();
   });
   initRealtime(server);
 

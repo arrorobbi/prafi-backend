@@ -173,6 +173,7 @@ Each app reads its `.env` file at start. The backend reads it when the service s
 | `REVALIDATE_SECRET`, `FRONTEND_REVALIDATE_URL` | Lets the backend refresh the website's cached public pages right after a change; the same secret is in the frontend `.env` |
 | `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile **secret** key: the backend confirms the review form's "not a robot" check with it. Empty = the check is skipped (warning at startup). Keep it secret; the matching *site* key is in the frontend `.env` |
 | `LOG_RETENTION_DAYS` | Days of API logs to keep (default 30) |
+| `BACKUP_DIR`, `BACKUP_KEEP`, `BACKUP_EMAIL_TO` | Weekly backup (section 7): folder (default `~/backups/prafi`), how many runs to keep (8), and who gets the email (default: the SMTP account; `off` = none) |
 | `DB_LOGGING` | `true` prints every SQL query (debugging only) |
 
 **Frontend** `/home/prafi/project/prafi-frontend/.env`:
@@ -219,17 +220,30 @@ PGPASSWORD="$(grep '^DB_PASSWORD=' .env | cut -d= -f2-)" psql -h localhost -U po
 
 Inside: `\dt` lists tables, `\d products` shows a table, `\q` quits. Only read (`SELECT`) here unless you know exactly what a change does; the apps keep the data consistent.
 
-**Backup** (do this before every migration, and regularly):
+**Automatic weekly backup.** Every **Sunday at 00:00 WIB** the backend makes a backup by itself (no cron needed):
+
+| file | what |
+|---|---|
+| `prafi_db_<date>_<time>.sql.gz` | The whole database (`pg_dump`, compressed) |
+| `prafi_images_<date>_<time>.tar.gz` | Every uploaded photo (`images/`). The database only holds their file names, so both files belong together |
+
+- They are saved in **`/home/prafi/backups/prafi/`**, readable only by `prafi`. The newest **8** runs are kept; older ones are deleted automatically.
+- The same files are **emailed as attachments** to the site's own Gmail account (`SMTP_USER` in `.env`), subject *Backup mingguan Trans Niaga*. That is the copy kept **off the server**: if the server is lost, the backups are still in that mailbox. An images archive too large for an email (about 17 MB) stays on the server only; the email says so.
+- The log shows each run: `journalctl -u prafi-backend | grep backup`.
+- Run one now (e.g. before a risky change): `npm run backup`; without the email: `npm run backup -- --no-email`.
+
+> The email settings can't upload to **Google Drive**: a Gmail app password only works for mail. The emailed copy sits in the same Google account's storage. Real Drive uploads would need a Google Cloud service account or OAuth login.
+
+Settings (optional, backend `.env`): `BACKUP_DIR` (folder, default `~/backups/prafi`), `BACKUP_KEEP` (runs to keep, default 8), `BACKUP_EMAIL_TO` (another address, or `off` for no email).
+
+**Manual backup** (plain SQL, e.g. right before a migration):
 
 ```bash
 cd /home/prafi/project/prafi-backend
 PGPASSWORD="$(grep '^DB_PASSWORD=' .env | cut -d= -f2-)" pg_dump -h localhost -U postgres prafi_db > ~/backup_prafi_db_$(date +%F).sql
-tar czf ~/backup_images_$(date +%F).tar.gz images
 ```
 
-Copy backups off the server too (e.g. `scp` to your computer). **There are no automatic backups yet.** A daily cron job is a good first improvement.
-
-**Restore** a backup (replaces all current data: stop the backend first):
+**Restore** a backup (replaces all current data: stop the backend first). From a weekly backup:
 
 ```bash
 sudo systemctl stop prafi-backend
@@ -237,9 +251,12 @@ cd /home/prafi/project/prafi-backend
 export PGPASSWORD="$(grep '^DB_PASSWORD=' .env | cut -d= -f2-)"
 dropdb -h localhost -U postgres prafi_db
 createdb -h localhost -U postgres prafi_db
-psql -h localhost -U postgres -d prafi_db -f ~/backup_prafi_db_YYYY-MM-DD.sql
+gunzip -c ~/backups/prafi/prafi_db_YYYY-MM-DD_HHMM.sql.gz | psql -h localhost -U postgres -d prafi_db
+tar -xzf ~/backups/prafi/prafi_images_YYYY-MM-DD_HHMM.tar.gz -C /home/prafi/project/prafi-backend
 sudo systemctl start prafi-backend
 ```
+
+Use the database and images files **from the same run**. From an emailed backup, first copy the two attachments to the server (Webmin File Manager → *Upload*, or `scp`). A plain `.sql` backup restores with `psql -h localhost -U postgres -d prafi_db -f <file>.sql` instead of the `gunzip` line.
 
 **Migrations**: a change to the table structure ships as an SQL file in `db/migrations/` (named by date). Run each new file once, after a backup:
 
@@ -573,7 +590,6 @@ Then check `/panduan` (and **Bantuan & Ketentuan** as a seller). Common mistakes
 ## 14. Things to improve
 
 - **Set `NODE_ENV=production`** in the backend `.env` (then restart): error responses still include internal details.
-- **Automatic daily backups** of the database and `images/`, copied off the server.
 - **Use a separate database user** for the app instead of the `postgres` superuser.
 - **Limit Webmin** (ports 10000 and 20000 are open to the internet): allow only known IPs, or close them and use `core.transniaga…` only.
 - **Put the backend `deploy/` folder in git**, so the service and nginx files aren't lost with the server.

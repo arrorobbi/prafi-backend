@@ -62,6 +62,17 @@ export const env = {
    */
   turnstileSecret: process.env.TURNSTILE_SECRET_KEY ?? '',
 
+  /**
+   * Weekly backup (Sunday 00:00 WIB): a database dump and an archive of images/, kept in `dir` (the newest `keep`
+   * runs) and emailed to `emailTo` as the off-server copy. BACKUP_EMAIL_TO empty = the SMTP account itself;
+   * "off" = don't email.
+   */
+  backup: {
+    dir: process.env.BACKUP_DIR || '',
+    keep: Math.max(1, Number(process.env.BACKUP_KEEP ?? 8) || 8),
+    emailTo: process.env.BACKUP_EMAIL_TO ?? '',
+  },
+
   /** API request/error logs (GET /api/logs) older than this many days are deleted. */
   logRetentionDays: Math.max(1, Number(process.env.LOG_RETENTION_DAYS ?? 30) || 30),
 

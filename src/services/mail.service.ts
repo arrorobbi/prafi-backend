@@ -24,12 +24,17 @@ export interface MailMessage {
   html: string;
   /** Plain-text version for mail clients that don't show HTML (and for the development log). */
   text: string;
+  /** Files to attach (e.g. the weekly backup) */
+  attachments?: { filename: string; path: string }[];
 }
 
 export async function sendMail(message: MailMessage) {
   await transport().sendMail({ from: env.mail.from, ...message });
   if (mailIsSimulated) {
-    console.log(`\n[mail] NOT SENT (SMTP_HOST is not set) → ${message.to}\n[mail] Subject: ${message.subject}\n${message.text.replace(/^/gm, '[mail] ')}\n`);
+    console.log(
+      `\n[mail] NOT SENT (SMTP_HOST is not set) → ${message.to}\n[mail] Subject: ${message.subject}\n${message.text.replace(/^/gm, '[mail] ')}\n` +
+        (message.attachments?.length ? `[mail] Attachments: ${message.attachments.map((a) => a.filename).join(', ')}\n` : ''),
+    );
   }
 }
 
