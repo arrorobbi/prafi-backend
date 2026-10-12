@@ -1,6 +1,6 @@
 /**
- * A small Markdown renderer: headings, paragraphs, **bold**, *italic*, `code`, links, lists, tables, > quotes and
- * fenced code blocks. Used by the API docs generator (npm run docs) and the server guide (/api/docs/server).
+ * A small Markdown renderer: headings, paragraphs, **bold**, *italic*, `code`, links, pictures, lists, tables,
+ * > quotes and fenced code blocks. Used by the API docs generator (npm run docs) and the server guide (/api/docs/server).
  */
 
 export const escapeHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -37,6 +37,18 @@ export function markdown(md: string): string {
       while (i < lines.length && !lines[i].startsWith('```')) code.push(lines[i++]);
       i++;
       out.push(`<pre><code class="lang-${fence[1] || 'text'}">${escapeHtml(code.join('\n'))}</code></pre>`);
+      continue;
+    }
+
+    // A picture on a line of its own: ![caption](address) → a figure (click = full size)
+    const picture = line.match(/^!\[([^\]]*)\]\(([^)\s]+)\)\s*$/);
+    if (picture) {
+      const [alt, src] = [escapeHtml(picture[1]), escapeHtml(picture[2])];
+      out.push(
+        `<figure><a href="${src}" target="_blank" rel="noopener"><img src="${src}" alt="${alt}" loading="lazy"></a>` +
+          `${alt ? `<figcaption>${alt}</figcaption>` : ''}</figure>`,
+      );
+      i++;
       continue;
     }
 
@@ -79,7 +91,7 @@ export function markdown(md: string): string {
     }
 
     const para: string[] = [];
-    while (i < lines.length && lines[i].trim() && !/^(```|#{1,4}\s|>|\s*([-*]|\d+\.)\s+)/.test(lines[i]) && !isTableRow(lines[i])) {
+    while (i < lines.length && lines[i].trim() && !/^(```|#{1,4}\s|>|!\[|\s*([-*]|\d+\.)\s+)/.test(lines[i]) && !isTableRow(lines[i])) {
       para.push(lines[i++]);
     }
     if (para.length) out.push(`<p>${inline(para.join(' '))}</p>`);

@@ -2,6 +2,8 @@
 
 How the Trans Niaga (UMKM Prafi) server is set up and how to run, update and look after it. Written for whoever takes over the server.
 
+> This guide is kept in two files that must stay in step: `docs/SERVER-GUIDE.md` (English) and `docs/SERVER-GUIDE.id.md` (Bahasa Indonesia). The page has an **ID / EN** switch and a **light / dark** theme switch; both choices are remembered in the browser.
+
 > This guide holds no passwords or secrets. They live only in the two `.env` files on the server (see *Configuration*). Never commit `.env` files or paste their contents into chats or tickets.
 
 ## 1. Overview
@@ -35,7 +37,7 @@ Port 80 (plain HTTP) is held by the frontend itself, not by nginx. The browser c
 | `/home/prafi/project/prafi-frontend` | Frontend source (Next.js). Git: `github.com/arrorobbi/prafi-frontend` |
 | `/home/prafi/project/prafi-maintenance` | Maintenance page shown during updates (see *Updating the apps → Maintenance page*). Local git only |
 
-Inside **prafi-backend**:
+Inside **prafi-backend** (every folder is explained in section 12):
 
 | path | what |
 |---|---|
@@ -45,11 +47,11 @@ Inside **prafi-backend**:
 | `db/migrations/` | SQL files that change the database structure, run once each in date order |
 | `postman/` | Postman collection; source of the public API docs |
 | `documentation/` | Generated public API docs (`npm run docs`) |
-| `docs/SERVER-GUIDE.md` | This guide |
+| `docs/SERVER-GUIDE.md`, `docs/SERVER-GUIDE.id.md` | This guide, in English and Bahasa Indonesia |
 | `deploy/` | systemd unit, nginx config and setup scripts. **Only on the server, not in git yet** |
 | `.env` | Backend settings and secrets |
 
-Inside **prafi-frontend**:
+Inside **prafi-frontend** (every folder is explained in section 13):
 
 | path | what |
 |---|---|
@@ -118,6 +120,8 @@ sudo systemctl restart prafi-backend
 
 Changes are made on a git branch, reviewed in a pull request and merged into `main` on GitHub. Small fixes may go straight to `main`. The server then pulls `main` and rebuilds.
 
+**The short way:** `bash ~/deploy.sh` does the steps below for both apps: database backup, new migrations, backend build, frontend build, restart. The restart needs the sudo password, so run it in SSH or the Webmin terminal. The manual steps:
+
 **Backend:**
 
 ```bash
@@ -184,7 +188,7 @@ Each app reads its `.env` file at start. The backend reads it when the service s
 | `JWT_SECRET` | Signs login tokens. Changing it logs everybody out. Long and random; never share |
 | `JWT_EXPIRES_IN` | Login lifetime (`1h`) |
 | `APP_URL` | The API's public address; used in image links |
-| `FRONTEND_URL` | The website's address; used in email links (password reset) |
+| `FRONTEND_URL` | The website's address; used in email links (password reset, Disnakertrans activation) and for the pictures in this guide |
 | `CORS_ORIGIN` | Other sites allowed to call the API from a browser (comma separated). The website itself doesn't need it |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | Outgoing email (Gmail; `SMTP_PASS` is a Gmail *app password*). Without `SMTP_HOST`, emails are only printed in the log |
 | `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` | The superadmin account made by `npm run db:seed` |
@@ -203,6 +207,7 @@ Each app reads its `.env` file at start. The backend reads it when the service s
 | `NEXT_PUBLIC_ADMIN_WHATSAPP`, `NEXT_PUBLIC_ADMIN_EMAIL` | Contact shown in *Panduan → Hubungi Administrator* |
 | `REVALIDATE_SECRET` | Same value as in the backend `.env` |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile **site** key (public) for the review form's "not a robot" check |
+| `GOOGLE_SITE_VERIFICATION` | Google Search Console verification code (optional) |
 
 ## 7. Database
 
@@ -226,7 +231,7 @@ Tables:
 | `reviews` | Visitors' product reviews (1-5 stars) |
 | `images` | Uploaded images (the files are in `prafi-backend/images/`) |
 | `notifications` | In-app notifications |
-| `otps`, `revoked_tokens` | Email verification codes; logged-out tokens |
+| `otps`, `revoked_tokens` | Email codes and links (OTP, Disnakertrans activation, password reset), stored as hashes; logged-out tokens |
 | `api_logs` | The Log API records |
 
 Open the database console (the password is read from `.env`, so it is never typed or shown):
@@ -276,7 +281,7 @@ sudo systemctl start prafi-backend
 
 Use the database and images files **from the same run**. From an emailed backup, first copy the two attachments to the server (Webmin File Manager → *Upload*, or `scp`). A plain `.sql` backup restores with `psql -h localhost -U postgres -d prafi_db -f <file>.sql` instead of the `gunzip` line.
 
-**Migrations**: a change to the table structure ships as an SQL file in `db/migrations/` (named by date). Run each new file once, after a backup:
+**Migrations**: a change to the table structure ships as an SQL file in `db/migrations/` (named by date). Run each new file once, after a backup (section 12 lists the files and explains how to write one):
 
 ```bash
 cd /home/prafi/project/prafi-backend
@@ -488,7 +493,379 @@ npm run dev                        # http://localhost:3000
 | `npm run typecheck` / `npm run lint` | type check | lint |
 | `npm run docs` | regenerates the public API docs | |
 
-## 12. Updating the Panduan (help pages)
+## 12. Backend (Express): structure and daily work
+
+The backend is the API at `https://api.transniaga.manokwarikab.go.id`: an **Express 5** app written in **TypeScript**, with **Sequelize** for the PostgreSQL database, **Socket.IO** for live notifications and **nodemailer** for email. Folder: `/home/prafi/project/prafi-backend`.
+
+### How a request is handled
+
+Every request passes the same chain. Knowing it tells you which file to open:
+
+| step | folder | what happens there |
+|---|---|---|
+| 1. Route | `src/routes/` | Matches the URL and method, and names who may call it (`authenticate`, `authorize(...roles)`) |
+| 2. Middleware | `src/middlewares/` | Checks the login token and role, logs the request, handles photo uploads |
+| 3. Controller | `src/controllers/` | Reads and validates the input (400 with field messages in Bahasa Indonesia when wrong), calls the service, sends the JSON answer |
+| 4. Service | `src/services/` | The actual work and rules: reads and writes the database, sends emails and notifications |
+| 5. Model | `src/models/` | One file per database table (columns, relations) |
+| 6. Error handler | `src/middlewares/errorHandler.ts` | Turns any error into the standard answer `{ "success": false, "error": { "code", "message", "details" } }` |
+
+### Folders and files
+
+| path | purpose |
+|---|---|
+| `src/server.ts` | Start-up: connects to the database, opens port 4000 and Socket.IO, starts the scheduled jobs |
+| `src/app.ts` | The Express app: security headers, CORS, `/images` (uploaded photos), `/docs` (public API docs), `/api` routes, error handler |
+| `src/config/` | `env.ts` reads `.env` (a missing required setting stops the start), `database.ts` the database connection, `upload.ts` photo limits (5 MB, allowed types) and the `images/` folder |
+| `src/constants/` | Fixed lists: `roles.ts` (the four roles and **who may do what**), `notifications.ts`, `realtime.ts` (live event names), `products.ts` (rules for the *recommended* label) |
+| `src/routes/` | One file per area: `auth`, `user`, `approval`, `product`, `productCategory`, `review`, `tenant`, `image`, `notification`, `stats`, `apiLog`, `landing` (public pages), `serverDocs` (this guide). `index.ts` joins them under `/api` |
+| `src/controllers/` | Input checks and answers, one file per area |
+| `src/services/` | Logic, one file per area, plus `mail.service.ts`, `emailVerification.service.ts` (OTP, Disnakertrans activation), `passwordReset.service.ts`, `backup.service.ts`, `imageCleanup.service.ts`, `apiLog.service.ts` |
+| `src/models/` | Database tables as code; `index.ts` links them together |
+| `src/middlewares/` | `auth.ts` (token and role), `requestLogger.ts` (console line and Log API), `upload.ts`, `errorHandler.ts`, `landingRefresh.ts` (tells the website to refresh its cached pages) |
+| `src/mail/templates.ts` | Every email (Bahasa Indonesia): subject, HTML and plain text |
+| `src/realtime/socket.ts` | Socket.IO: live notifications, ending sessions |
+| `src/utils/` | Small helpers: `jwt.ts`, `markdown.ts`, `turnstile.ts` ("not a robot" check), `clientIp.ts`, `readablePassword.ts`, `revalidateLanding.ts` |
+| `src/scripts/` | Commands run by hand (`seed.ts`, `sync.ts`, `backup.ts`, `cleanupImages.ts`) and the API docs generator (`docs.ts`, `docs.id.md`, `docs.flows.ts`) |
+| `src/types/` | TypeScript declarations (what `req.user` holds) |
+| `db/migrations/` | SQL files that change the table structure (below) |
+| `dist/` | The compiled program the service runs. Made by `npm run build`; never edit it |
+| `images/` | Uploaded photos. Not in git; part of every backup |
+| `postman/` | Postman collection and environment: the source of the public API docs |
+| `documentation/` | The generated public API docs (`/docs`). Made by `npm run docs`; never edit it |
+| `docs/` | This guide: `SERVER-GUIDE.md` (English), `SERVER-GUIDE.id.md` (Bahasa Indonesia), and `server-page/` (the page that shows it) |
+| `deploy/` | The systemd service file, nginx site file and setup scripts. Only on the server, not in git |
+| `.env`, `.env.example` | Settings and secrets (section 6); the example lists every name without the secrets |
+| `package.json`, `tsconfig.json` | Dependencies and commands; TypeScript settings |
+
+### Commands
+
+Run them in `/home/prafi/project/prafi-backend` as user `prafi`.
+
+| command | does |
+|---|---|
+| `npm run build` | Compiles `src/` into `dist/` (about 10 seconds). Needed after every code change |
+| `npm run typecheck` | Checks the code for type errors without building |
+| `npm run dev` | Development only: runs straight from `src/` and restarts on save |
+| `npm start` | Runs `dist/server.js` (what the service does) |
+| `npm run docs` | Rebuilds the public API docs from the Postman collection |
+| `npm run db:seed` | Creates the superadmin account (safe to repeat) |
+| `npm run db:sync` | Creates missing tables (a new, empty database only) |
+| `npm run backup` | Makes a backup now (section 7) |
+| `npm run images:cleanup` | Deletes unused uploaded photos now (section 7) |
+
+### Build and restart
+
+The service runs the compiled files, so a change in `src/` does nothing until it is built **and** the service is restarted:
+
+```bash
+cd /home/prafi/project/prafi-backend
+npm install            # only when package.json changed
+npm run build          # stops with an error message if the code is wrong; the running version is untouched
+sudo systemctl restart prafi-backend
+journalctl -u prafi-backend -n 20     # should end with "Server running on ..."
+```
+
+The helper script `bash ~/deploy.sh` does the whole update in one go: database backup, new migrations, backend build, frontend build, then the restart (it prints the restart command when it can't ask for the sudo password).
+
+### Database migrations
+
+A **migration** is an SQL file that changes the table structure (a new column, a new table, a different type). The live database is never changed by `db:sync`: every structure change is a file in `db/migrations/`, run once.
+
+Files so far, in the order they were run:
+
+| file | change |
+|---|---|
+| `20261008_price_instagram_reviews.sql` | Product price and *recommended* flag, Instagram link, product reviews |
+| `20261008_2_image_uploader.sql` | Who uploaded each image |
+| `20261008_3_tenant_links.sql` | Google Bisnis and Shopee links; Instagram optional |
+| `20261008_4_api_log_summary.sql`, `20261008_5_api_log_auth_email.sql` | More detail in the Log API |
+| `20261009_product_categories.sql` | Product categories with an image |
+| `20261010_review_moderation.sql` | Reporting and hiding reviews |
+| `20261012_google_business_link_text.sql` | Longer Google Bisnis link |
+| `20261013_tenant_links_optional.sql` | Every UMKM link optional |
+
+**Running a migration** (always back up first, and run it **before** restarting the backend with the new code):
+
+```bash
+cd /home/prafi/project/prafi-backend
+npm run backup -- --no-email
+PGPASSWORD="$(grep '^DB_PASSWORD=' .env | cut -d= -f2-)" psql -h localhost -U postgres -d prafi_db -v ON_ERROR_STOP=1 -f db/migrations/<file>.sql
+```
+
+**Writing a new one:**
+
+1. Name it `YYYYMMDD_what_it_does.sql` so the files sort by date.
+2. Start with a comment: the date, what changes and why, and the command to run it.
+3. Wrap several statements in `BEGIN;` … `COMMIT;`, so a failure changes nothing.
+4. Change the matching model in `src/models/` in the same commit, so code and database stay equal.
+5. Try it on a **copy** of the database before the live one:
+
+```bash
+export PGPASSWORD="$(grep '^DB_PASSWORD=' .env | cut -d= -f2-)"
+createdb -h localhost -U postgres prafi_test
+pg_dump -h localhost -U postgres prafi_db | psql -q -h localhost -U postgres -d prafi_test
+psql -h localhost -U postgres -d prafi_test -v ON_ERROR_STOP=1 -f db/migrations/<file>.sql
+dropdb -h localhost -U postgres prafi_test        # when done
+```
+
+6. Add a line for it to `~/deploy.sh` (the `migrate` lines), with a query that tells whether it was already applied.
+
+> There is no table that records which migrations ran. If you are unsure, look at the structure: `\d tenants` in the database console shows the columns a migration should have added or changed.
+
+### Jobs that run by themselves
+
+They run inside the backend service; there is no cron to look after. All times are the server's clock (WIB).
+
+| job | when | code |
+|---|---|---|
+| Delete unused uploaded photos | every night, 00:00 | `src/services/imageCleanup.service.ts` |
+| Backup of database and photos, emailed | every Sunday, 00:00 | `src/services/backup.service.ts` |
+| Delete old Log API rows (older than `LOG_RETENTION_DAYS`) | daily | `src/services/apiLog.service.ts` |
+
+### Adding or changing an endpoint
+
+1. Table change needed? Write the migration and update the model (above).
+2. Put the rule in the **service**, the input checks in the **controller**, and the URL with its allowed roles in the **route** (roles come from `src/constants/roles.ts`).
+3. Messages for users are in Bahasa Indonesia; code comments in English.
+4. Add the request to the Postman collection (`postman/Prafi-API.postman_collection.json`), its Indonesian text to `src/scripts/docs.id.md`, and run `npm run docs`.
+5. `npm run typecheck`, try it on a copy of the database, then build and restart.
+
+## 13. Frontend (Next.js): structure and daily work
+
+The frontend is the website at `https://transniaga.manokwarikab.go.id`: a **Next.js 15** app (App Router) with **React 19** and **Tailwind CSS 4**. Folder: `/home/prafi/project/prafi-frontend`. It holds no data of its own: everything comes from the backend API.
+
+### How a page gets its data
+
+| kind of page | where it is drawn | how it gets data |
+|---|---|---|
+| Public pages (Beranda, Produk, product, UMKM, Panduan) | On the server, so search engines and link previews get the full page | `src/lib/server-api.ts` calls the backend; answers are cached for 60 seconds and refreshed at once when the backend reports a change (`POST /internal/revalidate`) |
+| Dashboards, login, account pages | In the visitor's browser | `src/lib/api.ts` calls `/api/...` with the login token kept in the browser |
+
+The browser always calls `/api`, `/images` and `/socket.io` on the website's own domain; `next.config.ts` forwards them to the backend (`API_URL`).
+
+### Folders and files
+
+| path | purpose |
+|---|---|
+| `src/app/` | **Pages.** One folder per address: `src/app/tenant/produk/page.tsx` is `/tenant/produk`. `layout.tsx` wraps the pages below it; `loading.tsx` is the grey placeholder shown while a page loads |
+| `src/app/(public)/` | Public pages with the site header and footer: `page.tsx` (Beranda), `produk/`, `umkm/`, `panduan/`. The brackets group pages without adding to the address |
+| `src/app/admin/`, `disnakertrans/`, `superadmin/`, `tenant/` | One dashboard per role. Each `layout.tsx` holds that role's **sidebar menu** |
+| `src/app/login/`, `register/`, `verifikasi/`, `aktivasi/`, `lupa-password/`, `reset-password/`, `akun/` | Sign-in, sign-up, email OTP, Disnakertrans activation, password pages |
+| `src/app/robots.ts`, `sitemap.ts`, `manifest.ts`, `opengraph-image.tsx` | Search engine files and the default sharing picture |
+| `src/app/internal/revalidate/` | The address the backend calls to refresh cached pages |
+| `src/app/globals.css` | Colours and base styles of the whole site |
+| `src/components/site/` | Public pages: header, footer, carousel, product cards, reviews |
+| `src/components/dashboard/` | Dashboards: sidebar shell, tables, forms, charts, notifications |
+| `src/components/auth/` | Login frame, registration steps, OTP form |
+| `src/components/shadcn/` | Basic building blocks (button, input, dialog, table…). **Written by hand**: don't run the shadcn command, it would overwrite them |
+| `src/components/Icons.tsx` | Every icon (inline SVG) |
+| `src/lib/api.ts` | **Every API call** from the browser, one function per endpoint |
+| `src/lib/server-api.ts` | API calls for the public pages (server side, cached) |
+| `src/lib/auth.tsx` | The login session in the browser |
+| `src/lib/guides.tsx` | The Panduan content (section 15) |
+| `src/lib/seo.tsx` | Titles, descriptions and structured data for search engines |
+| `src/lib/format.ts`, `types.ts`, `adCalculator.ts`, … | Formatting (Rupiah, dates), data types, the profit calculator's formulas |
+| `src/middleware.ts` | Sends plain `http://` visits to `https://` |
+| `next.config.ts` | The `/api` forwarding and the "don't index" headers of private pages |
+| `public/` | Files served as they are: logo, icons, guide screenshots in `public/panduan/` |
+| `.next/` | The built site the service runs. Made by `npm run build`; never edit it |
+| `docs/PANDUAN-PENGGUNA.md` | The user guide as a document |
+| `deploy/` | systemd service file, nginx site files, setup script |
+| `.env`, `.env.example` | Settings (section 6) |
+
+### Commands
+
+Run them in `/home/prafi/project/prafi-frontend` as user `prafi`.
+
+| command | does |
+|---|---|
+| `npm run build` | Builds the site into `.next/` (1 to 2 minutes). Needed after every change, including `.env` |
+| `npm run lint` | Checks the code for mistakes (missing import, unused variable) |
+| `npm run dev` | Development only: `http://localhost:3000` with live reload |
+| `npm start` | Runs the built site on port 80 (what the service does) |
+
+### Build and restart
+
+```bash
+cd /home/prafi/project/prafi-frontend
+npm install            # only when package.json changed
+npm run build          # the live site keeps running the old build meanwhile; an error here changes nothing
+sudo systemctl restart prafi-frontend
+```
+
+Things to remember:
+
+- **Settings are read at build time.** After changing the frontend `.env`, build and restart, not only restart.
+- **The frontend has no migrations.** Database changes belong to the backend (section 12). If an update changes both, deploy the backend first.
+- **Stay on Next.js 15** (section 3), and never run `npm audit fix --force` here.
+- For a visible update, switch on the **maintenance page** first (section 5) and switch the website back on afterwards.
+
+### Common changes
+
+| I want to… | where |
+|---|---|
+| Change a text on a page | The page's file in `src/app/…/page.tsx`, or the component it uses in `src/components/` |
+| Add a menu item to a dashboard | The `NAV` list in that role's `src/app/<role>/layout.tsx`, plus a new folder with a `page.tsx` |
+| Call a new API endpoint | Add a function to `src/lib/api.ts` (and its type to `src/lib/types.ts`) |
+| Change a colour or the font | `src/app/globals.css` |
+| Change the help pages | `src/lib/guides.tsx` (section 15) |
+| Change the contact shown in Panduan | `NEXT_PUBLIC_ADMIN_WHATSAPP`, `NEXT_PUBLIC_ADMIN_EMAIL` in `.env`, then build |
+| Change what search engines see | `src/lib/seo.tsx` and the page's `metadata`; the README has an *SEO* section |
+
+## 14. System features
+
+What the system does, by who uses it. The pictures are screenshots of the website with sample data (`prafi-frontend/public/panduan/fitur-*.jpg`); click one to see it full size. Step-by-step instructions for users are in the website's **Panduan** (`/panduan`) and in `prafi-frontend/docs/PANDUAN-PENGGUNA.md`.
+
+### Roles
+
+| role | how the account is made | what it does |
+|---|---|---|
+| Visitor | no account | Browses products and UMKM, writes reviews |
+| Tenant (seller / UMKM) | signs up at `/register`, confirms the email with an OTP | Shop profile, products, reviews of own products, profit calculator |
+| Admin | signs up at `/register/admin` (OTP), then **activated by Disnakertrans** | Approves products, manages categories, activates sellers, decides on reported reviews |
+| Disnakertrans | created by the superadmin; gets a temporary password and an activation link by email | Activates admins; also everything an admin does for products, categories and reviews |
+| Superadmin | made on the server (`npm run db:seed`) | Creates Disnakertrans accounts, reads everything, Log API, this guide |
+
+### Visitors (no login)
+
+- **Beranda**: a carousel of the product categories with the products of the category on show, recommended products, and the list of UMKM. A product is *recommended* (thumbs-up) with at least 3 reviews averaging 4.8 stars or more.
+
+![Beranda: menu, category carousel and products](panduan/fitur-beranda.jpg)
+
+- **Search**: the magnifier in the header searches products and shops.
+
+![Search box](panduan/fitur-cari.jpg)
+
+- **Produk**: every approved product, **best rating first**, with a switch to *newest first*, a search box and a category filter.
+
+![Produk page sorted by rating](panduan/fitur-produk-urut.jpg)
+
+- **Product page**: photo, price, description, the seller, and **contact buttons** (WhatsApp with a ready message, Shopee, Instagram, Google Bisnis, Facebook, location) for the links the seller filled in.
+
+![Product page](panduan/fitur-produk-detail.jpg)
+
+- **Reviews without login**: 1 to 5 stars and a text of at least 3 words, after a "not a robot" check (Cloudflare Turnstile). One review per product per day from the same browser and network.
+
+![Reviews and the review form on a product page](panduan/fitur-ulasan.jpg)
+
+- **UMKM page**: the shop's profile, address, opening hours, contact buttons, rating and all its products.
+
+![A UMKM page](panduan/fitur-umkm.jpg)
+
+- **Panduan**: help topics with step-by-step screenshots, terms, privacy policy and the administrator's contact.
+
+### Sellers (tenant)
+
+- **Sign-up in steps** with email OTP (15 minutes); the account is active right away.
+
+![Seller sign-up: account details](panduan/fitur-daftar.jpg)
+
+![Email OTP](panduan/fitur-daftar-otp.jpg)
+
+- **Dashboard**: the number of products by status (active, waiting, rejected, taken down), with shortcuts to edit the profile and add a product.
+
+![Seller dashboard](panduan/fitur-tenant-dashboard.jpg)
+
+- **Profil UMKM**: logo, name, area, description, address, opening hours; WhatsApp number and every link are optional. Products can be added once the profile and the account photo are complete.
+
+![Profil UMKM form](panduan/fitur-profil-umkm.jpg)
+
+- **Products**: add with photo, price, category, description; a new or changed product waits for approval (*Menunggu Konfirmasi*). Rejected products show the reason and can be fixed and sent again.
+
+![Adding a product](panduan/fitur-tambah-produk.jpg)
+
+![Product status list](panduan/fitur-produk-saya.jpg)
+
+![A rejected product with its reason](panduan/fitur-produk-ditolak.jpg)
+
+- **Ulasan Produk**: every review of the seller's products, updated live; a fake or abusive review can be **reported** once, with a reason.
+
+![Ulasan Produk: reviews and the report button](panduan/fitur-tenant-ulasan.jpg)
+
+- **Kalkulator Profit & Iklan**: margin, break-even ROAS, highest safe ad cost per sale, and net profit per unit and per month. Nothing is saved.
+
+![Kalkulator Profit & Iklan](panduan/fitur-tenant-kalkulator.jpg)
+
+- **Notifications** (live, with an unread badge), **Bantuan & Ketentuan**, and **Pengaturan Akun** (name, phone, photo, password).
+
+![Notifications](panduan/fitur-notifikasi.jpg)
+
+![Account settings](panduan/fitur-pengaturan-akun.jpg)
+
+### Admin
+
+- **Dashboard**: sellers and products by status for a chosen period, and the products waiting for confirmation.
+
+![Admin dashboard](panduan/fitur-admin-dashboard.jpg)
+
+- **Konfirmasi Produk**: approve, reject (with a reason) or take down products. The seller is notified each time.
+
+![Konfirmasi Produk](panduan/fitur-admin-konfirmasi.jpg)
+
+![Product detail before deciding](panduan/fitur-admin-konfirmasi-detail.jpg)
+
+- **Kategori Produk**: add, rename, delete; each category needs an image (shown in the Beranda carousel).
+
+![Kategori Produk](panduan/fitur-admin-kategori.jpg)
+
+- **Manajemen UMKM**: activate or deactivate seller accounts, and read their shop profiles.
+
+![Manajemen UMKM](panduan/fitur-admin-umkm.jpg)
+
+- **Laporan Ulasan**: reviews reported by sellers; **hide** (no longer shown or counted in the rating), **keep**, or show a hidden one again.
+
+![Laporan Ulasan](panduan/fitur-admin-ulasan.jpg)
+
+- **Manajemen Produk** (all products by status and category), **Notifikasi**, **Pengaturan**.
+
+### Disnakertrans
+
+- **Account activation by email**: the superadmin doesn't choose a password. The new officer gets a temporary password and a button; on the activation page they type it and set their own password.
+
+![Activation page of a Disnakertrans account](panduan/fitur-aktivasi-akun.jpg)
+
+- **Aktivasi Admin**: activate or deactivate admin accounts. A newly activated admin gets an email.
+
+![Aktivasi Admin](panduan/fitur-disnakertrans-admin.jpg)
+
+- **Konfirmasi Produk**, **Laporan Ulasan**, **Kategori Produk**: the same as an admin. **Data Produk** and **Data UMKM** to read.
+
+### Superadmin
+
+- **Dashboard**: totals of every kind of account and of products by status.
+
+![Superadmin dashboard](panduan/fitur-superadmin-dashboard.jpg)
+
+- **Akun Disnakertrans**: create accounts (name, phone, email; no password) and resend the activation email.
+
+![Adding a Disnakertrans account](panduan/superadmin-1-tambah.jpg)
+
+- **Semua Pengguna**, **Data Produk**, **Data UMKM**, **Kategori Produk**: read-only.
+
+![Semua Pengguna](panduan/fitur-superadmin-pengguna.jpg)
+
+- **Log API**: every create, update and delete by signed-in users and every login attempt, with the result, a chart of requests per day and the most frequent errors. Passwords and tokens are never logged.
+
+![Log API](panduan/fitur-superadmin-log.jpg)
+
+- **Panduan Server**: this guide, in English and Bahasa Indonesia, light or dark.
+
+### Behind the scenes
+
+| feature | what it does | where |
+|---|---|---|
+| Email | Sign-up OTP, Disnakertrans activation, password reset, "your admin account is active", weekly backup. All in Bahasa Indonesia | `src/mail/templates.ts`, `SMTP_*` in the backend `.env` |
+| Live notifications | Notifications, review lists and the unread badge update without reloading (Socket.IO) | `src/realtime/socket.ts` |
+| Sessions | Login lasts 1 hour; logout, deactivation or a password reset ends the session at once | `src/middlewares/auth.ts` |
+| Photo uploads | A photo uploads when picked and is attached on *Simpan*; unused ones are deleted every night | sections 7 and 12 |
+| Review protection | "Not a robot" check, one review per product per day, at most 5 reviews in 10 minutes per network, reporting and hiding. Visitors' IP addresses are stored only as a hash | `src/services/review.service.ts` |
+| Weekly backup | Database and photos, kept on the server and emailed | section 7 |
+| Search engines (SEO) | Titles, descriptions, sitemap, structured data, `http` to `https` | frontend README, *SEO* |
+| Maintenance page | Shown instead of the website during updates, in two languages | section 5 |
+| Public API docs | `/docs` on the API domain, in English and Bahasa Indonesia, with flow charts | `npm run docs` |
+
+## 15. Updating the Panduan (help pages)
 
 The **Panduan** is the website's help: `/panduan` for everyone (header and footer link) and **Bantuan & Ketentuan** in the seller (tenant) dashboard. Both show the same list of topics; each topic opens to show its text and step-by-step screenshots. All of it lives in the **frontend** code; the backend is not involved.
 
@@ -505,6 +882,7 @@ All paths are inside `/home/prafi/project/prafi-frontend`.
 | `src/app/(public)/panduan/page.tsx` | The public page `/panduan`: shows topics whose `audience` has `"public"` |
 | `src/app/tenant/bantuan/page.tsx` | The seller page `/tenant/bantuan`: shows topics whose `audience` has `"tenant"` |
 | `docs/PANDUAN-PENGGUNA.md` | The same guide as a document (for printing / sharing). Not shown on the website: update it by hand when a topic changes |
+| `prafi-backend/docs/SERVER-GUIDE.md` and `.id.md`, section 14 | This guide's feature list has its own screenshots in the same folder (`fitur-*.jpg`): add a line and a picture there when a new feature arrives |
 
 ### How a topic is written
 
@@ -575,7 +953,7 @@ Step numbers are added automatically. For a topic without steps (like *Kebijakan
 
 - Take the screenshot from the real website (with sample data, not real customers), and outline the part the step talks about in **red**, as in the existing pictures.
 - Save it as **JPG, 1024×640** pixels (the page reserves that shape), under about 200 KB.
-- Name it `<topic>-<number>-<what>.jpg` (e.g. `ulasan-1-form.jpg`) and put it in `public/panduan/`.
+- Name it `<topic>-<number>-<what>.jpg` (e.g. `ulasan-1-form.jpg`) and put it in `public/panduan/`. Pictures used only by this server guide are named `fitur-<what>.jpg`.
 - To replace a picture, overwrite the file with the same name: no code change needed.
 
 ### Publishing the change
@@ -591,7 +969,7 @@ sudo systemctl restart prafi-frontend
 
 Then check `/panduan` (and **Bantuan & Ketentuan** as a seller). Common mistakes: a tag opened but not closed (`<b>` without `</b>`), a missing `,` after `},`, an icon used but not imported, or an `image` name that doesn't match the file (the step then shows a broken picture).
 
-## 13. Troubleshooting
+## 16. Troubleshooting
 
 | problem | check / fix |
 |---|---|
@@ -605,9 +983,8 @@ Then check `/panduan` (and **Bantuan & Ketentuan** as a seller). Common mistakes
 | Disk full | `df -h`; old logs: `sudo journalctl --vacuum-time=14d` |
 | HTTPS certificate expired | `sudo certbot renew` and check its output |
 
-## 14. Things to improve
+## 17. Things to improve
 
-- **Set `NODE_ENV=production`** in the backend `.env` (then restart): error responses still include internal details.
 - **Use a separate database user** for the app instead of the `postgres` superuser.
 - **Limit Webmin** (ports 10000 and 20000 are open to the internet): allow only known IPs, or close them and use `core.transniaga…` only.
 - **Put the backend `deploy/` folder in git**, so the service and nginx files aren't lost with the server.

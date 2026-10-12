@@ -7312,7 +7312,7 @@
     },
     {
       "name": "Server Guide",
-      "description": "How the server is set up and maintained (services, deploy, database, backups), for whoever manages it. Open `{{baseUrl}}/api/docs/server` in a browser and log in as **superadmin**. The guide's source is `docs/SERVER-GUIDE.md` in this repository.",
+      "description": "How the server is set up and maintained (services, deploy, database, backups), for whoever manages it. Open `{{baseUrl}}/api/docs/server` in a browser and log in as **superadmin**. The page has two languages (**ID / EN**) and two themes (**light / dark**); both choices are remembered in the browser. The guide's sources are `docs/SERVER-GUIDE.md` (English) and `docs/SERVER-GUIDE.id.md` (Bahasa Indonesia) in this repository; they must be kept in step.",
       "item": [
         {
           "name": "Server Guide Page (Public)",
@@ -7330,7 +7330,7 @@
                 "server"
               ]
             },
-            "description": "**Access:** public, no token (the page itself holds no server information)\n\nOpen it in a browser. It asks for the **superadmin** login (*Auth → Login*), keeps the token for that tab only, then loads *Server Guide Content*. Opened from **Panduan Server** in the website's superadmin dashboard (same domain, through its `/api` proxy), the dashboard login is used directly, without a second login. Other roles are refused and logged out again. Script: `/api/docs/server/app.js`.",
+            "description": "**Access:** public, no token (the page itself holds no server information)\n\nOpen it in a browser. It asks for the **superadmin** login (*Auth → Login*), keeps the token for that tab only, then loads *Server Guide Content*. Opened from **Panduan Server** in the website's superadmin dashboard (same domain, through its `/api` proxy), the dashboard login is used directly, without a second login. Other roles are refused and logged out again. Scripts: `/api/docs/server/app.js` and `/api/docs/server/theme.js`. The page's Content-Security-Policy also allows pictures from the website (`FRONTEND_URL`): the guide's screenshots are files of the frontend (`public/panduan/`).",
             "auth": {
               "type": "noauth"
             }
@@ -7363,7 +7363,7 @@
                     "server"
                   ]
                 },
-                "description": "**Access:** public, no token (the page itself holds no server information)\n\nOpen it in a browser. It asks for the **superadmin** login (*Auth → Login*), keeps the token for that tab only, then loads *Server Guide Content*. Opened from **Panduan Server** in the website's superadmin dashboard (same domain, through its `/api` proxy), the dashboard login is used directly, without a second login. Other roles are refused and logged out again. Script: `/api/docs/server/app.js`.",
+                "description": "**Access:** public, no token (the page itself holds no server information)\n\nOpen it in a browser. It asks for the **superadmin** login (*Auth → Login*), keeps the token for that tab only, then loads *Server Guide Content*. Opened from **Panduan Server** in the website's superadmin dashboard (same domain, through its `/api` proxy), the dashboard login is used directly, without a second login. Other roles are refused and logged out again. Scripts: `/api/docs/server/app.js` and `/api/docs/server/theme.js`. The page's Content-Security-Policy also allows pictures from the website (`FRONTEND_URL`): the guide's screenshots are files of the frontend (`public/panduan/`).",
                 "auth": {
                   "type": "noauth"
                 }
@@ -7388,7 +7388,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/docs/server/content",
+              "raw": "{{baseUrl}}/api/docs/server/content?lang=id",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -7397,9 +7397,16 @@
                 "docs",
                 "server",
                 "content"
+              ],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "id",
+                  "description": "id (default) or en"
+                }
               ]
             },
-            "description": "**Access:** superadmin\n\nThe server guide (`docs/SERVER-GUIDE.md`) rendered as HTML, plus `updatedAt` (when the file last changed). Read from the file on every request, so editing it needs no restart. Sent with `Cache-Control: no-store`. Other roles get 403."
+            "description": "**Access:** superadmin\n\nThe server guide rendered as HTML, plus `lang` and `updatedAt` (when the file last changed). Query `lang`: `id` (default, `docs/SERVER-GUIDE.id.md`) or `en` (`docs/SERVER-GUIDE.md`). Pictures written as `panduan/<name>.jpg` point to `<FRONTEND_URL>/panduan/`. Read from the file on every request, so editing it needs no restart. Sent with `Cache-Control: no-store`. Other roles get 403."
           },
           "event": [
             {
@@ -7430,7 +7437,7 @@
                     "content"
                   ]
                 },
-                "description": "**Access:** superadmin\n\nThe server guide (`docs/SERVER-GUIDE.md`) rendered as HTML, plus `updatedAt` (when the file last changed). Read from the file on every request, so editing it needs no restart. Sent with `Cache-Control: no-store`. Other roles get 403."
+                "description": "**Access:** superadmin\n\nThe server guide rendered as HTML, plus `lang` and `updatedAt` (when the file last changed). Query `lang`: `id` (default, `docs/SERVER-GUIDE.id.md`) or `en` (`docs/SERVER-GUIDE.md`). Pictures written as `panduan/<name>.jpg` point to `<FRONTEND_URL>/panduan/`. Read from the file on every request, so editing it needs no restart. Sent with `Cache-Control: no-store`. Other roles get 403."
               },
               "status": "OK",
               "code": 200,
@@ -7461,7 +7468,7 @@
                     "content"
                   ]
                 },
-                "description": "**Access:** superadmin\n\nThe server guide (`docs/SERVER-GUIDE.md`) rendered as HTML, plus `updatedAt` (when the file last changed). Read from the file on every request, so editing it needs no restart. Sent with `Cache-Control: no-store`. Other roles get 403."
+                "description": "**Access:** superadmin\n\nThe server guide rendered as HTML, plus `lang` and `updatedAt` (when the file last changed). Query `lang`: `id` (default, `docs/SERVER-GUIDE.id.md`) or `en` (`docs/SERVER-GUIDE.md`). Pictures written as `panduan/<name>.jpg` point to `<FRONTEND_URL>/panduan/`. Read from the file on every request, so editing it needs no restart. Sent with `Cache-Control: no-store`. Other roles get 403."
               },
               "status": "Forbidden",
               "code": 403,

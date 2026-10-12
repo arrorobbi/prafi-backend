@@ -454,13 +454,13 @@ Angka untuk grafik log API selama `days` hari terakhir (WIT): `total`, `success`
 Satu log lengkap, termasuk `errorStack` untuk error 5xx. 404 jika tidak ada (atau sudah dihapus).
 
 === FOLDER Server Guide => Panduan Server
-Cara server disiapkan dan dirawat (service, deploy, database, backup), untuk pengelola server. Buka `{{baseUrl}}/api/docs/server` di browser lalu masuk sebagai **superadmin**. Sumber panduan: `docs/SERVER-GUIDE.md` di repository ini.
+Cara server disiapkan dan dirawat (service, deploy, database, backup), untuk pengelola server. Buka `{{baseUrl}}/api/docs/server` di browser lalu masuk sebagai **superadmin**. Halaman memiliki dua bahasa (**ID / EN**) dan dua tema (**terang / gelap**); kedua pilihan diingat di browser. Sumber panduan: `docs/SERVER-GUIDE.md` (Inggris) dan `docs/SERVER-GUIDE.id.md` (Bahasa Indonesia) di repository ini; keduanya harus selalu sama isinya.
 
 === REQ Server Guide Page (Public) => Halaman Panduan Server
-Buka di browser. Halaman meminta login **superadmin** (*Auth → Login*), menyimpan token hanya untuk tab tersebut, lalu memuat *Isi Panduan Server*. Dibuka dari menu **Panduan Server** di dashboard superadmin (domain website, lewat proxy `/api`), login dashboard langsung dipakai tanpa login ulang. Role lain ditolak dan langsung dikeluarkan lagi. Halaman ini sendiri tidak berisi informasi server. Script: `/api/docs/server/app.js`.
+Buka di browser. Halaman meminta login **superadmin** (*Auth → Login*), menyimpan token hanya untuk tab tersebut, lalu memuat *Isi Panduan Server*. Dibuka dari menu **Panduan Server** di dashboard superadmin (domain website, lewat proxy `/api`), login dashboard langsung dipakai tanpa login ulang. Role lain ditolak dan langsung dikeluarkan lagi. Halaman ini sendiri tidak berisi informasi server. Script: `/api/docs/server/app.js` dan `/api/docs/server/theme.js`. Content-Security-Policy halaman ini juga mengizinkan gambar dari website (`FRONTEND_URL`): tangkapan layar panduan adalah berkas milik frontend (`public/panduan/`).
 
 === REQ Server Guide Content (superadmin) => Isi Panduan Server
-Panduan server (`docs/SERVER-GUIDE.md`) dalam bentuk HTML, beserta `updatedAt` (kapan file terakhir diubah). Dibaca dari file setiap request, sehingga mengubahnya tidak perlu restart. Dikirim dengan `Cache-Control: no-store`. Role lain mendapat 403.
+Panduan server dalam bentuk HTML, beserta `lang` dan `updatedAt` (kapan file terakhir diubah). Query `lang`: `id` (bawaan, `docs/SERVER-GUIDE.id.md`) atau `en` (`docs/SERVER-GUIDE.md`). Gambar yang ditulis sebagai `panduan/<nama>.jpg` mengarah ke `<FRONTEND_URL>/panduan/`. Dibaca dari file setiap request, sehingga mengubahnya tidak perlu restart. Dikirim dengan `Cache-Control: no-store`. Role lain mendapat 403.
 
 === FOLDER Realtime (WebSocket) => Realtime (WebSocket)
 Notifikasi realtime (dan, untuk superadmin, log API langsung) melalui **Socket.IO** (host dan port yang sama dengan API).
