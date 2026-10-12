@@ -33,6 +33,7 @@ Port 80 (plain HTTP) is held by the frontend itself, not by nginx. The browser c
 |---|---|
 | `/home/prafi/project/prafi-backend` | Backend source (TypeScript). Git: `github.com/arrorobbi/prafi-backend` |
 | `/home/prafi/project/prafi-frontend` | Frontend source (Next.js). Git: `github.com/arrorobbi/prafi-frontend` |
+| `/home/prafi/project/prafi-maintenance` | Maintenance page shown during updates (see *Updating the apps → Maintenance page*). Local git only |
 
 Inside **prafi-backend**:
 
@@ -81,6 +82,7 @@ Both apps run as **systemd services** that start at boot and restart themselves 
 |---|---|---|
 | `prafi-backend` | `node dist/server.js` (Node 22) in `prafi-backend/` | 4000 |
 | `prafi-frontend` | `next start -p 80` (Node 18) in `prafi-frontend/` | 80 |
+| `prafi-maintenance` | maintenance page; **instead of** `prafi-frontend` during updates (normally stopped) | 80 |
 | `nginx` | HTTPS proxy | 443 |
 | `postgresql` | database | 5432 (localhost only) |
 
@@ -151,6 +153,22 @@ Quick check after a deploy:
 curl -s https://api.transniaga.manokwarikab.go.id/api/health     # {"success":true,"data":{"status":"ok"}}
 curl -s -o /dev/null -w "%{http_code}\n" https://transniaga.manokwarikab.go.id/   # 200
 ```
+
+### Maintenance page
+
+While an update is running you can show visitors a notice instead of a half-updated site. It is a separate small app, `/home/prafi/project/prafi-maintenance` (service **`prafi-maintenance`**), that takes port 80 in place of the website. The two services can't run together: starting one stops the other.
+
+```bash
+sudo systemctl start prafi-maintenance   # maintenance page ON (the website stops)
+# ... git pull, migration, npm run build, restart prafi-backend ...
+sudo systemctl start prafi-frontend      # website back ON (the maintenance page stops)
+```
+
+- The page is in Bahasa Indonesia and English (it follows the visitor's browser; **ID / EN** switch on the page) and opens the real site by itself once it is back.
+- Every address answers `503`, so search engines don't index it as the site; `/api/…` gets a JSON `MAINTENANCE` error.
+- Optional estimated finish time, extra message and contact: edit `prafi-maintenance/maintenance.json` (no restart needed), e.g. `"until": "2026-10-12T15:00:00+07:00"`.
+- It is never started at boot: after a reboot the real website comes up.
+- Installed once with `sudo bash /home/prafi/project/prafi-maintenance/deploy/setup.sh`. Details: that folder's `README.md`.
 
 ## 6. Configuration (.env)
 
