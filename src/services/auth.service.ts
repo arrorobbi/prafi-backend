@@ -5,6 +5,7 @@ import { HttpError } from '../errors/HttpError';
 import { Approval, Image, RevokedToken, sequelize, User } from '../models';
 import type { AuthUser } from '../types/express';
 import { signAccessToken } from '../utils/jwt';
+import { readablePassword } from '../utils/readablePassword';
 import * as emailVerification from './emailVerification.service';
 import * as imageService from './image.service';
 import { notify } from './notification.service';
@@ -15,7 +16,8 @@ export interface RegisterInput {
   lastName: string;
   phoneNumber: string;
   email: string;
-  password: string;
+  /** Not used for disnakertrans accounts: they get a temporary password by email (see register) */
+  password?: string;
   role: Role;
   faceImageId?: number | null;
   /** Required for tenant accounts, not allowed for other roles. */
@@ -56,6 +58,8 @@ export async function login(email: string, password: string) {
  * `creator` is the logged-in user (superadmin → disnakertrans, see CREATABLE_ROLES), or null for a public
  * sign-up, which is only allowed for PUBLIC_REGISTRATION_ROLES (admin, tenant).
  * Admins start inactive until a disnakertrans activates them; every new account starts with mailActive = false.
+ * A disnakertrans account gets a temporary password made here (the superadmin doesn't choose one): it is emailed
+ * with the activation link, and its owner replaces it when activating the account.
  */
 export async function register(creator: AuthUser | null, input: RegisterInput) {
   if (creator === null) {
@@ -75,6 +79,10 @@ export async function register(creator: AuthUser | null, input: RegisterInput) {
     }
   }
 
+  const temporaryPassword = input.role === ROLES.DISNAKERTRANS ? readablePassword() : undefined;
+  const password = temporaryPassword ?? input.password;
+  if (!password) throw HttpError.badRequest('Validasi gagal', [{ field: 'password', message: 'password wajib diisi' }]);
+
   const isActive = ACTIVE_ON_REGISTRATION[input.role];
   const reason = isActive
     ? `Active on registration (${creator ? `created by ${creator.role}` : 'self-registered'})`
@@ -83,11 +91,11 @@ export async function register(creator: AuthUser | null, input: RegisterInput) {
   // The user and their approval are created together, so a user never exists without one.
   // Duplicate email / already-used faceImageId → UniqueConstraintError → 409 via the error handler
   const { user, approval } = await sequelize.transaction(async (transaction) => {
-    const created = await User.create({ ...input, faceImageId: input.faceImageId ?? null }, { transaction });
+    const created = await User.create({ ...input, password, faceImageId: input.faceImageId ?? null }, { transaction });
     return { user: created, approval: await Approval.create({ userId: created.id, isActive, reason }, { transaction }) };
   });
 
-  const verification = await emailVerification.startVerification(user);
+  const verification = await emailVerification.startVerification(user, { temporaryPassword });
 
   if (user.role === ROLES.ADMIN) await notify.adminRegistered(user, approval.id);
   else if (user.role === ROLES.TENANT) await notify.tenantRegistered(user, approval.id);

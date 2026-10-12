@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Prafi API",
-    "description": "Backend API for Prafi (Express + Sequelize + PostgreSQL), with realtime notifications over Socket.IO and emails (nodemailer).\n\n## Setup (once)\n1. Import this collection and `Prafi-Local.postman_environment.json`, then select **Prafi Local** (environment dropdown, top right).\n2. In **Prafi Local** set `loginEmail` / `loginPassword` (Current value) to the superadmin from `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`), then Ctrl+S.\n3. Start the server (`npm run dev` or `npm run build && npm start`). `baseUrl` is `http://localhost:4000`.\n4. Email: set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` in `.env` to send real emails. Set `FRONTEND_URL` to the frontend's address: the forgot-password email links to `<FRONTEND_URL>/reset-password`. Without `SMTP_HOST` (development) emails are printed in the server log and the OTP / activation token is returned in `meta.verification` and saved as `{{otp}}` / `{{verifyToken}}`.\n\n## Login and roles\n- Every request uses **Bearer `{{token}}`** (set on the collection; requests inherit it). Public requests have *No Auth*.\n- **Auth → Login** saves the token to `{{token}}` (valid **1 hour**). To switch role, change `loginEmail` / `loginPassword` (or the Login body) and send Login again.\n- The **name of each request says who can call it**: `(All roles)` = superadmin, disnakertrans, admin and tenant; `(superadmin, disnakertrans, admin)`, `(admin)`, `(tenant)`… = only those roles; `(Public)` = no login. Any other role gets **403**.\n- Every account must have a **verified email** (`mailActive: true`) and an **active approval** (`approval.isActive: true`) to log in and use the API.\n\n| role | created by | email verification | approval at start | can |\n|---|---|---|---|---|\n| superadmin | seed (`npm run db:seed`) | already verified | active | create disnakertrans accounts; **read-only** for everything else (users, products, tenants, product categories); notified of every new account and product |\n| disnakertrans | superadmin (*Register Disnakertrans*) | activation link (24 h) | active | view and activate/deactivate **admin** accounts and **products**, view all products and tenants, manage product categories |\n| admin | self sign-up (*Register Admin*) | OTP (15 min) | **inactive** until a disnakertrans activates it | activate tenant accounts **and products**, read users (tenants)/products/tenants, manage product categories |\n| tenant | self sign-up (*Register Tenant*) | OTP (15 min) | active | manage their own products and tenant profile |\n\n## Endpoints\n| folder | endpoint | access |\n|---|---|---|\n| Health | `GET /api/health` | Public |\n| Auth | `POST /api/auth/login` | Public |\n| Auth | `POST /api/auth/logout` | All roles |\n| Auth | `POST /api/auth/register/disnakertrans` | superadmin |\n| Auth | `POST /api/auth/register/admin` | Public |\n| Auth | `POST /api/auth/register/tenant` | Public |\n| Auth | `POST /api/auth/verify-otp/{{userId}}` | Public |\n| Auth | `GET /api/auth/verify-email/{{userId}}` | Public |\n| Auth | `POST /api/auth/resend-verification/{{userId}}` | Public |\n| Auth | `POST /api/auth/forgot-password` | Public |\n| Auth | `POST /api/auth/reset-password/check` | Public |\n| Auth | `POST /api/auth/reset-password` | Public |\n| Auth | `GET /api/auth/me` | All roles |\n| Auth | `PATCH /api/auth/me` | All roles |\n| Images | `POST /api/images` | All roles |\n| Images | `GET {{imagePath}}` | Public |\n| Images | `DELETE /api/images/{{imageId}}` | tenant |\n| Users | `GET /api/users` | superadmin, disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{userId}}` | disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{productId}}` | disnakertrans, admin |\n| Products | `GET /api/products` | All roles |\n| Products | `GET /api/products/{{productId}}` | All roles |\n| Products | `POST /api/products` | tenant |\n| Products | `PATCH /api/products/{{productId}}` | tenant |\n| Products | `DELETE /api/products/{{productId}}` | tenant |\n| Landing | `GET /api/landing/categories` | Public |\n| Landing | `GET /api/landing/products` | Public |\n| Landing | `GET /api/landing/products/{{productId}}` | Public |\n| Landing | `GET /api/landing/products/{{productId}}/reviews` | Public |\n| Landing | `POST /api/landing/products/{{productId}}/reviews` | Public |\n| Landing | `GET /api/landing/tenants` | Public |\n| Landing | `GET /api/landing/tenants/{{tenantProfileId}}` | Public |\n| Reviews | `GET /api/reviews/mine` | tenant |\n| Reviews | `POST /api/reviews/{{reviewId}}/report` | tenant |\n| Reviews | `GET /api/reviews` | disnakertrans, admin |\n| Reviews | `PATCH /api/reviews/{{reviewId}}/moderation` | disnakertrans, admin |\n| Product Categories | `GET /api/product-categories` | All roles |\n| Product Categories | `GET /api/product-categories/{{categoryId}}` | All roles |\n| Product Categories | `POST /api/product-categories` | disnakertrans, admin |\n| Product Categories | `PATCH /api/product-categories/{{categoryId}}` | disnakertrans, admin |\n| Product Categories | `DELETE /api/product-categories/{{categoryId}}` | disnakertrans, admin |\n| Tenants | `GET /api/tenants/me` | tenant |\n| Tenants | `POST /api/tenants/me` | tenant |\n| Tenants | `PATCH /api/tenants/me` | tenant |\n| Tenants | `DELETE /api/tenants/me` | tenant |\n| Tenants | `GET /api/tenants` | superadmin, disnakertrans, admin |\n| Tenants | `GET /api/tenants/{{tenantProfileId}}` | superadmin, disnakertrans, admin |\n| Notifications | `GET /api/notifications` | All roles |\n| Notifications | `GET /api/notifications/unread-count` | All roles |\n| Notifications | `PATCH /api/notifications/{{notificationId}}/read` | All roles |\n| Notifications | `PATCH /api/notifications/read-all` | All roles |\n| Notifications | `DELETE /api/notifications/{{notificationId}}` | All roles |\n| Stats | `GET /api/stats/overview` | superadmin, disnakertrans, admin |\n| Logs | `GET /api/logs` | superadmin |\n| Logs | `GET /api/logs/stats` | superadmin |\n| Logs | `GET /api/logs/{{logId}}` | superadmin |\n| Server Guide | `GET /api/docs/server` | Public (page; content superadmin) |\n| Server Guide | `GET /api/docs/server/content` | superadmin |\n| Examples | `GET /api/admin/ping` | superadmin, admin |\n| Examples | `GET /api/tenant/ping` | All roles |\n| Realtime (WebSocket) | Socket.IO at `{{baseUrl}}` | All roles (Bearer token) |\n\n## Saved variables\nRequests save what the next ones need: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `reviewId`, `reviewClientId` · `categoryId` · `tenantProfileId` · `notificationId` · `logId`. Each save is printed in the Postman Console.\n\n## Example walkthrough\n1. **Login** as superadmin → **Register Disnakertrans** → **Verify Email Link** (or open the link from the email).\n2. **Register Admin** → **Verify OTP** (code from the email, or `{{otp}}` in development).\n3. Set `loginEmail` = the disnakertrans email, `loginPassword` = `{{newUserPassword}}` → **Login** → **Activate / Deactivate User** with `userId` = the admin's id and `userRole` = `admin`.\n4. **Login** as the admin → **Create Product Category**.\n5. **Register Tenant** → **Verify OTP** → **Login** as the tenant → **Upload Image** → **Create My Tenant** → **Upload Image** again → **Create Product**.\n6. **Login** as the admin → **List Notifications** → **Activate / Deactivate Product** → **Landing Products** shows it.\n\n## Responses\n- Success: `{ \"success\": true, \"data\": …, \"meta\"?: { page, limit, total, totalPages } | { verification } }`\n- Error: `{ \"success\": false, \"error\": { \"code\", \"message\", \"details\"? } }`\n- `message` and `details[].message` are in **Bahasa Indonesia** (ready to show in the frontend). `code` and `field` stay in English; frontend logic should switch on `code`.\n\n| status | code (examples) | meaning |\n|---|---|---|\n| 400 | `VALIDATION_ERROR`, `BAD_REQUEST`, `ID_NOT_PROVIDED` | invalid input (`details` lists the fields) |\n| 400 | `OTP_INVALID`, `OTP_EXPIRED`, `LINK_INVALID`, `LINK_EXPIRED`, `RESET_LINK_INVALID`, `RESET_LINK_EXPIRED` | wrong or expired verification code / link / password reset link |\n| 401 | `UNAUTHORIZED` | no/invalid/expired/logged-out token, or the password was reset → log in again |\n| 403 | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `USER_NOT_ACTIVATED` | wrong role, email not verified yet, or account not activated |\n| 404 | `NOT_FOUND` | not found, or not yours |\n| 409 | `UNIQUE_CONSTRAINT`, `STILL_IN_USE`, `CONFLICT`, `EMAIL_ALREADY_VERIFIED` | duplicate value, record still in use, already verified |\n| 413 | `FILE_TOO_LARGE` | image over 5 MB |\n| 429 | `TOO_MANY_REQUESTS` | a new verification code was requested less than 60 seconds ago |\n\n## Notifications and realtime\nEvery role gets notifications for the events that concern them (see **Notifications**); activation notifications include the `approval` with `userId` and the `user`. They arrive live over Socket.IO as `notification:new` (see **Realtime (WebSocket)** for connecting in Postman and in the frontend).",
+    "description": "Backend API for Prafi (Express + Sequelize + PostgreSQL), with realtime notifications over Socket.IO and emails (nodemailer).\n\n## Setup (once)\n1. Import this collection and `Prafi-Local.postman_environment.json`, then select **Prafi Local** (environment dropdown, top right).\n2. In **Prafi Local** set `loginEmail` / `loginPassword` (Current value) to the superadmin from `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`), then Ctrl+S.\n3. Start the server (`npm run dev` or `npm run build && npm start`). `baseUrl` is `http://localhost:4000`.\n4. Email: set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` in `.env` to send real emails. Set `FRONTEND_URL` to the frontend's address: the forgot-password email links to `<FRONTEND_URL>/reset-password` and the disnakertrans activation email to `<FRONTEND_URL>/aktivasi`. Without `SMTP_HOST` (development) emails are printed in the server log and the OTP, or the activation token and temporary password, are returned in `meta.verification` and saved as `{{otp}}` / `{{verifyToken}}` / `{{temporaryPassword}}`.\n\n## Login and roles\n- Every request uses **Bearer `{{token}}`** (set on the collection; requests inherit it). Public requests have *No Auth*.\n- **Auth → Login** saves the token to `{{token}}` (valid **1 hour**). To switch role, change `loginEmail` / `loginPassword` (or the Login body) and send Login again.\n- The **name of each request says who can call it**: `(All roles)` = superadmin, disnakertrans, admin and tenant; `(superadmin, disnakertrans, admin)`, `(admin)`, `(tenant)`… = only those roles; `(Public)` = no login. Any other role gets **403**.\n- Every account must have a **verified email** (`mailActive: true`) and an **active approval** (`approval.isActive: true`) to log in and use the API.\n\n| role | created by | email verification | approval at start | can |\n|---|---|---|---|---|\n| superadmin | seed (`npm run db:seed`) | already verified | active | create disnakertrans accounts; **read-only** for everything else (users, products, tenants, product categories); notified of every new account and product |\n| disnakertrans | superadmin (*Register Disnakertrans*) | temporary password + activation link by email (24 h), replaced with their own password | active | view and activate/deactivate **admin** accounts and **products**, view all products and tenants, manage product categories |\n| admin | self sign-up (*Register Admin*) | OTP (15 min) | **inactive** until a disnakertrans activates it | activate tenant accounts **and products**, read users (tenants)/products/tenants, manage product categories |\n| tenant | self sign-up (*Register Tenant*) | OTP (15 min) | active | manage their own products and tenant profile |\n\n## Endpoints\n| folder | endpoint | access |\n|---|---|---|\n| Health | `GET /api/health` | Public |\n| Auth | `POST /api/auth/login` | Public |\n| Auth | `POST /api/auth/logout` | All roles |\n| Auth | `POST /api/auth/register/disnakertrans` | superadmin |\n| Auth | `POST /api/auth/register/admin` | Public |\n| Auth | `POST /api/auth/register/tenant` | Public |\n| Auth | `POST /api/auth/verify-otp/{{userId}}` | Public |\n| Auth | `POST /api/auth/activate/check` | Public |\n| Auth | `POST /api/auth/activate` | Public |\n| Auth | `POST /api/auth/resend-verification/{{userId}}` | Public |\n| Auth | `POST /api/auth/forgot-password` | Public |\n| Auth | `POST /api/auth/reset-password/check` | Public |\n| Auth | `POST /api/auth/reset-password` | Public |\n| Auth | `GET /api/auth/me` | All roles |\n| Auth | `PATCH /api/auth/me` | All roles |\n| Images | `POST /api/images` | All roles |\n| Images | `GET {{imagePath}}` | Public |\n| Images | `DELETE /api/images/{{imageId}}` | tenant |\n| Users | `GET /api/users` | superadmin, disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{userId}}` | disnakertrans, admin |\n| Approvals | `PATCH /api/approvals/{{productId}}` | disnakertrans, admin |\n| Products | `GET /api/products` | All roles |\n| Products | `GET /api/products/{{productId}}` | All roles |\n| Products | `POST /api/products` | tenant |\n| Products | `PATCH /api/products/{{productId}}` | tenant |\n| Products | `DELETE /api/products/{{productId}}` | tenant |\n| Landing | `GET /api/landing/categories` | Public |\n| Landing | `GET /api/landing/products` | Public |\n| Landing | `GET /api/landing/products/{{productId}}` | Public |\n| Landing | `GET /api/landing/products/{{productId}}/reviews` | Public |\n| Landing | `POST /api/landing/products/{{productId}}/reviews` | Public |\n| Landing | `GET /api/landing/tenants` | Public |\n| Landing | `GET /api/landing/tenants/{{tenantProfileId}}` | Public |\n| Reviews | `GET /api/reviews/mine` | tenant |\n| Reviews | `POST /api/reviews/{{reviewId}}/report` | tenant |\n| Reviews | `GET /api/reviews` | disnakertrans, admin |\n| Reviews | `PATCH /api/reviews/{{reviewId}}/moderation` | disnakertrans, admin |\n| Product Categories | `GET /api/product-categories` | All roles |\n| Product Categories | `GET /api/product-categories/{{categoryId}}` | All roles |\n| Product Categories | `POST /api/product-categories` | disnakertrans, admin |\n| Product Categories | `PATCH /api/product-categories/{{categoryId}}` | disnakertrans, admin |\n| Product Categories | `DELETE /api/product-categories/{{categoryId}}` | disnakertrans, admin |\n| Tenants | `GET /api/tenants/me` | tenant |\n| Tenants | `POST /api/tenants/me` | tenant |\n| Tenants | `PATCH /api/tenants/me` | tenant |\n| Tenants | `DELETE /api/tenants/me` | tenant |\n| Tenants | `GET /api/tenants` | superadmin, disnakertrans, admin |\n| Tenants | `GET /api/tenants/{{tenantProfileId}}` | superadmin, disnakertrans, admin |\n| Notifications | `GET /api/notifications` | All roles |\n| Notifications | `GET /api/notifications/unread-count` | All roles |\n| Notifications | `PATCH /api/notifications/{{notificationId}}/read` | All roles |\n| Notifications | `PATCH /api/notifications/read-all` | All roles |\n| Notifications | `DELETE /api/notifications/{{notificationId}}` | All roles |\n| Stats | `GET /api/stats/overview` | superadmin, disnakertrans, admin |\n| Logs | `GET /api/logs` | superadmin |\n| Logs | `GET /api/logs/stats` | superadmin |\n| Logs | `GET /api/logs/{{logId}}` | superadmin |\n| Server Guide | `GET /api/docs/server` | Public (page; content superadmin) |\n| Server Guide | `GET /api/docs/server/content` | superadmin |\n| Examples | `GET /api/admin/ping` | superadmin, admin |\n| Examples | `GET /api/tenant/ping` | All roles |\n| Realtime (WebSocket) | Socket.IO at `{{baseUrl}}` | All roles (Bearer token) |\n\n## Saved variables\nRequests save what the next ones need: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` / `temporaryPassword` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `reviewId`, `reviewClientId` · `categoryId` · `tenantProfileId` · `notificationId` · `logId`. Each save is printed in the Postman Console.\n\n## Example walkthrough\n1. **Login** as superadmin → **Register Disnakertrans** (no password: a temporary one is emailed) → **Check Activation Link** → **Activate Account** (sets the password to `{{newUserPassword}}`; or open the link from the email).\n2. **Register Admin** → **Verify OTP** (code from the email, or `{{otp}}` in development).\n3. Set `loginEmail` = the disnakertrans email, `loginPassword` = `{{newUserPassword}}` → **Login** → **Activate / Deactivate User** with `userId` = the admin's id and `userRole` = `admin`.\n4. **Login** as the admin → **Create Product Category**.\n5. **Register Tenant** → **Verify OTP** → **Login** as the tenant → **Upload Image** → **Create My Tenant** → **Upload Image** again → **Create Product**.\n6. **Login** as the admin → **List Notifications** → **Activate / Deactivate Product** → **Landing Products** shows it.\n\n## Responses\n- Success: `{ \"success\": true, \"data\": …, \"meta\"?: { page, limit, total, totalPages } | { verification } }`\n- Error: `{ \"success\": false, \"error\": { \"code\", \"message\", \"details\"? } }`\n- `message` and `details[].message` are in **Bahasa Indonesia** (ready to show in the frontend). `code` and `field` stay in English; frontend logic should switch on `code`.\n\n| status | code (examples) | meaning |\n|---|---|---|\n| 400 | `VALIDATION_ERROR`, `BAD_REQUEST`, `ID_NOT_PROVIDED` | invalid input (`details` lists the fields) |\n| 400 | `OTP_INVALID`, `OTP_EXPIRED`, `LINK_INVALID`, `LINK_EXPIRED`, `TEMPORARY_PASSWORD_INVALID`, `RESET_LINK_INVALID`, `RESET_LINK_EXPIRED` | wrong or expired verification code / activation link / temporary password / password reset link |\n| 401 | `UNAUTHORIZED` | no/invalid/expired/logged-out token, or the password was reset → log in again |\n| 403 | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `USER_NOT_ACTIVATED` | wrong role, email not verified yet, or account not activated |\n| 404 | `NOT_FOUND` | not found, or not yours |\n| 409 | `UNIQUE_CONSTRAINT`, `STILL_IN_USE`, `CONFLICT`, `EMAIL_ALREADY_VERIFIED` | duplicate value, record still in use, already verified |\n| 413 | `FILE_TOO_LARGE` | image over 5 MB |\n| 429 | `TOO_MANY_REQUESTS` | a new verification code was requested less than 60 seconds ago |\n\n## Notifications and realtime\nEvery role gets notifications for the events that concern them (see **Notifications**); activation notifications include the `approval` with `userId` and the `user`. They arrive live over Socket.IO as `notification:new` (see **Realtime (WebSocket)** for connecting in Postman and in the frontend).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -123,7 +123,7 @@
     },
     {
       "name": "Auth",
-      "description": "Login, logout, registration, email verification, forgot password and your own account (`/api/auth`).\n\n**Login** saves the token to `{{token}}`, which every other request uses. To act as another role, change `loginEmail` / `loginPassword` (or the body) and send Login again.\n\n| account | registered by | email verification | approval (`isActive`) |\n|---|---|---|---|\n| disnakertrans | superadmin (*Register Disnakertrans*) | activation **link** in the email (valid 24 h) | active right away |\n| admin | themselves (*Register Admin*, public) | 6-digit **OTP** in the email (valid 15 min) | **inactive** until a disnakertrans activates it |\n| tenant | themselves (*Register Tenant*, public) | 6-digit **OTP** in the email (valid 15 min) | active right away |\n\nEvery new account starts with `mailActive: false`: login and every endpoint that needs a token answer **403 `EMAIL_NOT_VERIFIED`** until the email is verified. Emails are in Bahasa Indonesia.\n\n**Development:** without `SMTP_HOST` in `.env`, emails are not sent but printed in the server log, and the register/resend responses include `meta.verification.devCode` / `devLink`, which the requests save as `{{otp}}` / `{{verifyToken}}`.\n\n**Forgot password:** *Forgot Password* emails a link to the frontend page `<FRONTEND_URL>/reset-password?userId=…&token=…` (valid 30 minutes, single use). That page calls *Check Reset Link*, then *Reset Password* with the new password. A reset ends every existing session.",
+      "description": "Login, logout, registration, email verification, forgot password and your own account (`/api/auth`).\n\n**Login** saves the token to `{{token}}`, which every other request uses. To act as another role, change `loginEmail` / `loginPassword` (or the body) and send Login again.\n\n| account | registered by | email verification | approval (`isActive`) |\n|---|---|---|---|\n| disnakertrans | superadmin (*Register Disnakertrans*, no password) | **temporary password + activation link** in the email (valid 24 h); the owner replaces the password with *Activate Account* | active right away |\n| admin | themselves (*Register Admin*, public) | 6-digit **OTP** in the email (valid 15 min) | **inactive** until a disnakertrans activates it |\n| tenant | themselves (*Register Tenant*, public) | 6-digit **OTP** in the email (valid 15 min) | active right away |\n\nEvery new account starts with `mailActive: false`: login and every endpoint that needs a token answer **403 `EMAIL_NOT_VERIFIED`** until the email is verified. Emails are in Bahasa Indonesia.\n\n**Development:** without `SMTP_HOST` in `.env`, emails are not sent but printed in the server log, and the register/resend responses include `meta.verification.devCode` (OTP) or `devLink` / `devToken` / `devTemporaryPassword` (disnakertrans), which the requests save as `{{otp}}`, `{{verifyToken}}` and `{{temporaryPassword}}`.\n\n**Forgot password:** *Forgot Password* emails a link to the frontend page `<FRONTEND_URL>/reset-password?userId=…&token=…` (valid 30 minutes, single use). That page calls *Check Reset Link*, then *Reset Password* with the new password. A reset ends every existing session.\n\n**Disnakertrans activation:** the superadmin doesn't choose a password. *Register Disnakertrans* emails a temporary one (8 characters, e.g. `Mangga47`) with a button to `<FRONTEND_URL>/aktivasi?userId=…&token=…`. That page calls *Check Activation Link*, then *Activate Account* with the temporary password and the new one. The temporary password alone never logs in.",
       "item": [
         {
           "name": "Login (Public)",
@@ -387,10 +387,10 @@
                 "disnakertrans"
               ]
             },
-            "description": "**Access:** superadmin\n\nCreates a **disnakertrans** account (the approver of admin accounts). Its approval is active right away (`approval.isActive: true`), but the email must be activated first: an email in Bahasa Indonesia tells the person the account was created and contains the public activation link (*Verify Email Link*, valid 24 hours). The password is the one in the body; give it to the person yourself.\n\nNotifies every superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development, `{{verifyToken}}`.",
+            "description": "**Access:** superadmin\n\nCreates a **disnakertrans** account (the approver of admin accounts). **No `password` in the body** (sending one is a 400): the server makes a temporary password of 8 characters that is easy to read (a word and digits, e.g. `Mangga47`) and emails it to the account's address, in Bahasa Indonesia, together with a button to the frontend page `<FRONTEND_URL>/aktivasi?userId=…&token=…` (valid 24 hours). There the owner types the temporary password and chooses their own (*Check Activation Link*, *Activate Account*); only then `mailActive` becomes `true` and the account can log in. The temporary password is never accepted for login. The approval is active right away (`approval.isActive: true`).\n\nNotifies every superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development (no `SMTP_HOST`), `{{verifyToken}}` and `{{temporaryPassword}}` from `meta.verification.devToken` / `devTemporaryPassword`.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Dewi\",\n  \"lastName\": \"Lestari\",\n  \"phoneNumber\": \"081377788899\",\n  \"email\": \"disnaker{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+              "raw": "{\n  \"firstName\": \"Dewi\",\n  \"lastName\": \"Lestari\",\n  \"phoneNumber\": \"081377788899\",\n  \"email\": \"disnaker{{$timestamp}}@prafi.test\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -410,8 +410,9 @@
                   "if (pm.response.code < 300) { pm.environment.set('registeredEmail', pm.response.json().data.email); console.log('saved {{registeredEmail}} = ' + pm.environment.get('registeredEmail')); }",
                   "var v = pm.response.code < 300 && pm.response.json().meta && pm.response.json().meta.verification;",
                   "if (v && v.devCode) { pm.environment.set('otp', v.devCode); console.log('saved {{otp}} = ' + pm.environment.get('otp')); }",
-                  "if (v && v.devLink) { pm.environment.set('verifyToken', v.devLink.split('token=')[1]); console.log('saved {{verifyToken}} = ' + pm.environment.get('verifyToken')); }",
-                  "if (v && !v.devCode && !v.devLink) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}} (or open the link in the email)');"
+                  "if (v && v.devToken) { pm.environment.set('verifyToken', v.devToken); console.log('saved {{verifyToken}} = ' + pm.environment.get('verifyToken')); }",
+                  "if (v && v.devTemporaryPassword) { pm.environment.set('temporaryPassword', v.devTemporaryPassword); console.log('saved {{temporaryPassword}} = ' + pm.environment.get('temporaryPassword')); }",
+                  "if (v && !v.devCode && !v.devToken) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}}, or the token and temporary password from the activation email in {{verifyToken}} / {{temporaryPassword}}');"
                 ]
               }
             }
@@ -439,10 +440,10 @@
                     "disnakertrans"
                   ]
                 },
-                "description": "**Access:** superadmin\n\nCreates a **disnakertrans** account (the approver of admin accounts). Its approval is active right away (`approval.isActive: true`), but the email must be activated first: an email in Bahasa Indonesia tells the person the account was created and contains the public activation link (*Verify Email Link*, valid 24 hours). The password is the one in the body; give it to the person yourself.\n\nNotifies every superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development, `{{verifyToken}}`.",
+                "description": "**Access:** superadmin\n\nCreates a **disnakertrans** account (the approver of admin accounts). **No `password` in the body** (sending one is a 400): the server makes a temporary password of 8 characters that is easy to read (a word and digits, e.g. `Mangga47`) and emails it to the account's address, in Bahasa Indonesia, together with a button to the frontend page `<FRONTEND_URL>/aktivasi?userId=…&token=…` (valid 24 hours). There the owner types the temporary password and chooses their own (*Check Activation Link*, *Activate Account*); only then `mailActive` becomes `true` and the account can log in. The temporary password is never accepted for login. The approval is active right away (`approval.isActive: true`).\n\nNotifies every superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development (no `SMTP_HOST`), `{{verifyToken}}` and `{{temporaryPassword}}` from `meta.verification.devToken` / `devTemporaryPassword`.",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"firstName\": \"Dewi\",\n  \"lastName\": \"Lestari\",\n  \"phoneNumber\": \"081377788899\",\n  \"email\": \"disnaker{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+                  "raw": "{\n  \"firstName\": \"Dewi\",\n  \"lastName\": \"Lestari\",\n  \"phoneNumber\": \"081377788899\",\n  \"email\": \"disnaker{{$timestamp}}@prafi.test\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -460,7 +461,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"3f4effd7-39e3-4ba2-94bd-325e2d50f98d\",\n    \"firstName\": \"Dewi\",\n    \"lastName\": \"Lestari\",\n    \"phoneNumber\": \"081377788899\",\n    \"email\": \"dewi.disnaker1791170022812@prafi.test\",\n    \"role\": \"disnakertrans\",\n    \"faceImageId\": null,\n    \"tenantName\": null,\n    \"mailActive\": false,\n    \"passwordChangedAt\": null,\n    \"createdAt\": \"2026-10-05T03:13:43.502Z\",\n    \"updatedAt\": \"2026-10-05T03:13:43.502Z\",\n    \"faceImage\": null,\n    \"approval\": {\n      \"id\": 15,\n      \"reason\": \"Active on registration (created by superadmin)\",\n      \"isActive\": true,\n      \"type\": \"user\",\n      \"userId\": \"3f4effd7-39e3-4ba2-94bd-325e2d50f98d\",\n      \"createdAt\": \"2026-10-05T03:13:43.755Z\",\n      \"updatedAt\": \"2026-10-05T03:13:43.755Z\"\n    }\n  },\n  \"meta\": {\n    \"verification\": {\n      \"method\": \"link\",\n      \"sentTo\": \"dewi.disnaker1791170022812@prafi.test\",\n      \"expiresAt\": \"2026-10-06T03:13:43.758Z\",\n      \"emailSent\": true\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"dbc47782-0ce0-4db3-8f51-96da51fc7a9a\",\n    \"firstName\": \"Dewi\",\n    \"lastName\": \"Lestari\",\n    \"phoneNumber\": \"081377788899\",\n    \"email\": \"disnaker1760245200@prafi.test\",\n    \"role\": \"disnakertrans\",\n    \"faceImageId\": null,\n    \"tenantName\": null,\n    \"mailActive\": false,\n    \"passwordChangedAt\": null,\n    \"createdAt\": \"2026-10-12T13:57:06.517Z\",\n    \"updatedAt\": \"2026-10-12T13:57:06.517Z\",\n    \"faceImage\": null,\n    \"approval\": {\n      \"id\": 7,\n      \"reason\": \"Active on registration (created by superadmin)\",\n      \"isActive\": true,\n      \"type\": \"user\",\n      \"userId\": \"dbc47782-0ce0-4db3-8f51-96da51fc7a9a\",\n      \"createdAt\": \"2026-10-12T13:57:06.947Z\",\n      \"updatedAt\": \"2026-10-12T13:57:06.947Z\"\n    }\n  },\n  \"meta\": {\n    \"verification\": {\n      \"method\": \"link\",\n      \"sentTo\": \"disnaker1760245200@prafi.test\",\n      \"expiresAt\": \"2026-10-13T13:57:06.959Z\",\n      \"emailSent\": true,\n      \"devLink\": \"https://transniaga.manokwarikab.go.id/aktivasi?userId=dbc47782-0ce0-4db3-8f51-96da51fc7a9a&token=bb5025118819f13ec6fb6f98c6004717b0407b805f1858fd59db8d7a96e1e84d\",\n      \"devToken\": \"bb5025118819f13ec6fb6f98c6004717b0407b805f1858fd59db8d7a96e1e84d\",\n      \"devTemporaryPassword\": \"Senja536\"\n    }\n  }\n}"
             },
             {
               "name": "400 Error",
@@ -484,10 +485,10 @@
                     "disnakertrans"
                   ]
                 },
-                "description": "**Access:** superadmin\n\nCreates a **disnakertrans** account (the approver of admin accounts). Its approval is active right away (`approval.isActive: true`), but the email must be activated first: an email in Bahasa Indonesia tells the person the account was created and contains the public activation link (*Verify Email Link*, valid 24 hours). The password is the one in the body; give it to the person yourself.\n\nNotifies every superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development, `{{verifyToken}}`.",
+                "description": "**Access:** superadmin\n\nCreates a **disnakertrans** account (the approver of admin accounts). **No `password` in the body** (sending one is a 400): the server makes a temporary password of 8 characters that is easy to read (a word and digits, e.g. `Mangga47`) and emails it to the account's address, in Bahasa Indonesia, together with a button to the frontend page `<FRONTEND_URL>/aktivasi?userId=…&token=…` (valid 24 hours). There the owner types the temporary password and chooses their own (*Check Activation Link*, *Activate Account*); only then `mailActive` becomes `true` and the account can log in. The temporary password is never accepted for login. The approval is active right away (`approval.isActive: true`).\n\nNotifies every superadmin (`USER_REGISTERED`). Saves `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}` and, in development (no `SMTP_HOST`), `{{verifyToken}}` and `{{temporaryPassword}}` from `meta.verification.devToken` / `devTemporaryPassword`.",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"firstName\": \"Dewi\",\n  \"lastName\": \"Lestari\",\n  \"phoneNumber\": \"081377788899\",\n  \"email\": \"disnaker{{$timestamp}}@prafi.test\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+                  "raw": "{\n  \"firstName\": \"Dewi\",\n  \"lastName\": \"Lestari\",\n  \"phoneNumber\": \"081377788899\",\n  \"email\": \"disnaker{{$timestamp}}@prafi.test\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -505,7 +506,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"email\",\n        \"message\": \"email wajib diisi\"\n      },\n      {\n        \"field\": \"password\",\n        \"message\": \"password minimal 8 karakter\"\n      }\n    ]\n  }\n}"
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"password\",\n        \"message\": \"password tidak diisi untuk akun disnakertrans: kata sandi sementara dibuat otomatis dan dikirim ke email akun tersebut\"\n      }\n    ],\n    \"stack\": \"HttpError: Validasi gagal\\n    at Function.badRequest (/home/prafi/project/prafi-backend/src/errors/HttpError.ts:15:12)\\n    at <anonymous> (/home/prafi/project/prafi-backend/src/controllers/auth.controller.ts:64:40)\\n    at Layer.handleRequest (/home/prafi/project/prafi-backend/node_modules/router/lib/layer.js:152:17)\\n    at next (/home/prafi/project/prafi-backend/node_modules/router/lib/route.js:157:13)\\n    at <anonymous> (/home/prafi/project/prafi-backend/src/middlewares/auth.ts:91:5)\\n    at Layer.handleRequest (/home/prafi/project/prafi-backend/node_modules/router/lib/layer.js:152:17)\\n    at next (/home/prafi/project/prafi-backend/node_modules/router/lib/route.js:157:13)\\n    at authenticate (/home/prafi/project/prafi-backend/src/middlewares/auth.ts:23:3)\\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\"\n  }\n}"
             }
           ]
         },
@@ -557,8 +558,9 @@
                   "if (pm.response.code < 300) { pm.environment.set('registeredEmail', pm.response.json().data.email); console.log('saved {{registeredEmail}} = ' + pm.environment.get('registeredEmail')); }",
                   "var v = pm.response.code < 300 && pm.response.json().meta && pm.response.json().meta.verification;",
                   "if (v && v.devCode) { pm.environment.set('otp', v.devCode); console.log('saved {{otp}} = ' + pm.environment.get('otp')); }",
-                  "if (v && v.devLink) { pm.environment.set('verifyToken', v.devLink.split('token=')[1]); console.log('saved {{verifyToken}} = ' + pm.environment.get('verifyToken')); }",
-                  "if (v && !v.devCode && !v.devLink) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}} (or open the link in the email)');"
+                  "if (v && v.devToken) { pm.environment.set('verifyToken', v.devToken); console.log('saved {{verifyToken}} = ' + pm.environment.get('verifyToken')); }",
+                  "if (v && v.devTemporaryPassword) { pm.environment.set('temporaryPassword', v.devTemporaryPassword); console.log('saved {{temporaryPassword}} = ' + pm.environment.get('temporaryPassword')); }",
+                  "if (v && !v.devCode && !v.devToken) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}}, or the token and temporary password from the activation email in {{verifyToken}} / {{temporaryPassword}}');"
                 ]
               }
             }
@@ -710,8 +712,9 @@
                   "if (pm.response.code < 300) { pm.environment.set('registeredEmail', pm.response.json().data.email); console.log('saved {{registeredEmail}} = ' + pm.environment.get('registeredEmail')); }",
                   "var v = pm.response.code < 300 && pm.response.json().meta && pm.response.json().meta.verification;",
                   "if (v && v.devCode) { pm.environment.set('otp', v.devCode); console.log('saved {{otp}} = ' + pm.environment.get('otp')); }",
-                  "if (v && v.devLink) { pm.environment.set('verifyToken', v.devLink.split('token=')[1]); console.log('saved {{verifyToken}} = ' + pm.environment.get('verifyToken')); }",
-                  "if (v && !v.devCode && !v.devLink) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}} (or open the link in the email)');"
+                  "if (v && v.devToken) { pm.environment.set('verifyToken', v.devToken); console.log('saved {{verifyToken}} = ' + pm.environment.get('verifyToken')); }",
+                  "if (v && v.devTemporaryPassword) { pm.environment.set('temporaryPassword', v.devTemporaryPassword); console.log('saved {{temporaryPassword}} = ' + pm.environment.get('temporaryPassword')); }",
+                  "if (v && !v.devCode && !v.devToken) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}}, or the token and temporary password from the activation email in {{verifyToken}} / {{temporaryPassword}}');"
                 ]
               }
             }
@@ -963,36 +966,39 @@
           ]
         },
         {
-          "name": "Verify Email Link (Public)",
+          "name": "Check Activation Link (Public)",
           "request": {
-            "method": "GET",
+            "method": "POST",
             "header": [
               {
-                "key": "Accept",
+                "key": "Content-Type",
                 "value": "application/json"
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/auth/verify-email/{{userId}}?token={{verifyToken}}",
+              "raw": "{{baseUrl}}/api/auth/activate/check",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "auth",
-                "verify-email",
-                "{{userId}}"
-              ],
-              "query": [
-                {
-                  "key": "token",
-                  "value": "{{verifyToken}}"
-                }
+                "activate",
+                "check"
               ]
             },
-            "description": "**Access:** public, no token\n\nDisnakertrans accounts: the activation link from the email. Opened in a browser it shows a confirmation page (Bahasa Indonesia); API clients get JSON. On success `mailActive` becomes `true`.\n\nErrors: 400 `LINK_INVALID`, 400 `LINK_EXPIRED` (older than 24 hours), 409 `EMAIL_ALREADY_VERIFIED`.",
+            "description": "**Access:** public, no token\n\nDisnakertrans accounts: is the activation link from the email still usable? The frontend page `/aktivasi` calls this before showing its form. Answers the account's `email` and the link's `expiresAt`.\n\nErrors: 400 `LINK_INVALID` (wrong token, or replaced by a newer activation email), 400 `LINK_EXPIRED` (older than 24 hours), 409 `EMAIL_ALREADY_VERIFIED` (the account is already activated).",
             "auth": {
               "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"token\": \"{{verifyToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "event": [
@@ -1010,34 +1016,37 @@
             {
               "name": "200 Success",
               "originalRequest": {
-                "method": "GET",
+                "method": "POST",
                 "header": [
                   {
-                    "key": "Accept",
+                    "key": "Content-Type",
                     "value": "application/json"
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/auth/verify-email/{{userId}}?token={{verifyToken}}",
+                  "raw": "{{baseUrl}}/api/auth/activate/check",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
                     "auth",
-                    "verify-email",
-                    "{{userId}}"
-                  ],
-                  "query": [
-                    {
-                      "key": "token",
-                      "value": "{{verifyToken}}"
-                    }
+                    "activate",
+                    "check"
                   ]
                 },
-                "description": "**Access:** public, no token\n\nDisnakertrans accounts: the activation link from the email. Opened in a browser it shows a confirmation page (Bahasa Indonesia); API clients get JSON. On success `mailActive` becomes `true`.\n\nErrors: 400 `LINK_INVALID`, 400 `LINK_EXPIRED` (older than 24 hours), 409 `EMAIL_ALREADY_VERIFIED`.",
+                "description": "**Access:** public, no token\n\nDisnakertrans accounts: is the activation link from the email still usable? The frontend page `/aktivasi` calls this before showing its form. Answers the account's `email` and the link's `expiresAt`.\n\nErrors: 400 `LINK_INVALID` (wrong token, or replaced by a newer activation email), 400 `LINK_EXPIRED` (older than 24 hours), 409 `EMAIL_ALREADY_VERIFIED` (the account is already activated).",
                 "auth": {
                   "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"token\": \"{{verifyToken}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
                 }
               },
               "status": "OK",
@@ -1050,39 +1059,42 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Email berhasil diaktifkan, silakan login\",\n    \"user\": {\n      \"id\": \"3f4effd7-39e3-4ba2-94bd-325e2d50f98d\",\n      \"firstName\": \"Dewi\",\n      \"lastName\": \"Lestari\",\n      \"phoneNumber\": \"081377788899\",\n      \"email\": \"dewi.disnaker1791170022812@prafi.test\",\n      \"role\": \"disnakertrans\",\n      \"faceImageId\": null,\n      \"tenantName\": null,\n      \"mailActive\": true,\n      \"passwordChangedAt\": null,\n      \"createdAt\": \"2026-10-05T03:13:43.502Z\",\n      \"updatedAt\": \"2026-10-05T03:13:43.799Z\",\n      \"faceImage\": null,\n      \"approval\": {\n        \"id\": 15,\n        \"reason\": \"Active on registration (created by superadmin)\",\n        \"isActive\": true,\n        \"type\": \"user\",\n        \"userId\": \"3f4effd7-39e3-4ba2-94bd-325e2d50f98d\",\n        \"createdAt\": \"2026-10-05T03:13:43.755Z\",\n        \"updatedAt\": \"2026-10-05T03:13:43.755Z\"\n      }\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"valid\": true,\n    \"email\": \"disnaker1760245200@prafi.test\",\n    \"expiresAt\": \"2026-10-13T13:57:06.959Z\"\n  }\n}"
             },
             {
               "name": "400 Error",
               "originalRequest": {
-                "method": "GET",
+                "method": "POST",
                 "header": [
                   {
-                    "key": "Accept",
+                    "key": "Content-Type",
                     "value": "application/json"
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/auth/verify-email/{{userId}}?token={{verifyToken}}",
+                  "raw": "{{baseUrl}}/api/auth/activate/check",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
                     "auth",
-                    "verify-email",
-                    "{{userId}}"
-                  ],
-                  "query": [
-                    {
-                      "key": "token",
-                      "value": "{{verifyToken}}"
-                    }
+                    "activate",
+                    "check"
                   ]
                 },
-                "description": "**Access:** public, no token\n\nDisnakertrans accounts: the activation link from the email. Opened in a browser it shows a confirmation page (Bahasa Indonesia); API clients get JSON. On success `mailActive` becomes `true`.\n\nErrors: 400 `LINK_INVALID`, 400 `LINK_EXPIRED` (older than 24 hours), 409 `EMAIL_ALREADY_VERIFIED`.",
+                "description": "**Access:** public, no token\n\nDisnakertrans accounts: is the activation link from the email still usable? The frontend page `/aktivasi` calls this before showing its form. Answers the account's `email` and the link's `expiresAt`.\n\nErrors: 400 `LINK_INVALID` (wrong token, or replaced by a newer activation email), 400 `LINK_EXPIRED` (older than 24 hours), 409 `EMAIL_ALREADY_VERIFIED` (the account is already activated).",
                 "auth": {
                   "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"token\": \"{{verifyToken}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
                 }
               },
               "status": "Bad Request",
@@ -1095,7 +1107,150 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"LINK_INVALID\",\n    \"message\": \"Tautan aktivasi tidak valid atau sudah tidak berlaku\"\n  }\n}"
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"LINK_INVALID\",\n    \"message\": \"Tautan aktivasi tidak valid atau sudah diganti oleh email aktivasi yang lebih baru\",\n    \"stack\": \"HttpError: Tautan aktivasi tidak valid atau sudah diganti oleh email aktivasi yang lebih baru\\n    at findValidActivation (/home/prafi/project/prafi-backend/src/services/emailVerification.service.ts:152:11)\\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\\n    at async Object.checkActivation (/home/prafi/project/prafi-backend/src/services/emailVerification.service.ts:162:26)\\n    at async checkActivation (/home/prafi/project/prafi-backend/src/controllers/auth.controller.ts:255:35)\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Activate Account (Public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/activate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "activate"
+              ]
+            },
+            "description": "**Access:** public, no token\n\nDisnakertrans accounts: replaces the **temporary password** from the activation email with the person's own `password` (at least 8 characters, different from the temporary one). On success `mailActive` becomes `true` and the account can log in with the new password. `userId` and `token` come from the link in the email.\n\nA wrong `temporaryPassword` answers 400 `TEMPORARY_PASSWORD_INVALID` with `details.attemptsLeft`; after 5 wrong tries the link is blocked and a new activation email is needed (*Resend Verification*, which sends a new link **and** a new temporary password).\n\nOther errors: 400 validation, 400 `LINK_INVALID`, 400 `LINK_EXPIRED`, 409 `EMAIL_ALREADY_VERIFIED`.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"token\": \"{{verifyToken}}\",\n  \"temporaryPassword\": \"{{temporaryPassword}}\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/activate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "activate"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nDisnakertrans accounts: replaces the **temporary password** from the activation email with the person's own `password` (at least 8 characters, different from the temporary one). On success `mailActive` becomes `true` and the account can log in with the new password. `userId` and `token` come from the link in the email.\n\nA wrong `temporaryPassword` answers 400 `TEMPORARY_PASSWORD_INVALID` with `details.attemptsLeft`; after 5 wrong tries the link is blocked and a new activation email is needed (*Resend Verification*, which sends a new link **and** a new temporary password).\n\nOther errors: 400 validation, 400 `LINK_INVALID`, 400 `LINK_EXPIRED`, 409 `EMAIL_ALREADY_VERIFIED`.",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"token\": \"{{verifyToken}}\",\n  \"temporaryPassword\": \"{{temporaryPassword}}\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Akun berhasil diaktifkan, silakan login dengan kata sandi baru Anda\",\n    \"user\": {\n      \"id\": \"dbc47782-0ce0-4db3-8f51-96da51fc7a9a\",\n      \"firstName\": \"Dewi\",\n      \"lastName\": \"Lestari\",\n      \"phoneNumber\": \"081377788899\",\n      \"email\": \"disnaker1760245200@prafi.test\",\n      \"role\": \"disnakertrans\",\n      \"faceImageId\": null,\n      \"tenantName\": null,\n      \"mailActive\": true,\n      \"passwordChangedAt\": null,\n      \"createdAt\": \"2026-10-12T13:57:06.517Z\",\n      \"updatedAt\": \"2026-10-12T13:57:07.842Z\",\n      \"faceImage\": null,\n      \"approval\": {\n        \"id\": 7,\n        \"reason\": \"Active on registration (created by superadmin)\",\n        \"isActive\": true,\n        \"type\": \"user\",\n        \"userId\": \"dbc47782-0ce0-4db3-8f51-96da51fc7a9a\",\n        \"createdAt\": \"2026-10-12T13:57:06.947Z\",\n        \"updatedAt\": \"2026-10-12T13:57:06.947Z\"\n      }\n    }\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/activate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "activate"
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nDisnakertrans accounts: replaces the **temporary password** from the activation email with the person's own `password` (at least 8 characters, different from the temporary one). On success `mailActive` becomes `true` and the account can log in with the new password. `userId` and `token` come from the link in the email.\n\nA wrong `temporaryPassword` answers 400 `TEMPORARY_PASSWORD_INVALID` with `details.attemptsLeft`; after 5 wrong tries the link is blocked and a new activation email is needed (*Resend Verification*, which sends a new link **and** a new temporary password).\n\nOther errors: 400 validation, 400 `LINK_INVALID`, 400 `LINK_EXPIRED`, 409 `EMAIL_ALREADY_VERIFIED`.",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"token\": \"{{verifyToken}}\",\n  \"temporaryPassword\": \"{{temporaryPassword}}\",\n  \"password\": \"{{newUserPassword}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"TEMPORARY_PASSWORD_INVALID\",\n    \"message\": \"Kata sandi sementara salah, periksa kembali email aktivasi Anda\",\n    \"details\": {\n      \"attemptsLeft\": 4\n    },\n    \"stack\": \"HttpError: Kata sandi sementara salah, periksa kembali email aktivasi Anda\\n    at Object.activate (/home/prafi/project/prafi-backend/src/services/emailVerification.service.ts:183:11)\\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\\n    at async activate (/home/prafi/project/prafi-backend/src/controllers/auth.controller.ts:270:3)\"\n  }\n}"
             }
           ]
         },
@@ -1116,7 +1271,7 @@
                 "{{userId}}"
               ]
             },
-            "description": "**Access:** public, no token\n\nSends a new OTP (admin, tenant) or activation link (disnakertrans); the previous one stops working. At most once per 60 seconds (429 `TOO_MANY_REQUESTS`, `details.retryAfterSeconds`). Saves the new `{{otp}}` / `{{verifyToken}}` in development.",
+            "description": "**Access:** public, no token\n\nSends a new OTP (admin, tenant), or for disnakertrans a new activation email: a new link **and a new temporary password** (the old one is only stored as a hash, so it can't be sent again). The previous code, link and temporary password stop working. At most once per 60 seconds (429 `TOO_MANY_REQUESTS`, `details.retryAfterSeconds`). Saves the new `{{otp}}`, or `{{verifyToken}}` and `{{temporaryPassword}}`, in development.",
             "auth": {
               "type": "noauth"
             }
@@ -1130,8 +1285,9 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));",
                   "var v = pm.response.code < 300 && pm.response.json().meta && pm.response.json().meta.verification;",
                   "if (v && v.devCode) { pm.environment.set('otp', v.devCode); console.log('saved {{otp}} = ' + pm.environment.get('otp')); }",
-                  "if (v && v.devLink) { pm.environment.set('verifyToken', v.devLink.split('token=')[1]); console.log('saved {{verifyToken}} = ' + pm.environment.get('verifyToken')); }",
-                  "if (v && !v.devCode && !v.devLink) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}} (or open the link in the email)');"
+                  "if (v && v.devToken) { pm.environment.set('verifyToken', v.devToken); console.log('saved {{verifyToken}} = ' + pm.environment.get('verifyToken')); }",
+                  "if (v && v.devTemporaryPassword) { pm.environment.set('temporaryPassword', v.devTemporaryPassword); console.log('saved {{temporaryPassword}} = ' + pm.environment.get('temporaryPassword')); }",
+                  "if (v && !v.devCode && !v.devToken) console.log('Verification emailed to ' + v.sentTo + ': put the OTP from the email in {{otp}}, or the token and temporary password from the activation email in {{verifyToken}} / {{temporaryPassword}}');"
                 ]
               }
             }

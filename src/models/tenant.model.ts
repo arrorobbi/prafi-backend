@@ -57,7 +57,8 @@ Tenant.init(
     whatsappLink: { type: DataTypes.STRING, allowNull: false },
     gmapsLink: { type: DataTypes.STRING, allowNull: false },
     instagramLink: { type: DataTypes.STRING, allowNull: true },
-    googleBusinessLink: { type: DataTypes.STRING, allowNull: true },
+    // TEXT: Google Business links are often far longer than 255 characters
+    googleBusinessLink: { type: DataTypes.TEXT, allowNull: true },
     shopeeLink: { type: DataTypes.STRING, allowNull: true },
     logoId: {
       type: DataTypes.INTEGER,

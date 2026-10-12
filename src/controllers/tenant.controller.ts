@@ -12,6 +12,9 @@ const REQUIRED_LINK_FIELDS = ['fbLink'] as const;
 /** Optional links: a http(s) link, or null / "" for none */
 const OPTIONAL_LINK_FIELDS = ['instagramLink', 'googleBusinessLink', 'shopeeLink'] as const;
 const MAX_LINK = 255;
+/** Longer limits per field (the column is TEXT): Google Business links are very long */
+const MAX_LINK_BY_FIELD: Record<string, number> = { googleBusinessLink: 2048 };
+const maxLink = (field: string) => MAX_LINK_BY_FIELD[field] ?? MAX_LINK;
 const ID_FIELDS = ['logoId'] as const;
 const FIELDS: string[] = [...TEXT_FIELDS, ...REQUIRED_LINK_FIELDS, ...OPTIONAL_LINK_FIELDS, ...ID_FIELDS];
 /** On create, `name` may be left out: it defaults to the owner's tenantName. */
@@ -54,8 +57,8 @@ function parseTenantBody(body: Record<string, unknown>, partial: boolean) {
       if (!partial) errors.push({ field, message: `${field} wajib diisi` });
     } else if (typeof value !== 'string' || !isLink(value)) {
       errors.push({ field, message: `${field} wajib diisi dengan tautan yang diawali http:// atau https://` });
-    } else if (value.trim().length > MAX_LINK) {
-      errors.push({ field, message: `${field} maksimal ${MAX_LINK} karakter` });
+    } else if (value.trim().length > maxLink(field)) {
+      errors.push({ field, message: `${field} maksimal ${maxLink(field)} karakter` });
     } else {
       input[field] = value.trim();
     }
@@ -68,8 +71,8 @@ function parseTenantBody(body: Record<string, unknown>, partial: boolean) {
       input[field] = null;
     } else if (typeof value !== 'string' || !isLink(value)) {
       errors.push({ field, message: `${field} harus berupa tautan yang diawali http:// atau https://, atau dikosongkan` });
-    } else if (value.trim().length > MAX_LINK) {
-      errors.push({ field, message: `${field} maksimal ${MAX_LINK} karakter` });
+    } else if (value.trim().length > maxLink(field)) {
+      errors.push({ field, message: `${field} maksimal ${maxLink(field)} karakter` });
     } else {
       input[field] = value.trim();
     }

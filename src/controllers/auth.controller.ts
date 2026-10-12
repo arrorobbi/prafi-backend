@@ -1,7 +1,6 @@
 import type { RequestHandler } from 'express';
 import { ROLES, type Role } from '../constants/roles';
 import { HttpError } from '../errors/HttpError';
-import { VERIFICATION_PAGE_CSP, verificationResultPage } from '../mail/templates';
 import * as authService from '../services/auth.service';
 import * as emailVerification from '../services/emailVerification.service';
 import * as passwordReset from '../services/passwordReset.service';
@@ -22,7 +21,8 @@ export const login: RequestHandler = async (req, res) => {
 
 /**
  * Registration for one role; the URL decides the role, so the body doesn't need `role`.
- * POST /api/auth/register/disnakertrans — superadmin only; active right away, verifies the email with a link
+ * POST /api/auth/register/disnakertrans — superadmin only; active right away. No password in the body: a temporary
+ *   one is emailed with the activation link, and the owner replaces it there (POST /api/auth/activate)
  * POST /api/auth/register/admin  — public sign-up; inactive until a disnakertrans activates it, verifies with an OTP
  * POST /api/auth/register/tenant — public sign-up; active right away, verifies with an OTP
  * Every new account has mailActive = false until its email is verified.
@@ -33,13 +33,18 @@ const registerAs =
     const body = (req.body ?? {}) as Record<string, unknown>;
     const errors: { field: string; message: string }[] = [];
 
-    for (const field of ['firstName', 'lastName', 'phoneNumber', 'email', 'password'] as const) {
+    // Disnakertrans accounts get a temporary password by email; nobody chooses one for them
+    const needsPassword = role !== ROLES.DISNAKERTRANS;
+    for (const field of ['firstName', 'lastName', 'phoneNumber', 'email', ...(needsPassword ? (['password'] as const) : [])] as const) {
       if (typeof body[field] !== 'string' || !(body[field] as string).trim()) {
         errors.push({ field, message: `${field} wajib diisi` });
       }
     }
-    if (typeof body.password === 'string' && body.password.length < MIN_PASSWORD_LENGTH) {
+    if (needsPassword && typeof body.password === 'string' && body.password.length < MIN_PASSWORD_LENGTH) {
       errors.push({ field: 'password', message: `password minimal ${MIN_PASSWORD_LENGTH} karakter` });
+    }
+    if (!needsPassword && body.password !== undefined) {
+      errors.push({ field: 'password', message: 'password tidak diisi untuk akun disnakertrans: kata sandi sementara dibuat otomatis dan dikirim ke email akun tersebut' });
     }
     if (body.role !== undefined && body.role !== role) {
       errors.push({ field: 'role', message: `endpoint ini hanya membuat akun ${role}, gunakan POST /api/auth/register/${body.role}` });
@@ -64,7 +69,7 @@ const registerAs =
       lastName: (body.lastName as string).trim(),
       phoneNumber: (body.phoneNumber as string).trim(),
       email: body.email as string,
-      password: body.password as string,
+      ...(needsPassword && { password: body.password as string }),
       role,
       faceImageId: faceImageId as number | null,
       ...(isTenant && { tenantName: (body.tenantName as string).trim() }),
@@ -186,32 +191,11 @@ export const verifyOtp: RequestHandler = async (req, res) => {
   res.json({ success: true, data: { message: 'Email berhasil diverifikasi, silakan login', user: await authService.getProfile(userId) } });
 };
 
-/**
- * GET /api/auth/verify-email/:userId?token= — the activation link emailed to disnakertrans accounts.
- * Opened in a browser it answers with a page; API clients (Accept: application/json) get JSON.
- */
-export const verifyEmailLink: RequestHandler = async (req, res) => {
-  const wantsHtml = req.accepts(['json', 'html']) === 'html';
-  try {
-    const userId = parseUserId(req.params.userId);
-    const token = typeof req.query.token === 'string' ? req.query.token.trim() : '';
-    if (!token) throw HttpError.badRequest('Validasi gagal', [{ field: 'token', message: 'token wajib diisi' }]);
-    await emailVerification.verifyLink(userId, token);
-    const message = 'Email berhasil diaktifkan, silakan login';
-    if (wantsHtml) res.set('Content-Security-Policy', VERIFICATION_PAGE_CSP).type('html').send(verificationResultPage(true, message));
-    else res.json({ success: true, data: { message, user: await authService.getProfile(userId) } });
-  } catch (err) {
-    if (!wantsHtml || !(err instanceof HttpError)) throw err;
-    // Answered here as a page, not by the errorHandler: still give the request's log row its error
-    res.locals.apiError = { code: err.code, message: err.message, details: err.details };
-    res.status(err.statusCode).set('Content-Security-Policy', VERIFICATION_PAGE_CSP).type('html').send(verificationResultPage(false, err.message));
-  }
-};
-
-/** POST /api/auth/resend-verification/:userId — a new OTP (admin, tenant) or activation link (disnakertrans). */
+/** POST /api/auth/resend-verification/:userId — a new OTP (admin, tenant) or activation email (disnakertrans). */
 export const resendVerification: RequestHandler = async (req, res) => {
   const verification = await emailVerification.resend(parseUserId(req.params.userId));
-  res.json({ success: true, data: { message: `Kode verifikasi baru telah dikirim ke ${verification.sentTo}` }, meta: { verification } });
+  const what = verification.method === 'link' ? 'Email aktivasi baru (tautan dan kata sandi sementara baru)' : 'Kode verifikasi baru';
+  res.json({ success: true, data: { message: `${what} telah dikirim ke ${verification.sentTo}` }, meta: { verification } });
 };
 
 // ---------- forgot / reset password (public) ----------
@@ -261,4 +245,31 @@ export const resetPassword: RequestHandler = async (req, res) => {
   const { userId, token, password } = parseResetBody((req.body ?? {}) as Record<string, unknown>, true);
   await passwordReset.resetPassword(userId, token, password);
   res.json({ success: true, data: { message: 'Kata sandi berhasil diubah, silakan login dengan kata sandi baru' } });
+};
+
+// ---------- disnakertrans account activation (public: the link in the email goes to the frontend's /aktivasi) ----------
+
+/** POST /api/auth/activate/check — body { userId, token }: is this activation link still usable? */
+export const checkActivation: RequestHandler = async (req, res) => {
+  const { userId, token } = parseResetBody((req.body ?? {}) as Record<string, unknown>, false);
+  res.json({ success: true, data: await emailVerification.checkActivation(userId, token) });
+};
+
+/**
+ * POST /api/auth/activate — body { userId, token, temporaryPassword, password }: replaces the temporary password from
+ * the email with the person's own, and marks the email as verified.
+ */
+export const activate: RequestHandler = async (req, res) => {
+  const body = (req.body ?? {}) as Record<string, unknown>;
+  // Pasted from the email: spaces around it are not part of it
+  const temporaryPassword = typeof body.temporaryPassword === 'string' ? body.temporaryPassword.trim() : '';
+  if (!temporaryPassword) {
+    throw HttpError.badRequest('Validasi gagal', [{ field: 'temporaryPassword', message: 'temporaryPassword wajib diisi dengan kata sandi sementara dari email' }]);
+  }
+  const { userId, token, password } = parseResetBody(body, true);
+  await emailVerification.activate(userId, token, temporaryPassword, password);
+  res.json({
+    success: true,
+    data: { message: 'Akun berhasil diaktifkan, silakan login dengan kata sandi baru Anda', user: await authService.getProfile(userId) },
+  });
 };

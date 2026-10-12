@@ -9,7 +9,8 @@ router.post('/login', authController.login);
 // Revokes the token sent with the request (it stays invalid until its normal expiry)
 router.post('/logout', authenticate, authController.logout);
 
-// superadmin → creates disnakertrans (active right away, email activation link); rules in CREATABLE_ROLES
+// superadmin → creates disnakertrans (active right away; a temporary password and an activation link are emailed);
+// rules in CREATABLE_ROLES
 router.post(
   '/register/disnakertrans',
   authenticate,
@@ -25,8 +26,10 @@ router.post('/register', authController.registerMoved);
 
 // Email verification: public, because the user can't log in before the email is verified
 router.post('/verify-otp/:userId', authController.verifyOtp);
-router.get('/verify-email/:userId', authController.verifyEmailLink);
 router.post('/resend-verification/:userId', authController.resendVerification);
+// Disnakertrans: the email links to the frontend's /aktivasi page, which calls these two (temporary password → own password)
+router.post('/activate/check', authController.checkActivation);
+router.post('/activate', authController.activate);
 
 // Forgot password: public. The email links to the frontend's /reset-password page, which calls these two
 router.post('/forgot-password', authController.forgotPassword);

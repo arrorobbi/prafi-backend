@@ -12,7 +12,7 @@ import type { DbModels } from '.';
 import type { User } from './user.model';
 
 /**
- * 'otp' = 6-digit email verification code (admin/tenant), 'link' = email activation link token (disnakertrans),
+ * 'otp' = 6-digit email verification code (admin/tenant), 'link' = account activation link token (disnakertrans; used with the emailed temporary password),
  * 'reset' = forgot-password link token.
  */
 export const OTP_PURPOSES = ['otp', 'link', 'reset'] as const;
@@ -29,7 +29,7 @@ export class Otp extends Model<InferAttributes<Otp>, InferCreationAttributes<Otp
   /** SHA-256 of the code (otp) or token (link). */
   declare code: string;
   declare expiresAt: Date;
-  /** Wrong guesses so far (otp only). */
+  /** Wrong guesses so far (the otp; for a link, the temporary password). */
   declare attempts: CreationOptional<number>;
   declare usedAt: CreationOptional<Date | null>;
   declare createdAt: CreationOptional<Date>;

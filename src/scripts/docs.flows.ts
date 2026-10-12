@@ -120,15 +120,16 @@ export const FLOWS: Record<string, Chart[]> = {
           '401 / 403',
         ),
         check({ en: 'Role is superadmin?', id: 'Role adalah superadmin?' }, '403 Forbidden'),
-        check({ en: 'Body valid and email free?', id: 'Body valid dan email belum dipakai?' }, '400 / 409'),
+        check({ en: 'Body valid (no password) and email free?', id: 'Body valid (tanpa password) dan email belum dipakai?' }, '400 / 409'),
+        step({ en: 'Make a readable temporary password (8 characters)', id: 'Buat kata sandi sementara yang mudah dibaca (8 karakter)' }),
         step(
           { en: 'Create user (`mailActive: false`) + approval (active)', id: 'Buat user (`mailActive: false`) + approval (aktif)' },
-          effect({ en: 'Email (Bahasa Indonesia): account created + activation link, valid 24 h', id: 'Email: akun dibuat + link aktivasi, berlaku 24 jam' }),
+          effect({ en: 'Email (Bahasa Indonesia): temporary password + activation link, valid 24 h', id: 'Email: kata sandi sementara + link aktivasi, berlaku 24 jam' }),
           effect({ en: 'Notify superadmins (USER_REGISTERED)', id: 'Notifikasi ke superadmin (USER_REGISTERED)' }),
         ),
         end(
           { en: '201 profile + meta.verification', id: '201 profil + meta.verification' },
-          note({ en: 'Logs in after opening the link', id: 'Bisa login setelah membuka link' }),
+          note({ en: 'Logs in after Activate Account (own password)', id: 'Bisa login setelah Aktifkan Akun (kata sandi sendiri)' }),
         ),
       ],
     },
@@ -147,16 +148,20 @@ export const FLOWS: Record<string, Chart[]> = {
       ],
     },
     {
-      title: { en: 'Verify Email Link (disnakertrans)', id: 'Aktivasi Email lewat Link (disnakertrans)' },
+      title: { en: 'Activate Account (disnakertrans)', id: 'Aktifkan Akun (disnakertrans)' },
       nodes: [
-        start('GET /api/auth/ verify-email/:userId?token='),
+        start('POST /api/auth/activate { userId, token, temporaryPassword, password }'),
+        check({ en: 'Body valid, new password at least 8 characters?', id: 'Body valid, kata sandi baru minimal 8 karakter?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
         check({ en: 'User exists and email not verified yet?', id: 'Pengguna ada dan email belum terverifikasi?' }, '404 / 409'),
-        check({ en: 'Token matches and not used?', id: 'Token cocok dan belum dipakai?' }, '400 LINK_INVALID'),
-        check({ en: 'Within 24 hours?', id: 'Masih dalam 24 jam?' }, '400 LINK_EXPIRED'),
-        step({ en: 'Set `mailActive: true`', id: 'Set `mailActive: true`' }),
-        end(
-          { en: 'Browser: confirmation page · API: 200 JSON', id: 'Browser: halaman konfirmasi · API: 200 JSON' },
+        check({ en: 'Token is the newest link, within 24 hours?', id: 'Token adalah link terbaru, masih dalam 24 jam?' }, '400 LINK_INVALID / LINK_EXPIRED'),
+        check({ en: 'Fewer than 5 wrong tries?', id: 'Kurang dari 5 kali salah?' }, { en: '400 request a new email', id: '400 minta email baru' }),
+        check(
+          { en: 'Temporary password matches?', id: 'Kata sandi sementara cocok?' },
+          { en: '400 TEMPORARY_PASSWORD_INVALID { attemptsLeft }', id: '400 TEMPORARY_PASSWORD_INVALID { attemptsLeft }' },
         ),
+        check({ en: 'New password differs from the temporary one?', id: 'Kata sandi baru berbeda dari yang sementara?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
+        step({ en: 'Save the new password, set `mailActive: true`, mark the link used', id: 'Simpan kata sandi baru, set `mailActive: true`, tandai link terpakai' }),
+        end({ en: '200 profile, can log in', id: '200 profil, bisa login' }),
       ],
     },
     {
@@ -167,7 +172,7 @@ export const FLOWS: Record<string, Chart[]> = {
         check({ en: 'Last code sent over 60 s ago?', id: 'Kode terakhir dikirim lebih dari 60 detik lalu?' }, '429 TOO_MANY_REQUESTS'),
         step(
           { en: 'Replace the old code with a new one', id: 'Ganti kode lama dengan yang baru' },
-          effect({ en: 'Email: new OTP (admin, tenant) or new link (disnakertrans)', id: 'Email: OTP baru (admin, tenant) atau link baru (disnakertrans)' }),
+          effect({ en: 'Email: new OTP (admin, tenant), or new link + new temporary password (disnakertrans)', id: 'Email: OTP baru (admin, tenant), atau link + kata sandi sementara baru (disnakertrans)' }),
         ),
         end({ en: '200 + meta.verification', id: '200 + meta.verification' }),
       ],

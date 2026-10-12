@@ -6,6 +6,7 @@ import { HttpError } from '../errors/HttpError';
 import { accountCreatedOtp, disnakertransAccountCreated } from '../mail/templates';
 import { Otp, sequelize, User } from '../models';
 import type { OtpPurpose } from '../models/otp.model';
+import { readablePassword } from '../utils/readablePassword';
 import { mailIsSimulated, sendMail } from './mail.service';
 
 export const OTP_VALID_MINUTES = 15;
@@ -35,30 +36,51 @@ export interface VerificationInfo {
   /** Development only (no SMTP configured): the OTP / link, so it can be tested without an inbox. */
   devCode?: string;
   devLink?: string;
+  /** Development only, disnakertrans: the link's token and the temporary password from the email. */
+  devToken?: string;
+  devTemporaryPassword?: string;
 }
 
-/** The public activation link sent to disnakertrans accounts. */
-export const activationLink = (userId: string, token: string) => `${env.appUrl}/api/auth/verify-email/${userId}?token=${token}`;
+/** The frontend page the activation email links to; it asks for the temporary password and a new one. */
+export const ACTIVATION_PAGE_PATH = '/aktivasi';
+
+/** The activation link sent to disnakertrans accounts (a page of the frontend). */
+export const activationLink = (userId: string, token: string) =>
+  `${env.frontendUrl}${ACTIVATION_PAGE_PATH}?userId=${encodeURIComponent(userId)}&token=${encodeURIComponent(token)}`;
 
 /**
  * Creates a new code for the user (replacing any unused one) and emails it:
- * an activation link for disnakertrans, a 6-digit OTP for admin/tenant.
+ * a 6-digit OTP for admin/tenant; for disnakertrans an activation link together with a temporary password
+ * (`temporaryPassword` when the account was just created with it; otherwise a new one is made and saved, since the
+ * old one is only stored as a hash and can't be sent again).
  * A failed email does not throw: the account still exists and the user can ask for a new code.
  */
-export async function startVerification(user: VerifiableUser, { resent = false } = {}): Promise<VerificationInfo> {
+export async function startVerification(
+  user: VerifiableUser,
+  { resent = false, temporaryPassword }: { resent?: boolean; temporaryPassword?: string } = {},
+): Promise<VerificationInfo> {
   const method = EMAIL_VERIFICATION_METHOD[user.role];
   const secret = method === 'otp' ? String(randomInt(0, 1_000_000)).padStart(6, '0') : randomBytes(32).toString('hex');
   const ttlMs = method === 'otp' ? OTP_VALID_MINUTES * 60_000 : LINK_VALID_HOURS * 3_600_000;
   const expiresAt = new Date(Date.now() + ttlMs);
+  const newPassword = method === 'link' && !temporaryPassword ? readablePassword() : undefined;
+  const emailedPassword = temporaryPassword ?? newPassword;
 
   await sequelize.transaction(async (transaction) => {
     await Otp.destroy({ where: { userId: user.id, purpose: method, usedAt: null }, transaction });
     await Otp.create({ userId: user.id, purpose: method, code: hash(secret), expiresAt }, { transaction });
+    if (newPassword) {
+      // Saved through the instance so the User model's beforeSave hook hashes it
+      const account = await User.scope('withPassword').findByPk(user.id, { transaction });
+      await account!.update({ password: newPassword }, { transaction });
+    }
   });
 
   const link = method === 'link' ? activationLink(user.id, secret) : undefined;
   const content =
-    method === 'otp' ? accountCreatedOtp(user, secret, OTP_VALID_MINUTES, resent) : disnakertransAccountCreated(user, link!, LINK_VALID_HOURS);
+    method === 'otp'
+      ? accountCreatedOtp(user, secret, OTP_VALID_MINUTES, resent)
+      : disnakertransAccountCreated(user, link!, emailedPassword!, LINK_VALID_HOURS, resent);
 
   let emailSent = true;
   try {
@@ -75,7 +97,7 @@ export async function startVerification(user: VerifiableUser, { resent = false }
     expiresAt,
     emailSent,
     ...(dev && method === 'otp' && { devCode: secret }),
-    ...(dev && method === 'link' && { devLink: link }),
+    ...(dev && method === 'link' && { devLink: link, devToken: secret, devTemporaryPassword: emailedPassword }),
   };
 }
 
@@ -121,22 +143,61 @@ export async function verifyOtp(userId: string, otp: string) {
   await complete(user, code);
 }
 
-/** GET /api/auth/verify-email/:userId?token= — disnakertrans: the activation link from the email. */
-export async function verifyLink(userId: string, token: string) {
+/** The user's newest activation link, checked against `token` (not used yet, not expired). */
+async function findValidActivation(userId: string, token: string) {
   const user = await findUnverifiedUser(userId);
   const code = await latestCode(user.id, 'link');
 
   if (!code || !sameHash(hash(token), code.code)) {
-    throw new HttpError(400, 'Tautan aktivasi tidak valid atau sudah tidak berlaku', 'LINK_INVALID');
+    throw new HttpError(400, 'Tautan aktivasi tidak valid atau sudah diganti oleh email aktivasi yang lebih baru', 'LINK_INVALID');
   }
   if (code.expiresAt.getTime() < Date.now()) {
-    throw new HttpError(400, `Tautan aktivasi sudah kedaluwarsa (berlaku ${LINK_VALID_HOURS} jam), silakan minta tautan baru`, 'LINK_EXPIRED');
+    throw new HttpError(400, `Tautan aktivasi sudah kedaluwarsa (berlaku ${LINK_VALID_HOURS} jam), silakan minta email aktivasi baru`, 'LINK_EXPIRED');
   }
-
-  await complete(user, code);
+  return { user, code };
 }
 
-/** POST /api/auth/resend-verification/:userId — a new OTP or link, at most once per RESEND_COOLDOWN_SECONDS. */
+/** POST /api/auth/activate/check — lets the frontend check the link before showing the form. */
+export async function checkActivation(userId: string, token: string) {
+  const { user, code } = await findValidActivation(userId, token);
+  return { valid: true, email: user.email, expiresAt: code.expiresAt };
+}
+
+/**
+ * POST /api/auth/activate — disnakertrans: the link from the email plus the temporary password in it prove the
+ * person reads that inbox; they choose their own password, and only then the email counts as verified
+ * (mailActive = true) and the account can log in. Wrong temporary passwords are limited like OTP guesses.
+ */
+export async function activate(userId: string, token: string, temporaryPassword: string, password: string) {
+  const { user, code } = await findValidActivation(userId, token);
+
+  if (code.attempts >= OTP_MAX_ATTEMPTS) {
+    throw new HttpError(400, 'Terlalu banyak percobaan kata sandi sementara yang salah, silakan minta email aktivasi baru', 'TEMPORARY_PASSWORD_INVALID', {
+      attemptsLeft: 0,
+    });
+  }
+  const account = await User.scope('withPassword').findByPk(user.id);
+  if (!account || !(await account.comparePassword(temporaryPassword))) {
+    const attemptsLeft = Math.max(OTP_MAX_ATTEMPTS - (code.attempts + 1), 0);
+    await code.increment('attempts');
+    throw new HttpError(400, 'Kata sandi sementara salah, periksa kembali email aktivasi Anda', 'TEMPORARY_PASSWORD_INVALID', { attemptsLeft });
+  }
+  if (password === temporaryPassword) {
+    throw HttpError.badRequest('Validasi gagal', [{ field: 'password', message: 'Kata sandi baru harus berbeda dari kata sandi sementara' }]);
+  }
+
+  await sequelize.transaction(async (transaction) => {
+    await code.update({ usedAt: new Date() }, { transaction });
+    // The model's beforeSave hook hashes the password
+    await account.update({ password, mailActive: true }, { transaction });
+    await Otp.destroy({ where: { userId: user.id, purpose: ['otp', 'link'], usedAt: null, id: { [Op.ne]: code.id } }, transaction });
+  });
+}
+
+/**
+ * POST /api/auth/resend-verification/:userId — a new OTP, or a new activation link with a new temporary password
+ * (disnakertrans), at most once per RESEND_COOLDOWN_SECONDS.
+ */
 export async function resend(userId: string) {
   const user = await findUnverifiedUser(userId);
 

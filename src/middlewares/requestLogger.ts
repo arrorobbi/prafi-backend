@@ -95,12 +95,12 @@ const levelOf = (status: number): LogLevel => (status >= 500 ? 'error' : status 
 
 /**
  * Auth actions are always stored, even from guests: login (also a wrong email or password), sign-up, OTP,
- * activation link, resend, forgot / reset password, logout, profile changes. Not GET /api/auth/me, which every
+ * account activation, resend, forgot / reset password, logout, profile changes. Not GET /api/auth/me, which every
  * dashboard page calls.
  */
 function isAuthAction(method: string, path: string) {
   if (!path.startsWith('/api/auth/')) return false;
-  return STORED_METHODS.has(method) || (method === 'GET' && path.startsWith('/api/auth/verify-email/'));
+  return STORED_METHODS.has(method);
 }
 
 /**
@@ -121,7 +121,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 async function authEmailOf(req: Request, path: string): Promise<string | null> {
   const body = isObject(req.body) ? req.body : {};
   if (typeof body.email === 'string' && body.email.trim()) return body.email.trim().toLowerCase().slice(0, 255);
-  const fromPath = path.match(/^\/api\/auth\/(?:verify-otp|verify-email|resend-verification)\/([^/]+)$/)?.[1];
+  const fromPath = path.match(/^\/api\/auth\/(?:verify-otp|resend-verification)\/([^/]+)$/)?.[1];
   const userId = fromPath ?? (typeof body.userId === 'string' ? body.userId : undefined);
   if (!userId || !UUID.test(userId)) return null;
   const user = await User.findByPk(userId, { attributes: ['email'] });

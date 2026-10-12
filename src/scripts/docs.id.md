@@ -12,7 +12,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 1. Import koleksi ini dan `Prafi-Local.postman_environment.json`, lalu pilih **Prafi Local** (dropdown environment, kanan atas).
 2. Di **Prafi Local**, isi `loginEmail` / `loginPassword` (kolom Current value) dengan akun superadmin dari `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`), lalu Ctrl+S.
 3. Jalankan server (`npm run dev` atau `npm run build && npm start`). `baseUrl` adalah `http://localhost:4000`.
-4. Email: isi `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` di `.env` agar email benar-benar terkirim. Isi `FRONTEND_URL` dengan alamat frontend: email lupa kata sandi berisi link ke `<FRONTEND_URL>/reset-password`. Tanpa `SMTP_HOST` (development), email ditampilkan di log server dan OTP / token aktivasi dikembalikan di `meta.verification` serta disimpan sebagai `{{otp}}` / `{{verifyToken}}`.
+4. Email: isi `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` di `.env` agar email benar-benar terkirim. Isi `FRONTEND_URL` dengan alamat frontend: email lupa kata sandi berisi link ke `<FRONTEND_URL>/reset-password` dan email aktivasi disnakertrans ke `<FRONTEND_URL>/aktivasi`. Tanpa `SMTP_HOST` (development), email ditampilkan di log server dan OTP, atau token aktivasi beserta kata sandi sementara, dikembalikan di `meta.verification` serta disimpan sebagai `{{otp}}` / `{{verifyToken}}` / `{{temporaryPassword}}`.
 
 ## Login dan role
 - Setiap request memakai **Bearer `{{token}}`** (diatur di koleksi; request mewarisinya). Request publik memakai *No Auth*.
@@ -23,7 +23,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | role | dibuat oleh | verifikasi email | approval awal | dapat |
 |---|---|---|---|---|
 | superadmin | seed (`npm run db:seed`) | sudah terverifikasi | aktif | membuat akun disnakertrans; **hanya membaca** data lainnya (user, produk, tenant, kategori produk); menerima notifikasi setiap akun dan produk baru |
-| disnakertrans | superadmin (*Register Disnakertrans*) | link aktivasi (24 jam) | aktif | melihat serta mengaktifkan/menonaktifkan akun **admin** dan **produk**, melihat semua produk dan tenant, mengelola kategori produk |
+| disnakertrans | superadmin (*Register Disnakertrans*) | kata sandi sementara + link aktivasi lewat email (24 jam), diganti dengan kata sandi sendiri | aktif | melihat serta mengaktifkan/menonaktifkan akun **admin** dan **produk**, melihat semua produk dan tenant, mengelola kategori produk |
 | admin | daftar sendiri (*Register Admin*) | OTP (15 menit) | **tidak aktif** sampai diaktifkan disnakertrans | mengaktifkan akun tenant **dan produk**, membaca user (tenant)/produk/tenant, mengelola kategori produk |
 | tenant | daftar sendiri (*Register Tenant*) | OTP (15 menit) | aktif | mengelola produk dan profil tenant miliknya sendiri |
 
@@ -37,7 +37,8 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Auth | `POST /api/auth/register/admin` | Publik |
 | Auth | `POST /api/auth/register/tenant` | Publik |
 | Auth | `POST /api/auth/verify-otp/{{userId}}` | Publik |
-| Auth | `GET /api/auth/verify-email/{{userId}}` | Publik |
+| Auth | `POST /api/auth/activate/check` | Publik |
+| Auth | `POST /api/auth/activate` | Publik |
 | Auth | `POST /api/auth/resend-verification/{{userId}}` | Publik |
 | Auth | `POST /api/auth/forgot-password` | Publik |
 | Auth | `POST /api/auth/reset-password/check` | Publik |
@@ -93,10 +94,10 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Realtime (WebSocket) | Socket.IO di `{{baseUrl}}` | Semua role (Bearer token) |
 
 ## Variabel yang disimpan
-Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `reviewId`, `reviewClientId` · `categoryId` · `tenantProfileId` · `notificationId` · `logId`. Setiap penyimpanan dicetak di Postman Console.
+Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` / `temporaryPassword` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `reviewId`, `reviewClientId` · `categoryId` · `tenantProfileId` · `notificationId` · `logId`. Setiap penyimpanan dicetak di Postman Console.
 
 ## Contoh alur
-1. **Login** sebagai superadmin → **Register Disnakertrans** → **Verify Email Link** (atau buka link dari email).
+1. **Login** sebagai superadmin → **Register Disnakertrans** (tanpa password: kata sandi sementara dikirim lewat email) → **Check Activation Link** → **Activate Account** (mengatur password menjadi `{{newUserPassword}}`; atau buka link dari email).
 2. **Register Admin** → **Verify OTP** (kode dari email, atau `{{otp}}` saat development).
 3. Isi `loginEmail` = email disnakertrans, `loginPassword` = `{{newUserPassword}}` → **Login** → **Activate / Deactivate User** dengan `userId` = id admin dan `userRole` = `admin`.
 4. **Login** sebagai admin → **Upload Image** → **Create Product Category** (gambar untuk carousel beranda).
@@ -111,7 +112,7 @@ Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUse
 | status | code (contoh) | arti |
 |---|---|---|
 | 400 | `VALIDATION_ERROR`, `BAD_REQUEST`, `ID_NOT_PROVIDED` | input tidak valid (`details` berisi daftar field) |
-| 400 | `OTP_INVALID`, `OTP_EXPIRED`, `LINK_INVALID`, `LINK_EXPIRED`, `RESET_LINK_INVALID`, `RESET_LINK_EXPIRED` | kode / link verifikasi / link atur ulang kata sandi salah atau kedaluwarsa |
+| 400 | `OTP_INVALID`, `OTP_EXPIRED`, `LINK_INVALID`, `LINK_EXPIRED`, `TEMPORARY_PASSWORD_INVALID`, `RESET_LINK_INVALID`, `RESET_LINK_EXPIRED` | kode / link verifikasi / link atur ulang kata sandi salah atau kedaluwarsa |
 | 401 | `UNAUTHORIZED` | token tidak ada/tidak valid/kedaluwarsa/sudah logout, atau kata sandi telah diatur ulang → login lagi |
 | 403 | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `USER_NOT_ACTIVATED` | role tidak sesuai, email belum diverifikasi, atau akun belum diaktifkan |
 | 404 | `NOT_FOUND` | tidak ditemukan, atau bukan milik Anda |
@@ -135,13 +136,15 @@ Login, logout, pendaftaran, verifikasi email, lupa kata sandi, dan akun Anda sen
 
 | akun | didaftarkan oleh | verifikasi email | approval (`isActive`) |
 |---|---|---|---|
-| disnakertrans | superadmin (*Register Disnakertrans*) | **link** aktivasi di email (berlaku 24 jam) | langsung aktif |
+| disnakertrans | superadmin (*Register Disnakertrans*, tanpa password) | **kata sandi sementara + link aktivasi** di email (berlaku 24 jam); pemilik menggantinya lewat *Aktifkan Akun* | langsung aktif |
 | admin | sendiri (*Register Admin*, publik) | **OTP** 6 digit di email (berlaku 15 menit) | **tidak aktif** sampai diaktifkan disnakertrans |
 | tenant | sendiri (*Register Tenant*, publik) | **OTP** 6 digit di email (berlaku 15 menit) | langsung aktif |
 
 Setiap akun baru dimulai dengan `mailActive: false`: login dan semua endpoint yang memerlukan token menjawab **403 `EMAIL_NOT_VERIFIED`** sampai email diverifikasi. Email dikirim dalam Bahasa Indonesia.
 
-**Development:** tanpa `SMTP_HOST` di `.env`, email tidak dikirim tetapi ditampilkan di log server, dan respons register/resend menyertakan `meta.verification.devCode` / `devLink`, yang disimpan request sebagai `{{otp}}` / `{{verifyToken}}`.
+**Development:** tanpa `SMTP_HOST` di `.env`, email tidak dikirim tetapi ditampilkan di log server, dan respons register/resend menyertakan `meta.verification.devCode` (OTP) atau `devLink` / `devToken` / `devTemporaryPassword` (disnakertrans), yang disimpan request sebagai `{{otp}}`, `{{verifyToken}}`, dan `{{temporaryPassword}}`.
+
+**Aktivasi disnakertrans:** superadmin tidak menentukan password. *Daftarkan Disnakertrans* mengirim kata sandi sementara (8 karakter, mis. `Mangga47`) lewat email beserta tombol ke `<FRONTEND_URL>/aktivasi?userId=…&token=…`. Halaman tersebut memanggil *Cek Link Aktivasi*, lalu *Aktifkan Akun* dengan kata sandi sementara dan kata sandi baru. Kata sandi sementara saja tidak pernah bisa dipakai login.
 
 **Lupa kata sandi:** *Lupa Kata Sandi* mengirim email berisi link ke halaman frontend `<FRONTEND_URL>/reset-password?userId=…&token=…` (berlaku 30 menit, sekali pakai). Halaman tersebut memanggil *Cek Link Atur Ulang*, lalu *Atur Ulang Kata Sandi* dengan kata sandi baru. Pengaturan ulang mengakhiri semua sesi yang ada.
 
@@ -159,9 +162,9 @@ Error: 401 email/password salah, 403 `EMAIL_NOT_VERIFIED` (verifikasi email dulu
 Mencabut token yang dipakai untuk request ini (sesi lain tetap login) dan mengosongkan `{{token}}`. Koneksi WebSocket yang memakai token ini menerima `session:ended` (`logged_out`).
 
 === REQ Register Disnakertrans (superadmin) => Daftarkan Disnakertrans
-Membuat akun **disnakertrans** (pemberi persetujuan akun admin). Approval-nya langsung aktif (`approval.isActive: true`), tetapi emailnya harus diaktifkan dulu: email berbahasa Indonesia memberi tahu bahwa akun telah dibuat dan berisi link aktivasi publik (*Aktivasi Email lewat Link*, berlaku 24 jam). Password adalah yang dikirim di body; berikan sendiri kepada orang tersebut.
+Membuat akun **disnakertrans** (pemberi persetujuan akun admin). **Tanpa `password` di body** (jika dikirim: 400): server membuat kata sandi sementara 8 karakter yang mudah dibaca (kata dan angka, mis. `Mangga47`) dan mengirimkannya ke email akun tersebut, dalam Bahasa Indonesia, beserta tombol ke halaman frontend `<FRONTEND_URL>/aktivasi?userId=…&token=…` (berlaku 24 jam). Di sana pemilik akun memasukkan kata sandi sementara dan membuat kata sandinya sendiri (*Cek Link Aktivasi*, *Aktifkan Akun*); baru setelah itu `mailActive` menjadi `true` dan akun bisa login. Kata sandi sementara tidak pernah diterima untuk login. Approval-nya langsung aktif (`approval.isActive: true`).
 
-Memberi tahu setiap superadmin (`USER_REGISTERED`). Menyimpan `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}`, dan saat development `{{verifyToken}}`.
+Memberi tahu setiap superadmin (`USER_REGISTERED`). Menyimpan `{{userId}}`, `{{userRole}}`, `{{registeredEmail}}`, dan saat development (tanpa `SMTP_HOST`) `{{verifyToken}}` serta `{{temporaryPassword}}` dari `meta.verification.devToken` / `devTemporaryPassword`.
 
 === REQ Register Admin (Public) => Daftar sebagai Admin
 Pendaftaran publik untuk akun **admin**, tanpa token. Mengirim OTP 6 digit ke email (berlaku 15 menit); verifikasi dengan *Verifikasi OTP*. Setelah itu pun admin belum bisa login sampai diaktifkan oleh disnakertrans (*Persetujuan → Aktifkan / Nonaktifkan Pengguna*, `approval.isActive: false` sampai saat itu).
@@ -180,13 +183,20 @@ Akun admin dan tenant: mengonfirmasi email dengan kode 6 digit dari email pendaf
 
 Error: 400 `OTP_INVALID` (kode salah, `details.attemptsLeft`; setelah 5 kali salah perlu kode baru), 400 `OTP_EXPIRED` (lebih dari 15 menit), 409 `EMAIL_ALREADY_VERIFIED`, 404 user tidak ditemukan.
 
-=== REQ Verify Email Link (Public) => Aktivasi Email lewat Link
-Akun disnakertrans: link aktivasi dari email. Jika dibuka di browser, menampilkan halaman konfirmasi (Bahasa Indonesia); client API mendapat JSON. Jika berhasil, `mailActive` menjadi `true`.
+=== REQ Check Activation Link (Public) => Cek Link Aktivasi
+Akun disnakertrans: apakah link aktivasi dari email masih bisa dipakai? Halaman frontend `/aktivasi` memanggilnya sebelum menampilkan form. Mengembalikan `email` akun dan `expiresAt` link.
 
-Error: 400 `LINK_INVALID`, 400 `LINK_EXPIRED` (lebih dari 24 jam), 409 `EMAIL_ALREADY_VERIFIED`.
+Error: 400 `LINK_INVALID` (token salah, atau sudah diganti email aktivasi yang lebih baru), 400 `LINK_EXPIRED` (lebih dari 24 jam), 409 `EMAIL_ALREADY_VERIFIED` (akun sudah diaktifkan).
+
+=== REQ Activate Account (Public) => Aktifkan Akun
+Akun disnakertrans: mengganti **kata sandi sementara** dari email aktivasi dengan `password` milik sendiri (minimal 8 karakter, berbeda dari kata sandi sementara). Jika berhasil, `mailActive` menjadi `true` dan akun bisa login dengan kata sandi baru. `userId` dan `token` berasal dari link di email.
+
+`temporaryPassword` yang salah menjawab 400 `TEMPORARY_PASSWORD_INVALID` dengan `details.attemptsLeft`; setelah 5 kali salah link diblokir dan perlu email aktivasi baru (*Kirim Ulang Verifikasi*, yang mengirim link **dan** kata sandi sementara baru).
+
+Error lain: 400 validasi, 400 `LINK_INVALID`, 400 `LINK_EXPIRED`, 409 `EMAIL_ALREADY_VERIFIED`.
 
 === REQ Resend Verification (Public) => Kirim Ulang Verifikasi
-Mengirim OTP baru (admin, tenant) atau link aktivasi baru (disnakertrans); kode sebelumnya tidak berlaku lagi. Paling sering sekali per 60 detik (429 `TOO_MANY_REQUESTS`, `details.retryAfterSeconds`). Menyimpan `{{otp}}` / `{{verifyToken}}` baru saat development.
+Mengirim OTP baru (admin, tenant), atau untuk disnakertrans email aktivasi baru: link baru **dan kata sandi sementara baru** (yang lama hanya tersimpan sebagai hash, sehingga tidak bisa dikirim ulang). Kode, link, dan kata sandi sementara sebelumnya tidak berlaku lagi. Paling sering sekali per 60 detik (429 `TOO_MANY_REQUESTS`, `details.retryAfterSeconds`). Menyimpan `{{otp}}`, atau `{{verifyToken}}` dan `{{temporaryPassword}}`, yang baru saat development.
 
 === REQ Forgot Password (Public) => Lupa Kata Sandi
 Mengirim email (Bahasa Indonesia) berisi link untuk mengatur ulang kata sandi, berlaku **30 menit** dan sekali pakai. Link membuka halaman **frontend** `<FRONTEND_URL>/reset-password?userId=…&token=…` (`FRONTEND_URL` di `.env`), yang memanggil *Cek Link Atur Ulang* dan *Atur Ulang Kata Sandi*.
@@ -357,7 +367,7 @@ Kategori yang masih dipakai produk tidak bisa dihapus (409 `STILL_IN_USE`, `deta
 === FOLDER Tenants => Tenant
 Profil tenant (toko). User tenant mengelola profil **miliknya sendiri** di `/api/tenants/me`; superadmin, disnakertrans, dan admin membaca semua profil.
 
-**Tautan:** `whatsappLink` dan `gmapsLink` wajib (frontend menyimpan `"-"` untuk tautan Google Maps yang kosong). `fbLink` **wajib berupa tautan** `http(s)://`: `"-"` atau kosong ditolak (400), dan profil lama yang masih `"-"` dianggap belum lengkap (`missingFields` berisi `fbLink`) sehingga belum bisa menambah produk. `instagramLink`, `googleBusinessLink`, dan `shopeeLink` **opsional**: tautan `http(s)://`, atau `null` / `""` jika tidak ada (disimpan sebagai `null`). Tautan opsional tidak pernah membuat profil dianggap belum lengkap.
+**Tautan:** `whatsappLink` dan `gmapsLink` wajib (frontend menyimpan `"-"` untuk tautan Google Maps yang kosong). `fbLink` **wajib berupa tautan** `http(s)://`: `"-"` atau kosong ditolak (400), dan profil lama yang masih `"-"` dianggap belum lengkap (`missingFields` berisi `fbLink`) sehingga belum bisa menambah produk. `instagramLink`, `googleBusinessLink`, dan `shopeeLink` **opsional**: tautan `http(s)://`, atau `null` / `""` jika tidak ada (disimpan sebagai `null`). Panjang tautan maksimal 255 karakter, kecuali `googleBusinessLink` yang boleh sampai **2.048** karakter (tautan Google Bisnis sering sangat panjang). Tautan opsional tidak pernah membuat profil dianggap belum lengkap.
 
 === REQ Get My Tenant (tenant) => Profil Tenant Saya
 404 jika Anda belum membuat profil. `isComplete` / `missingFields`: produk baru dapat dibuat setelah semua field wajib terisi (tautan opsional tidak dihitung). `missingFields` juga berisi `faceImageId` selama akun Anda belum memiliki foto profil..

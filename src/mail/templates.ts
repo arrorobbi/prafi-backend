@@ -20,7 +20,7 @@ const MUTED = '#6b7280';
 const PAGE_BG = '#f4f5f7';
 const FONT = "Poppins,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 
-/** Served by the frontend, so emails and the activation page show the same logo as the site. */
+/** Served by the frontend, so emails show the same logo as the site. */
 export const LOGO_URL = `${env.frontendUrl}/logo.png`;
 
 const ROLE_NAMES: Record<string, string> = {
@@ -47,8 +47,7 @@ const AUTO_NOTICE =
   `Email ini dikirim otomatis oleh sistem ${BRAND}, mohon tidak membalas email ini. ` +
   'Jika Anda tidak merasa mendaftar atau tidak mengenali akun ini, abaikan email ini.';
 
-/** `notice`: the "sent automatically" footer line; off for the activation result page (a web page, not an email). */
-function layout(title: string, bodyHtml: string, { notice = true } = {}) {
+function layout(title: string, bodyHtml: string) {
   const site = escape(env.frontendUrl);
   const year = new Date().getFullYear();
   return `<!doctype html>
@@ -79,7 +78,7 @@ function layout(title: string, bodyHtml: string, { notice = true } = {}) {
         <tr><td style="padding:12px 32px 28px;font-size:15px;line-height:1.6;">${bodyHtml}</td></tr>
         <tr><td style="background:${NAVY};color:#ffffff;padding:22px 32px;font-size:13px;line-height:1.6;">
           <strong>UMKM ${BRAND.toUpperCase()}</strong> adalah direktori dan marketplace UMKM ${PLACE}, dibangun dari semangat gotong royong untuk memajukan perekonomian lokal.
-          ${notice ? `<div style="margin-top:10px;font-size:12px;opacity:.8;">${AUTO_NOTICE}</div>` : ''}
+          <div style="margin-top:10px;font-size:12px;opacity:.8;">${AUTO_NOTICE}</div>
         </td></tr>
         <tr><td style="background:${ORANGE};color:#ffffff;padding:14px 32px;font-size:12px;">
           <a href="${site}/produk" style="color:#ffffff;font-weight:600;text-decoration:none;">Produk</a> &nbsp;·&nbsp;
@@ -101,29 +100,53 @@ interface Recipient {
   role: string;
 }
 
-/** To a disnakertrans account created by a superadmin: the account exists, click the link to activate the email. */
-export function disnakertransAccountCreated(user: Recipient, link: string, validHours: number): Omit<MailMessage, 'to'> {
+/**
+ * To a disnakertrans account created by a superadmin: the account exists; the button opens the activation page,
+ * where the temporary password from this email is replaced by one the person chooses. `resent`: a new email asked
+ * for later (its temporary password replaces the earlier one).
+ */
+export function disnakertransAccountCreated(
+  user: Recipient,
+  link: string,
+  temporaryPassword: string,
+  validHours: number,
+  resent = false,
+): Omit<MailMessage, 'to'> {
   const name = `${user.firstName} ${user.lastName}`;
   const role = ROLE_NAMES[user.role] ?? user.role;
-  const subject = `Akun Disnakertrans ${BRAND} Anda telah dibuat`;
+  const subject = resent ? `Email aktivasi baru akun Disnakertrans ${BRAND} Anda` : `Akun Disnakertrans ${BRAND} Anda telah dibuat`;
+  const intro = resent
+    ? `Berikut email aktivasi baru untuk akun ${role} Anda di ${BRAND} (${user.email}). Tautan dan kata sandi sementara pada email sebelumnya tidak berlaku lagi.`
+    : `Akun Anda dengan peran ${role} telah dibuat oleh Superadmin di ${BRAND} menggunakan email ${user.email}.`;
   const html = layout(
-    'Akun Anda telah dibuat',
+    resent ? 'Email aktivasi baru' : 'Akun Anda telah dibuat',
     `<p>Halo <strong>${escape(name)}</strong>,</p>
-     <p>Akun Anda dengan peran <strong>${role}</strong> telah dibuat oleh Superadmin di ${BRAND} menggunakan email <strong>${escape(user.email)}</strong>.</p>
-     <p>Sebelum dapat menggunakan sistem, aktifkan email Anda dengan menekan tombol berikut:</p>
-     ${button(link, 'Aktifkan Email')}
+     <p>${
+       resent
+         ? `Berikut email aktivasi baru untuk akun <strong>${role}</strong> Anda di ${BRAND} (<strong>${escape(user.email)}</strong>). Tautan dan kata sandi sementara pada email sebelumnya tidak berlaku lagi.`
+         : `Akun Anda dengan peran <strong>${role}</strong> telah dibuat oleh Superadmin di ${BRAND} menggunakan email <strong>${escape(user.email)}</strong>.`
+     }</p>
+     <p>Kata sandi sementara Anda:</p>
+     <p style="text-align:center;margin:20px 0;">
+       <span style="display:inline-block;background:${ORANGE_SOFT};border:1px dashed ${ORANGE};border-radius:12px;padding:12px 26px;font-size:26px;font-weight:700;letter-spacing:2px;color:${NAVY};font-family:'Courier New',Courier,monospace;">${escape(temporaryPassword)}</span>
+     </p>
+     <p>Untuk mengaktifkan akun, tekan tombol berikut, masukkan kata sandi sementara di atas, lalu buat kata sandi baru Anda sendiri:</p>
+     ${button(link, 'Aktifkan Akun &amp; Buat Kata Sandi')}
      ${copyLink(link)}
-     <p>Tautan ini berlaku selama <strong>${validHours} jam</strong>. Kata sandi untuk masuk akan diberikan langsung oleh Superadmin.</p>
+     <p>Tautan dan kata sandi sementara ini berlaku selama <strong>${validHours} jam</strong>. Kata sandi sementara tidak dapat dipakai untuk masuk: akun baru dapat digunakan setelah Anda membuat kata sandi baru.</p>
      ${SIGN_OFF}`,
   );
   const text = [
     `Halo ${name},`,
     '',
-    `Akun Anda dengan peran ${role} telah dibuat oleh Superadmin di ${BRAND} menggunakan email ${user.email}.`,
-    'Sebelum dapat menggunakan sistem, aktifkan email Anda melalui tautan berikut:',
+    intro,
+    '',
+    `Kata sandi sementara Anda: ${temporaryPassword}`,
+    '',
+    'Untuk mengaktifkan akun, buka tautan berikut, masukkan kata sandi sementara di atas, lalu buat kata sandi baru Anda sendiri:',
     link,
     '',
-    `Tautan ini berlaku selama ${validHours} jam. Kata sandi untuk masuk akan diberikan langsung oleh Superadmin.`,
+    `Tautan dan kata sandi sementara ini berlaku selama ${validHours} jam. Kata sandi sementara tidak dapat dipakai untuk masuk: akun baru dapat digunakan setelah Anda membuat kata sandi baru.`,
     ...TEXT_SIGN_OFF,
   ].join('\n');
   return { subject, html, text };
@@ -328,22 +351,3 @@ export function passwordResetRequested(user: Recipient, link: string, validMinut
   ].join('\n');
   return { subject, html, text };
 }
-
-/**
- * Browser page shown after clicking the activation link. Served by this backend, so it sends its own
- * Content-Security-Policy (VERIFICATION_PAGE_CSP) to allow the frontend's logo and Google Fonts.
- */
-export function verificationResultPage(ok: boolean, message: string) {
-  return layout(
-    ok ? 'Email berhasil diaktifkan' : 'Aktivasi email gagal',
-    `<p style="font-size:40px;margin:0 0 8px;">${ok ? '✅' : '⚠️'}</p>
-     <p>${escape(message)}</p>
-     ${ok ? `<p>Anda sekarang dapat masuk ke ${BRAND} menggunakan email dan kata sandi Anda.</p>${button(`${env.frontendUrl}/login`, 'Masuk')}` : ''}`,
-    { notice: false },
-  );
-}
-
-export const VERIFICATION_PAGE_CSP =
-  `default-src 'none'; img-src ${new URL(env.frontendUrl).origin} data:; ` +
-  "style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; " +
-  "base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
