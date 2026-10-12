@@ -3535,7 +3535,7 @@
                 }
               ]
             },
-            "description": "**Access:** public, no token\n\nApproved products only, newest first. Each has its `category` (`id`, `name`). Optional filters: `recommended=true` (products whose reviews average **4.8 stars or more**; set by the server), `tenantId` (one owner's products), `categoryId` (one category, e.g. the carousel's current slide) and `sort` (`newest`, the default, or `rating`: best average first, products without reviews last). Each product's `tenant.tenant` is the owner's UMKM profile (`id`, `name`, and its public links `whatsappLink`, `instagramLink`, `shopeeLink`, `googleBusinessLink`, `fbLink`, `gmapsLink`; empty ones are `null` or `\"-\"`) for *Landing Tenant* and the product page's contact buttons.",
+            "description": "**Access:** public, no token\n\nApproved products only, newest first. Each has its `category` (`id`, `name`). Optional filters: `recommended=true` (products whose reviews average **4.8 stars or more**; set by the server), `tenantId` (one owner's products), `categoryId` (one category, e.g. the carousel's current slide) and `sort` (`newest`, the default, or `rating`: best average first, products without reviews last). Each product's `tenant.tenant` is the owner's UMKM profile (`id`, `name`, and its public links `whatsappLink`, `instagramLink`, `shopeeLink`, `googleBusinessLink`, `fbLink`, `gmapsLink`; empty ones are `null`) for *Landing Tenant* and the product page's contact buttons.",
             "auth": {
               "type": "noauth"
             }
@@ -3602,7 +3602,7 @@
                     }
                   ]
                 },
-                "description": "**Access:** public, no token\n\nApproved products only, newest first. Each has its `category` (`id`, `name`). Optional filters: `recommended=true` (products whose reviews average **4.8 stars or more**; set by the server), `tenantId` (one owner's products), `categoryId` (one category, e.g. the carousel's current slide) and `sort` (`newest`, the default, or `rating`: best average first, products without reviews last). Each product's `tenant.tenant` is the owner's UMKM profile (`id`, `name`, and its public links `whatsappLink`, `instagramLink`, `shopeeLink`, `googleBusinessLink`, `fbLink`, `gmapsLink`; empty ones are `null` or `\"-\"`) for *Landing Tenant* and the product page's contact buttons.",
+                "description": "**Access:** public, no token\n\nApproved products only, newest first. Each has its `category` (`id`, `name`). Optional filters: `recommended=true` (products whose reviews average **4.8 stars or more**; set by the server), `tenantId` (one owner's products), `categoryId` (one category, e.g. the carousel's current slide) and `sort` (`newest`, the default, or `rating`: best average first, products without reviews last). Each product's `tenant.tenant` is the owner's UMKM profile (`id`, `name`, and its public links `whatsappLink`, `instagramLink`, `shopeeLink`, `googleBusinessLink`, `fbLink`, `gmapsLink`; empty ones are `null`) for *Landing Tenant* and the product page's contact buttons.",
                 "auth": {
                   "type": "noauth"
                 }
@@ -3669,7 +3669,7 @@
                     }
                   ]
                 },
-                "description": "**Access:** public, no token\n\nApproved products only, newest first. Each has its `category` (`id`, `name`). Optional filters: `recommended=true` (products whose reviews average **4.8 stars or more**; set by the server), `tenantId` (one owner's products), `categoryId` (one category, e.g. the carousel's current slide) and `sort` (`newest`, the default, or `rating`: best average first, products without reviews last). Each product's `tenant.tenant` is the owner's UMKM profile (`id`, `name`, and its public links `whatsappLink`, `instagramLink`, `shopeeLink`, `googleBusinessLink`, `fbLink`, `gmapsLink`; empty ones are `null` or `\"-\"`) for *Landing Tenant* and the product page's contact buttons.",
+                "description": "**Access:** public, no token\n\nApproved products only, newest first. Each has its `category` (`id`, `name`). Optional filters: `recommended=true` (products whose reviews average **4.8 stars or more**; set by the server), `tenantId` (one owner's products), `categoryId` (one category, e.g. the carousel's current slide) and `sort` (`newest`, the default, or `rating`: best average first, products without reviews last). Each product's `tenant.tenant` is the owner's UMKM profile (`id`, `name`, and its public links `whatsappLink`, `instagramLink`, `shopeeLink`, `googleBusinessLink`, `fbLink`, `gmapsLink`; empty ones are `null`) for *Landing Tenant* and the product page's contact buttons.",
                 "auth": {
                   "type": "noauth"
                 }
@@ -5499,7 +5499,7 @@
     },
     {
       "name": "Tenants",
-      "description": "Tenant (shop) profiles. A tenant user manages **their own** profile at `/api/tenants/me`; superadmin, disnakertrans and admin read every profile.\n\n**Links:** `whatsappLink` and `gmapsLink` are required (the frontend saves `\"-\"` for an empty Google Maps link). `fbLink` is **required as a real link** `http(s)://`: `\"-\"` or empty is refused (400), and older profiles still saved with `\"-\"` count as incomplete (`missingFields` includes `fbLink`), so they can't add products yet. `instagramLink`, `googleBusinessLink` and `shopeeLink` are **optional**: a `http(s)://` link, or `null` / `\"\"` for none (stored as `null`). Optional links never block a profile from being complete.",
+      "description": "Tenant (shop) profiles. A tenant user manages **their own** profile at `/api/tenants/me`; superadmin, disnakertrans and admin read every profile.\n\n**Links:** every link is **optional**: `whatsappLink`, `gmapsLink`, `fbLink`, `instagramLink`, `googleBusinessLink` and `shopeeLink`. Each is a `http(s)://` link, or `null` / `\"\"` for none (stored as `null`; the old `\"-\"` placeholder is also taken as empty). At most 255 characters, except `googleBusinessLink`, which may be up to **2,048** (Google Business links are often very long). Links never block a profile from being complete.",
       "item": [
         {
           "name": "Get My Tenant (tenant)",
@@ -5517,7 +5517,7 @@
                 "me"
               ]
             },
-            "description": "**Access:** tenant\n\n404 if you have not created your profile yet. `isComplete` / `missingFields`: products can only be created once every required field is filled in (the optional links don't count). `missingFields` also lists `faceImageId` while your account has no profile photo.."
+            "description": "**Access:** tenant\n\n404 if you have not created your profile yet. `isComplete` / `missingFields`: products can only be created once every required field is filled in (links never count: all of them are optional). `missingFields` also lists `faceImageId` while your account has no profile photo.."
           },
           "event": [
             {
@@ -5547,7 +5547,7 @@
                     "me"
                   ]
                 },
-                "description": "**Access:** tenant\n\n404 if you have not created your profile yet. `isComplete` / `missingFields`: products can only be created once every required field is filled in (the optional links don't count)."
+                "description": "**Access:** tenant\n\n404 if you have not created your profile yet. `isComplete` / `missingFields`: products can only be created once every required field is filled in (links never count: all of them are optional)."
               },
               "status": "OK",
               "code": 200,
@@ -5614,7 +5614,7 @@
                 "me"
               ]
             },
-            "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and the optional links `instagramLink`, `googleBusinessLink`, `shopeeLink`. `logoId`: upload the logo first. The profile has no category any more: each product has one (`categoryId`). Saves `{{tenantProfileId}}`.",
+            "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and every link (`whatsappLink`, `gmapsLink`, `fbLink`, `instagramLink`, `googleBusinessLink`, `shopeeLink`), which are optional. `logoId`: upload the logo first. The profile has no category any more: each product has one (`categoryId`). Saves `{{tenantProfileId}}`.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Warung Budi\",\n  \"description\": \"Kopi dan makanan ringan\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00 - 22:00\",\n  \"fbLink\": \"https://facebook.com/warungbudi\",\n  \"whatsappLink\": \"https://wa.me/6281298765432\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"instagramLink\": \"https://instagram.com/warungbudi\",\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": null,\n  \"logoId\": {{imageId}}\n}",
@@ -5668,7 +5668,7 @@
                     "me"
                   ]
                 },
-                "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and the optional links `instagramLink`, `googleBusinessLink`, `shopeeLink`. `logoId`: upload the logo first. The profile has no category any more: each product has one (`categoryId`). Saves `{{tenantProfileId}}`.",
+                "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and every link (`whatsappLink`, `gmapsLink`, `fbLink`, `instagramLink`, `googleBusinessLink`, `shopeeLink`), which are optional. `logoId`: upload the logo first. The profile has no category any more: each product has one (`categoryId`). Saves `{{tenantProfileId}}`.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"name\": \"Warung Budi\",\n  \"description\": \"Kopi dan makanan ringan\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00 - 22:00\",\n  \"fbLink\": \"https://facebook.com/warungbudi\",\n  \"whatsappLink\": \"https://wa.me/6281298765432\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"instagramLink\": \"https://instagram.com/warungbudi\",\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": null,\n  \"logoId\": {{imageId}}\n}",
@@ -5712,7 +5712,7 @@
                     "me"
                   ]
                 },
-                "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and the optional links `instagramLink`, `googleBusinessLink`, `shopeeLink`. `logoId`: upload the logo first. The profile has no category any more: each product has one (`categoryId`). Saves `{{tenantProfileId}}`.",
+                "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and every link (`whatsappLink`, `gmapsLink`, `fbLink`, `instagramLink`, `googleBusinessLink`, `shopeeLink`), which are optional. `logoId`: upload the logo first. The profile has no category any more: each product has one (`categoryId`). Saves `{{tenantProfileId}}`.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"name\": \"Warung Budi\",\n  \"description\": \"Kopi dan makanan ringan\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00 - 22:00\",\n  \"fbLink\": \"https://facebook.com/warungbudi\",\n  \"whatsappLink\": \"https://wa.me/6281298765432\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"instagramLink\": \"https://instagram.com/warungbudi\",\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": null,\n  \"logoId\": {{imageId}}\n}",
@@ -5758,7 +5758,7 @@
                 "me"
               ]
             },
-            "description": "**Access:** tenant\n\nSend only the fields to change. Send `null` (or `\"\"`) to remove an optional link. Admins get `TENANT_PROFILE_UPDATED`. Replacing `logoId` deletes the old logo and its file.",
+            "description": "**Access:** tenant\n\nSend only the fields to change. Send `null` (or `\"\"`) to remove a link. Admins get `TENANT_PROFILE_UPDATED`. Replacing `logoId` deletes the old logo and its file.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": \"https://shopee.co.id/warungbudi\",\n  \"instagramLink\": null\n}",
@@ -5802,7 +5802,7 @@
                     "me"
                   ]
                 },
-                "description": "**Access:** tenant\n\nSend only the fields to change. Send `null` (or `\"\"`) to remove an optional link. Admins get `TENANT_PROFILE_UPDATED`. Replacing `logoId` deletes the old logo and its file.",
+                "description": "**Access:** tenant\n\nSend only the fields to change. Send `null` (or `\"\"`) to remove a link. Admins get `TENANT_PROFILE_UPDATED`. Replacing `logoId` deletes the old logo and its file.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": \"https://shopee.co.id/warungbudi\",\n  \"instagramLink\": null\n}",

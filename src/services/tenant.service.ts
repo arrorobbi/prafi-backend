@@ -12,10 +12,10 @@ export interface TenantInput {
   address: string;
   area: string;
   operationalHours: string;
-  fbLink: string;
-  whatsappLink: string;
-  gmapsLink: string;
-  /** Optional (null = none) */
+  /** Every link is optional (null = none) */
+  fbLink?: string | null;
+  whatsappLink?: string | null;
+  gmapsLink?: string | null;
   instagramLink?: string | null;
   googleBusinessLink?: string | null;
   shopeeLink?: string | null;
@@ -53,20 +53,16 @@ const PROFILE_TEXT_FIELDS = [
   'address',
   'area',
   'operationalHours',
-  'whatsappLink',
-  'gmapsLink',
 ] as const;
 
 /**
- * Required fields that are still blank. The optional links (Instagram, Google Bisnis, Shopee) never count.
+ * Required fields that are still blank. Links never count: every one of them is optional.
  * `owner`: the tenant's own account also needs a profile photo (faceImageId) before products can be added.
  */
 export function missingProfileFields(tenant: Tenant | null, owner?: { faceImageId: number | null } | null): string[] {
   const ownerMissing = owner && owner.faceImageId == null ? ['faceImageId'] : [];
   if (!tenant) return ['profile', ...ownerMissing];
   const missing: string[] = PROFILE_TEXT_FIELDS.filter((f) => !String(tenant[f] ?? '').trim());
-  // Facebook must be a real link: older profiles saved "-" when it was left empty
-  if (!/^https?:\/\/\S+$/i.test(tenant.fbLink ?? '')) missing.push('fbLink');
   if (tenant.logoId == null) missing.push('logoId');
   return [...missing, ...ownerMissing];
 }

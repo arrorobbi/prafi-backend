@@ -304,7 +304,7 @@ Halaman publik untuk pengunjung: tanpa token, tanpa data pribadi (tanpa email/te
 Semua kategori produk urut A→Z beserta `image` (null hanya untuk kategori lama yang belum diberi gambar) dan `productCount` (hanya produk yang sudah disetujui), untuk carousel beranda: setiap slide adalah gambar kategori, dan di sebelahnya *Produk Landing* dengan `categoryId` menampilkan produk kategori tersebut.
 
 === REQ Landing Products (Public) => Produk Landing
-Hanya produk yang sudah disetujui, terbaru di atas, masing-masing dengan `category` (`id`, `name`). Filter opsional: `recommended=true` (produk dengan rata-rata ulasan **4,8 bintang atau lebih**, diatur server), `tenantId` (produk satu pemilik), `categoryId` (satu kategori, mis. slide carousel yang sedang tampil), dan `sort` (`newest` sebagai bawaan, atau `rating`: rata-rata tertinggi di atas, produk tanpa ulasan di bawah). `tenant.tenant` pada setiap produk adalah profil UMKM pemiliknya (`id`, `name`, dan tautan publiknya `whatsappLink`, `instagramLink`, `shopeeLink`, `googleBusinessLink`, `fbLink`, `gmapsLink`; yang kosong bernilai `null` atau `"-"`) untuk *Detail UMKM Landing* dan tombol kontak di halaman produk.
+Hanya produk yang sudah disetujui, terbaru di atas, masing-masing dengan `category` (`id`, `name`). Filter opsional: `recommended=true` (produk dengan rata-rata ulasan **4,8 bintang atau lebih**, diatur server), `tenantId` (produk satu pemilik), `categoryId` (satu kategori, mis. slide carousel yang sedang tampil), dan `sort` (`newest` sebagai bawaan, atau `rating`: rata-rata tertinggi di atas, produk tanpa ulasan di bawah). `tenant.tenant` pada setiap produk adalah profil UMKM pemiliknya (`id`, `name`, dan tautan publiknya `whatsappLink`, `instagramLink`, `shopeeLink`, `googleBusinessLink`, `fbLink`, `gmapsLink`; yang kosong bernilai `null`) untuk *Detail UMKM Landing* dan tombol kontak di halaman produk.
 
 === REQ Landing Product (Public) => Detail Produk Landing
 Satu produk yang sudah disetujui beserta `ratingAverage` / `reviewCount`. 404 untuk produk yang tidak ada atau belum disetujui.
@@ -367,16 +367,16 @@ Kategori yang masih dipakai produk tidak bisa dihapus (409 `STILL_IN_USE`, `deta
 === FOLDER Tenants => Tenant
 Profil tenant (toko). User tenant mengelola profil **miliknya sendiri** di `/api/tenants/me`; superadmin, disnakertrans, dan admin membaca semua profil.
 
-**Tautan:** `whatsappLink` dan `gmapsLink` wajib (frontend menyimpan `"-"` untuk tautan Google Maps yang kosong). `fbLink` **wajib berupa tautan** `http(s)://`: `"-"` atau kosong ditolak (400), dan profil lama yang masih `"-"` dianggap belum lengkap (`missingFields` berisi `fbLink`) sehingga belum bisa menambah produk. `instagramLink`, `googleBusinessLink`, dan `shopeeLink` **opsional**: tautan `http(s)://`, atau `null` / `""` jika tidak ada (disimpan sebagai `null`). Panjang tautan maksimal 255 karakter, kecuali `googleBusinessLink` yang boleh sampai **2.048** karakter (tautan Google Bisnis sering sangat panjang). Tautan opsional tidak pernah membuat profil dianggap belum lengkap.
+**Tautan:** semua tautan **opsional**: `whatsappLink`, `gmapsLink`, `fbLink`, `instagramLink`, `googleBusinessLink`, dan `shopeeLink`. Masing-masing berupa tautan `http(s)://`, atau `null` / `""` jika tidak ada (disimpan sebagai `null`; placeholder lama `"-"` juga diterima sebagai kosong). Panjang tautan maksimal 255 karakter, kecuali `googleBusinessLink` yang boleh sampai **2.048** karakter (tautan Google Bisnis sering sangat panjang). Tautan tidak pernah membuat profil dianggap belum lengkap.
 
 === REQ Get My Tenant (tenant) => Profil Tenant Saya
-404 jika Anda belum membuat profil. `isComplete` / `missingFields`: produk baru dapat dibuat setelah semua field wajib terisi (tautan opsional tidak dihitung). `missingFields` juga berisi `faceImageId` selama akun Anda belum memiliki foto profil..
+404 jika Anda belum membuat profil. `isComplete` / `missingFields`: produk baru dapat dibuat setelah semua field wajib terisi (tautan tidak dihitung: semuanya opsional). `missingFields` juga berisi `faceImageId` selama akun Anda belum memiliki foto profil..
 
 === REQ Create My Tenant (tenant) => Buat Profil Tenant Saya
-Satu profil per tenant. Wajib: semua field kecuali `name` (bawaan: tenantName Anda) dan tautan opsional `instagramLink`, `googleBusinessLink`, `shopeeLink`. `logoId`: unggah logo dulu. Profil tidak lagi memiliki kategori: setiap produk yang memilikinya (`categoryId`). Menyimpan `{{tenantProfileId}}`.
+Satu profil per tenant. Wajib: semua field kecuali `name` (bawaan: tenantName Anda) dan semua tautan (`whatsappLink`, `gmapsLink`, `fbLink`, `instagramLink`, `googleBusinessLink`, `shopeeLink`), yang opsional. `logoId`: unggah logo dulu. Profil tidak lagi memiliki kategori: setiap produk yang memilikinya (`categoryId`). Menyimpan `{{tenantProfileId}}`.
 
 === REQ Update My Tenant (tenant) => Ubah Profil Tenant Saya
-Kirim hanya field yang ingin diubah. Kirim `null` (atau `""`) untuk menghapus tautan opsional. Admin menerima `TENANT_PROFILE_UPDATED`. Jika `logoId` diganti, logo lama beserta filenya dihapus.
+Kirim hanya field yang ingin diubah. Kirim `null` (atau `""`) untuk menghapus sebuah tautan. Admin menerima `TENANT_PROFILE_UPDATED`. Jika `logoId` diganti, logo lama beserta filenya dihapus.
 
 === REQ Delete My Tenant (tenant) => Hapus Profil Tenant Saya
 Menghapus profil tenant Anda (akun Anda tetap ada).

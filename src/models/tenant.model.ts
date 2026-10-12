@@ -20,10 +20,10 @@ export class Tenant extends Model<InferAttributes<Tenant>, InferCreationAttribut
   declare address: string;
   declare area: string;
   declare operationalHours: string;
-  declare fbLink: string;
-  declare whatsappLink: string;
-  declare gmapsLink: string;
-  /** Optional links (null when not given) */
+  /** Every link is optional (null when not given) */
+  declare fbLink: string | null;
+  declare whatsappLink: string | null;
+  declare gmapsLink: string | null;
   declare instagramLink: string | null;
   declare googleBusinessLink: string | null;
   declare shopeeLink: string | null;
@@ -53,9 +53,9 @@ Tenant.init(
     address: { type: DataTypes.STRING, allowNull: false },
     area: { type: DataTypes.STRING, allowNull: false },
     operationalHours: { type: DataTypes.STRING, allowNull: false },
-    fbLink: { type: DataTypes.STRING, allowNull: false },
-    whatsappLink: { type: DataTypes.STRING, allowNull: false },
-    gmapsLink: { type: DataTypes.STRING, allowNull: false },
+    fbLink: { type: DataTypes.STRING, allowNull: true },
+    whatsappLink: { type: DataTypes.STRING, allowNull: true },
+    gmapsLink: { type: DataTypes.STRING, allowNull: true },
     instagramLink: { type: DataTypes.STRING, allowNull: true },
     // TEXT: Google Business links are often far longer than 255 characters
     googleBusinessLink: { type: DataTypes.TEXT, allowNull: true },
