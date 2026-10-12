@@ -388,7 +388,7 @@ sudo tail -f /var/log/nginx/access.log      # every request
 
 **502 Bad Gateway** comes from nginx: the app behind it isn't answering. Check that app's service (section 4), not nginx.
 
-Good to know: because the frontend (not nginx) holds port 80, `http://` addresses are **not** redirected to `https://`; they are answered by the frontend directly. Even `http://api.transniaga…` works, through the website's `/api` proxy.
+Good to know: the frontend (not nginx) holds port 80, so the frontend itself sends `http://transniaga.manokwarikab.go.id/...` on to `https://` (a 308 redirect, in `prafi-frontend/src/middleware.ts`). Other host names on port 80 are not redirected: `http://api.transniaga…` is answered by the frontend through the website's `/api` proxy, and `http://localhost` / `http://127.0.0.1` stay plain (the backend uses them to refresh cached pages).
 
 ## 10. Webmin (server panel)
 
@@ -611,5 +611,4 @@ Then check `/panduan` (and **Bantuan & Ketentuan** as a seller). Common mistakes
 - **Use a separate database user** for the app instead of the `postgres` superuser.
 - **Limit Webmin** (ports 10000 and 20000 are open to the internet): allow only known IPs, or close them and use `core.transniaga…` only.
 - **Put the backend `deploy/` folder in git**, so the service and nginx files aren't lost with the server.
-- **Redirect HTTP to HTTPS**: let nginx take port 80 again just to redirect to `https://` (the frontend then listens on another local port, e.g. 3000), so no page is ever served unencrypted.
 - **Turn off old TLS versions**: `ssl_protocols` in `/etc/nginx/nginx.conf` still allows TLS 1.0 and 1.1; `TLSv1.2 TLSv1.3` is enough for every current browser.
