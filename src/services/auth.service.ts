@@ -8,6 +8,7 @@ import { signAccessToken } from '../utils/jwt';
 import { readablePassword } from '../utils/readablePassword';
 import * as emailVerification from './emailVerification.service';
 import * as imageService from './image.service';
+import { assertLoginAllowed, clearLoginFailures, recordLoginFailure } from './loginGuard.service';
 import { notify } from './notification.service';
 import { endUserSessions } from '../realtime/socket';
 
@@ -27,7 +28,11 @@ export interface RegisterInput {
 // Compared against when the email doesn't exist, so response time doesn't reveal which emails are registered
 const DUMMY_HASH = bcrypt.hashSync('dummy-password-for-timing', 12);
 
-export async function login(email: string, password: string) {
+/** `ip`: the visitor's address, for the limit on wrong passwords (loginGuard.service.ts). */
+export async function login(email: string, password: string, ip: string | null = null) {
+  // Too many wrong passwords from this network: refused before the password is even looked at
+  assertLoginAllowed(email, ip);
+
   const user = await User.scope('withPassword').findOne({
     where: { email: email.trim().toLowerCase() },
     include: [{ association: 'approval', attributes: ['isActive'] }],
@@ -38,8 +43,11 @@ export async function login(email: string, password: string) {
     : await bcrypt.compare(password, DUMMY_HASH);
 
   if (!user || !passwordOk) {
-    throw HttpError.unauthorized('Email atau password salah');
+    // Counted the same whether or not the email exists, so the answer doesn't reveal which emails are registered
+    const attemptsLeft = recordLoginFailure(email, ip);
+    throw new HttpError(401, 'Email atau password salah', 'UNAUTHORIZED', { attemptsLeft });
   }
+  clearLoginFailures(email, ip);
 
   // Checked only after the password is correct, so these states aren't revealed to anyone else.
   // Email first: the user can fix that themselves (the userId lets the frontend open the OTP screen).

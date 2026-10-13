@@ -118,7 +118,7 @@ Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUse
 | 404 | `NOT_FOUND` | tidak ditemukan, atau bukan milik Anda |
 | 409 | `UNIQUE_CONSTRAINT`, `STILL_IN_USE`, `CONFLICT`, `EMAIL_ALREADY_VERIFIED` | nilai duplikat, data masih digunakan, sudah terverifikasi |
 | 413 | `FILE_TOO_LARGE` | gambar lebih dari 5 MB |
-| 429 | `TOO_MANY_REQUESTS` | kode verifikasi baru diminta kurang dari 60 detik yang lalu |
+| 429 | `TOO_MANY_REQUESTS` | kode verifikasi baru diminta kurang dari 60 detik yang lalu; terlalu banyak login gagal (5 per akun atau 20 per jaringan dalam 15 menit) |
 
 ## Notifikasi dan realtime
 Setiap role menerima notifikasi untuk kejadian yang berkaitan dengannya (lihat **Notifikasi**); notifikasi aktivasi menyertakan `approval` beserta `userId` dan `user`. Notifikasi dikirim langsung melalui Socket.IO sebagai `notification:new` (lihat **Realtime (WebSocket)** untuk cara terhubung di Postman dan di frontend).
@@ -154,7 +154,9 @@ Masuk dan menyimpan access token sebagai `{{token}}` (berlaku 1 jam), serta `{{c
 - superadmin: akun seed (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` di `.env`)
 - disnakertrans / admin / tenant: akun yang dibuat dengan request Register (password `{{newUserPassword}}`; email disimpan sebagai `{{registeredEmail}}`)
 
-Error: 401 email/password salah, 403 `EMAIL_NOT_VERIFIED` (verifikasi email dulu; `details` berisi `userId` dan `method`), 403 `USER_NOT_ACTIVATED` (akun belum diaktifkan). Lupa kata sandi? Gunakan *Lupa Kata Sandi*.
+**Batas percobaan:** hanya password salah yang dihitung. Setelah **5 kali salah untuk satu email dari satu jaringan (IP)**, atau **20 kali salah dari satu jaringan** untuk email mana pun, dalam 15 menit, jaringan itu mendapat 429 `TOO_MANY_REQUESTS` (`details.retryAfterSeconds`) sampai percobaan tertua berumur 15 menit, juga bila password-nya benar. Login yang berhasil menghapus hitungan akun tersebut. Jawaban 401 menyertakan `details.attemptsLeft`.
+
+Error: 401 email/password salah (`details.attemptsLeft`), 429 terlalu banyak percobaan gagal, 403 `EMAIL_NOT_VERIFIED` (verifikasi email dulu; `details` berisi `userId` dan `method`), 403 `USER_NOT_ACTIVATED` (akun belum diaktifkan). Lupa kata sandi? Gunakan *Lupa Kata Sandi*.
 
 `data.user` adalah profil lengkap, sama seperti *Profil Saya* (`faceImage`, `approval`), sehingga foto dapat langsung ditampilkan setelah login.
 

@@ -857,6 +857,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 |---|---|---|
 | Email | Sign-up OTP, Disnakertrans activation, password reset, "your admin account is active", weekly backup. All in Bahasa Indonesia | `src/mail/templates.ts`, `SMTP_*` in the backend `.env` |
 | Live notifications | Notifications, review lists and the unread badge update without reloading (Socket.IO) | `src/realtime/socket.ts` |
+| Login protection | 5 wrong passwords for one account from one network, or 20 from one network across accounts, in 15 minutes: that network must wait (429). Counted in the backend's memory, so a restart clears it | `src/services/loginGuard.service.ts` |
 | Sessions | Login lasts 1 hour; logout, deactivation or a password reset ends the session at once | `src/middlewares/auth.ts` |
 | Photo uploads | A photo uploads when picked and is attached on *Simpan*; unused ones are deleted every night | sections 7 and 12 |
 | Review protection | "Not a robot" check, one review per product per day, at most 5 reviews in 10 minutes per network, reporting and hiding. Visitors' IP addresses are stored only as a hash | `src/services/review.service.ts` |
@@ -978,6 +979,7 @@ Then check `/panduan` (and **Bantuan & Ketentuan** as a seller). Common mistakes
 | A service keeps restarting (`code=exited`) | Read the log. Common causes: a wrong Node version (Next.js 16 on Node 18), a missing `.env` setting (`Missing required environment variable`), a build that wasn't run (`dist/` or `.next/` missing) |
 | Backend log: database connection error | `systemctl status postgresql`; check `DB_*` in `.env` |
 | Backend log: `column ... does not exist` | A migration wasn't run (section 7) |
+| Someone can't log in: "Terlalu banyak percobaan login yang gagal" | Too many wrong passwords from their network. It ends by itself after 15 minutes; *Lupa Password* works meanwhile. To clear every wait at once: `sudo systemctl restart prafi-backend` |
 | Emails don't arrive | Backend log shows the mail error; check `SMTP_*` (Gmail app password still valid?) |
 | Public pages show old data | They are cached up to 60 s; check `REVALIDATE_SECRET` is the same in both `.env` files |
 | Disk full | `df -h`; old logs: `sudo journalctl --vacuum-time=14d` |

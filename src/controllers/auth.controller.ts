@@ -4,6 +4,7 @@ import { HttpError } from '../errors/HttpError';
 import * as authService from '../services/auth.service';
 import * as emailVerification from '../services/emailVerification.service';
 import * as passwordReset from '../services/passwordReset.service';
+import { clientIp } from '../utils/clientIp';
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -15,7 +16,7 @@ export const login: RequestHandler = async (req, res) => {
   if (typeof password !== 'string' || !password) errors.push({ field: 'password', message: 'Password wajib diisi' });
   if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);
 
-  const result = await authService.login(email as string, password as string);
+  const result = await authService.login(email as string, password as string, clientIp(req));
   res.json({ success: true, data: result });
 };
 

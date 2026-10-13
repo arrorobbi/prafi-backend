@@ -857,6 +857,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 |---|---|---|
 | Email | OTP pendaftaran, aktivasi Disnakertrans, atur ulang kata sandi, "akun admin Anda sudah aktif", cadangan mingguan. Semuanya dalam Bahasa Indonesia | `src/mail/templates.ts`, `SMTP_*` di `.env` backend |
 | Notifikasi langsung | Notifikasi, daftar ulasan, dan tanda belum dibaca diperbarui tanpa memuat ulang (Socket.IO) | `src/realtime/socket.ts` |
+| Perlindungan login | 5 password salah untuk satu akun dari satu jaringan, atau 20 dari satu jaringan untuk akun mana pun, dalam 15 menit: jaringan itu harus menunggu (429). Dihitung di memori backend, jadi restart menghapusnya | `src/services/loginGuard.service.ts` |
 | Sesi | Login berlaku 1 jam; logout, penonaktifan, atau atur ulang kata sandi langsung mengakhiri sesi | `src/middlewares/auth.ts` |
 | Unggah foto | Foto terunggah saat dipilih dan ditautkan saat *Simpan*; yang tidak terpakai dihapus setiap malam | bagian 7 dan 12 |
 | Perlindungan ulasan | Pemeriksaan "bukan robot", satu ulasan per produk per hari, maksimal 5 ulasan dalam 10 menit per jaringan, pelaporan dan penyembunyian. Alamat IP pengunjung hanya disimpan sebagai hash | `src/services/review.service.ts` |
@@ -978,6 +979,7 @@ Lalu periksa `/panduan` (dan **Bantuan & Ketentuan** sebagai penjual). Kesalahan
 | Sebuah service terus restart (`code=exited`) | Baca lognya. Penyebab umum: versi Node yang salah (Next.js 16 di Node 18), pengaturan `.env` yang hilang (`Missing required environment variable`), build yang belum dijalankan (`dist/` atau `.next/` tidak ada) |
 | Log backend: galat koneksi database | `systemctl status postgresql`; periksa `DB_*` di `.env` |
 | Log backend: `column ... does not exist` | Ada migrasi yang belum dijalankan (bagian 7) |
+| Seseorang tidak bisa login: "Terlalu banyak percobaan login yang gagal" | Terlalu banyak password salah dari jaringannya. Berakhir sendiri setelah 15 menit; *Lupa Password* tetap bisa dipakai. Untuk menghapus semua waktu tunggu sekaligus: `sudo systemctl restart prafi-backend` |
 | Email tidak sampai | Log backend menampilkan galat emailnya; periksa `SMTP_*` (app password Gmail masih berlaku?) |
 | Halaman publik menampilkan data lama | Halaman di-cache hingga 60 detik; periksa `REVALIDATE_SECRET` sama di kedua berkas `.env` |
 | Disk penuh | `df -h`; log lama: `sudo journalctl --vacuum-time=14d` |
