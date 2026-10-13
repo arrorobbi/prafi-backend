@@ -2005,7 +2005,7 @@
                 "me"
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nUpdates your own account; send only the fields to change: `firstName`, `lastName`, `phoneNumber`, `email`, `faceImageId` (or `null`), `tenantName` (tenants only), `password` + `currentPassword`.\n\n`id`, `role` and `mailActive` can never be changed here. Replacing `faceImageId` (or setting it to `null`) deletes the old image and its file.",
+            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nUpdates your own account; send only the fields to change: `firstName`, `lastName`, `phoneNumber`, `email`, `faceImageId` (or `null`), `tenantName` (tenants only), `password` + `currentPassword`.\n\n`id`, `role` and `mailActive` can never be changed here. Replacing `faceImageId` (or setting it to `null`) deletes the old image and its file. A new `faceImageId` must be a picture that shows a **face**: 400 `FACE_NOT_FOUND` (field `faceImageId`) otherwise, also when it was uploaded without `?purpose=face`.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"firstName\": \"Andi\",\n  \"phoneNumber\": \"081234567899\"\n}",
@@ -2049,7 +2049,7 @@
                     "me"
                   ]
                 },
-                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nUpdates your own account; send only the fields to change: `firstName`, `lastName`, `phoneNumber`, `email`, `faceImageId` (or `null`), `tenantName` (tenants only), `password` + `currentPassword`.\n\n`id`, `role` and `mailActive` can never be changed here. Replacing `faceImageId` (or setting it to `null`) deletes the old image and its file.",
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nUpdates your own account; send only the fields to change: `firstName`, `lastName`, `phoneNumber`, `email`, `faceImageId` (or `null`), `tenantName` (tenants only), `password` + `currentPassword`.\n\n`id`, `role` and `mailActive` can never be changed here. Replacing `faceImageId` (or setting it to `null`) deletes the old image and its file. A new `faceImageId` must be a picture that shows a **face**: 400 `FACE_NOT_FOUND` (field `faceImageId`) otherwise, also when it was uploaded without `?purpose=face`.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"firstName\": \"Andi\",\n  \"phoneNumber\": \"081234567899\"\n}",
@@ -2093,7 +2093,7 @@
                     "me"
                   ]
                 },
-                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nUpdates your own account; send only the fields to change: `firstName`, `lastName`, `phoneNumber`, `email`, `faceImageId` (or `null`), `tenantName` (tenants only), `password` + `currentPassword`.\n\n`id`, `role` and `mailActive` can never be changed here. Replacing `faceImageId` (or setting it to `null`) deletes the old image and its file.",
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nUpdates your own account; send only the fields to change: `firstName`, `lastName`, `phoneNumber`, `email`, `faceImageId` (or `null`), `tenantName` (tenants only), `password` + `currentPassword`.\n\n`id`, `role` and `mailActive` can never be changed here. Replacing `faceImageId` (or setting it to `null`) deletes the old image and its file. A new `faceImageId` must be a picture that shows a **face**: 400 `FACE_NOT_FOUND` (field `faceImageId`) otherwise, also when it was uploaded without `?purpose=face`.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"firstName\": \"Andi\",\n  \"phoneNumber\": \"081234567899\"\n}",
@@ -2137,9 +2137,17 @@
               "path": [
                 "api",
                 "images"
+              ],
+              "query": [
+                {
+                  "key": "purpose",
+                  "value": "face",
+                  "disabled": true,
+                  "description": "turn on for an account photo: the picture must show a face"
+                }
               ]
             },
-            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nmultipart/form-data, field **image** (pick a file in Body → form-data). Saves `{{imageId}}` and `{{imagePath}}` (`imgUrl`; the response also has the full link in `url`).\n\nAn image can be used once: as one product image, one tenant logo or one face image.",
+            "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nmultipart/form-data, field **image** (pick a file in Body → form-data). Saves `{{imageId}}` and `{{imagePath}}` (`imgUrl`; the response also has the full link in `url`).\n\nAn image can be used once: as one product image, one tenant logo or one face image.\n\n**Account photo:** add the query `?purpose=face` when the picture is for an account's profile photo (`faceImageId`). The server checks that it shows a **face** (a face detector running on the server; nothing about the face is stored) and answers 400 `FACE_NOT_FOUND` if not, so the person hears it right at upload. The check takes about half a second.",
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -2185,7 +2193,7 @@
                     "images"
                   ]
                 },
-                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nmultipart/form-data, field **image** (pick a file in Body → form-data). Saves `{{imageId}}` and `{{imagePath}}` (`imgUrl`; the response also has the full link in `url`).\n\nAn image can be used once: as one product image, one tenant logo or one face image.",
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nmultipart/form-data, field **image** (pick a file in Body → form-data). Saves `{{imageId}}` and `{{imagePath}}` (`imgUrl`; the response also has the full link in `url`).\n\nAn image can be used once: as one product image, one tenant logo or one face image.\n\n**Account photo:** add the query `?purpose=face` when the picture is for an account's profile photo (`faceImageId`). The server checks that it shows a **face** (a face detector running on the server; nothing about the face is stored) and answers 400 `FACE_NOT_FOUND` if not, so the person hears it right at upload. The check takes about half a second.",
                 "body": {
                   "mode": "formdata",
                   "formdata": [
@@ -2229,7 +2237,7 @@
                     "images"
                   ]
                 },
-                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nmultipart/form-data, field **image** (pick a file in Body → form-data). Saves `{{imageId}}` and `{{imagePath}}` (`imgUrl`; the response also has the full link in `url`).\n\nAn image can be used once: as one product image, one tenant logo or one face image.",
+                "description": "**Access:** any logged-in role (superadmin, disnakertrans, admin, tenant)\n\nmultipart/form-data, field **image** (pick a file in Body → form-data). Saves `{{imageId}}` and `{{imagePath}}` (`imgUrl`; the response also has the full link in `url`).\n\nAn image can be used once: as one product image, one tenant logo or one face image.\n\n**Account photo:** add the query `?purpose=face` when the picture is for an account's profile photo (`faceImageId`). The server checks that it shows a **face** (a face detector running on the server; nothing about the face is stored) and answers 400 `FACE_NOT_FOUND` if not, so the person hears it right at upload. The check takes about half a second.",
                 "body": {
                   "mode": "formdata",
                   "formdata": [

@@ -234,7 +234,7 @@ Error: 400 validasi (`password` kurang dari 8 karakter), 400 `RESET_LINK_INVALID
 Akun yang sedang login beserta `faceImage`, `approval` akunnya, dan `mailActive`.
 
 === REQ Update Me (All roles) => Ubah Akun Saya
-Mengubah akun Anda sendiri; kirim hanya field yang ingin diubah: `firstName`, `lastName`, `phoneNumber`, `email`, `faceImageId` (atau `null`), `tenantName` (khusus tenant), `password` + `currentPassword`.
+Mengubah akun Anda sendiri; kirim hanya field yang ingin diubah: `firstName`, `lastName`, `phoneNumber`, `email`, `faceImageId` (atau `null`), `tenantName` (khusus tenant), `password` + `currentPassword`. `faceImageId` yang baru harus berupa gambar yang menampilkan **wajah**: 400 `FACE_NOT_FOUND` (field `faceImageId`) bila tidak, juga bila gambarnya diunggah tanpa `?purpose=face`.
 
 `id`, `role`, dan `mailActive` tidak pernah bisa diubah di sini. Jika `faceImageId` diganti (atau `null`), gambar lama beserta filenya dihapus.
 
@@ -247,6 +247,8 @@ Setiap kegagalan unggah memiliki pesan yang jelas dan `code` sendiri: `IMAGE_REQ
 multipart/form-data, field **image** (pilih file di Body → form-data). Menyimpan `{{imageId}}` dan `{{imagePath}}` (`imgUrl`; respons juga berisi link lengkap di `url`).
 
 Satu gambar hanya bisa dipakai sekali: sebagai satu gambar produk, satu logo tenant, atau satu foto wajah.
+
+**Foto akun:** tambahkan query `?purpose=face` bila gambar ini untuk foto profil akun (`faceImageId`). Server memeriksa bahwa gambar menampilkan **wajah** (pendeteksi wajah berjalan di server; tidak ada data wajah yang disimpan) dan menjawab 400 `FACE_NOT_FOUND` bila tidak, sehingga pengguna langsung tahu saat mengunggah. Pemeriksaan sekitar setengah detik.
 
 === REQ Open Image (Public) => Buka Gambar
 Link publik gambar yang diunggah (`{{baseUrl}}` + `imgUrl`), seperti yang dimuat oleh frontend.

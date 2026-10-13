@@ -8,6 +8,7 @@ import type { AuthUser } from '../types/express';
 import { signAccessToken } from '../utils/jwt';
 import { readablePassword } from '../utils/readablePassword';
 import * as emailVerification from './emailVerification.service';
+import { assertFaceImage } from './faceDetection.service';
 import * as imageService from './image.service';
 import { assertLoginAllowed, clearLoginFailures, recordLoginFailure } from './loginGuard.service';
 import { notify } from './notification.service';
@@ -86,6 +87,7 @@ export async function register(creator: AuthUser | null, input: RegisterInput) {
         { field: 'faceImageId', message: 'Gambar tidak ditemukan, unggah terlebih dahulu melalui POST /api/images' },
       ]);
     }
+    await assertFaceImage(input.faceImageId);
   }
 
   const temporaryPassword = input.role === ROLES.DISNAKERTRANS ? readablePassword() : undefined;
@@ -146,6 +148,8 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
         { field: 'faceImageId', message: 'Gambar tidak ditemukan, unggah terlebih dahulu melalui POST /api/images' },
       ]);
     }
+    // Only a new photo is checked: the one already on the account stays as it is
+    if (changes.faceImageId !== user.faceImageId) await assertFaceImage(changes.faceImageId);
   }
 
   // The password is hashed by the model's beforeSave hook.

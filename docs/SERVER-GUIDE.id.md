@@ -522,7 +522,7 @@ Setiap permintaan melewati rantai yang sama. Dengan mengetahuinya, Anda tahu ber
 | `src/constants/` | Daftar tetap: `roles.ts` (empat peran dan **siapa boleh melakukan apa**), `notifications.ts`, `realtime.ts` (nama event langsung), `products.ts` (aturan label *rekomendasi*) |
 | `src/routes/` | Satu berkas per bidang: `auth`, `user`, `approval`, `product`, `productCategory`, `review`, `tenant`, `image`, `notification`, `stats`, `apiLog`, `landing` (halaman publik), `serverDocs` (panduan ini), `serverMonitor` (Monitor Server). `index.ts` menggabungkannya di bawah `/api` |
 | `src/controllers/` | Pemeriksaan masukan dan jawaban, satu berkas per bidang |
-| `src/services/` | Logika, satu berkas per bidang, ditambah `mail.service.ts`, `emailVerification.service.ts` (OTP, aktivasi Disnakertrans), `passwordReset.service.ts`, `backup.service.ts`, `imageCleanup.service.ts`, `apiLog.service.ts`, `serverMonitor.service.ts`, `loginGuard.service.ts` |
+| `src/services/` | Logika, satu berkas per bidang, ditambah `mail.service.ts`, `emailVerification.service.ts` (OTP, aktivasi Disnakertrans), `passwordReset.service.ts`, `backup.service.ts`, `imageCleanup.service.ts`, `apiLog.service.ts`, `serverMonitor.service.ts`, `loginGuard.service.ts`, `faceDetection.service.ts` |
 | `src/models/` | Tabel database dalam bentuk kode; `index.ts` menghubungkannya |
 | `src/middlewares/` | `auth.ts` (token dan peran), `requestLogger.ts` (baris konsol dan Log API), `upload.ts`, `errorHandler.ts`, `landingRefresh.ts` (memberi tahu website agar menyegarkan halaman yang di-cache) |
 | `src/mail/templates.ts` | Semua email (Bahasa Indonesia): subjek, HTML, dan teks biasa |
@@ -568,7 +568,7 @@ sudo systemctl restart prafi-backend
 journalctl -u prafi-backend -n 20     # harus berakhir dengan "Server running on ..."
 ```
 
-Skrip bantu `bash ~/deploy.sh` mengerjakan seluruh pembaruan sekaligus: cadangan database, migrasi baru, build backend, build frontend, lalu restart (skrip mencetak perintah restart bila tidak dapat meminta password sudo).
+Skrip bantu `bash ~/deploy.sh` mengerjakan seluruh pembaruan sekaligus: cadangan database, migrasi baru, `npm install` bila ada paket baru, build backend, build frontend, lalu restart (skrip mencetak perintah restart bila tidak dapat meminta password sudo).
 
 ### Migrasi database
 
@@ -790,7 +790,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 
 ![Kalkulator Profit & Iklan](panduan/fitur-tenant-kalkulator.jpg)
 
-- **Notifikasi** (langsung, dengan tanda belum dibaca), **Bantuan & Ketentuan**, dan **Pengaturan Akun** (nama, telepon, foto, password).
+- **Notifikasi** (langsung, dengan tanda belum dibaca), **Bantuan & Ketentuan**, dan **Pengaturan Akun** (nama, telepon, foto, password). Foto akun harus menampilkan wajah pemiliknya; gambar lain ditolak saat diunggah.
 
 ![Notifikasi](panduan/fitur-notifikasi.jpg)
 
@@ -866,6 +866,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 | Notifikasi langsung | Notifikasi, daftar ulasan, dan tanda belum dibaca diperbarui tanpa memuat ulang (Socket.IO) | `src/realtime/socket.ts` |
 | Perlindungan login | 5 password salah untuk satu akun dari satu jaringan, atau 20 dari satu jaringan untuk akun mana pun, dalam 15 menit: jaringan itu harus menunggu (429). Dihitung di memori backend, jadi restart menghapusnya | `src/services/loginGuard.service.ts` |
 | Sesi | Login berakhir setelah **1 jam tanpa aktivitas**: selama pengguna mengeklik atau mengetik, website memperpanjangnya (paling sering sekali semenit), sampai **12 jam** setelah login. Logout, penonaktifan, atau atur ulang kata sandi langsung mengakhiri sesi | `src/services/auth.service.ts` (`refreshSession`), frontend `src/lib/auth.tsx` |
+| Pemeriksaan foto akun | Foto akun yang baru harus menampilkan wajah. Pendeteksi wajah di server memeriksanya saat diunggah (sekitar setengah detik) dan sekali lagi saat disimpan; logo, produk, atau pemandangan ditolak. Tidak ada data wajah yang disimpan. Pemeriksaan pertama setelah restart memuat pendeteksi, yang menambah sekitar 300 MB memori backend | `src/services/faceDetection.service.ts` |
 | Unggah foto | Foto terunggah saat dipilih dan ditautkan saat *Simpan*; yang tidak terpakai dihapus setiap malam | bagian 7 dan 12 |
 | Perlindungan ulasan | Pemeriksaan "bukan robot", satu ulasan per produk per hari, maksimal 5 ulasan dalam 10 menit per jaringan, pelaporan dan penyembunyian. Alamat IP pengunjung hanya disimpan sebagai hash | `src/services/review.service.ts` |
 | Cadangan mingguan | Database dan foto, disimpan di server dan dikirim lewat email | bagian 7 |
@@ -988,6 +989,7 @@ Lalu periksa `/panduan` (dan **Bantuan & Ketentuan** sebagai penjual). Kesalahan
 | Log backend: galat koneksi database | `systemctl status postgresql`; periksa `DB_*` di `.env` |
 | Log backend: `column ... does not exist` | Ada migrasi yang belum dijalankan (bagian 7) |
 | Seseorang tidak bisa login: "Terlalu banyak percobaan login yang gagal" | Terlalu banyak password salah dari jaringannya. Berakhir sendiri setelah 15 menit; *Lupa Password* tetap bisa dipakai. Untuk menghapus semua waktu tunggu sekaligus: `sudo systemctl restart prafi-backend` |
+| Foto wajah asli ditolak sebagai foto akun ("Wajah tidak terlihat pada foto") | Pendeteksi memerlukan wajah yang cukup jelas: minta foto yang menghadap kamera dengan cahaya cukup. Bila foto yang jelas pun ditolak, turunkan `MIN_SCORE` di `src/services/faceDetection.service.ts` (lalu build dan restart). Bila log menampilkan `[face] detection could not run`, pendeteksinya rusak (jalankan `npm install` di backend) dan sementara itu foto diterima tanpa diperiksa |
 | Email masuk ke folder **Spam** penerima | Situs mengirim lewat akun Gmail gratis, yang kurang dipercaya penyedia email untuk surat otomatis; emailnya dibuat sederhana untuk membantu (tanpa web font, tanpa tautan promosi). Minta penerima menandainya *Bukan spam*. Perbaikan yang tahan lama adalah mengirim dari domain situs sendiri melalui layanan email, dengan record SPF, DKIM, dan DMARC yang dipasang oleh pengelola `manokwarikab.go.id`, lalu ubah `SMTP_*` dan `MAIL_FROM` di `.env` backend |
 | Email tidak sampai | Log backend menampilkan galat emailnya; periksa `SMTP_*` (app password Gmail masih berlaku?) |
 | Halaman publik menampilkan data lama | Halaman di-cache hingga 60 detik; periksa `REVALIDATE_SECRET` sama di kedua berkas `.env` |

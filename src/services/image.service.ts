@@ -3,6 +3,7 @@ import path from 'node:path';
 import { IMAGES_DIR, IMAGES_URL_PATH } from '../config/upload';
 import { HttpError } from '../errors/HttpError';
 import { Image, Product, ProductCategory, Tenant, User } from '../models';
+import { assertFaceInFile, rememberFaceImage } from './faceDetection.service';
 
 /** The first bytes of each allowed type, so a renamed non-image (e.g. a PDF saved as .jpg) is refused. */
 const SIGNATURES: Record<string, (b: Buffer) => boolean> = {
@@ -26,8 +27,9 @@ async function readHead(filePath: string) {
 /**
  * Saves an uploaded file (from the `uploadImage` middleware) as an Image record. Every failure says why in
  * Bahasa Indonesia, and the file is removed again so nothing is left behind.
+ * `face`: the picture is meant as an account photo, so it must show a face (POST /api/images?purpose=face).
  */
-export async function createFromUpload(file: Express.Multer.File, altText: string | undefined, uploaderId: string) {
+export async function createFromUpload(file: Express.Multer.File, altText: string | undefined, uploaderId: string, { face = false } = {}) {
   const discard = () => fs.unlink(file.path).catch(() => {});
 
   if (file.size === 0) {
@@ -45,13 +47,24 @@ export async function createFromUpload(file: Express.Multer.File, altText: strin
     );
   }
 
+  if (face) {
+    try {
+      await assertFaceInFile(file.path);
+    } catch (err) {
+      await discard();
+      throw err;
+    }
+  }
+
   try {
-    return await Image.create({
+    const image = await Image.create({
       name: file.originalname,
       imgUrl: `${IMAGES_URL_PATH}/${file.filename}`,
       altText: altText?.trim() || path.parse(file.originalname).name,
       uploaderId,
     });
+    if (face) rememberFaceImage(image.id);
+    return image;
   } catch (err) {
     // Don't leave orphan files behind if the DB insert fails
     await discard();
