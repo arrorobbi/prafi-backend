@@ -1,8 +1,11 @@
 /**
  * Email templates (Bahasa Indonesia). Each returns the subject, an HTML body and a plain-text body.
  * HTML uses inline styles and tables only, which is what email clients reliably support.
- * The look follows the Transniaga landing page: logo + orange/navy brand on white, a navy "about" block and an
- * orange link bar at the bottom, orange pill buttons, Poppins (falls back to Arial where web fonts don't load).
+ * The look follows the Transniaga landing page: logo + orange/navy brand on white, orange pill buttons.
+ *
+ * Kept plain on purpose, so mail providers treat them as personal account messages and not as bulk mail (which
+ * lands in Spam / Promotions): no web font or other outside file apart from the logo, no marketing block or menu of
+ * links in the footer, and only the links the message is about. Each has a short preview line (`preheader`).
  */
 import { env } from '../config/env';
 import type { MailMessage } from '../services/mail.service';
@@ -18,7 +21,7 @@ const ORANGE_SOFT = '#fdf1e7';
 const TEXT = '#1b1b1b';
 const MUTED = '#6b7280';
 const PAGE_BG = '#f4f5f7';
-const FONT = "Poppins,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const FONT = "'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 
 /** Served by the frontend, so emails show the same logo as the site. */
 export const LOGO_URL = `${env.frontendUrl}/logo.png`;
@@ -47,20 +50,20 @@ const AUTO_NOTICE =
   `Email ini dikirim otomatis oleh sistem ${BRAND}, mohon tidak membalas email ini. ` +
   'Jika Anda tidak merasa mendaftar atau tidak mengenali akun ini, abaikan email ini.';
 
-function layout(title: string, bodyHtml: string) {
+/** `preheader`: the line mail apps show next to the subject (hidden in the message itself) */
+function layout(title: string, bodyHtml: string, preheader = '') {
   const site = escape(env.frontendUrl);
-  const year = new Date().getFullYear();
   return `<!doctype html>
 <html lang="id">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escape(title)} · ${BRAND}</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body style="margin:0;padding:0;background:${PAGE_BG};font-family:${FONT};color:${TEXT};">
+  ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escape(preheader)}</div>` : ''}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${PAGE_BG};padding:32px 12px;">
     <tr><td align="center">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 14px 30px rgba(14,60,105,0.12);">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:20px;overflow:hidden;border:1px solid #e5e7eb;">
         <tr><td style="padding:22px 32px;border-bottom:3px solid ${ORANGE};">
           <a href="${site}" style="text-decoration:none;">
             <table role="presentation" cellpadding="0" cellspacing="0"><tr>
@@ -76,15 +79,9 @@ function layout(title: string, bodyHtml: string) {
           <div style="font-size:21px;font-weight:700;color:${NAVY};">${escape(title)}</div>
         </td></tr>
         <tr><td style="padding:12px 32px 28px;font-size:15px;line-height:1.6;">${bodyHtml}</td></tr>
-        <tr><td style="background:${NAVY};color:#ffffff;padding:22px 32px;font-size:13px;line-height:1.6;">
-          <strong>UMKM ${BRAND.toUpperCase()}</strong> adalah direktori dan marketplace UMKM ${PLACE}, dibangun dari semangat gotong royong untuk memajukan perekonomian lokal.
-          <div style="margin-top:10px;font-size:12px;opacity:.8;">${AUTO_NOTICE}</div>
-        </td></tr>
-        <tr><td style="background:${ORANGE};color:#ffffff;padding:14px 32px;font-size:12px;">
-          <a href="${site}/produk" style="color:#ffffff;font-weight:600;text-decoration:none;">Produk</a> &nbsp;·&nbsp;
-          <a href="${site}/umkm" style="color:#ffffff;font-weight:600;text-decoration:none;">UMKM</a> &nbsp;·&nbsp;
-          <a href="${site}/panduan" style="color:#ffffff;font-weight:600;text-decoration:none;">Panduan</a>
-          <div style="margin-top:6px;">© ${year} ${BRAND} · ${PLACE}</div>
+        <tr><td style="background:${PAGE_BG};color:${MUTED};padding:18px 32px;font-size:12px;line-height:1.6;border-top:1px solid #e5e7eb;">
+          ${AUTO_NOTICE}
+          <div style="margin-top:8px;">${BRAND} · ${PLACE} · <a href="${site}" style="color:${MUTED};">${site.replace(/^https?:\/\//, '')}</a></div>
         </td></tr>
       </table>
     </td></tr>
@@ -135,6 +132,7 @@ export function disnakertransAccountCreated(
      ${copyLink(link)}
      <p>Tautan dan kata sandi sementara ini berlaku selama <strong>${validHours} jam</strong>. Kata sandi sementara tidak dapat dipakai untuk masuk: akun baru dapat digunakan setelah Anda membuat kata sandi baru.</p>
      ${SIGN_OFF}`,
+    'Kata sandi sementara dan tautan untuk mengaktifkan akun Anda.',
   );
   const text = [
     `Halo ${name},`,
@@ -155,7 +153,7 @@ export function disnakertransAccountCreated(
 /** To a self-registered admin or tenant: the account exists, confirm the email with this OTP. */
 export function accountCreatedOtp(user: Recipient, code: string, validMinutes: number, resent = false): Omit<MailMessage, 'to'> {
   const name = `${user.firstName} ${user.lastName}`;
-  const subject = resent ? `Kode OTP baru ${BRAND} Anda: ${code}` : `Akun ${BRAND} Anda telah dibuat - kode OTP ${code}`;
+  const subject = `${code} adalah kode verifikasi ${BRAND} Anda`;
   const role = ROLE_NAMES[user.role] ?? user.role;
   const waitForApproval =
     user.role === 'admin'
@@ -176,6 +174,7 @@ export function accountCreatedOtp(user: Recipient, code: string, validMinutes: n
      <p>Kode ini berlaku selama <strong>${validMinutes} menit</strong>. Jangan berikan kode ini kepada siapa pun.</p>
      ${waitForApproval}
      ${SIGN_OFF}`,
+    `Kode verifikasi Anda ${code}, berlaku ${validMinutes} menit.`,
   );
   const text = [
     `Halo ${name},`,
@@ -337,6 +336,7 @@ export function passwordResetRequested(user: Recipient, link: string, validMinut
      <p>Tautan ini berlaku selama <strong>${validMinutes} menit</strong> dan hanya dapat digunakan satu kali. Setelah kata sandi diubah, semua sesi login Anda akan diakhiri.</p>
      <p>Jika Anda tidak meminta pengaturan ulang kata sandi, abaikan email ini. Kata sandi Anda tidak akan berubah.</p>
      ${SIGN_OFF}`,
+    `Tautan untuk membuat kata sandi baru, berlaku ${validMinutes} menit.`,
   );
   const text = [
     `Halo ${name},`,

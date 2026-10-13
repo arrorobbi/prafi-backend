@@ -987,6 +987,7 @@ Then check `/panduan` (and **Bantuan & Ketentuan** as a seller). Common mistakes
 | Backend log: database connection error | `systemctl status postgresql`; check `DB_*` in `.env` |
 | Backend log: `column ... does not exist` | A migration wasn't run (section 7) |
 | Someone can't log in: "Terlalu banyak percobaan login yang gagal" | Too many wrong passwords from their network. It ends by itself after 15 minutes; *Lupa Password* works meanwhile. To clear every wait at once: `sudo systemctl restart prafi-backend` |
+| Emails land in the recipient's **Spam** folder | The site sends through a free Gmail account, which mail providers trust less for automatic mail; the emails are kept plain to help (no web fonts, no marketing links). Ask the recipient to mark it *Not spam*. The lasting fix is to send from the site's own domain through a mail service, with SPF, DKIM and DMARC records set by whoever manages `manokwarikab.go.id`, then change `SMTP_*` and `MAIL_FROM` in the backend `.env` |
 | Emails don't arrive | Backend log shows the mail error; check `SMTP_*` (Gmail app password still valid?) |
 | Public pages show old data | They are cached up to 60 s; check `REVALIDATE_SECRET` is the same in both `.env` files |
 | Disk full, or the email *Peringatan: disk server … terisi …%* arrived | See what takes space in the dashboard's **Monitor Server**, or `df -h`. Clear old logs (`sudo journalctl --vacuum-time=14d`), old manual backups in the home folder, or keep fewer weekly backups (`BACKUP_KEEP`). Size of each top folder: `sudo du -xh / --max-depth=1` |

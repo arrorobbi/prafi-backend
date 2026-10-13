@@ -29,7 +29,12 @@ export interface MailMessage {
 }
 
 export async function sendMail(message: MailMessage) {
-  await transport().sendMail({ from: env.mail.from, ...message });
+  await transport().sendMail({
+    from: env.mail.from,
+    // Marks the message as sent by a system for one person (not bulk mail), and stops "out of office" replies
+    headers: { 'Auto-Submitted': 'auto-generated', 'X-Auto-Response-Suppress': 'All' },
+    ...message,
+  });
   if (mailIsSimulated) {
     console.log(
       `\n[mail] NOT SENT (SMTP_HOST is not set) → ${message.to}\n[mail] Subject: ${message.subject}\n${message.text.replace(/^/gm, '[mail] ')}\n` +
