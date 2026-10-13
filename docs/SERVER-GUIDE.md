@@ -196,6 +196,7 @@ Each app reads its `.env` file at start. The backend reads it when the service s
 | `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile **secret** key: the backend confirms the review form's "not a robot" check with it. Empty = the check is skipped (warning at startup). Keep it secret; the matching *site* key is in the frontend `.env` |
 | `LOG_RETENTION_DAYS` | Days of API logs to keep (default 30) |
 | `BACKUP_DIR`, `BACKUP_KEEP`, `BACKUP_EMAIL_TO` | Weekly backup (section 7): folder (default `~/backups/prafi`), how many runs to keep (8), and who gets the email (default: the SMTP account; `off` = none) |
+| `DISK_ALERT_PERCENT`, `DISK_ALERT_EMAIL_TO` | Server monitor (section 14): an email is sent when the disk is this full (percent, default 90; 0 = no alert), to this address (default: the SMTP account; `off` = nobody) |
 | `DB_LOGGING` | `true` prints every SQL query (debugging only) |
 
 **Frontend** `/home/prafi/project/prafi-frontend/.env`:
@@ -518,9 +519,9 @@ Every request passes the same chain. Knowing it tells you which file to open:
 | `src/app.ts` | The Express app: security headers, CORS, `/images` (uploaded photos), `/docs` (public API docs), `/api` routes, error handler |
 | `src/config/` | `env.ts` reads `.env` (a missing required setting stops the start), `database.ts` the database connection, `upload.ts` photo limits (5 MB, allowed types) and the `images/` folder |
 | `src/constants/` | Fixed lists: `roles.ts` (the four roles and **who may do what**), `notifications.ts`, `realtime.ts` (live event names), `products.ts` (rules for the *recommended* label) |
-| `src/routes/` | One file per area: `auth`, `user`, `approval`, `product`, `productCategory`, `review`, `tenant`, `image`, `notification`, `stats`, `apiLog`, `landing` (public pages), `serverDocs` (this guide). `index.ts` joins them under `/api` |
+| `src/routes/` | One file per area: `auth`, `user`, `approval`, `product`, `productCategory`, `review`, `tenant`, `image`, `notification`, `stats`, `apiLog`, `landing` (public pages), `serverDocs` (this guide), `serverMonitor` (Monitor Server). `index.ts` joins them under `/api` |
 | `src/controllers/` | Input checks and answers, one file per area |
-| `src/services/` | Logic, one file per area, plus `mail.service.ts`, `emailVerification.service.ts` (OTP, Disnakertrans activation), `passwordReset.service.ts`, `backup.service.ts`, `imageCleanup.service.ts`, `apiLog.service.ts` |
+| `src/services/` | Logic, one file per area, plus `mail.service.ts`, `emailVerification.service.ts` (OTP, Disnakertrans activation), `passwordReset.service.ts`, `backup.service.ts`, `imageCleanup.service.ts`, `apiLog.service.ts`, `serverMonitor.service.ts`, `loginGuard.service.ts` |
 | `src/models/` | Database tables as code; `index.ts` links them together |
 | `src/middlewares/` | `auth.ts` (token and role), `requestLogger.ts` (console line and Log API), `upload.ts`, `errorHandler.ts`, `landingRefresh.ts` (tells the website to refresh its cached pages) |
 | `src/mail/templates.ts` | Every email (Bahasa Indonesia): subject, HTML and plain text |
@@ -622,6 +623,7 @@ They run inside the backend service; there is no cron to look after. All times a
 | Delete unused uploaded photos | every night, 00:00 | `src/services/imageCleanup.service.ts` |
 | Backup of database and photos, emailed | every Sunday, 00:00 | `src/services/backup.service.ts` |
 | Delete old Log API rows (older than `LOG_RETENTION_DAYS`) | daily | `src/services/apiLog.service.ts` |
+| Disk check, with an email when it is almost full | every 10 minutes | `src/services/serverMonitor.service.ts` |
 
 ### Adding or changing an endpoint
 
@@ -849,6 +851,10 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 
 ![Log API](panduan/fitur-superadmin-log.jpg)
 
+- **Monitor Server**: CPU, RAM and disk of the server live (a new reading every 3 seconds while the page is open, with a chart of the last 5 minutes), whether the backend, website, maintenance page, PostgreSQL and nginx are running, and how much the database, photos and backups take. Nothing is stored.
+
+![Monitor Server](panduan/fitur-superadmin-monitor.jpg)
+
 - **Panduan Server**: this guide, in English and Bahasa Indonesia, light or dark.
 
 ### Behind the scenes
@@ -862,6 +868,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 | Photo uploads | A photo uploads when picked and is attached on *Simpan*; unused ones are deleted every night | sections 7 and 12 |
 | Review protection | "Not a robot" check, one review per product per day, at most 5 reviews in 10 minutes per network, reporting and hiding. Visitors' IP addresses are stored only as a hash | `src/services/review.service.ts` |
 | Weekly backup | Database and photos, kept on the server and emailed | section 7 |
+| Disk alert | Every 10 minutes the backend checks the disk; at `DISK_ALERT_PERCENT` (90) or more it emails the site's mailbox what takes space and what can be cleared, at most once a day | `src/services/serverMonitor.service.ts` |
 | Search engines (SEO) | Titles, descriptions, sitemap, structured data, `http` to `https` | frontend README, *SEO* |
 | Maintenance page | Shown instead of the website during updates, in two languages | section 5 |
 | Public API docs | `/docs` on the API domain, in English and Bahasa Indonesia, with flow charts | `npm run docs` |
@@ -982,7 +989,7 @@ Then check `/panduan` (and **Bantuan & Ketentuan** as a seller). Common mistakes
 | Someone can't log in: "Terlalu banyak percobaan login yang gagal" | Too many wrong passwords from their network. It ends by itself after 15 minutes; *Lupa Password* works meanwhile. To clear every wait at once: `sudo systemctl restart prafi-backend` |
 | Emails don't arrive | Backend log shows the mail error; check `SMTP_*` (Gmail app password still valid?) |
 | Public pages show old data | They are cached up to 60 s; check `REVALIDATE_SECRET` is the same in both `.env` files |
-| Disk full | `df -h`; old logs: `sudo journalctl --vacuum-time=14d` |
+| Disk full, or the email *Peringatan: disk server … terisi …%* arrived | See what takes space in the dashboard's **Monitor Server**, or `df -h`. Clear old logs (`sudo journalctl --vacuum-time=14d`), old manual backups in the home folder, or keep fewer weekly backups (`BACKUP_KEEP`). Size of each top folder: `sudo du -xh / --max-depth=1` |
 | HTTPS certificate expired | `sudo certbot renew` and check its output |
 
 ## 17. Things to improve

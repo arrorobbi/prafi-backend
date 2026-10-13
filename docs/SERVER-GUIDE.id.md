@@ -196,6 +196,7 @@ Setiap aplikasi membaca berkas `.env` miliknya saat mulai. Backend membacanya sa
 | `TURNSTILE_SECRET_KEY` | Kunci **rahasia** Cloudflare Turnstile: backend memastikan pemeriksaan "bukan robot" pada form ulasan dengannya. Kosong = pemeriksaan dilewati (ada peringatan saat start). Jaga kerahasiaannya; kunci *site* pasangannya ada di `.env` frontend |
 | `LOG_RETENTION_DAYS` | Lama penyimpanan log API dalam hari (bawaan 30) |
 | `BACKUP_DIR`, `BACKUP_KEEP`, `BACKUP_EMAIL_TO` | Cadangan mingguan (bagian 7): folder (bawaan `~/backups/prafi`), jumlah cadangan yang disimpan (8), dan penerima email (bawaan: akun SMTP; `off` = tidak dikirim) |
+| `DISK_ALERT_PERCENT`, `DISK_ALERT_EMAIL_TO` | Monitor server (bagian 14): email dikirim saat disk terisi sebanyak ini (persen, bawaan 90; 0 = tanpa peringatan), ke alamat ini (bawaan: akun SMTP; `off` = tidak dikirim) |
 | `DB_LOGGING` | `true` mencetak setiap kueri SQL (hanya untuk mencari masalah) |
 
 **Frontend** `/home/prafi/project/prafi-frontend/.env`:
@@ -518,9 +519,9 @@ Setiap permintaan melewati rantai yang sama. Dengan mengetahuinya, Anda tahu ber
 | `src/app.ts` | Aplikasi Express: header keamanan, CORS, `/images` (foto unggahan), `/docs` (dokumentasi API publik), route `/api`, penangan galat |
 | `src/config/` | `env.ts` membaca `.env` (pengaturan wajib yang hilang menghentikan start), `database.ts` koneksi database, `upload.ts` batas foto (5 MB, jenis yang diizinkan) dan folder `images/` |
 | `src/constants/` | Daftar tetap: `roles.ts` (empat peran dan **siapa boleh melakukan apa**), `notifications.ts`, `realtime.ts` (nama event langsung), `products.ts` (aturan label *rekomendasi*) |
-| `src/routes/` | Satu berkas per bidang: `auth`, `user`, `approval`, `product`, `productCategory`, `review`, `tenant`, `image`, `notification`, `stats`, `apiLog`, `landing` (halaman publik), `serverDocs` (panduan ini). `index.ts` menggabungkannya di bawah `/api` |
+| `src/routes/` | Satu berkas per bidang: `auth`, `user`, `approval`, `product`, `productCategory`, `review`, `tenant`, `image`, `notification`, `stats`, `apiLog`, `landing` (halaman publik), `serverDocs` (panduan ini), `serverMonitor` (Monitor Server). `index.ts` menggabungkannya di bawah `/api` |
 | `src/controllers/` | Pemeriksaan masukan dan jawaban, satu berkas per bidang |
-| `src/services/` | Logika, satu berkas per bidang, ditambah `mail.service.ts`, `emailVerification.service.ts` (OTP, aktivasi Disnakertrans), `passwordReset.service.ts`, `backup.service.ts`, `imageCleanup.service.ts`, `apiLog.service.ts` |
+| `src/services/` | Logika, satu berkas per bidang, ditambah `mail.service.ts`, `emailVerification.service.ts` (OTP, aktivasi Disnakertrans), `passwordReset.service.ts`, `backup.service.ts`, `imageCleanup.service.ts`, `apiLog.service.ts`, `serverMonitor.service.ts`, `loginGuard.service.ts` |
 | `src/models/` | Tabel database dalam bentuk kode; `index.ts` menghubungkannya |
 | `src/middlewares/` | `auth.ts` (token dan peran), `requestLogger.ts` (baris konsol dan Log API), `upload.ts`, `errorHandler.ts`, `landingRefresh.ts` (memberi tahu website agar menyegarkan halaman yang di-cache) |
 | `src/mail/templates.ts` | Semua email (Bahasa Indonesia): subjek, HTML, dan teks biasa |
@@ -622,6 +623,7 @@ Semuanya berjalan di dalam service backend; tidak ada cron yang perlu diurus. Se
 | Menghapus foto unggahan yang tidak terpakai | setiap malam, 00:00 | `src/services/imageCleanup.service.ts` |
 | Cadangan database dan foto, dikirim lewat email | setiap Minggu, 00:00 | `src/services/backup.service.ts` |
 | Menghapus baris Log API yang lama (lebih tua dari `LOG_RETENTION_DAYS`) | harian | `src/services/apiLog.service.ts` |
+| Pemeriksaan disk, dengan email saat hampir penuh | setiap 10 menit | `src/services/serverMonitor.service.ts` |
 
 ### Menambah atau mengubah endpoint
 
@@ -849,6 +851,10 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 
 ![Log API](panduan/fitur-superadmin-log.jpg)
 
+- **Monitor Server**: CPU, RAM, dan disk server secara langsung (pembacaan baru setiap 3 detik selama halaman terbuka, dengan grafik 5 menit terakhir), apakah backend, website, halaman pemeliharaan, PostgreSQL, dan nginx berjalan, serta berapa besar database, foto, dan cadangan. Tidak ada yang disimpan.
+
+![Monitor Server](panduan/fitur-superadmin-monitor.jpg)
+
 - **Panduan Server**: panduan ini, dalam bahasa Inggris dan Bahasa Indonesia, tema terang atau gelap.
 
 ### Di balik layar
@@ -862,6 +868,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 | Unggah foto | Foto terunggah saat dipilih dan ditautkan saat *Simpan*; yang tidak terpakai dihapus setiap malam | bagian 7 dan 12 |
 | Perlindungan ulasan | Pemeriksaan "bukan robot", satu ulasan per produk per hari, maksimal 5 ulasan dalam 10 menit per jaringan, pelaporan dan penyembunyian. Alamat IP pengunjung hanya disimpan sebagai hash | `src/services/review.service.ts` |
 | Cadangan mingguan | Database dan foto, disimpan di server dan dikirim lewat email | bagian 7 |
+| Peringatan disk | Setiap 10 menit backend memeriksa disk; pada `DISK_ALERT_PERCENT` (90) atau lebih, backend mengirim email ke kotak surat situs berisi apa yang memakai ruang dan apa yang dapat dikosongkan, paling sering sekali sehari | `src/services/serverMonitor.service.ts` |
 | Mesin pencari (SEO) | Judul, deskripsi, sitemap, data terstruktur, `http` ke `https` | README frontend, *SEO* |
 | Halaman pemeliharaan | Tampil menggantikan website saat pembaruan, dalam dua bahasa | bagian 5 |
 | Dokumentasi API publik | `/docs` pada domain API, dalam bahasa Inggris dan Bahasa Indonesia, dengan diagram alur | `npm run docs` |
@@ -982,7 +989,7 @@ Lalu periksa `/panduan` (dan **Bantuan & Ketentuan** sebagai penjual). Kesalahan
 | Seseorang tidak bisa login: "Terlalu banyak percobaan login yang gagal" | Terlalu banyak password salah dari jaringannya. Berakhir sendiri setelah 15 menit; *Lupa Password* tetap bisa dipakai. Untuk menghapus semua waktu tunggu sekaligus: `sudo systemctl restart prafi-backend` |
 | Email tidak sampai | Log backend menampilkan galat emailnya; periksa `SMTP_*` (app password Gmail masih berlaku?) |
 | Halaman publik menampilkan data lama | Halaman di-cache hingga 60 detik; periksa `REVALIDATE_SECRET` sama di kedua berkas `.env` |
-| Disk penuh | `df -h`; log lama: `sudo journalctl --vacuum-time=14d` |
+| Disk penuh, atau email *Peringatan: disk server … terisi …%* datang | Lihat apa yang memakai ruang di **Monitor Server** pada dashboard, atau `df -h`. Hapus log lama (`sudo journalctl --vacuum-time=14d`), cadangan manual lama di folder home, atau kurangi cadangan mingguan yang disimpan (`BACKUP_KEEP`). Ukuran tiap folder utama: `sudo du -xh / --max-depth=1` |
 | Sertifikat HTTPS kedaluwarsa | `sudo certbot renew` dan periksa keluarannya |
 
 ## 17. Hal yang perlu ditingkatkan

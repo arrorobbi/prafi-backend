@@ -73,6 +73,15 @@ export const env = {
     emailTo: process.env.BACKUP_EMAIL_TO ?? '',
   },
 
+  /**
+   * Server monitor (superadmin → Monitor Server). An email goes out when the disk is this full (percent; 0 = no
+   * alert) to `alertEmailTo`: empty = the SMTP account itself, "off" = nobody.
+   */
+  monitor: {
+    diskAlertPercent: Math.min(100, Math.max(0, Number(process.env.DISK_ALERT_PERCENT ?? 90) || 0)),
+    alertEmailTo: process.env.DISK_ALERT_EMAIL_TO ?? '',
+  },
+
   /** API request/error logs (GET /api/logs) older than this many days are deleted. */
   logRetentionDays: Math.max(1, Number(process.env.LOG_RETENTION_DAYS ?? 30) || 30),
 

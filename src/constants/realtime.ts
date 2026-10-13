@@ -25,6 +25,14 @@ export const REALTIME_EVENTS = {
    * action: 'created' | 'reported' | 'hidden' | 'kept' | 'unhidden'
    */
   REVIEW_CHANGED: 'review:changed',
+  /**
+   * client (superadmin) → server: the Monitor Server page is open / was left. While at least one superadmin
+   * watches, the server pushes SERVER_METRICS every few seconds. Other roles are ignored. No payload.
+   */
+  MONITOR_WATCH: 'monitor:watch',
+  MONITOR_UNWATCH: 'monitor:unwatch',
+  /** server → watching superadmins: a new reading (same shape as GET /api/server/metrics). */
+  SERVER_METRICS: 'server:metrics',
 } as const;
 
 export type ReviewChange = 'created' | 'reported' | 'hidden' | 'kept' | 'unhidden';

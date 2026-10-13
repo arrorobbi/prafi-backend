@@ -628,6 +628,39 @@ export const FLOWS: Record<string, Chart[]> = {
     },
   ],
 
+  'Server Monitor': [
+    {
+      title: { en: 'Watch the server live', id: 'Memantau server secara langsung' },
+      nodes: [
+        start('GET /api/server/metrics'),
+        ...auth('superadmin'),
+        step(
+          { en: 'Read CPU, memory, disk, services and sizes', id: 'Baca CPU, memori, disk, layanan, dan ukuran' },
+          note({ en: 'Nothing is stored; sizes are looked up at most every 30 s', id: 'Tidak ada yang disimpan; ukuran dibaca paling sering tiap 30 detik' }),
+        ),
+        step({ en: 'Socket.IO: the page sends `monitor:watch`', id: 'Socket.IO: halaman mengirim `monitor:watch`' }),
+        check({ en: 'Connection belongs to a superadmin?', id: 'Koneksi milik superadmin?' }, { en: 'Ignored', id: 'Diabaikan' }),
+        step(
+          { en: 'Push `server:metrics` every 3 seconds', id: 'Kirim `server:metrics` setiap 3 detik' },
+          note({ en: 'Only while someone watches', id: 'Hanya selama ada yang melihat' }),
+        ),
+        end({ en: '`monitor:unwatch` or disconnect: stop', id: '`monitor:unwatch` atau terputus: berhenti' }),
+      ],
+    },
+    {
+      title: { en: 'Disk alert', id: 'Peringatan disk' },
+      nodes: [
+        start({ en: 'Every 10 minutes (inside the backend)', id: 'Setiap 10 menit (di dalam backend)' }),
+        check({ en: 'Disk at DISK_ALERT_PERCENT or more?', id: 'Disk mencapai DISK_ALERT_PERCENT atau lebih?' }, { en: 'Nothing to do', id: 'Tidak ada yang dilakukan' }, 'note'),
+        check({ en: 'No alert sent in the last 24 hours?', id: 'Belum ada peringatan dalam 24 jam terakhir?' }, { en: 'Wait', id: 'Tunggu' }, 'note'),
+        end(
+          { en: 'Email to DISK_ALERT_EMAIL_TO', id: 'Email ke DISK_ALERT_EMAIL_TO' },
+          note({ en: 'What takes space and what can be cleared', id: 'Apa yang memakai ruang dan apa yang dapat dikosongkan' }),
+        ),
+      ],
+    },
+  ],
+
   Logs: [
     {
       title: { en: 'How a request is logged', id: 'Cara permintaan dicatat' },

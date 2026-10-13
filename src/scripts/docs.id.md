@@ -89,6 +89,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Log | `GET /api/logs/{{logId}}` | superadmin |
 | Panduan Server | `GET /api/docs/server` | Publik (halaman; isi superadmin) |
 | Panduan Server | `GET /api/docs/server/content` | superadmin |
+| Monitor Server | `GET /api/server/metrics` | superadmin |
 | Contoh | `GET /api/admin/ping` | superadmin, admin |
 | Contoh | `GET /api/tenant/ping` | Semua role |
 | Realtime (WebSocket) | Socket.IO di `{{baseUrl}}` | Semua role (Bearer token) |
@@ -464,6 +465,18 @@ Buka di browser. Halaman meminta login **superadmin** (*Auth → Login*), menyim
 === REQ Server Guide Content (superadmin) => Isi Panduan Server
 Panduan server dalam bentuk HTML, beserta `lang` dan `updatedAt` (kapan file terakhir diubah). Query `lang`: `id` (bawaan, `docs/SERVER-GUIDE.id.md`) atau `en` (`docs/SERVER-GUIDE.md`). Gambar yang ditulis sebagai `panduan/<nama>.jpg` mengarah ke `<FRONTEND_URL>/panduan/`. Dibaca dari file setiap request, sehingga mengubahnya tidak perlu restart. Dikirim dengan `Cache-Control: no-store`. Role lain mendapat 403.
 
+=== FOLDER Server Monitor => Monitor Server
+CPU, memori, dan disk server, layanan yang dibutuhkan situs, serta pemakaian ruang, untuk halaman **Monitor Server** di dashboard superadmin (`/api/server`).
+
+**Langsung:** setelah terhubung ke Socket.IO (*Realtime*), superadmin mengirim `monitor:watch`; server lalu mengirim `server:metrics` setiap 3 detik sampai `monitor:unwatch` atau koneksi terputus. Selama tidak ada yang melihat, tidak ada yang dikumpulkan, dan tidak ada yang pernah disimpan.
+
+**Peringatan disk:** setiap 10 menit backend memeriksa disk dengan sendirinya. Pada `DISK_ALERT_PERCENT` (bawaan 90; 0 = mati) atau lebih, backend mengirim email ke `DISK_ALERT_EMAIL_TO` (bawaan: akun SMTP), dalam Bahasa Indonesia, berisi apa yang memakai ruang dan apa yang dapat dikosongkan; paling sering sekali sehari selama disk masih sepenuh itu.
+
+=== REQ Server Metrics (superadmin) => Keadaan Server
+Satu pembacaan server tempat API berjalan: `cpu.percent` (porsi sibuk semua core sejak pembacaan sebelumnya), `memory` dan `disk` (byte dan persen; `disk.alertPercent` adalah batas pengiriman email peringatan disk, 0 = mati), `host` (lama menyala, jumlah core, beban rata-rata), `app` (versi Node, lama berjalan dan memori backend), `services` (keadaan `prafi-backend`, `prafi-frontend`, `prafi-maintenance`, `postgresql`, `nginx`: `active`, `inactive`, `failed`, `activating`, atau `unknown`), dan `storage` (ukuran database, foto unggahan, dan cadangan di server, serta cadangan mingguan terbaru).
+
+Halaman **Monitor Server** di dashboard menampilkannya sekali, lalu mengikuti event langsung `server:metrics` (*Realtime*), yang dikirim setiap `meta.pushSeconds` detik selama ada superadmin yang membuka halaman itu. Tidak ada yang disimpan. Dikirim dengan `Cache-Control: no-store`. Role lain mendapat 403.
+
 === FOLDER Realtime (WebSocket) => Realtime (WebSocket)
 Notifikasi realtime (dan, untuk superadmin, log API langsung) melalui **Socket.IO** (host dan port yang sama dengan API).
 
@@ -485,6 +498,7 @@ Notifikasi realtime (dan, untuk superadmin, log API langsung) melalui **Socket.I
 | `session:ended` | `{ reason, message }` | `reason`: `logged_out` (token ini logout), `deactivated` (akun dinonaktifkan), `token_expired` (token 1 jam kedaluwarsa), `password_reset` (kata sandi diatur ulang). Server lalu memutus koneksi; frontend sebaiknya me-logout user. |
 | `log:new` | `{ log }` | **hanya superadmin**: satu baris baru tersimpan di log API (bentuknya sama dengan item `GET /api/logs`, tanpa `errorStack`) |
 | `review:changed` | `{ reviewId, productId, action }` | **penjual** produk tersebut (setiap perubahan ulasan) serta **admin + disnakertrans** (laporan dan keputusan): ulasan `created`, `reported`, `hidden`, `kept`, atau `unhidden`. Halaman Ulasan memuat ulang daftarnya |
+| `server:metrics` | pembacaan dari *Keadaan Server* | **superadmin yang mengirim `monitor:watch`** (halaman Monitor Server): setiap 3 detik sampai `monitor:unwatch` atau koneksi terputus. Satu-satunya event yang dikirim client adalah `monitor:watch` dan `monitor:unwatch` (tanpa payload) |
 
 Setiap user hanya menerima event miliknya (ditambah event untuk role-nya, mis. `log:new` untuk superadmin); semua tab/perangkat milik user tersebut ikut menerimanya.
 

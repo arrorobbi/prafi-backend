@@ -6,6 +6,7 @@ import { closeRealtime, initRealtime } from './realtime/socket';
 import { startRetention as startLogRetention } from './services/apiLog.service';
 import { startWeeklyBackup } from './services/backup.service';
 import { startOrphanImageCleanup } from './services/imageCleanup.service';
+import { startServerMonitor } from './services/serverMonitor.service';
 import { logTurnstileStatus } from './utils/turnstile';
 
 async function start() {
@@ -26,6 +27,7 @@ async function start() {
     startLogRetention();
     startOrphanImageCleanup();
     startWeeklyBackup();
+    startServerMonitor();
   });
   initRealtime(server);
 

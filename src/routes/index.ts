@@ -13,6 +13,7 @@ import tenantRoutes from './tenant.routes';
 import productCategoryRoutes from './productCategory.routes';
 import reviewRoutes from './review.routes';
 import serverDocsRoutes from './serverDocs.routes';
+import serverMonitorRoutes from './serverMonitor.routes';
 import userRoutes from './user.routes';
 
 const router = Router();
@@ -35,6 +36,7 @@ router.use('/logs', apiLogRoutes);
 router.use('/stats', statsRoutes);
 // Server guide (docs/SERVER-GUIDE.md): the page is public, its content is superadmin only
 router.use('/docs', serverDocsRoutes);
+router.use('/server', serverMonitorRoutes);
 
 // Example of role-protected routes — replace with real feature routes
 router.get('/admin/ping', authenticate, authorize(ROLES.SUPERADMIN, ROLES.ADMIN), (req, res) => {

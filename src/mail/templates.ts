@@ -351,3 +351,64 @@ export function passwordResetRequested(user: Recipient, link: string, validMinut
   ].join('\n');
   return { subject, html, text };
 }
+
+const gb = (bytes: number) => `${(bytes / 1024 ** 3).toFixed(1).replace('.', ',')} GB`;
+const sizeAuto = (bytes: number) => (bytes >= 1024 ** 3 ? gb(bytes) : sizeOf(bytes));
+
+/**
+ * To the site's own mailbox: the server's disk is almost full (server monitor, at most once a day). A full disk
+ * stops uploads, backups and finally the database, so it says what takes space and what can be cleared.
+ */
+export function diskAlmostFull(d: {
+  hostname: string;
+  path: string;
+  percent: number;
+  alertPercent: number;
+  totalBytes: number;
+  usedBytes: number;
+  freeBytes: number;
+  storage: { databaseBytes: number | null; imagesBytes: number; imagesCount: number; backupsBytes: number };
+}): Omit<MailMessage, 'to'> {
+  const used = String(d.percent).replace('.', ',');
+  const subject = `Peringatan: disk server ${BRAND} terisi ${used}%`;
+  const rows: [string, string][] = [
+    ['Terpakai', `${gb(d.usedBytes)} dari ${gb(d.totalBytes)} (${used}%)`],
+    ['Sisa', gb(d.freeBytes)],
+    ['Database', d.storage.databaseBytes == null ? '-' : sizeAuto(d.storage.databaseBytes)],
+    ['Foto unggahan', `${sizeAuto(d.storage.imagesBytes)} (${d.storage.imagesCount} berkas)`],
+    ['Cadangan di server', sizeAuto(d.storage.backupsBytes)],
+  ];
+  const tips = [
+    'Hapus log sistem yang lama: sudo journalctl --vacuum-time=14d',
+    'Hapus cadangan manual lama di folder home (berkas backup_prafi_db_*.sql dan before-reset_*) yang sudah tidak diperlukan',
+    'Kurangi jumlah cadangan mingguan yang disimpan (BACKUP_KEEP di .env backend)',
+    'Lihat folder terbesar: sudo du -xh / --max-depth=2 | sort -h | tail -20',
+  ];
+  const html = layout(
+    'Disk server hampir penuh',
+    `<p>Disk server <strong>${escape(d.hostname)}</strong> (<code>${escape(d.path)}</code>) sudah terisi <strong>${used}%</strong>, melewati batas peringatan ${d.alertPercent}%.</p>
+     <p>Bila disk penuh, unggah foto, cadangan, dan akhirnya database akan gagal. Mohon kosongkan ruang sebelum itu terjadi.</p>
+     <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
+       ${rows.map(([k, v]) => `<tr><td style="padding:7px 10px;border-bottom:1px solid #e5e7eb;color:${MUTED};">${k}</td><td style="padding:7px 10px;border-bottom:1px solid #e5e7eb;font-weight:600;">${escape(v)}</td></tr>`).join('')}
+     </table>
+     <p><strong>Yang dapat dilakukan:</strong></p>
+     <ul style="padding-left:20px;margin:8px 0 16px;">${tips.map((t) => `<li style="margin-bottom:6px;">${escape(t)}</li>`).join('')}</ul>
+     ${button(`${env.frontendUrl}/superadmin/monitor`, 'Buka Monitor Server')}
+     <p style="font-size:13px;color:${MUTED};">Peringatan ini dikirim paling sering sekali sehari selama disk masih di atas batas. Batasnya diatur dengan DISK_ALERT_PERCENT di .env backend.</p>
+     ${SIGN_OFF}`,
+  );
+  const text = [
+    `Disk server ${d.hostname} (${d.path}) sudah terisi ${used}%, melewati batas peringatan ${d.alertPercent}%.`,
+    'Bila disk penuh, unggah foto, cadangan, dan akhirnya database akan gagal. Mohon kosongkan ruang sebelum itu terjadi.',
+    '',
+    ...rows.map(([k, v]) => `${k}: ${v}`),
+    '',
+    'Yang dapat dilakukan:',
+    ...tips.map((t) => `- ${t}`),
+    '',
+    `Monitor Server: ${env.frontendUrl}/superadmin/monitor`,
+    'Peringatan ini dikirim paling sering sekali sehari selama disk masih di atas batas (DISK_ALERT_PERCENT di .env backend).',
+    ...TEXT_SIGN_OFF,
+  ].join('\n');
+  return { subject, html, text };
+}

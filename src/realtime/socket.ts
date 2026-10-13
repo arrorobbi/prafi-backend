@@ -5,7 +5,7 @@ import { REALTIME_EVENTS as E, type SessionEndReason } from '../constants/realti
 import { HttpError } from '../errors/HttpError';
 import { verifyAccess } from '../middlewares/auth';
 import { Notification } from '../models';
-import type { Role } from '../constants/roles';
+import { ROLES, type Role } from '../constants/roles';
 import type { AuthUser } from '../types/express';
 
 interface SocketData {
@@ -18,6 +18,8 @@ let io: Server | null = null;
 const roomOf = (userId: string) => `user:${userId}`;
 /** Every connection of a role, e.g. all superadmins (for the live API log) */
 const roleRoom = (role: Role) => `role:${role}`;
+/** Superadmins with the Monitor Server page open (they ask to join; leaving the page or disconnecting leaves it) */
+const MONITOR_ROOM = 'monitor';
 
 /** Token from the Socket.IO auth payload (`io(url, { auth: { token } })`) or an `Authorization: Bearer` header (Postman). */
 function tokenFrom(socket: Socket) {
@@ -58,6 +60,13 @@ export function initRealtime(httpServer: HttpServer) {
 
   io.on('connection', async (socket) => {
     const { user } = socket.data as SocketData;
+    // Listeners first, before anything is awaited: a client may send its first event the moment it connects.
+    // Server monitor: superadmins only; anyone else asking is simply not added
+    socket.on(E.MONITOR_WATCH, () => {
+      if (user.role === ROLES.SUPERADMIN) void socket.join(MONITOR_ROOM);
+    });
+    socket.on(E.MONITOR_UNWATCH, () => void socket.leave(MONITOR_ROOM));
+
     await socket.join([roomOf(user.id), roleRoom(user.role)]);
     // Initial sync so the badge is correct right after connecting
     socket.emit(E.NOTIFICATION_UNREAD_COUNT, { count: await Notification.count({ where: { userId: user.id, readAt: null } }) });
@@ -87,6 +96,16 @@ export function emitToUser(userId: string, event: string, payload: unknown) {
 export function emitToRoles(roles: Role[], event: string, payload: unknown) {
   if (!io || !roles.length) return;
   io.to(roles.map(roleRoom)).emit(event, payload);
+}
+
+/** How many connections are watching the server monitor (0 = no need to collect anything). */
+export function monitorWatchers() {
+  return io?.sockets.adapter.rooms.get(MONITOR_ROOM)?.size ?? 0;
+}
+
+/** Sends an event to the superadmins watching the server monitor. */
+export function emitToMonitor(event: string, payload: unknown) {
+  io?.to(MONITOR_ROOM).emit(event, payload);
 }
 
 /** Ends a user's open connections: all of them, or only those using one token (logout of one session). */
