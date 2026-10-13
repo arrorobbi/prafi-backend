@@ -15,6 +15,11 @@ export const REALTIME_EVENTS = {
    */
   SESSION_ENDED: 'session:ended',
   /**
+   * client → server: the page renewed its login (POST /api/auth/refresh) and hands over the new token, so this
+   * connection isn't closed when the old one runs out. Payload: { token }
+   */
+  SESSION_RENEW: 'session:renew',
+  /**
    * server → superadmins: a new API log row was saved (same shape as GET /api/logs, without errorStack).
    * Payload: { log }
    */

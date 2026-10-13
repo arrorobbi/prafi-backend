@@ -208,10 +208,27 @@ export const FLOWS: Record<string, Chart[]> = {
         ...auth(),
         check({ en: 'Token has an id (`jti`)?', id: 'Token punya id (`jti`)?' }, { en: '400 old token, wait until it expires', id: '400 token lama, tunggu kedaluwarsa' }),
         step(
-          { en: 'Revoke this token', id: 'Cabut token ini' },
-          effect({ en: 'Close the sockets using this token (session:ended)', id: 'Tutup socket yang memakai token ini (session:ended)' }),
+          { en: 'Revoke this session (this token and any renewed from the same login)', id: 'Cabut sesi ini (token ini dan semua hasil perpanjangan dari login yang sama)' },
+          effect({ en: 'Close the sockets of this session (session:ended)', id: 'Tutup socket sesi ini (session:ended)' }),
         ),
         end({ en: '200, other sessions stay logged in', id: '200, sesi lain tetap login' }),
+      ],
+    },
+    {
+      title: { en: 'Refresh Session (sliding session)', id: 'Perpanjang Sesi (sesi geser)' },
+      nodes: [
+        start({ en: 'The user is active (click, key, touch) and the token is older than 1 minute', id: 'Pengguna aktif (klik, ketikan, sentuhan) dan token berumur lebih dari 1 menit' }),
+        step({ en: 'POST /api/auth/refresh with the current token', id: 'POST /api/auth/refresh dengan token saat ini' }),
+        ...auth(),
+        check({ en: 'Less than 12 hours since the login?', id: 'Kurang dari 12 jam sejak login?' }, { en: '403 SESSION_MAX_REACHED: the token runs out', id: '403 SESSION_MAX_REACHED: token habis sendiri' }),
+        step(
+          { en: 'New token: same session, valid 1 hour from now', id: 'Token baru: sesi yang sama, berlaku 1 jam dari sekarang' },
+          effect({ en: 'The page tells its socket: session:renew', id: 'Halaman memberi tahu socket-nya: session:renew' }),
+        ),
+        end(
+          { en: '200 { accessToken, sessionEndsAt }', id: '200 { accessToken, sessionEndsAt }' },
+          note({ en: '1 hour without activity = logged out', id: '1 jam tanpa aktivitas = keluar' }),
+        ),
       ],
     },
     {

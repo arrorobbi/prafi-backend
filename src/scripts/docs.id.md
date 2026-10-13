@@ -16,7 +16,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 
 ## Login dan role
 - Setiap request memakai **Bearer `{{token}}`** (diatur di koleksi; request mewarisinya). Request publik memakai *No Auth*.
-- **Auth → Login** menyimpan token ke `{{token}}` (berlaku **1 jam**). Untuk berganti role, ubah `loginEmail` / `loginPassword` (atau body Login) lalu kirim Login lagi.
+- **Auth → Login** menyimpan token ke `{{token}}` (berlaku **1 jam**, diperpanjang selama Anda aktif: *Perpanjang Sesi*). Untuk berganti role, ubah `loginEmail` / `loginPassword` (atau body Login) lalu kirim Login lagi.
 - **Nama setiap request menunjukkan siapa yang boleh memanggilnya**: `(All roles)` = superadmin, disnakertrans, admin, dan tenant; `(superadmin, disnakertrans, admin)`, `(admin)`, `(tenant)`… = hanya role tersebut; `(Public)` = tanpa login. Role lain mendapat **403**.
 - Setiap akun harus memiliki **email terverifikasi** (`mailActive: true`) dan **approval aktif** (`approval.isActive: true`) untuk login dan memakai API.
 
@@ -33,6 +33,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Health | `GET /api/health` | Publik |
 | Auth | `POST /api/auth/login` | Publik |
 | Auth | `POST /api/auth/logout` | Semua role |
+| Auth | `POST /api/auth/refresh` | Semua role |
 | Auth | `POST /api/auth/register/disnakertrans` | superadmin |
 | Auth | `POST /api/auth/register/admin` | Publik |
 | Auth | `POST /api/auth/register/tenant` | Publik |
@@ -150,7 +151,7 @@ Setiap akun baru dimulai dengan `mailActive: false`: login dan semua endpoint ya
 **Lupa kata sandi:** *Lupa Kata Sandi* mengirim email berisi link ke halaman frontend `<FRONTEND_URL>/reset-password?userId=…&token=…` (berlaku 30 menit, sekali pakai). Halaman tersebut memanggil *Cek Link Atur Ulang*, lalu *Atur Ulang Kata Sandi* dengan kata sandi baru. Pengaturan ulang mengakhiri semua sesi yang ada.
 
 === REQ Login (Public) => Login
-Masuk dan menyimpan access token sebagai `{{token}}` (berlaku 1 jam), serta `{{currentUserId}}` dan `{{currentRole}}`.
+Masuk dan menyimpan access token sebagai `{{token}}` (berlaku 1 jam, diperpanjang selama Anda aktif: *Perpanjang Sesi*), serta `{{currentUserId}}` dan `{{currentRole}}`.
 
 - superadmin: akun seed (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` di `.env`)
 - disnakertrans / admin / tenant: akun yang dibuat dengan request Register (password `{{newUserPassword}}`; email disimpan sebagai `{{registeredEmail}}`)
@@ -163,6 +164,15 @@ Error: 401 email/password salah (`details.attemptsLeft`), 429 terlalu banyak per
 
 === REQ Logout (All roles) => Logout
 Mencabut token yang dipakai untuk request ini (sesi lain tetap login) dan mengosongkan `{{token}}`. Koneksi WebSocket yang memakai token ini menerima `session:ended` (`logged_out`).
+
+=== REQ Refresh Session (All roles) => Perpanjang Sesi
+**Sesi geser (sliding session).** Menukar token saat ini yang masih berlaku dengan token yang berlaku satu jam lagi dari sekarang, dan menyimpannya sebagai `{{token}}`. Website memanggilnya sendiri selama pengguna aktif (klik, ketikan, sentuhan; paling sering sekali semenit), sehingga login baru berakhir setelah **1 jam tanpa aktivitas** (`JWT_EXPIRES_IN`).
+
+Token baru termasuk sesi yang sama: satu *Logout* mengakhiri semua token sesi itu. Sesi dapat diperpanjang sampai **12 jam setelah login** (`SESSION_MAX_HOURS`); setelah itu endpoint ini menjawab 403 `SESSION_MAX_REACHED` dan token yang ada habis dengan sendirinya. `data.sessionEndsAt` adalah saat tersebut. Token yang digantikan tidak dibatalkan; ia habis sendiri dalam satu jam.
+
+Koneksi Socket.IO yang terbuka diberi tahu lewat event `session:renew` (*Realtime*); kalau tidak, koneksi ditutup saat token lama habis. Tidak dicatat di log API.
+
+Error: 401 tanpa token / token kedaluwarsa / sudah logout, 403 `SESSION_MAX_REACHED`.
 
 === REQ Register Disnakertrans (superadmin) => Daftarkan Disnakertrans
 Membuat akun **disnakertrans** (pemberi persetujuan akun admin). **Tanpa `password` di body** (jika dikirim: 400): server membuat kata sandi sementara 8 karakter yang mudah dibaca (kata dan angka, mis. `Mangga47`) dan mengirimkannya ke email akun tersebut, dalam Bahasa Indonesia, beserta tombol ke halaman frontend `<FRONTEND_URL>/aktivasi?userId=…&token=…` (berlaku 24 jam). Di sana pemilik akun memasukkan kata sandi sementara dan membuat kata sandinya sendiri (*Cek Link Aktivasi*, *Aktifkan Akun*); baru setelah itu `mailActive` menjadi `true` dan akun bisa login. Kata sandi sementara tidak pernah diterima untuk login. Approval-nya langsung aktif (`approval.isActive: true`).
@@ -495,10 +505,11 @@ Notifikasi realtime (dan, untuk superadmin, log API langsung) melalui **Socket.I
 |---|---|---|
 | `notification:unread-count` | `{ count }` | tepat setelah terhubung, dan setelah tandai dibaca / tandai semua / hapus (menyinkronkan semua tab) |
 | `notification:new` | `{ notification, unreadCount }` | notifikasi baru dibuat untuk user ini (bentuknya sama dengan item `GET /api/notifications`) |
-| `session:ended` | `{ reason, message }` | `reason`: `logged_out` (token ini logout), `deactivated` (akun dinonaktifkan), `token_expired` (token 1 jam kedaluwarsa), `password_reset` (kata sandi diatur ulang). Server lalu memutus koneksi; frontend sebaiknya me-logout user. |
+| `session:ended` | `{ reason, message }` | `reason`: `logged_out` (token ini logout), `deactivated` (akun dinonaktifkan), `token_expired` (token habis: 1 jam tanpa aktivitas, atau batas sesi 12 jam), `password_reset` (kata sandi diatur ulang). Server lalu memutus koneksi; frontend sebaiknya me-logout user. |
 | `log:new` | `{ log }` | **hanya superadmin**: satu baris baru tersimpan di log API (bentuknya sama dengan item `GET /api/logs`, tanpa `errorStack`) |
 | `review:changed` | `{ reviewId, productId, action }` | **penjual** produk tersebut (setiap perubahan ulasan) serta **admin + disnakertrans** (laporan dan keputusan): ulasan `created`, `reported`, `hidden`, `kept`, atau `unhidden`. Halaman Ulasan memuat ulang daftarnya |
 | `server:metrics` | pembacaan dari *Keadaan Server* | **superadmin yang mengirim `monitor:watch`** (halaman Monitor Server): setiap 3 detik sampai `monitor:unwatch` atau koneksi terputus. Satu-satunya event yang dikirim client adalah `monitor:watch` dan `monitor:unwatch` (tanpa payload) |
+| `session:renew` (client → server) | `{ token }` | setelah *Perpanjang Sesi*, halaman menyerahkan token baru agar koneksi ini hidup selama token itu. Tanpa itu server menutup koneksi saat token lama habis (`session:ended`, `token_expired`). Token dari sesi atau user lain diabaikan |
 
 Setiap user hanya menerima event miliknya (ditambah event untuk role-nya, mis. `log:new` untuk superadmin); semua tab/perangkat milik user tersebut ikut menerimanya.
 

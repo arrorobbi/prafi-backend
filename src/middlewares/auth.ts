@@ -28,7 +28,9 @@ export const authenticate: RequestHandler = async (req, _res, next) => {
  * valid signature, not expired, not logged out, user still exists, email verified and activated.
  * Throws HttpError (401/403) otherwise.
  */
-export async function verifyAccess(token: string): Promise<{ user: AuthUser; token: { jti?: string; expiresAt: Date } }> {
+export async function verifyAccess(
+  token: string,
+): Promise<{ user: AuthUser; token: { jti?: string; expiresAt: Date; sessionStartedAt: Date } }> {
   // A Postman/Insomnia variable that was never set is sent as literal text, e.g. "{{tenantToken}}"
   if (/^\{\{.+\}\}$/.test(token)) {
     throw HttpError.unauthorized(`Variabel token ${token} belum diisi, login terlebih dahulu agar token tersimpan`);
@@ -73,7 +75,8 @@ export async function verifyAccess(token: string): Promise<{ user: AuthUser; tok
 
   return {
     user: { id: user.id, email: user.email, role: user.role },
-    token: { jti: payload.jti, expiresAt: new Date(payload.exp * 1000) },
+    // Tokens from before sessions could be renewed have no start of their own: their issue time is the login
+    token: { jti: payload.jti, expiresAt: new Date(payload.exp * 1000), sessionStartedAt: new Date((payload.sst ?? payload.iat) * 1000) },
   };
 }
 

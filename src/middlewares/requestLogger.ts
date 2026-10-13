@@ -98,6 +98,8 @@ const levelOf = (status: number): LogLevel => (status >= 500 ? 'error' : status 
  * account activation, resend, forgot / reset password, logout, profile changes. Not GET /api/auth/me, which every
  * dashboard page calls.
  */
+const SESSION_REFRESH_PATH = '/api/auth/refresh';
+
 function isAuthAction(method: string, path: string) {
   if (!path.startsWith('/api/auth/')) return false;
   return STORED_METHODS.has(method);
@@ -109,8 +111,10 @@ function isAuthAction(method: string, path: string) {
  * (reviews, bots) and reads are not stored. The console still shows every request.
  */
 const skipDb = (req: Request, path: string) =>
-  !isAuthAction(req.method, path) &&
-  (!STORED_METHODS.has(req.method) || (!req.user && !/^Bearer\s+\S+/i.test(req.get('authorization') ?? '')));
+  // Renewing the session happens every minute a user is active: it would bury everything else in the log
+  path === SESSION_REFRESH_PATH ||
+  (!isAuthAction(req.method, path) &&
+  (!STORED_METHODS.has(req.method) || (!req.user && !/^Bearer\s+\S+/i.test(req.get('authorization') ?? ''))));
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

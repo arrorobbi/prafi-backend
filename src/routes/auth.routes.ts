@@ -8,6 +8,8 @@ const router = Router();
 router.post('/login', authController.login);
 // Revokes the token sent with the request (it stays invalid until its normal expiry)
 router.post('/logout', authenticate, authController.logout);
+// Sliding session: an active user's token is renewed (up to SESSION_MAX_HOURS after the login)
+router.post('/refresh', authenticate, authController.refresh);
 
 // superadmin → creates disnakertrans (active right away; a temporary password and an activation link are emailed);
 // rules in CREATABLE_ROLES

@@ -11,6 +11,16 @@ import type { AuthUser } from '../types/express';
 interface SocketData {
   user: AuthUser;
   jti?: string;
+  /** Ends the connection when its token runs out; replaced when the session is renewed */
+  expiryTimer?: NodeJS.Timeout;
+}
+
+/** (Re)starts the countdown to the token's end (capped: Node timers overflow above ~24.8 days). */
+function scheduleExpiry(socket: Socket, expiresAt: Date) {
+  const data = socket.data as SocketData;
+  clearTimeout(data.expiryTimer);
+  const msLeft = expiresAt.getTime() - Date.now();
+  data.expiryTimer = setTimeout(() => endSession(socket, 'token_expired'), Math.min(Math.max(msLeft, 0), 2_147_483_647));
 }
 
 let io: Server | null = null;
@@ -45,10 +55,8 @@ export function initRealtime(httpServer: HttpServer) {
       (socket.data as SocketData) = { user, jti: info.jti };
 
       // Disconnect when the token expires, so the client logs in again instead of staying connected forever
-      // (capped: Node timers overflow above ~24.8 days)
-      const msLeft = info.expiresAt.getTime() - Date.now();
-      const timer = setTimeout(() => endSession(socket, 'token_expired'), Math.min(Math.max(msLeft, 0), 2_147_483_647));
-      socket.on('disconnect', () => clearTimeout(timer));
+      scheduleExpiry(socket, info.expiresAt);
+      socket.on('disconnect', () => clearTimeout((socket.data as SocketData).expiryTimer));
       next();
     } catch (err) {
       const e = err instanceof HttpError ? err : HttpError.unauthorized('Token tidak valid');
@@ -66,6 +74,18 @@ export function initRealtime(httpServer: HttpServer) {
       if (user.role === ROLES.SUPERADMIN) void socket.join(MONITOR_ROOM);
     });
     socket.on(E.MONITOR_UNWATCH, () => void socket.leave(MONITOR_ROOM));
+    // Sliding session: the page renewed its token (POST /api/auth/refresh) and passes it on, so this connection
+    // lives as long as the new one. Anything but a valid token of the same session is ignored.
+    socket.on(E.SESSION_RENEW, async (payload: { token?: unknown }) => {
+      if (typeof payload?.token !== 'string') return;
+      try {
+        const renewed = await verifyAccess(payload.token);
+        const data = socket.data as SocketData;
+        if (renewed.user.id === user.id && renewed.token.jti === data.jti) scheduleExpiry(socket, renewed.token.expiresAt);
+      } catch {
+        // Not a usable token: the connection keeps its current end
+      }
+    });
 
     await socket.join([roomOf(user.id), roleRoom(user.role)]);
     // Initial sync so the badge is correct right after connecting

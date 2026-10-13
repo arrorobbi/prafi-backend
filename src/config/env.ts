@@ -26,8 +26,11 @@ export const env = {
 
   jwt: {
     secret: required('JWT_SECRET'),
-    // Access tokens expire after 1 hour; the user must log in again afterwards
+    // How long a login stays valid without activity. While the user is active the frontend renews the token
+    // (POST /api/auth/refresh), each time for this long again
     expiresIn: process.env.JWT_EXPIRES_IN ?? '1h',
+    // However active, a session ends this many hours after the login (then: log in again)
+    sessionMaxHours: Math.max(1, Number(process.env.SESSION_MAX_HOURS ?? 12) || 12),
   },
 
   /**

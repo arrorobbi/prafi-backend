@@ -186,7 +186,8 @@ Setiap aplikasi membaca berkas `.env` miliknya saat mulai. Backend membacanya sa
 | `PORT` | 4000 (nginx mengarah ke sini) |
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | Koneksi database (bagian 7) |
 | `JWT_SECRET` | Menandatangani token login. Mengubahnya membuat semua orang keluar. Panjang dan acak; jangan dibagikan |
-| `JWT_EXPIRES_IN` | Masa berlaku login (`1h`) |
+| `JWT_EXPIRES_IN` | Lama login bertahan **tanpa aktivitas** (`1h`); login pengguna yang aktif diperpanjang, setiap kali selama ini lagi |
+| `SESSION_MAX_HOURS` | Seaktif apa pun, sesi berakhir sekian jam setelah login (bawaan 12) |
 | `APP_URL` | Alamat publik API; dipakai pada tautan gambar |
 | `FRONTEND_URL` | Alamat website; dipakai pada tautan di email (atur ulang kata sandi, aktivasi Disnakertrans) dan untuk gambar di panduan ini |
 | `CORS_ORIGIN` | Situs lain yang boleh memanggil API dari browser (dipisah koma). Website sendiri tidak memerlukannya |
@@ -864,7 +865,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 | Email | OTP pendaftaran, aktivasi Disnakertrans, atur ulang kata sandi, "akun admin Anda sudah aktif", cadangan mingguan. Semuanya dalam Bahasa Indonesia | `src/mail/templates.ts`, `SMTP_*` di `.env` backend |
 | Notifikasi langsung | Notifikasi, daftar ulasan, dan tanda belum dibaca diperbarui tanpa memuat ulang (Socket.IO) | `src/realtime/socket.ts` |
 | Perlindungan login | 5 password salah untuk satu akun dari satu jaringan, atau 20 dari satu jaringan untuk akun mana pun, dalam 15 menit: jaringan itu harus menunggu (429). Dihitung di memori backend, jadi restart menghapusnya | `src/services/loginGuard.service.ts` |
-| Sesi | Login berlaku 1 jam; logout, penonaktifan, atau atur ulang kata sandi langsung mengakhiri sesi | `src/middlewares/auth.ts` |
+| Sesi | Login berakhir setelah **1 jam tanpa aktivitas**: selama pengguna mengeklik atau mengetik, website memperpanjangnya (paling sering sekali semenit), sampai **12 jam** setelah login. Logout, penonaktifan, atau atur ulang kata sandi langsung mengakhiri sesi | `src/services/auth.service.ts` (`refreshSession`), frontend `src/lib/auth.tsx` |
 | Unggah foto | Foto terunggah saat dipilih dan ditautkan saat *Simpan*; yang tidak terpakai dihapus setiap malam | bagian 7 dan 12 |
 | Perlindungan ulasan | Pemeriksaan "bukan robot", satu ulasan per produk per hari, maksimal 5 ulasan dalam 10 menit per jaringan, pelaporan dan penyembunyian. Alamat IP pengunjung hanya disimpan sebagai hash | `src/services/review.service.ts` |
 | Cadangan mingguan | Database dan foto, disimpan di server dan dikirim lewat email | bagian 7 |

@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { Op } from 'sequelize';
 import { ACTIVE_ON_REGISTRATION, CREATABLE_ROLES, EMAIL_VERIFICATION_METHOD, PUBLIC_REGISTRATION_ROLES, ROLES, type Role } from '../constants/roles';
+import { env } from '../config/env';
 import { HttpError } from '../errors/HttpError';
 import { Approval, Image, RevokedToken, sequelize, User } from '../models';
 import type { AuthUser } from '../types/express';
@@ -156,11 +157,38 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
   return getProfile(user.id);
 }
 
+const SESSION_MAX_MS = env.jwt.sessionMaxHours * 3_600_000;
+
+/**
+ * POST /api/auth/refresh — sliding session: a still-valid token is exchanged for one that lasts JWT_EXPIRES_IN from
+ * now. The frontend calls it while the user is active, so only JWT_EXPIRES_IN without activity logs them out.
+ * It belongs to the same session (same id, so one logout ends all of them) and stops being renewed
+ * SESSION_MAX_HOURS after the login. The token it replaces simply runs out by itself.
+ */
+export function refreshSession(user: AuthUser, token: { jti?: string; sessionStartedAt: Date }) {
+  const sessionEndsAt = new Date(token.sessionStartedAt.getTime() + SESSION_MAX_MS);
+  if (!token.jti || Date.now() >= sessionEndsAt.getTime()) {
+    // 403, not 401: the current token is still good until it runs out; it just can't be renewed any more
+    throw new HttpError(
+      403,
+      `Sesi sudah mencapai batas ${env.jwt.sessionMaxHours} jam, silakan login kembali setelah sesi ini berakhir`,
+      'SESSION_MAX_REACHED',
+      { sessionEndsAt },
+    );
+  }
+  const accessToken = signAccessToken(
+    { sub: user.id, role: user.role },
+    { jti: token.jti, startedAt: Math.floor(token.sessionStartedAt.getTime() / 1000) },
+  );
+  return { accessToken, tokenType: 'Bearer', sessionEndsAt };
+}
+
 /**
  * Logs out the token used for this request: it is rejected from now on, even though it hasn't expired.
- * Only this token is revoked, so the user's other sessions (other devices/logins) stay logged in.
+ * Only this session is revoked (this token and any renewed from the same login), so the user's other sessions
+ * (other devices/logins) stay logged in.
  */
-export async function logout(user: AuthUser, token: { jti?: string; expiresAt: Date }) {
+export async function logout(user: AuthUser, token: { jti?: string; expiresAt: Date; sessionStartedAt: Date }) {
   if (!token.jti) {
     throw HttpError.badRequest(
       `Token ini dibuat sebelum fitur logout tersedia dan tidak dapat dicabut; token akan kedaluwarsa pada ${token.expiresAt.toISOString()}. Silakan login kembali untuk mendapatkan token baru.`,
@@ -171,7 +199,12 @@ export async function logout(user: AuthUser, token: { jti?: string; expiresAt: D
   await RevokedToken.destroy({ where: { expiresAt: { [Op.lt]: new Date() } } });
   await RevokedToken.findOrCreate({
     where: { jti: token.jti },
-    defaults: { jti: token.jti, userId: user.id, expiresAt: token.expiresAt },
+    // Kept until the session could no longer be renewed at all, so no token of it can come back
+    defaults: {
+      jti: token.jti,
+      userId: user.id,
+      expiresAt: new Date(Math.max(token.expiresAt.getTime(), token.sessionStartedAt.getTime() + SESSION_MAX_MS)),
+    },
   });
   // Close the WebSocket connections that use this token (other sessions stay connected)
   await endUserSessions(user.id, 'logged_out', token.jti);

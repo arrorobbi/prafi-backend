@@ -186,7 +186,8 @@ Each app reads its `.env` file at start. The backend reads it when the service s
 | `PORT` | 4000 (nginx points here) |
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | Database connection (section 7) |
 | `JWT_SECRET` | Signs login tokens. Changing it logs everybody out. Long and random; never share |
-| `JWT_EXPIRES_IN` | Login lifetime (`1h`) |
+| `JWT_EXPIRES_IN` | How long a login lasts **without activity** (`1h`); an active user's login is renewed, each time for this long again |
+| `SESSION_MAX_HOURS` | However active, a session ends this many hours after the login (default 12) |
 | `APP_URL` | The API's public address; used in image links |
 | `FRONTEND_URL` | The website's address; used in email links (password reset, Disnakertrans activation) and for the pictures in this guide |
 | `CORS_ORIGIN` | Other sites allowed to call the API from a browser (comma separated). The website itself doesn't need it |
@@ -864,7 +865,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 | Email | Sign-up OTP, Disnakertrans activation, password reset, "your admin account is active", weekly backup. All in Bahasa Indonesia | `src/mail/templates.ts`, `SMTP_*` in the backend `.env` |
 | Live notifications | Notifications, review lists and the unread badge update without reloading (Socket.IO) | `src/realtime/socket.ts` |
 | Login protection | 5 wrong passwords for one account from one network, or 20 from one network across accounts, in 15 minutes: that network must wait (429). Counted in the backend's memory, so a restart clears it | `src/services/loginGuard.service.ts` |
-| Sessions | Login lasts 1 hour; logout, deactivation or a password reset ends the session at once | `src/middlewares/auth.ts` |
+| Sessions | A login ends after **1 hour without activity**: while the user clicks or types, the website renews it (at most once a minute), up to **12 hours** after the login. Logout, deactivation or a password reset ends the session at once | `src/services/auth.service.ts` (`refreshSession`), frontend `src/lib/auth.tsx` |
 | Photo uploads | A photo uploads when picked and is attached on *Simpan*; unused ones are deleted every night | sections 7 and 12 |
 | Review protection | "Not a robot" check, one review per product per day, at most 5 reviews in 10 minutes per network, reporting and hiding. Visitors' IP addresses are stored only as a hash | `src/services/review.service.ts` |
 | Weekly backup | Database and photos, kept on the server and emailed | section 7 |

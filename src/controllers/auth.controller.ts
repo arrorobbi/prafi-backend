@@ -97,6 +97,12 @@ export const logout: RequestHandler = async (req, res) => {
   res.json({ success: true, data: { message: 'Berhasil logout, token ini tidak dapat digunakan lagi' } });
 };
 
+/** POST /api/auth/refresh — a token that lasts JWT_EXPIRES_IN from now, for the same session (sliding session). */
+export const refresh: RequestHandler = (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json({ success: true, data: authService.refreshSession(req.user!, req.accessToken!) });
+};
+
 export const me: RequestHandler = async (req, res) => {
   const user = await authService.getProfile(req.user!.id);
   res.json({ success: true, data: user });
