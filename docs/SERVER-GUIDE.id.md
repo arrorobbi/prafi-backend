@@ -712,13 +712,15 @@ Hal yang perlu diingat:
 | Menambah menu di sebuah dashboard | Daftar `NAV` di `src/app/<peran>/layout.tsx` peran tersebut, ditambah folder baru berisi `page.tsx` |
 | Memanggil endpoint API baru | Tambahkan fungsi di `src/lib/api.ts` (dan tipenya di `src/lib/types.ts`) |
 | Mengubah warna atau huruf | `src/app/globals.css` |
+| Membuat gambar membesar saat diklik | Gunakan `<Thumb zoom … />` (`src/components/ui.tsx`); popup-nya ada di `src/components/Lightbox.tsx`. Bukan untuk gambar di dalam tautan atau kartu yang dapat diklik |
+| Menjadikan seluruh kartu satu tautan | Class `card-link` pada kartu dan `card-link-main` pada tautan yang diikutinya (dijelaskan di `globals.css`) |
 | Mengubah halaman bantuan | `src/lib/guides.tsx` (bagian 15) |
 | Mengubah kontak yang tampil di Panduan | `NEXT_PUBLIC_ADMIN_WHATSAPP`, `NEXT_PUBLIC_ADMIN_EMAIL` di `.env`, lalu build |
 | Mengubah yang dilihat mesin pencari | `src/lib/seo.tsx` dan `metadata` halaman; README memiliki bagian *SEO* |
 
 ## 14. Fitur sistem
 
-Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar website dengan data contoh (`prafi-frontend/public/panduan/fitur-*.jpg`); klik sebuah gambar untuk melihat ukuran penuh. Petunjuk langkah demi langkah untuk pengguna ada di **Panduan** website (`/panduan`) dan di `prafi-frontend/docs/PANDUAN-PENGGUNA.md`.
+Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar website dengan data contoh (`prafi-frontend/public/panduan/fitur-*.jpg`); klik sebuah gambar untuk memperbesarnya. Petunjuk langkah demi langkah untuk pengguna ada di **Panduan** website (`/panduan`) dan di `prafi-frontend/docs/PANDUAN-PENGGUNA.md`.
 
 ### Peran
 
@@ -887,7 +889,7 @@ Semua lokasi berada di dalam `/home/prafi/project/prafi-frontend`.
 |---|---|
 | `src/lib/guides.tsx` | **Isinya.** Daftar `GUIDES`: setiap topik dengan judul, ikon, siapa yang melihatnya, dan teksnya. Inilah berkas yang Anda ubah |
 | `public/panduan/*.jpg` | Tangkapan layar yang dipakai langkah-langkah (JPG 1024×640) |
-| `src/components/GuideSteps.tsx` | `Steps` dan `Step`: langkah bernomor, masing-masing dengan tangkapan layar opsional (klik = ukuran penuh) |
+| `src/components/GuideSteps.tsx` | `Steps` dan `Step`: langkah bernomor, masing-masing dengan tangkapan layar opsional (klik untuk memperbesarnya di popup) |
 | `src/components/GuideList.tsx` | Menggambar daftar topik (setiap topik adalah kotak yang dapat dibuka) |
 | `src/app/(public)/panduan/page.tsx` | Halaman publik `/panduan`: menampilkan topik yang `audience`-nya memuat `"public"` |
 | `src/app/tenant/bantuan/page.tsx` | Halaman penjual `/tenant/bantuan`: menampilkan topik yang `audience`-nya memuat `"tenant"` |

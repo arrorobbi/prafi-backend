@@ -712,13 +712,15 @@ Things to remember:
 | Add a menu item to a dashboard | The `NAV` list in that role's `src/app/<role>/layout.tsx`, plus a new folder with a `page.tsx` |
 | Call a new API endpoint | Add a function to `src/lib/api.ts` (and its type to `src/lib/types.ts`) |
 | Change a colour or the font | `src/app/globals.css` |
+| Let a picture open larger when clicked | Use `<Thumb zoom … />` (`src/components/ui.tsx`); the popup is `src/components/Lightbox.tsx`. Not for a picture inside a link or a clickable card |
+| Make a whole card one link | Class `card-link` on the card and `card-link-main` on the link it should follow (explained in `globals.css`) |
 | Change the help pages | `src/lib/guides.tsx` (section 15) |
 | Change the contact shown in Panduan | `NEXT_PUBLIC_ADMIN_WHATSAPP`, `NEXT_PUBLIC_ADMIN_EMAIL` in `.env`, then build |
 | Change what search engines see | `src/lib/seo.tsx` and the page's `metadata`; the README has an *SEO* section |
 
 ## 14. System features
 
-What the system does, by who uses it. The pictures are screenshots of the website with sample data (`prafi-frontend/public/panduan/fitur-*.jpg`); click one to see it full size. Step-by-step instructions for users are in the website's **Panduan** (`/panduan`) and in `prafi-frontend/docs/PANDUAN-PENGGUNA.md`.
+What the system does, by who uses it. The pictures are screenshots of the website with sample data (`prafi-frontend/public/panduan/fitur-*.jpg`); click one to see it larger. Step-by-step instructions for users are in the website's **Panduan** (`/panduan`) and in `prafi-frontend/docs/PANDUAN-PENGGUNA.md`.
 
 ### Roles
 
@@ -887,7 +889,7 @@ All paths are inside `/home/prafi/project/prafi-frontend`.
 |---|---|
 | `src/lib/guides.tsx` | **The content.** The `GUIDES` list: every topic with its title, icon, who sees it, and its text. This is the file you edit |
 | `public/panduan/*.jpg` | The screenshots used by the steps (1024×640 JPG) |
-| `src/components/GuideSteps.tsx` | `Steps` and `Step`: the numbered steps, each with an optional screenshot (click = full size) |
+| `src/components/GuideSteps.tsx` | `Steps` and `Step`: the numbered steps, each with an optional screenshot (a click opens it larger in a popup) |
 | `src/components/GuideList.tsx` | Draws the topic list (each topic is an expandable box) |
 | `src/app/(public)/panduan/page.tsx` | The public page `/panduan`: shows topics whose `audience` has `"public"` |
 | `src/app/tenant/bantuan/page.tsx` | The seller page `/tenant/bantuan`: shows topics whose `audience` has `"tenant"` |

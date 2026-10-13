@@ -23,7 +23,7 @@
       updated: 'Terakhir diperbarui: ', loading: 'Memuat panduan…',
       notSuperDashboard: 'Akun yang sedang login di dashboard bukan superadmin.', notSuper: 'Akun ini bukan superadmin.',
       onlySuper: 'Panduan server hanya untuk akun superadmin.', expired: 'Sesi berakhir, silakan masuk lagi.',
-      offline: 'Server tidak dapat dihubungi, coba lagi.', loginFailed: 'Login gagal.', locale: 'id-ID',
+      offline: 'Server tidak dapat dihubungi, coba lagi.', loginFailed: 'Login gagal.', locale: 'id-ID', closePicture: 'Tutup gambar',
     },
     en: {
       title: 'Server Guide · Trans Niaga', light: 'Light', dark: 'Dark', themeGroup: 'Theme',
@@ -32,7 +32,7 @@
       updated: 'Last updated: ', loading: 'Loading the guide…',
       notSuperDashboard: 'The account signed in on the dashboard is not a superadmin.', notSuper: 'This account is not a superadmin.',
       onlySuper: 'The server guide is for superadmin accounts only.', expired: 'The session has ended, please sign in again.',
-      offline: 'The server cannot be reached, try again.', loginFailed: 'Sign-in failed.', locale: 'en-GB',
+      offline: 'The server cannot be reached, try again.', loginFailed: 'Sign-in failed.', locale: 'en-GB', closePicture: 'Close picture',
     },
   };
   var lang = document.documentElement.lang === 'en' ? 'en' : 'id';
@@ -129,6 +129,54 @@
       pre.appendChild(btn);
     });
   }
+
+  // ---------- pictures: a click opens them larger on this page, not in a new tab ----------
+  var zoomed = null;
+  function closeZoom() {
+    if (!zoomed) return;
+    document.body.removeChild(zoomed.box);
+    document.removeEventListener('keydown', zoomed.onKey);
+    if (zoomed.from) zoomed.from.focus();
+    zoomed = null;
+  }
+  function openZoom(link) {
+    closeZoom();
+    var img = link.querySelector('img');
+    var box = document.createElement('div');
+    box.className = 'zoom';
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-modal', 'true');
+    box.setAttribute('aria-label', img.alt || 'Gambar');
+    var big = document.createElement('img');
+    big.src = link.href;
+    big.alt = img.alt;
+    var close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'zoom-close';
+    close.setAttribute('aria-label', t('closePicture'));
+    close.textContent = '\u00d7';
+    box.appendChild(big);
+    if (img.alt) {
+      var caption = document.createElement('p');
+      caption.textContent = img.alt;
+      box.appendChild(caption);
+    }
+    box.appendChild(close);
+    // A click beside the picture, the button or Esc closes it
+    box.addEventListener('click', function (ev) { if (ev.target !== big) closeZoom(); });
+    var onKey = function (ev) { if (ev.key === 'Escape') closeZoom(); };
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(box);
+    zoomed = { box: box, onKey: onKey, from: link };
+    close.focus();
+  }
+  $('content').addEventListener('click', function (ev) {
+    var link = ev.target.closest ? ev.target.closest('figure a') : null;
+    // Ctrl / middle click still opens a new tab, as with any link
+    if (!link || ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.button !== 0) return;
+    ev.preventDefault();
+    openZoom(link);
+  });
 
   /** `keepPlace`: after a language switch, stay at the section being read */
   function loadGuide(token, keepPlace) {

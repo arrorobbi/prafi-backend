@@ -83,6 +83,12 @@
   figure { margin: 14px 0 22px; max-width: 760px; }
   figure img { display: block; width: 100%; height: auto; aspect-ratio: 1024 / 640; object-fit: cover; background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; }
   figcaption { margin-top: 6px; color: var(--muted); font-size: 0.82rem; }
+  figure a { cursor: zoom-in; display: block; }
+  /* a picture opened larger (click, Esc or the button closes it) */
+  .zoom { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px; background: rgba(0, 0, 0, 0.82); cursor: zoom-out; }
+  .zoom img { max-width: 100%; max-height: calc(100vh - 110px); object-fit: contain; border-radius: 10px; background: #fff; cursor: default; }
+  .zoom p { margin: 0; color: #fff; font-size: 0.9rem; text-align: center; max-width: 720px; }
+  .zoom-close { position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; padding: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.18); color: #fff; font-size: 1.6rem; line-height: 1; }
   .meta { color: var(--muted); font-size: 0.82rem; margin-top: 24px; }
 
   @media (max-width: 860px) {
