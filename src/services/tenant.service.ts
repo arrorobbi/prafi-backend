@@ -1,6 +1,7 @@
 import { literal, Op, type Includeable, type WhereOptions } from 'sequelize';
 import { HttpError } from '../errors/HttpError';
 import { Image, Tenant, User } from '../models';
+import { findByOldSlug } from '../utils/slug';
 import type { AuthUser } from '../types/express';
 import * as imageService from './image.service';
 import { notify } from './notification.service';
@@ -43,6 +44,8 @@ async function assertLogoExists(logoId: number) {
     ]);
   }
 }
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const findOwn = (user: AuthUser) => Tenant.findOne({ where: { userId: user.id } });
 
@@ -206,13 +209,16 @@ export async function listPublic({ page, limit, q }: ListPublicTenantsOptions) {
   return { tenants: rows, meta: { page, limit, total: count, totalPages: Math.ceil(count / limit) } };
 }
 
-/** By the profile's id or its owner's user id (product.tenant.id), so product pages can link straight here. */
+/** By the profile's slug, its id, or its owner's user id (product.tenant.id), so product pages can link straight here. */
 export async function getPublic(id: string) {
-  const tenant = await Tenant.findOne({
-    where: { [Op.or]: [{ id }, { userId: id }] },
-    attributes: PUBLIC_ATTRIBUTES,
-    include: PUBLIC_INCLUDE,
-  });
+  const find = (where: WhereOptions) => Tenant.findOne({ where, attributes: PUBLIC_ATTRIBUTES, include: PUBLIC_INCLUDE });
+  // A slug (/umkm/dapur-mama), or an id from a link made before slugs
+  let tenant = await find(UUID_RE.test(id) ? { [Op.or]: [{ id }, { userId: id }] } : { slug: id });
+  // A slug from before the UMKM was renamed: still the same UMKM (its current slug is in the answer)
+  if (!tenant && !UUID_RE.test(id)) {
+    const oldId = await findByOldSlug('tenant', id);
+    if (oldId) tenant = await find({ id: oldId });
+  }
   if (!tenant) throw HttpError.notFound('UMKM tidak ditemukan');
   return tenant;
 }

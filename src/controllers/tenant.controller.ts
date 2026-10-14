@@ -1,6 +1,7 @@
 import type { RequestHandler } from 'express';
 import { HttpError } from '../errors/HttpError';
 import * as tenantService from '../services/tenant.service';
+import { SLUG_RE } from '../utils/slug';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DEFAULT_LIMIT = 20;
@@ -18,6 +19,7 @@ const FIELDS: string[] = [...TEXT_FIELDS, ...LINK_FIELDS, ...ID_FIELDS];
 /** On create, `name` may be left out: it defaults to the owner's tenantName. */
 const OPTIONAL_ON_CREATE = ['name'];
 const LOCKED_FIELDS: Record<string, string> = {
+  slug: 'slug dibuat otomatis dari nama UMKM',
   id: 'id tidak dapat diubah',
   userId: 'profil tenant selalu dimiliki oleh tenant yang sedang login',
   tenantCategoryId: 'tenantCategoryId sudah tidak dipakai: kategori kini dipilih per produk (categoryId pada POST/PATCH /api/products)',
@@ -154,7 +156,10 @@ export const listPublic: RequestHandler = async (req, res) => {
 
 /** GET /api/landing/tenants/:id — one UMKM by its profile id or its owner's user id (product.tenant.id). */
 export const getPublic: RequestHandler = async (req, res) => {
+  // /api/landing/tenants/:id takes the UMKM's slug or its id
   const id = String(req.params.id);
-  if (!UUID_RE.test(id)) throw HttpError.badRequest('Validasi gagal', [{ field: 'id', message: 'id harus berupa UUID yang valid' }]);
+  if (!UUID_RE.test(id) && !SLUG_RE.test(id)) {
+    throw HttpError.badRequest('Validasi gagal', [{ field: 'id', message: 'id harus berupa slug atau UUID yang valid' }]);
+  }
   res.json({ success: true, data: await tenantService.getPublic(id) });
 };

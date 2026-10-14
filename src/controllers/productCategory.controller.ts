@@ -7,6 +7,7 @@ const MAX_LIMIT = 100;
 const MAX_NAME_LENGTH = 255;
 const FIELDS = ['name', 'imageId'];
 const LOCKED_FIELDS: Record<string, string> = {
+  slug: 'slug dibuat otomatis dari nama kategori',
   id: 'id tidak dapat diubah',
   productCount: 'productCount dihitung dari produk',
   createdAt: 'createdAt diatur oleh server',

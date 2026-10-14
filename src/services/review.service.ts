@@ -157,7 +157,7 @@ const MODERATION_ATTRIBUTES = [
 
 const productInclude = (where?: WhereOptions) => ({
   association: 'product',
-  attributes: ['id', 'name', 'tenantId'],
+  attributes: ['id', 'name', 'slug', 'tenantId'],
   ...(where && { where, required: true }),
   include: [{ association: 'tenant', attributes: ['id', 'tenantName', 'firstName', 'lastName'] }],
 });

@@ -8,6 +8,7 @@ import {
   NonAttribute,
 } from 'sequelize';
 import { sequelize } from '../config/database';
+import { forgetOldSlugs, freeSlug, hookTransaction, keepOldSlug, saveSlugToo, slugify } from '../utils/slug';
 import type { DbModels } from '.';
 import type { Image } from './image.model';
 import type { User } from './user.model';
@@ -16,6 +17,11 @@ import type { User } from './user.model';
 export class Tenant extends Model<InferAttributes<Tenant>, InferCreationAttributes<Tenant>> {
   declare id: CreationOptional<string>;
   declare name: string;
+  /**
+   * The readable part of the UMKM's address (/umkm/<slug>), made from the name by the hook below; a number is added
+   * when taken (dapur-mama-1). Null only on rows saved by a backend version from before slugs.
+   */
+  declare slug: CreationOptional<string | null>;
   declare description: string;
   declare address: string;
   declare area: string;
@@ -49,6 +55,7 @@ Tenant.init(
   {
     id: { type: DataTypes.UUID, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
     name: { type: DataTypes.STRING, allowNull: false, validate: { notEmpty: true } },
+    slug: { type: DataTypes.STRING(120), allowNull: true, unique: true },
     description: { type: DataTypes.STRING, allowNull: false },
     address: { type: DataTypes.STRING, allowNull: false },
     area: { type: DataTypes.STRING, allowNull: false },
@@ -77,3 +84,20 @@ Tenant.init(
   },
   { sequelize, tableName: 'tenants', modelName: 'Tenant' },
 );
+
+// A new profile, or a renamed one, gets the first free slug for its name
+Tenant.beforeSave(async (tenant, options) => {
+  if (!tenant.name || !(tenant.isNewRecord || tenant.changed('name') || !tenant.slug)) return;
+  const base = slugify(tenant.name, 'umkm');
+  const before = tenant.isNewRecord ? null : tenant.slug;
+  // Renamed to something with the same slug words (e.g. only capitals changed): keep the address
+  if (before && (before === base || before.replace(/-\d+$/, '') === base)) return;
+  const transaction = hookTransaction(options);
+  tenant.slug = await freeSlug(Tenant, 'tenant', base, { exceptId: tenant.isNewRecord ? undefined : tenant.id, transaction });
+  saveSlugToo(options);
+  // The address it had keeps working (and stays reserved for it)
+  if (!tenant.isNewRecord) await keepOldSlug('tenant', tenant.id, before, tenant.slug, transaction);
+});
+
+// Deleted: its old addresses are free again
+Tenant.afterDestroy(async (tenant, options) => forgetOldSlugs('tenant', tenant.id, hookTransaction(options)));

@@ -8,6 +8,7 @@ import {
   NonAttribute,
 } from 'sequelize';
 import { sequelize } from '../config/database';
+import { saveSlugToo, slugify } from '../utils/slug';
 import type { DbModels } from '.';
 import type { Image } from './image.model';
 import type { Product } from './product.model';
@@ -19,6 +20,11 @@ export class ProductCategory extends Model<
 > {
   declare id: CreationOptional<number>;
   declare name: string;
+  /**
+   * The readable part of the category's address (/produk?kategori=<slug>): always exactly the name's slug, never
+   * numbered. Unique, so two categories whose names give the same slug can't both exist.
+   */
+  declare slug: CreationOptional<string | null>;
   /**
    * Required by the API (create needs one, update can only replace it): the landing page carousel shows it.
    * Nullable in the database only for categories created before images existed, until an image is added.
@@ -43,6 +49,7 @@ ProductCategory.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false, unique: true, validate: { notEmpty: true } },
+    slug: { type: DataTypes.STRING(120), allowNull: true, unique: true },
     imageId: {
       type: DataTypes.INTEGER,
       allowNull: true,
@@ -54,3 +61,10 @@ ProductCategory.init(
   },
   { sequelize, tableName: 'product_categories', modelName: 'ProductCategory' },
 );
+
+// The slug always follows the name (the service refuses a name whose slug another category already has)
+ProductCategory.beforeSave((category, options) => {
+  if (!category.name || !(category.isNewRecord || category.changed('name') || !category.slug)) return;
+  category.slug = slugify(category.name, 'kategori');
+  saveSlugToo(options);
+});

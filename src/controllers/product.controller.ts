@@ -1,6 +1,7 @@
 import type { RequestHandler } from 'express';
 import { HttpError } from '../errors/HttpError';
 import * as productService from '../services/product.service';
+import { SLUG_RE } from '../utils/slug';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DEFAULT_LIMIT = 20;
@@ -11,6 +12,7 @@ const UPDATABLE_FIELDS: string[] = [...TEXT_FIELDS, 'price', 'categoryId', 'imag
 /** Rupiah (IDR); also keeps the value inside the INTEGER column */
 const MAX_PRICE = 2_000_000_000;
 const LOCKED_FIELDS: Record<string, string> = {
+  slug: 'slug dibuat otomatis dari nama produk',
   id: 'id tidak dapat diubah',
   tenantId: 'produk selalu dimiliki oleh tenant yang membuatnya',
   approvalId: 'approvalId diatur oleh server',
@@ -81,6 +83,15 @@ function parseProductBody(body: Record<string, unknown>, partial: boolean) {
 function parseId(value: unknown) {
   const id = String(value);
   if (!UUID_RE.test(id)) throw HttpError.badRequest('Validasi gagal', [{ field: 'id', message: 'id harus berupa UUID yang valid' }]);
+  return id;
+}
+
+/** A public address part: the product's slug, or its id */
+function parseIdOrSlug(value: unknown) {
+  const id = String(value);
+  if (!UUID_RE.test(id) && !SLUG_RE.test(id)) {
+    throw HttpError.badRequest('Validasi gagal', [{ field: 'id', message: 'id harus berupa slug atau UUID yang valid' }]);
+  }
   return id;
 }
 
@@ -159,7 +170,8 @@ export const listPublic: RequestHandler = async (req, res) => {
 
 /** GET /api/landing/products/:id — public: one approved product, with its rating summary. */
 export const getPublic: RequestHandler = async (req, res) => {
-  res.json({ success: true, data: await productService.getActive(parseId(req.params.id)) });
+  // /api/landing/products/:id takes the product's slug or its id
+  res.json({ success: true, data: await productService.getActive(parseIdOrSlug(req.params.id)) });
 };
 
 export const getOne: RequestHandler = async (req, res) => {

@@ -234,6 +234,7 @@ Tabel:
 | `images` | Gambar yang diunggah (berkasnya ada di `prafi-backend/images/`) |
 | `notifications` | Notifikasi di dalam aplikasi |
 | `otps`, `revoked_tokens` | Kode dan tautan email (OTP, aktivasi Disnakertrans, atur ulang kata sandi), disimpan sebagai hash; token yang sudah logout |
+| `old_slugs` | Alamat yang dimiliki produk atau UMKM sebelum namanya diubah, agar tautan lama tetap berfungsi |
 | `api_logs` | Catatan Log API |
 
 Membuka konsol database (password dibaca dari `.env`, jadi tidak pernah diketik atau ditampilkan):
@@ -527,7 +528,7 @@ Setiap permintaan melewati rantai yang sama. Dengan mengetahuinya, Anda tahu ber
 | `src/middlewares/` | `auth.ts` (token dan peran), `requestLogger.ts` (baris konsol dan Log API), `upload.ts`, `errorHandler.ts`, `landingRefresh.ts` (memberi tahu website agar menyegarkan halaman yang di-cache) |
 | `src/mail/templates.ts` | Semua email (Bahasa Indonesia): subjek, HTML, dan teks biasa |
 | `src/realtime/socket.ts` | Socket.IO: notifikasi langsung, mengakhiri sesi |
-| `src/utils/` | Fungsi bantu kecil: `jwt.ts`, `markdown.ts`, `turnstile.ts` (pemeriksaan "bukan robot"), `clientIp.ts`, `readablePassword.ts`, `revalidateLanding.ts` |
+| `src/utils/` | Fungsi bantu kecil: `jwt.ts`, `markdown.ts`, `turnstile.ts` (pemeriksaan "bukan robot"), `clientIp.ts`, `readablePassword.ts`, `revalidateLanding.ts`, `slug.ts` (alamat halaman) |
 | `src/scripts/` | Perintah yang dijalankan manual (`seed.ts`, `sync.ts`, `backup.ts`, `cleanupImages.ts`) dan pembuat dokumentasi API (`docs.ts`, `docs.id.md`, `docs.flows.ts`) |
 | `src/types/` | Deklarasi TypeScript (isi `req.user`) |
 | `db/migrations/` | Berkas SQL yang mengubah struktur tabel (di bawah) |
@@ -586,6 +587,7 @@ Berkas sejauh ini, sesuai urutan dijalankannya:
 | `20261010_review_moderation.sql` | Pelaporan dan penyembunyian ulasan |
 | `20261012_google_business_link_text.sql` | Tautan Google Bisnis yang lebih panjang |
 | `20261013_tenant_links_optional.sql` | Semua tautan UMKM menjadi opsional |
+| `20261014_slugs.sql` | Alamat yang mudah dibaca (slug) untuk produk, UMKM, dan kategori; tabel `old_slugs` |
 
 **Menjalankan migrasi** (selalu cadangkan dulu, dan jalankan **sebelum** me-restart backend dengan kode baru):
 
@@ -873,6 +875,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 | Perlindungan ulasan | Pemeriksaan "bukan robot", satu ulasan per produk per hari, maksimal 5 ulasan dalam 10 menit per jaringan, pelaporan dan penyembunyian. Alamat IP pengunjung hanya disimpan sebagai hash | `src/services/review.service.ts` |
 | Cadangan mingguan | Database dan foto, disimpan di server dan dikirim lewat email | bagian 7 |
 | Peringatan disk | Setiap 10 menit backend memeriksa disk; pada `DISK_ALERT_PERCENT` (90) atau lebih, backend mengirim email ke kotak surat situs berisi apa yang memakai ruang dan apa yang dapat dikosongkan, paling sering sekali sehari | `src/services/serverMonitor.service.ts` |
+| Alamat yang mudah dibaca (slug) | Halaman dialamatkan dengan nama: `/produk/brownis-prafi`, `/umkm/dapur-mama`, `/produk?kategori=kuliner`. Slug produk atau UMKM yang sudah dipakai diberi angka (`-1`, `-2`, …); nama kategori tidak boleh berulang sama sekali. Mengubah nama membuat slug baru, dan alamat lama (juga yang lama dengan id) meneruskan pengunjung ke alamat baru | `src/utils/slug.ts`, hook `beforeSave` pada model; frontend `productPath` / `tenantPath` / `categoryPath` di `src/lib/format.ts` |
 | Mesin pencari (SEO) | Judul, deskripsi, sitemap, data terstruktur, `http` ke `https` | README frontend, *SEO* |
 | Halaman pemeliharaan | Tampil menggantikan website saat pembaruan, dalam dua bahasa | bagian 5 |
 | Dokumentasi API publik | `/docs` pada domain API, dalam bahasa Inggris dan Bahasa Indonesia, dengan diagram alur | `npm run docs` |

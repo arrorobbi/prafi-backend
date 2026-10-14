@@ -8,6 +8,7 @@ import {
   NonAttribute,
 } from 'sequelize';
 import { sequelize } from '../config/database';
+import { forgetOldSlugs, freeSlug, hookTransaction, keepOldSlug, saveSlugToo, slugify } from '../utils/slug';
 import type { DbModels } from '.';
 import type { Approval } from './approval.model';
 import type { Image } from './image.model';
@@ -18,6 +19,11 @@ import type { User } from './user.model';
 export class Product extends Model<InferAttributes<Product>, InferCreationAttributes<Product>> {
   declare id: CreationOptional<string>;
   declare name: string;
+  /**
+   * The readable part of the product's address (/produk/<slug>), made from the name by the hook below; a number is
+   * added when taken (brownis-prafi-1). Null only on rows saved by a backend version from before slugs.
+   */
+  declare slug: CreationOptional<string | null>;
   declare description: string;
   declare details: string;
   /** In rupiah (IDR), whole numbers only. */
@@ -61,6 +67,7 @@ Product.init(
   {
     id: { type: DataTypes.UUID, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
     name: { type: DataTypes.STRING, allowNull: false, validate: { notEmpty: true } },
+    slug: { type: DataTypes.STRING(120), allowNull: true, unique: true },
     description: { type: DataTypes.STRING, allowNull: false },
     details: { type: DataTypes.STRING, allowNull: false },
     price: { type: DataTypes.INTEGER, allowNull: false, validate: { min: 0 } },
@@ -92,3 +99,20 @@ Product.init(
   },
   { sequelize, tableName: 'products', modelName: 'Product' },
 );
+
+// A new product, or a renamed one, gets the first free slug for its name
+Product.beforeSave(async (product, options) => {
+  if (!product.name || !(product.isNewRecord || product.changed('name') || !product.slug)) return;
+  const base = slugify(product.name, 'produk');
+  const before = product.isNewRecord ? null : product.slug;
+  // Renamed to something with the same slug words (e.g. only capitals changed): keep the address
+  if (before && (before === base || before.replace(/-\d+$/, '') === base)) return;
+  const transaction = hookTransaction(options);
+  product.slug = await freeSlug(Product, 'product', base, { exceptId: product.isNewRecord ? undefined : product.id, transaction });
+  saveSlugToo(options);
+  // The address it had keeps working (and stays reserved for it)
+  if (!product.isNewRecord) await keepOldSlug('product', product.id, before, product.slug, transaction);
+});
+
+// Deleted: its old addresses are free again
+Product.afterDestroy(async (product, options) => forgetOldSlugs('product', product.id, hookTransaction(options)));

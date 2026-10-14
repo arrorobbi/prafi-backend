@@ -3174,7 +3174,7 @@
                 "products"
               ]
             },
-            "description": "**Access:** tenant\n\nYour tenant profile must be **complete** first (*Tenants → Create My Tenant*) and your account needs a **profile photo** (`faceImageId`, *Auth → Update Me*); otherwise 403 `TENANT_PROFILE_INCOMPLETE` with `details.missingFields` (e.g. `[\"faceImageId\"]`). Upload the image first (*Images → Upload Image*); `imageId` is required. `categoryId` is required: a product category (*Product Categories → List*). `isRecommended` cannot be sent: the server sets it (true while the reviews average 4.8 stars or more, see *Landing → Create Review*). Saves `{{productId}}`. Superadmins, admins and disnakertrans get `PRODUCT_SUBMITTED`, the tenant gets `PRODUCT_UNDER_REVIEW`.",
+            "description": "**Access:** tenant\n\nYour tenant profile must be **complete** first (*Tenants → Create My Tenant*) and your account needs a **profile photo** (`faceImageId`, *Auth → Update Me*); otherwise 403 `TENANT_PROFILE_INCOMPLETE` with `details.missingFields` (e.g. `[\"faceImageId\"]`). Upload the image first (*Images → Upload Image*); `imageId` is required. `categoryId` is required: a product category (*Product Categories → List*). `isRecommended` cannot be sent: the server sets it (true while the reviews average 4.8 stars or more, see *Landing → Create Review*). Saves `{{productId}}`. Superadmins, admins and disnakertrans get `PRODUCT_SUBMITTED`, the tenant gets `PRODUCT_UNDER_REVIEW`. The answer carries `slug`, the readable part of the product's address on the website (`/produk/<slug>`), made from the name: when another product already has it, a number is added (`brownis-prafi`, `brownis-prafi-1`, `brownis-prafi-2`, …). `slug` can't be sent.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Kopi Susu Gula Aren\",\n  \"description\": \"Kopi susu dengan gula aren asli\",\n  \"details\": \"250 ml, es\",\n  \"price\": 18000,\n  \"categoryId\": {{categoryId}},\n  \"imageId\": {{imageId}}\n}",
@@ -3218,7 +3218,7 @@
                     "products"
                   ]
                 },
-                "description": "**Access:** tenant\n\nYour tenant profile must be **complete** first (*Tenants → Create My Tenant*) and your account needs a **profile photo** (`faceImageId`, *Auth → Update Me*); otherwise 403 `TENANT_PROFILE_INCOMPLETE` with `details.missingFields` (e.g. `[\"faceImageId\"]`). Upload the image first (*Images → Upload Image*); `imageId` is required. `categoryId` is required: a product category (*Product Categories → List*). `isRecommended` cannot be sent: the server sets it (true while the reviews average 4.8 stars or more, see *Landing → Create Review*). Saves `{{productId}}`. Superadmins, admins and disnakertrans get `PRODUCT_SUBMITTED`, the tenant gets `PRODUCT_UNDER_REVIEW`.",
+                "description": "**Access:** tenant\n\nYour tenant profile must be **complete** first (*Tenants → Create My Tenant*) and your account needs a **profile photo** (`faceImageId`, *Auth → Update Me*); otherwise 403 `TENANT_PROFILE_INCOMPLETE` with `details.missingFields` (e.g. `[\"faceImageId\"]`). Upload the image first (*Images → Upload Image*); `imageId` is required. `categoryId` is required: a product category (*Product Categories → List*). `isRecommended` cannot be sent: the server sets it (true while the reviews average 4.8 stars or more, see *Landing → Create Review*). Saves `{{productId}}`. Superadmins, admins and disnakertrans get `PRODUCT_SUBMITTED`, the tenant gets `PRODUCT_UNDER_REVIEW`. The answer carries `slug`, the readable part of the product's address on the website (`/produk/<slug>`), made from the name: when another product already has it, a number is added (`brownis-prafi`, `brownis-prafi-1`, `brownis-prafi-2`, …). `slug` can't be sent.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"name\": \"Kopi Susu Gula Aren\",\n  \"description\": \"Kopi susu dengan gula aren asli\",\n  \"details\": \"250 ml, es\",\n  \"price\": 18000,\n  \"categoryId\": {{categoryId}},\n  \"imageId\": {{imageId}}\n}",
@@ -3261,7 +3261,7 @@
                     "products"
                   ]
                 },
-                "description": "**Access:** tenant\n\nYour tenant profile must be **complete** first (*Tenants → Create My Tenant*) and your account needs a **profile photo** (`faceImageId`, *Auth → Update Me*); otherwise 403 `TENANT_PROFILE_INCOMPLETE` with `details.missingFields` (e.g. `[\"faceImageId\"]`). Upload the image first (*Images → Upload Image*); `imageId` is required. `categoryId` is required: a product category (*Product Categories → List*). `isRecommended` cannot be sent: the server sets it (true while the reviews average 4.8 stars or more, see *Landing → Create Review*). Saves `{{productId}}`. Superadmins, admins and disnakertrans get `PRODUCT_SUBMITTED`, the tenant gets `PRODUCT_UNDER_REVIEW`.",
+                "description": "**Access:** tenant\n\nYour tenant profile must be **complete** first (*Tenants → Create My Tenant*) and your account needs a **profile photo** (`faceImageId`, *Auth → Update Me*); otherwise 403 `TENANT_PROFILE_INCOMPLETE` with `details.missingFields` (e.g. `[\"faceImageId\"]`). Upload the image first (*Images → Upload Image*); `imageId` is required. `categoryId` is required: a product category (*Product Categories → List*). `isRecommended` cannot be sent: the server sets it (true while the reviews average 4.8 stars or more, see *Landing → Create Review*). Saves `{{productId}}`. Superadmins, admins and disnakertrans get `PRODUCT_SUBMITTED`, the tenant gets `PRODUCT_UNDER_REVIEW`. The answer carries `slug`, the readable part of the product's address on the website (`/produk/<slug>`), made from the name: when another product already has it, a number is added (`brownis-prafi`, `brownis-prafi-1`, `brownis-prafi-2`, …). `slug` can't be sent.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"name\": \"Kopi Susu Gula Aren\",\n  \"description\": \"Kopi susu dengan gula aren asli\",\n  \"details\": \"250 ml, es\",\n  \"price\": 18000,\n  \"categoryId\": {{categoryId}},\n  \"imageId\": {{imageId}}\n}",
@@ -3307,7 +3307,7 @@
                 "{{productId}}"
               ]
             },
-            "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `price`, `categoryId`, `imageId`. Activation and `isRecommended` cannot be changed here. Admins and disnakertrans get `PRODUCT_UPDATED`. Replacing `imageId` deletes the old image and its file.",
+            "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `price`, `categoryId`, `imageId`. Activation and `isRecommended` cannot be changed here. Admins and disnakertrans get `PRODUCT_UPDATED`. Replacing `imageId` deletes the old image and its file. Changing `name` makes a new `slug` (numbered when taken); the old one keeps leading to the same product.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"price\": 20000,\n  \"categoryId\": {{categoryId}}\n}",
@@ -3351,7 +3351,7 @@
                     "{{productId}}"
                   ]
                 },
-                "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `price`, `categoryId`, `imageId`. Activation and `isRecommended` cannot be changed here. Admins and disnakertrans get `PRODUCT_UPDATED`. Replacing `imageId` deletes the old image and its file.",
+                "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `price`, `categoryId`, `imageId`. Activation and `isRecommended` cannot be changed here. Admins and disnakertrans get `PRODUCT_UPDATED`. Replacing `imageId` deletes the old image and its file. Changing `name` makes a new `slug` (numbered when taken); the old one keeps leading to the same product.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"price\": 20000,\n  \"categoryId\": {{categoryId}}\n}",
@@ -3395,7 +3395,7 @@
                     "{{productId}}"
                   ]
                 },
-                "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `price`, `categoryId`, `imageId`. Activation and `isRecommended` cannot be changed here. Admins and disnakertrans get `PRODUCT_UPDATED`. Replacing `imageId` deletes the old image and its file.",
+                "description": "**Access:** tenant\n\nOwn products only. Send any of `name`, `description`, `details`, `price`, `categoryId`, `imageId`. Activation and `isRecommended` cannot be changed here. Admins and disnakertrans get `PRODUCT_UPDATED`. Replacing `imageId` deletes the old image and its file. Changing `name` makes a new `slug` (numbered when taken); the old one keeps leading to the same product.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"price\": 20000,\n  \"categoryId\": {{categoryId}}\n}",
@@ -3806,7 +3806,7 @@
                 "{{productId}}"
               ]
             },
-            "description": "**Access:** public, no token\n\nOne approved product with `ratingAverage` / `reviewCount`. 404 for unknown or not-yet-approved products.",
+            "description": "**Access:** public, no token\n\nOne approved product with `ratingAverage` / `reviewCount`. 404 for unknown or not-yet-approved products. `{{productId}}` may be the product's **slug** or its id. A slug the product had before it was renamed still finds it; the answer always carries the current `slug`.",
             "auth": {
               "type": "noauth"
             }
@@ -3840,7 +3840,7 @@
                     "{{productId}}"
                   ]
                 },
-                "description": "**Access:** public, no token\n\nOne approved product with `ratingAverage` / `reviewCount`. 404 for unknown or not-yet-approved products.",
+                "description": "**Access:** public, no token\n\nOne approved product with `ratingAverage` / `reviewCount`. 404 for unknown or not-yet-approved products. `{{productId}}` may be the product's **slug** or its id. A slug the product had before it was renamed still finds it; the answer always carries the current `slug`.",
                 "auth": {
                   "type": "noauth"
                 }
@@ -3874,7 +3874,7 @@
                     "{{productId}}"
                   ]
                 },
-                "description": "**Access:** public, no token\n\nOne approved product with `ratingAverage` / `reviewCount`. 404 for unknown or not-yet-approved products.",
+                "description": "**Access:** public, no token\n\nOne approved product with `ratingAverage` / `reviewCount`. 404 for unknown or not-yet-approved products. `{{productId}}` may be the product's **slug** or its id. A slug the product had before it was renamed still finds it; the answer always carries the current `slug`.",
                 "auth": {
                   "type": "noauth"
                 }
@@ -4385,7 +4385,7 @@
                 "{{tenantProfileId}}"
               ]
             },
-            "description": "**Access:** public, no token\n\nOne UMKM with its summary. The id may be the profile's id **or its owner's user id** (`product.tenant.id`), so a product page can link straight to its UMKM. Its products: *Landing Products* with `tenantId` = `userId`.",
+            "description": "**Access:** public, no token\n\nOne UMKM with its summary. The id may be the profile's id **or its owner's user id** (`product.tenant.id`), so a product page can link straight to its UMKM. Its products: *Landing Products* with `tenantId` = `userId`. The UMKM's **slug** works too (`/umkm/<slug>` on the website), as does a slug it had before it was renamed.",
             "auth": {
               "type": "noauth"
             }
@@ -4419,7 +4419,7 @@
                     "{{tenantProfileId}}"
                   ]
                 },
-                "description": "**Access:** public, no token\n\nOne UMKM with its summary. The id may be the profile's id **or its owner's user id** (`product.tenant.id`), so a product page can link straight to its UMKM. Its products: *Landing Products* with `tenantId` = `userId`.",
+                "description": "**Access:** public, no token\n\nOne UMKM with its summary. The id may be the profile's id **or its owner's user id** (`product.tenant.id`), so a product page can link straight to its UMKM. Its products: *Landing Products* with `tenantId` = `userId`. The UMKM's **slug** works too (`/umkm/<slug>` on the website), as does a slug it had before it was renamed.",
                 "auth": {
                   "type": "noauth"
                 }
@@ -4453,7 +4453,7 @@
                     "{{tenantProfileId}}"
                   ]
                 },
-                "description": "**Access:** public, no token\n\nOne UMKM with its summary. The id may be the profile's id **or its owner's user id** (`product.tenant.id`), so a product page can link straight to its UMKM. Its products: *Landing Products* with `tenantId` = `userId`.",
+                "description": "**Access:** public, no token\n\nOne UMKM with its summary. The id may be the profile's id **or its owner's user id** (`product.tenant.id`), so a product page can link straight to its UMKM. Its products: *Landing Products* with `tenantId` = `userId`. The UMKM's **slug** works too (`/umkm/<slug>` on the website), as does a slug it had before it was renamed.",
                 "auth": {
                   "type": "noauth"
                 }
@@ -5258,7 +5258,7 @@
                 "product-categories"
               ]
             },
-            "description": "**Access:** disnakertrans, admin\n\nNames are unique. `imageId` is **required** (upload the image first; one image per category): the carousel on the landing page shows it. Saves `{{categoryId}}`.",
+            "description": "**Access:** disnakertrans, admin\n\nNames are unique. `imageId` is **required** (upload the image first; one image per category): the carousel on the landing page shows it. Saves `{{categoryId}}`. **No duplicate categories:** a name that gives the same `slug` as an existing category (same words, whatever the capitals, spaces or punctuation: \"Kuliner\", \"kuliner\", \"Kuliner!\") is refused with 409 `CATEGORY_EXISTS`. Unlike products, a category slug is never numbered. The slug is the category's address on the website (`/produk?kategori=<slug>`).",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
@@ -5302,7 +5302,7 @@
                     "product-categories"
                   ]
                 },
-                "description": "**Access:** disnakertrans, admin\n\nNames are unique. `imageId` is **required** (upload the image first; one image per category): the carousel on the landing page shows it. Saves `{{categoryId}}`.",
+                "description": "**Access:** disnakertrans, admin\n\nNames are unique. `imageId` is **required** (upload the image first; one image per category): the carousel on the landing page shows it. Saves `{{categoryId}}`. **No duplicate categories:** a name that gives the same `slug` as an existing category (same words, whatever the capitals, spaces or punctuation: \"Kuliner\", \"kuliner\", \"Kuliner!\") is refused with 409 `CATEGORY_EXISTS`. Unlike products, a category slug is never numbered. The slug is the category's address on the website (`/produk?kategori=<slug>`).",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
@@ -5345,7 +5345,7 @@
                     "product-categories"
                   ]
                 },
-                "description": "**Access:** disnakertrans, admin\n\nNames are unique. `imageId` is **required** (upload the image first; one image per category): the carousel on the landing page shows it. Saves `{{categoryId}}`.",
+                "description": "**Access:** disnakertrans, admin\n\nNames are unique. `imageId` is **required** (upload the image first; one image per category): the carousel on the landing page shows it. Saves `{{categoryId}}`. **No duplicate categories:** a name that gives the same `slug` as an existing category (same words, whatever the capitals, spaces or punctuation: \"Kuliner\", \"kuliner\", \"Kuliner!\") is refused with 409 `CATEGORY_EXISTS`. Unlike products, a category slug is never numbered. The slug is the category's address on the website (`/produk?kategori=<slug>`).",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"name\": \"Kuliner {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
@@ -5391,7 +5391,7 @@
                 "{{categoryId}}"
               ]
             },
-            "description": "**Access:** disnakertrans, admin\n\nSend `name` and/or `imageId`. A new `imageId` replaces the image (the old one and its file are deleted). The image can't be removed (`imageId: null` → 400), only replaced. Older categories without an image should get one.",
+            "description": "**Access:** disnakertrans, admin\n\nSend `name` and/or `imageId`. A new `imageId` replaces the image (the old one and its file are deleted). The image can't be removed (`imageId: null` → 400), only replaced. Older categories without an image should get one. A new `name` changes the `slug` with it; a name that matches another category is refused with 409 `CATEGORY_EXISTS`.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
@@ -5435,7 +5435,7 @@
                     "{{categoryId}}"
                   ]
                 },
-                "description": "**Access:** disnakertrans, admin\n\nSend `name` and/or `imageId`. A new `imageId` replaces the image (the old one and its file are deleted). The image can't be removed (`imageId: null` → 400), only replaced. Older categories without an image should get one.",
+                "description": "**Access:** disnakertrans, admin\n\nSend `name` and/or `imageId`. A new `imageId` replaces the image (the old one and its file are deleted). The image can't be removed (`imageId: null` → 400), only replaced. Older categories without an image should get one. A new `name` changes the `slug` with it; a name that matches another category is refused with 409 `CATEGORY_EXISTS`.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
@@ -5479,7 +5479,7 @@
                     "{{categoryId}}"
                   ]
                 },
-                "description": "**Access:** disnakertrans, admin\n\nSend `name` and/or `imageId`. A new `imageId` replaces the image (the old one and its file are deleted). The image can't be removed (`imageId: null` → 400), only replaced. Older categories without an image should get one.",
+                "description": "**Access:** disnakertrans, admin\n\nSend `name` and/or `imageId`. A new `imageId` replaces the image (the old one and its file are deleted). The image can't be removed (`imageId: null` → 400), only replaced. Older categories without an image should get one. A new `name` changes the `slug` with it; a name that matches another category is refused with 409 `CATEGORY_EXISTS`.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"name\": \"Kuliner & Minuman {{$timestamp}}\",\n  \"imageId\": {{imageId}}\n}",
@@ -5715,7 +5715,7 @@
                 "me"
               ]
             },
-            "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and every link (`whatsappLink`, `gmapsLink`, `fbLink`, `instagramLink`, `googleBusinessLink`, `shopeeLink`), which are optional. `logoId`: upload the logo first. The profile has no category any more: each product has one (`categoryId`). Saves `{{tenantProfileId}}`.",
+            "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and every link (`whatsappLink`, `gmapsLink`, `fbLink`, `instagramLink`, `googleBusinessLink`, `shopeeLink`), which are optional. `logoId`: upload the logo first. The profile has no category any more: each product has one (`categoryId`). Saves `{{tenantProfileId}}`. The answer carries `slug`, the UMKM's address on the website (`/umkm/<slug>`), made from `name` and numbered when taken (`dapur-mama`, `dapur-mama-1`). `slug` can't be sent.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Warung Budi\",\n  \"description\": \"Kopi dan makanan ringan\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00 - 22:00\",\n  \"fbLink\": \"https://facebook.com/warungbudi\",\n  \"whatsappLink\": \"https://wa.me/6281298765432\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"instagramLink\": \"https://instagram.com/warungbudi\",\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": null,\n  \"logoId\": {{imageId}}\n}",
@@ -5769,7 +5769,7 @@
                     "me"
                   ]
                 },
-                "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and every link (`whatsappLink`, `gmapsLink`, `fbLink`, `instagramLink`, `googleBusinessLink`, `shopeeLink`), which are optional. `logoId`: upload the logo first. The profile has no category any more: each product has one (`categoryId`). Saves `{{tenantProfileId}}`.",
+                "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and every link (`whatsappLink`, `gmapsLink`, `fbLink`, `instagramLink`, `googleBusinessLink`, `shopeeLink`), which are optional. `logoId`: upload the logo first. The profile has no category any more: each product has one (`categoryId`). Saves `{{tenantProfileId}}`. The answer carries `slug`, the UMKM's address on the website (`/umkm/<slug>`), made from `name` and numbered when taken (`dapur-mama`, `dapur-mama-1`). `slug` can't be sent.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"name\": \"Warung Budi\",\n  \"description\": \"Kopi dan makanan ringan\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00 - 22:00\",\n  \"fbLink\": \"https://facebook.com/warungbudi\",\n  \"whatsappLink\": \"https://wa.me/6281298765432\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"instagramLink\": \"https://instagram.com/warungbudi\",\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": null,\n  \"logoId\": {{imageId}}\n}",
@@ -5813,7 +5813,7 @@
                     "me"
                   ]
                 },
-                "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and every link (`whatsappLink`, `gmapsLink`, `fbLink`, `instagramLink`, `googleBusinessLink`, `shopeeLink`), which are optional. `logoId`: upload the logo first. The profile has no category any more: each product has one (`categoryId`). Saves `{{tenantProfileId}}`.",
+                "description": "**Access:** tenant\n\nOne profile per tenant. Required: every field except `name` (defaults to your tenantName) and every link (`whatsappLink`, `gmapsLink`, `fbLink`, `instagramLink`, `googleBusinessLink`, `shopeeLink`), which are optional. `logoId`: upload the logo first. The profile has no category any more: each product has one (`categoryId`). Saves `{{tenantProfileId}}`. The answer carries `slug`, the UMKM's address on the website (`/umkm/<slug>`), made from `name` and numbered when taken (`dapur-mama`, `dapur-mama-1`). `slug` can't be sent.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"name\": \"Warung Budi\",\n  \"description\": \"Kopi dan makanan ringan\",\n  \"address\": \"Jl. Merdeka No. 1\",\n  \"area\": \"Bandung\",\n  \"operationalHours\": \"08:00 - 22:00\",\n  \"fbLink\": \"https://facebook.com/warungbudi\",\n  \"whatsappLink\": \"https://wa.me/6281298765432\",\n  \"gmapsLink\": \"https://maps.app.goo.gl/example\",\n  \"instagramLink\": \"https://instagram.com/warungbudi\",\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": null,\n  \"logoId\": {{imageId}}\n}",
@@ -5859,7 +5859,7 @@
                 "me"
               ]
             },
-            "description": "**Access:** tenant\n\nSend only the fields to change. Send `null` (or `\"\"`) to remove a link. Admins get `TENANT_PROFILE_UPDATED`. Replacing `logoId` deletes the old logo and its file.",
+            "description": "**Access:** tenant\n\nSend only the fields to change. Send `null` (or `\"\"`) to remove a link. Admins get `TENANT_PROFILE_UPDATED`. Replacing `logoId` deletes the old logo and its file. Changing `name` makes a new `slug`; the old one keeps leading to the same UMKM.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": \"https://shopee.co.id/warungbudi\",\n  \"instagramLink\": null\n}",
@@ -5903,7 +5903,7 @@
                     "me"
                   ]
                 },
-                "description": "**Access:** tenant\n\nSend only the fields to change. Send `null` (or `\"\"`) to remove a link. Admins get `TENANT_PROFILE_UPDATED`. Replacing `logoId` deletes the old logo and its file.",
+                "description": "**Access:** tenant\n\nSend only the fields to change. Send `null` (or `\"\"`) to remove a link. Admins get `TENANT_PROFILE_UPDATED`. Replacing `logoId` deletes the old logo and its file. Changing `name` makes a new `slug`; the old one keeps leading to the same UMKM.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"googleBusinessLink\": \"https://g.page/warungbudi\",\n  \"shopeeLink\": \"https://shopee.co.id/warungbudi\",\n  \"instagramLink\": null\n}",
@@ -5947,7 +5947,7 @@
                     "me"
                   ]
                 },
-                "description": "**Access:** tenant\n\nSend only the fields to change. Admins get `TENANT_PROFILE_UPDATED`. Replacing `logoId` deletes the old logo and its file.",
+                "description": "**Access:** tenant\n\nSend only the fields to change. Admins get `TENANT_PROFILE_UPDATED`. Replacing `logoId` deletes the old logo and its file. Changing `name` makes a new `slug`; the old one keeps leading to the same UMKM.",
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"operationalHours\": \"07:00 - 23:00\"\n}",

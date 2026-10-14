@@ -302,10 +302,10 @@ superadmin/disnakertrans/admin: semua produk. tenant: hanya produk miliknya. Mas
 Tenant mendapat 404 untuk produk yang bukan miliknya.
 
 === REQ Create Product (tenant) => Buat Produk
-Profil tenant Anda harus **lengkap** terlebih dahulu (*Tenant → Buat Profil Tenant Saya*) dan akun Anda harus memiliki **foto profil** (`faceImageId`, *Auth → Ubah Profil Saya*); jika belum, 403 `TENANT_PROFILE_INCOMPLETE` dengan `details.missingFields` (mis. `["faceImageId"]`). Unggah gambarnya dulu (*Gambar → Unggah Gambar*); `imageId` wajib diisi. `categoryId` wajib: kategori produk (*Kategori Produk → Daftar*). `isRecommended` tidak boleh dikirim: server yang mengaturnya (lihat *Landing → Tulis Ulasan*). Menyimpan `{{productId}}`. Superadmin, admin, dan disnakertrans menerima `PRODUCT_SUBMITTED`, tenant menerima `PRODUCT_UNDER_REVIEW`.
+Profil tenant Anda harus **lengkap** terlebih dahulu (*Tenant → Buat Profil Tenant Saya*) dan akun Anda harus memiliki **foto profil** (`faceImageId`, *Auth → Ubah Profil Saya*); jika belum, 403 `TENANT_PROFILE_INCOMPLETE` dengan `details.missingFields` (mis. `["faceImageId"]`). Unggah gambarnya dulu (*Gambar → Unggah Gambar*); `imageId` wajib diisi. `categoryId` wajib: kategori produk (*Kategori Produk → Daftar*). `isRecommended` tidak boleh dikirim: server yang mengaturnya (lihat *Landing → Tulis Ulasan*). Menyimpan `{{productId}}`. Superadmin, admin, dan disnakertrans menerima `PRODUCT_SUBMITTED`, tenant menerima `PRODUCT_UNDER_REVIEW`. Jawaban berisi `slug`, bagian alamat produk yang mudah dibaca di website (`/produk/<slug>`), dibuat dari nama: bila sudah dipakai produk lain, sebuah angka ditambahkan (`brownis-prafi`, `brownis-prafi-1`, `brownis-prafi-2`, …). `slug` tidak dapat dikirim.
 
 === REQ Update Product (tenant) => Ubah Produk
-Hanya produk milik sendiri. Kirim salah satu dari `name`, `description`, `details`, `price`, `categoryId`, `imageId`. Aktivasi dan `isRecommended` tidak bisa diubah di sini. Admin dan disnakertrans menerima `PRODUCT_UPDATED`. Jika `imageId` diganti, gambar lama beserta filenya dihapus.
+Hanya produk milik sendiri. Kirim salah satu dari `name`, `description`, `details`, `price`, `categoryId`, `imageId`. Aktivasi dan `isRecommended` tidak bisa diubah di sini. Admin dan disnakertrans menerima `PRODUCT_UPDATED`. Jika `imageId` diganti, gambar lama beserta filenya dihapus. Mengubah `name` membuat `slug` baru (diberi angka bila sudah dipakai); slug lama tetap mengarah ke produk yang sama.
 
 === REQ Delete Product (tenant) => Hapus Produk
 Hanya produk milik sendiri. Approval, ulasan, dan gambarnya ikut dihapus. Admin dan disnakertrans menerima `PRODUCT_DELETED`.
@@ -322,7 +322,7 @@ Semua kategori produk urut A→Z beserta `image` (null hanya untuk kategori lama
 Hanya produk yang sudah disetujui, terbaru di atas, masing-masing dengan `category` (`id`, `name`). Filter opsional: `recommended=true` (produk dengan rata-rata ulasan **4,8 bintang atau lebih**, diatur server), `tenantId` (produk satu pemilik), `categoryId` (satu kategori, mis. slide carousel yang sedang tampil), dan `sort` (`newest` sebagai bawaan, atau `rating`: rata-rata tertinggi di atas, produk tanpa ulasan di bawah). `tenant.tenant` pada setiap produk adalah profil UMKM pemiliknya (`id`, `name`, dan tautan publiknya `whatsappLink`, `instagramLink`, `shopeeLink`, `googleBusinessLink`, `fbLink`, `gmapsLink`; yang kosong bernilai `null`) untuk *Detail UMKM Landing* dan tombol kontak di halaman produk.
 
 === REQ Landing Product (Public) => Detail Produk Landing
-Satu produk yang sudah disetujui beserta `ratingAverage` / `reviewCount`. 404 untuk produk yang tidak ada atau belum disetujui.
+Satu produk yang sudah disetujui beserta `ratingAverage` / `reviewCount`. 404 untuk produk yang tidak ada atau belum disetujui. `{{productId}}` boleh berupa **slug** produk atau id-nya. Slug yang dimiliki produk sebelum namanya diubah tetap menemukannya; jawaban selalu berisi `slug` yang sekarang.
 
 === REQ List Reviews (Public) => Daftar Ulasan
 Ulasan sebuah produk, terbaru di atas. `meta.ratingAverage` dan `meta.reviewCount` untuk ringkasan bintang.
@@ -343,7 +343,7 @@ Setelah setiap ulasan, `isRecommended` produk dihitung ulang: `true` bila ada **
 UMKM (profil tenant) yang akun pemiliknya aktif, urut A→Z, masing-masing dengan logo, `productCount` (produk yang sudah disetujui), `ratingAverage`, dan `reviewCount`. Opsional `q` (cari nama). Menyimpan yang pertama sebagai `{{tenantProfileId}}`.
 
 === REQ Landing Tenant (Public) => Detail UMKM Landing
-Satu UMKM beserta ringkasannya. Id boleh berupa id profil **atau id user pemiliknya** (`product.tenant.id`), sehingga halaman produk dapat langsung menautkan ke UMKM-nya. Produknya: *Produk Landing* dengan `tenantId` = `userId`.
+Satu UMKM beserta ringkasannya. Id boleh berupa id profil **atau id user pemiliknya** (`product.tenant.id`), sehingga halaman produk dapat langsung menautkan ke UMKM-nya. Produknya: *Produk Landing* dengan `tenantId` = `userId`. **Slug** UMKM juga dapat dipakai (`/umkm/<slug>` di website), begitu pula slug sebelum namanya diubah.
 
 === FOLDER Reviews => Ulasan
 Menjaga ulasan produk (`/api/reviews`, Bearer `{{token}}`). Pengunjung menulis ulasan tanpa login (*Landing → Tulis Ulasan*); di sini **penjual melaporkan** ulasan pada produknya sendiri dan **admin / disnakertrans memutuskan**: `hide` (tidak lagi tampil dan tidak dihitung dalam rating maupun rekomendasi; datanya tetap tersimpan), `keep` (tetap tampil; penjual tidak dapat melaporkannya lagi) atau `unhide` (menampilkan kembali ulasan yang disembunyikan).
@@ -371,10 +371,10 @@ Diurutkan berdasarkan nama, masing-masing dengan `image` dan `productCount` (sem
 === REQ Get Product Category (All roles) => Detail Kategori Produk
 
 === REQ Create Product Category (disnakertrans, admin) => Buat Kategori Produk
-Nama harus unik. `imageId` **wajib** (unggah gambarnya dulu; satu gambar per kategori): carousel di halaman landing menampilkannya. Menyimpan `{{categoryId}}`.
+Nama harus unik. `imageId` **wajib** (unggah gambarnya dulu; satu gambar per kategori): carousel di halaman landing menampilkannya. Menyimpan `{{categoryId}}`. **Tidak ada kategori ganda:** nama yang menghasilkan `slug` sama dengan kategori yang sudah ada (kata yang sama, apa pun huruf besar, spasi, atau tanda bacanya: "Kuliner", "kuliner", "Kuliner!") ditolak dengan 409 `CATEGORY_EXISTS`. Berbeda dengan produk, slug kategori tidak pernah diberi angka. Slug adalah alamat kategori di website (`/produk?kategori=<slug>`).
 
 === REQ Update Product Category (disnakertrans, admin) => Ubah Kategori Produk
-Kirim `name` dan/atau `imageId`. `imageId` baru menggantikan gambar (gambar lama beserta filenya dihapus). Gambar tidak bisa dihapus (`imageId: null` → 400), hanya diganti. Kategori lama yang belum punya gambar sebaiknya segera diberi gambar.
+Kirim `name` dan/atau `imageId`. `imageId` baru menggantikan gambar (gambar lama beserta filenya dihapus). Gambar tidak bisa dihapus (`imageId: null` → 400), hanya diganti. Kategori lama yang belum punya gambar sebaiknya segera diberi gambar. `name` baru ikut mengubah `slug`; nama yang sama dengan kategori lain ditolak dengan 409 `CATEGORY_EXISTS`.
 
 === REQ Delete Product Category (disnakertrans, admin) => Hapus Kategori Produk
 Kategori yang masih dipakai produk tidak bisa dihapus (409 `STILL_IN_USE`, `details.productCount`): pindahkan dulu produknya ke kategori lain. Gambarnya (beserta file) ikut dihapus.
@@ -388,10 +388,10 @@ Profil tenant (toko). User tenant mengelola profil **miliknya sendiri** di `/api
 404 jika Anda belum membuat profil. `isComplete` / `missingFields`: produk baru dapat dibuat setelah semua field wajib terisi (tautan tidak dihitung: semuanya opsional). `missingFields` juga berisi `faceImageId` selama akun Anda belum memiliki foto profil..
 
 === REQ Create My Tenant (tenant) => Buat Profil Tenant Saya
-Satu profil per tenant. Wajib: semua field kecuali `name` (bawaan: tenantName Anda) dan semua tautan (`whatsappLink`, `gmapsLink`, `fbLink`, `instagramLink`, `googleBusinessLink`, `shopeeLink`), yang opsional. `logoId`: unggah logo dulu. Profil tidak lagi memiliki kategori: setiap produk yang memilikinya (`categoryId`). Menyimpan `{{tenantProfileId}}`.
+Satu profil per tenant. Wajib: semua field kecuali `name` (bawaan: tenantName Anda) dan semua tautan (`whatsappLink`, `gmapsLink`, `fbLink`, `instagramLink`, `googleBusinessLink`, `shopeeLink`), yang opsional. `logoId`: unggah logo dulu. Profil tidak lagi memiliki kategori: setiap produk yang memilikinya (`categoryId`). Menyimpan `{{tenantProfileId}}`. Jawaban berisi `slug`, alamat UMKM di website (`/umkm/<slug>`), dibuat dari `name` dan diberi angka bila sudah dipakai (`dapur-mama`, `dapur-mama-1`). `slug` tidak dapat dikirim.
 
 === REQ Update My Tenant (tenant) => Ubah Profil Tenant Saya
-Kirim hanya field yang ingin diubah. Kirim `null` (atau `""`) untuk menghapus sebuah tautan. Admin menerima `TENANT_PROFILE_UPDATED`. Jika `logoId` diganti, logo lama beserta filenya dihapus.
+Kirim hanya field yang ingin diubah. Kirim `null` (atau `""`) untuk menghapus sebuah tautan. Admin menerima `TENANT_PROFILE_UPDATED`. Jika `logoId` diganti, logo lama beserta filenya dihapus. Mengubah `name` membuat `slug` baru; slug lama tetap mengarah ke UMKM yang sama.
 
 === REQ Delete My Tenant (tenant) => Hapus Profil Tenant Saya
 Menghapus profil tenant Anda (akun Anda tetap ada).

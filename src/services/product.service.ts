@@ -4,6 +4,7 @@ import { HttpError } from '../errors/HttpError';
 import { Approval, Image, Product, ProductCategory, sequelize, User } from '../models';
 import type { AuthUser } from '../types/express';
 import * as imageService from './image.service';
+import { findByOldSlug, isSlugConflict } from '../utils/slug';
 import { assertProfileComplete } from './tenant.service';
 import { notify } from './notification.service';
 
@@ -27,7 +28,7 @@ export interface ListProductsOptions {
   categoryId?: number;
 }
 
-const CATEGORY_INCLUDE: Includeable = { association: 'category', attributes: ['id', 'name'] };
+const CATEGORY_INCLUDE: Includeable = { association: 'category', attributes: ['id', 'name', 'slug'] };
 
 const productInclude = (isActive?: boolean): Includeable[] => [
   { association: 'image' },
@@ -39,6 +40,8 @@ const productInclude = (isActive?: boolean): Includeable[] => [
   },
   { association: 'tenant', attributes: ['id', 'tenantName', 'firstName', 'lastName', 'email'] },
 ];
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const canReadAll = (user: AuthUser) => PRODUCT_READ_ALL_ROLES.includes(user.role);
 
@@ -113,7 +116,7 @@ const PUBLIC_INCLUDE: Includeable[] = [
     include: [
       {
         association: 'tenant',
-        attributes: ['id', 'name', 'whatsappLink', 'instagramLink', 'shopeeLink', 'googleBusinessLink', 'fbLink', 'gmapsLink'],
+        attributes: ['id', 'name', 'slug', 'whatsappLink', 'instagramLink', 'shopeeLink', 'googleBusinessLink', 'fbLink', 'gmapsLink'],
       },
     ],
   },
@@ -146,9 +149,18 @@ export async function listActive({ page, limit, recommended, tenantId, categoryI
   return { products: rows, meta: { page, limit, total: count, totalPages: Math.ceil(count / limit) } };
 }
 
-/** Public: one approved product (404 for unknown or not-yet-approved ones). */
-export async function getActive(id: string) {
-  const product = await Product.findByPk(id, { attributes: withRating(['approvalId']), include: PUBLIC_INCLUDE });
+/**
+ * Public: one approved product, by its slug (/produk/brownis-prafi) or its id (links from before slugs).
+ * 404 for unknown or not-yet-approved ones.
+ */
+export async function getActive(idOrSlug: string) {
+  const find = (where: WhereOptions) => Product.findOne({ where, attributes: withRating(['approvalId']), include: PUBLIC_INCLUDE });
+  let product = await find(UUID_RE.test(idOrSlug) ? { id: idOrSlug } : { slug: idOrSlug });
+  // A slug from before the product was renamed: still the same product (its current slug is in the answer)
+  if (!product && !UUID_RE.test(idOrSlug)) {
+    const id = await findByOldSlug('product', idOrSlug);
+    if (id) product = await find({ id });
+  }
   if (!product) throw HttpError.notFound('Produk tidak ditemukan');
   return product;
 }
@@ -182,6 +194,10 @@ export async function create(user: AuthUser, input: ProductInput) {
       { transaction },
     );
     return Product.create({ ...input, tenantId: user.id, approvalId: approval.id }, { transaction });
+  }).catch((err) => {
+    // Two products with the same name saved in the same instant picked the same slug: ask to send it again
+    if (isSlugConflict(err)) throw HttpError.conflict('Produk dengan nama yang sama sedang disimpan, silakan kirim ulang');
+    throw err;
   });
   const created = await getById(user, product.id);
   await notify.productSubmitted(created, { id: user.id, tenantName: created.tenant?.tenantName });

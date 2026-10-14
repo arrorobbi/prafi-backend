@@ -234,6 +234,7 @@ Tables:
 | `images` | Uploaded images (the files are in `prafi-backend/images/`) |
 | `notifications` | In-app notifications |
 | `otps`, `revoked_tokens` | Email codes and links (OTP, Disnakertrans activation, password reset), stored as hashes; logged-out tokens |
+| `old_slugs` | Addresses a product or UMKM had before it was renamed, so old links keep working |
 | `api_logs` | The Log API records |
 
 Open the database console (the password is read from `.env`, so it is never typed or shown):
@@ -527,7 +528,7 @@ Every request passes the same chain. Knowing it tells you which file to open:
 | `src/middlewares/` | `auth.ts` (token and role), `requestLogger.ts` (console line and Log API), `upload.ts`, `errorHandler.ts`, `landingRefresh.ts` (tells the website to refresh its cached pages) |
 | `src/mail/templates.ts` | Every email (Bahasa Indonesia): subject, HTML and plain text |
 | `src/realtime/socket.ts` | Socket.IO: live notifications, ending sessions |
-| `src/utils/` | Small helpers: `jwt.ts`, `markdown.ts`, `turnstile.ts` ("not a robot" check), `clientIp.ts`, `readablePassword.ts`, `revalidateLanding.ts` |
+| `src/utils/` | Small helpers: `jwt.ts`, `markdown.ts`, `turnstile.ts` ("not a robot" check), `clientIp.ts`, `readablePassword.ts`, `revalidateLanding.ts`, `slug.ts` (page addresses) |
 | `src/scripts/` | Commands run by hand (`seed.ts`, `sync.ts`, `backup.ts`, `cleanupImages.ts`) and the API docs generator (`docs.ts`, `docs.id.md`, `docs.flows.ts`) |
 | `src/types/` | TypeScript declarations (what `req.user` holds) |
 | `db/migrations/` | SQL files that change the table structure (below) |
@@ -586,6 +587,7 @@ Files so far, in the order they were run:
 | `20261010_review_moderation.sql` | Reporting and hiding reviews |
 | `20261012_google_business_link_text.sql` | Longer Google Bisnis link |
 | `20261013_tenant_links_optional.sql` | Every UMKM link optional |
+| `20261014_slugs.sql` | Readable addresses (slugs) for products, UMKM and categories; table `old_slugs` |
 
 **Running a migration** (always back up first, and run it **before** restarting the backend with the new code):
 
@@ -873,6 +875,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 | Review protection | "Not a robot" check, one review per product per day, at most 5 reviews in 10 minutes per network, reporting and hiding. Visitors' IP addresses are stored only as a hash | `src/services/review.service.ts` |
 | Weekly backup | Database and photos, kept on the server and emailed | section 7 |
 | Disk alert | Every 10 minutes the backend checks the disk; at `DISK_ALERT_PERCENT` (90) or more it emails the site's mailbox what takes space and what can be cleared, at most once a day | `src/services/serverMonitor.service.ts` |
+| Readable addresses (slugs) | Pages are addressed by name: `/produk/brownis-prafi`, `/umkm/dapur-mama`, `/produk?kategori=kuliner`. A product or UMKM slug that is taken gets a number (`-1`, `-2`, …); category names can't repeat at all. Renaming makes a new slug, and the old address (also the old ones with an id) sends the visitor on to the new one | `src/utils/slug.ts`, the models' `beforeSave` hooks; frontend `productPath` / `tenantPath` / `categoryPath` in `src/lib/format.ts` |
 | Search engines (SEO) | Titles, descriptions, sitemap, structured data, `http` to `https` | frontend README, *SEO* |
 | Maintenance page | Shown instead of the website during updates, in two languages | section 5 |
 | Public API docs | `/docs` on the API domain, in English and Bahasa Indonesia, with flow charts | `npm run docs` |

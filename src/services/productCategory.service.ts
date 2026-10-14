@@ -1,6 +1,7 @@
-import { literal, type FindAttributeOptions } from 'sequelize';
+import { literal, Op, type FindAttributeOptions } from 'sequelize';
 import { HttpError } from '../errors/HttpError';
 import { Image, Product, ProductCategory } from '../models';
+import { slugify } from '../utils/slug';
 import * as imageService from './image.service';
 
 export interface ListCategoriesOptions {
@@ -64,8 +65,26 @@ async function assertImageExists(imageId: number | undefined) {
   }
 }
 
-/** Duplicate name (or an image already used by another category) → UniqueConstraintError → 409 via the error handler. */
+/**
+ * No duplicate categories: a name whose slug another category already has is refused (so "Kuliner", "kuliner" and
+ * "Kuliner!" are one category). Unlike products, a category slug is never numbered.
+ */
+async function assertNameIsNew(name: string, exceptId?: number) {
+  const twin = await ProductCategory.findOne({
+    where: { slug: slugify(name, 'kategori'), ...(exceptId !== undefined && { id: { [Op.ne]: exceptId } }) },
+    attributes: ['id', 'name'],
+  });
+  if (twin) {
+    throw new HttpError(409, `Kategori "${twin.name}" sudah ada. Nama kategori tidak boleh sama atau serupa`, 'CATEGORY_EXISTS', {
+      field: 'name',
+      existing: { id: twin.id, name: twin.name },
+    });
+  }
+}
+
+/** An image already used by another category → UniqueConstraintError → 409 via the error handler. */
 export async function create(input: CategoryInput) {
+  await assertNameIsNew(input.name);
   await assertImageExists(input.imageId);
   const category = await ProductCategory.create({ name: input.name, imageId: input.imageId });
   return getById(category.id);
@@ -75,6 +94,7 @@ export async function create(input: CategoryInput) {
 export async function update(id: number, changes: Partial<CategoryInput>) {
   const category = await ProductCategory.findByPk(id);
   if (!category) throw HttpError.notFound('Kategori produk tidak ditemukan');
+  if (changes.name !== undefined) await assertNameIsNew(changes.name, id);
   await assertImageExists(changes.imageId);
 
   const oldImageId = category.imageId;
