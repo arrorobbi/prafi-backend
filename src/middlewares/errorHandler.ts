@@ -1,5 +1,6 @@
 import type { ErrorRequestHandler, RequestHandler } from 'express';
 import { MulterError } from 'multer';
+import { MAX_UPLOAD_SIZE } from '../config/upload';
 import {
   BaseError as SequelizeBaseError,
   ConnectionError,
@@ -126,7 +127,7 @@ function fromMulterError(err: unknown): HttpError | null {
   if (!(err instanceof MulterError)) return null;
 
   if (err.code === 'LIMIT_FILE_SIZE') {
-    return new HttpError(413, 'Ukuran file terlalu besar (maksimal 5 MB)', 'FILE_TOO_LARGE');
+    return new HttpError(413, `Ukuran file terlalu besar (maksimal ${MAX_UPLOAD_SIZE / 1024 / 1024} MB)`, 'FILE_TOO_LARGE');
   }
   if (err.code === 'LIMIT_UNEXPECTED_FILE') {
     return HttpError.badRequest(`Field file "${err.field}" tidak dikenali, gunakan field "image"`);

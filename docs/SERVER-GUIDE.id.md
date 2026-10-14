@@ -368,7 +368,7 @@ Baris yang berakhiran `# managed by Certbot` adalah pengaturan sertifikat: biark
 
 ### Perubahan yang sering dilakukan
 
-**Ukuran unggahan.** Unggahan foto melewati tiga batas: nginx (`client_max_body_size`, 10M website / 20M API), lalu batas backend sendiri yaitu **5 MB per gambar** (`MAX_IMAGE_SIZE` di `src/config/upload.ts`). Yang terkecil yang berlaku. Untuk mengizinkan foto lebih besar, naikkan batas backend (lalu build ulang), dan jaga kedua batas nginx tetap di atasnya.
+**Ukuran unggahan.** Unggahan foto melewati tiga batas: nginx (`client_max_body_size`, 10M website / 20M API), lalu backend, yang menerima hingga **9 MB** (`MAX_UPLOAD_SIZE`) dan **mengompres yang lebih dari 3 MB** sebelum disimpan (`MAX_IMAGE_SIZE`, keduanya di `src/config/upload.ts`; `src/services/imageCompress.service.ts`). Website sudah memotong dan mengompres gambar menjadi 3 MB di browser sebelum diunggah, jadi server hanya mengompres kiriman dari client lain. Jaga batas nginx website (10M) tetap di atas 9 MB.
 
 **Mematikan / menyalakan sebuah situs.** Hapus atau buat lagi tautannya, lalu uji dan reload:
 
@@ -519,7 +519,7 @@ Setiap permintaan melewati rantai yang sama. Dengan mengetahuinya, Anda tahu ber
 |---|---|
 | `src/server.ts` | Awal program: menyambung ke database, membuka port 4000 dan Socket.IO, memulai pekerjaan terjadwal |
 | `src/app.ts` | Aplikasi Express: header keamanan, CORS, `/images` (foto unggahan), `/docs` (dokumentasi API publik), route `/api`, penangan galat |
-| `src/config/` | `env.ts` membaca `.env` (pengaturan wajib yang hilang menghentikan start), `database.ts` koneksi database, `upload.ts` batas foto (5 MB, jenis yang diizinkan) dan folder `images/` |
+| `src/config/` | `env.ts` membaca `.env` (pengaturan wajib yang hilang menghentikan start), `database.ts` koneksi database, `upload.ts` batas foto (diterima 9 MB, disimpan maksimal 3 MB; jenis yang diizinkan) dan folder `images/` |
 | `src/constants/` | Daftar tetap: `roles.ts` (empat peran dan **siapa boleh melakukan apa**), `notifications.ts`, `realtime.ts` (nama event langsung), `products.ts` (aturan label *rekomendasi*) |
 | `src/routes/` | Satu berkas per bidang: `auth`, `user`, `approval`, `product`, `productCategory`, `review`, `tenant`, `image`, `notification`, `stats`, `apiLog`, `landing` (halaman publik), `serverDocs` (panduan ini), `serverMonitor` (Monitor Server). `index.ts` menggabungkannya di bawah `/api` |
 | `src/controllers/` | Pemeriksaan masukan dan jawaban, satu berkas per bidang |
@@ -870,6 +870,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 | Notifikasi langsung | Notifikasi, daftar ulasan, dan tanda belum dibaca diperbarui tanpa memuat ulang (Socket.IO) | `src/realtime/socket.ts` |
 | Perlindungan login | 5 password salah untuk satu akun dari satu jaringan, atau 20 dari satu jaringan untuk akun mana pun, dalam 15 menit: jaringan itu harus menunggu (429). Dihitung di memori backend, jadi restart menghapusnya | `src/services/loginGuard.service.ts` |
 | Sesi | Login berakhir setelah **1 jam tanpa aktivitas**: selama pengguna mengeklik atau mengetik, website memperpanjangnya (paling sering sekali semenit), sampai **12 jam** setelah login. Logout, penonaktifan, atau atur ulang kata sandi langsung mengakhiri sesi | `src/services/auth.service.ts` (`refreshSession`), frontend `src/lib/auth.tsx` |
+| Persiapan gambar | Sebelum diunggah, website memotong setiap gambar sesuai bentuk tempat tampilnya (produk 1:1, logo UMKM 1:1, kategori carousel 2:3, BUMDES 16:10) dan mengompresnya menjadi 3 MB; foto akun hanya dapat diambil dengan kamera. Form menyebutkan rasio dan ukuran yang disarankan | frontend `src/lib/imageTools.ts` (`CROP`), `ImageCropDialog.tsx`, `CameraCapture.tsx` |
 | Pemeriksaan foto akun | Foto akun yang baru harus menampilkan wajah. Pendeteksi wajah di server memeriksanya saat diunggah (sekitar setengah detik) dan sekali lagi saat disimpan; logo, produk, atau pemandangan ditolak. Tidak ada data wajah yang disimpan. Pemeriksaan pertama setelah restart memuat pendeteksi, yang menambah sekitar 300 MB memori backend | `src/services/faceDetection.service.ts` |
 | Unggah foto | Foto terunggah saat dipilih dan ditautkan saat *Simpan*; yang tidak terpakai dihapus setiap malam | bagian 7 dan 12 |
 | Perlindungan ulasan | Pemeriksaan "bukan robot", satu ulasan per produk per hari, maksimal 5 ulasan dalam 10 menit per jaringan, pelaporan dan penyembunyian. Alamat IP pengunjung hanya disimpan sebagai hash | `src/services/review.service.ts` |

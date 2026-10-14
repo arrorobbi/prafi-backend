@@ -119,7 +119,7 @@ Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUse
 | 403 | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `USER_NOT_ACTIVATED` | role tidak sesuai, email belum diverifikasi, atau akun belum diaktifkan |
 | 404 | `NOT_FOUND` | tidak ditemukan, atau bukan milik Anda |
 | 409 | `UNIQUE_CONSTRAINT`, `STILL_IN_USE`, `CONFLICT`, `EMAIL_ALREADY_VERIFIED` | nilai duplikat, data masih digunakan, sudah terverifikasi |
-| 413 | `FILE_TOO_LARGE` | gambar lebih dari 5 MB |
+| 413 | `FILE_TOO_LARGE` | gambar lebih dari 9 MB |
 | 429 | `TOO_MANY_REQUESTS` | kode verifikasi baru diminta kurang dari 60 detik yang lalu; terlalu banyak login gagal (5 per akun atau 20 per jaringan dalam 15 menit) |
 
 ## Notifikasi dan realtime
@@ -239,9 +239,9 @@ Mengubah akun Anda sendiri; kirim hanya field yang ingin diubah: `firstName`, `l
 `id`, `role`, dan `mailActive` tidak pernah bisa diubah di sini. Jika `faceImageId` diganti (atau `null`), gambar lama beserta filenya dihapus.
 
 === FOLDER Images => Gambar
-Unggah gambar (maks. 5 MB; jpg, png, webp, gif). Unggah dulu, lalu pakai id yang dikembalikan sebagai `faceImageId`, `imageId` produk, atau `logoId` tenant. File dapat diakses publik di `imgUrl`. Jika gambar sebuah data diganti, gambar lama dan filenya otomatis dihapus.
+Unggah gambar (jpg, png, webp, gif; diterima hingga 9 MB, dan yang lebih dari **3 MB dikompres** menjadi 3 MB atau kurang sebelum disimpan: diperkecil hingga maksimal 2560 px dan disimpan dengan kualitas lebih rendah; PNG atau GIF besar menjadi WebP, sehingga `imgUrl` dapat berakhiran `.webp`). Unggah dulu, lalu pakai id yang dikembalikan sebagai `faceImageId`, `imageId` produk, atau `logoId` tenant. File dapat diakses publik di `imgUrl`. Jika gambar sebuah data diganti, gambar lama dan filenya otomatis dihapus.
 
-Setiap kegagalan unggah memiliki pesan yang jelas dan `code` sendiri: `IMAGE_REQUIRED` (tanpa file), `EMPTY_IMAGE` (0 byte), `UNSUPPORTED_IMAGE_TYPE` (mis. `image/heic` dari iPhone), `INVALID_IMAGE_CONTENT` (isi file bukan gambar), `FILE_TOO_LARGE` (413, lebih dari 5 MB), `UPLOAD_INCOMPLETE` (koneksi terputus), `IMAGE_STORAGE_FAILED` / `IMAGE_SAVE_FAILED` (500, penyimpanan atau database server).
+Setiap kegagalan unggah memiliki pesan yang jelas dan `code` sendiri: `IMAGE_REQUIRED` (tanpa file), `EMPTY_IMAGE` (0 byte), `UNSUPPORTED_IMAGE_TYPE` (mis. `image/heic` dari iPhone), `INVALID_IMAGE_CONTENT` (isi file bukan gambar), `FILE_TOO_LARGE` (413, lebih dari 9 MB), `UPLOAD_INCOMPLETE` (koneksi terputus), `IMAGE_STORAGE_FAILED` / `IMAGE_SAVE_FAILED` (500, penyimpanan atau database server).
 
 === REQ Upload Image (All roles) => Unggah Gambar
 multipart/form-data, field **image** (pilih file di Body → form-data). Menyimpan `{{imageId}}` dan `{{imagePath}}` (`imgUrl`; respons juga berisi link lengkap di `url`).

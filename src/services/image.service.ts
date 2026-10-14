@@ -4,6 +4,7 @@ import { IMAGES_DIR, IMAGES_URL_PATH } from '../config/upload';
 import { HttpError } from '../errors/HttpError';
 import { Image, Product, ProductCategory, Tenant, User } from '../models';
 import { assertFaceInFile, rememberFaceImage } from './faceDetection.service';
+import { shrinkToLimit } from './imageCompress.service';
 
 /** The first bytes of each allowed type, so a renamed non-image (e.g. a PDF saved as .jpg) is refused. */
 const SIGNATURES: Record<string, (b: Buffer) => boolean> = {
@@ -45,6 +46,14 @@ export async function createFromUpload(file: Express.Multer.File, altText: strin
       'INVALID_IMAGE_CONTENT',
       { received: file.mimetype },
     );
+  }
+
+  // Over 3 MB: compressed now (the file may get a new name, e.g. a big PNG becomes WebP)
+  try {
+    Object.assign(file, await shrinkToLimit(file));
+  } catch (err) {
+    await fs.unlink(file.path).catch(() => {});
+    throw new HttpError(400, 'Gambar tidak dapat diproses, gunakan foto JPG, PNG, atau WEBP lain', 'INVALID_IMAGE_CONTENT', { reason: (err as Error).message });
   }
 
   if (face) {

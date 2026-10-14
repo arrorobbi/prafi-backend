@@ -368,7 +368,7 @@ Lines ending in `# managed by Certbot` are the certificate settings: leave them 
 
 ### Common changes
 
-**Upload size.** A photo upload passes three limits: nginx (`client_max_body_size`, 10M website / 20M API), then the backend's own limit of **5 MB per image** (`MAX_IMAGE_SIZE` in `src/config/upload.ts`). The smallest one wins. To allow bigger photos, raise the backend limit (and rebuild), and keep both nginx limits above it.
+**Upload size.** A photo upload passes three limits: nginx (`client_max_body_size`, 10M website / 20M API), then the backend, which accepts up to **9 MB** (`MAX_UPLOAD_SIZE`) and **compresses anything over 3 MB** before storing it (`MAX_IMAGE_SIZE`, both in `src/config/upload.ts`; `src/services/imageCompress.service.ts`). The website already crops and compresses pictures to 3 MB in the browser before uploading, so the server only compresses what other clients send. Keep the website's nginx limit (10M) above 9 MB.
 
 **Switch a site off / on.** Remove or re-create its link, then test and reload:
 
@@ -519,7 +519,7 @@ Every request passes the same chain. Knowing it tells you which file to open:
 |---|---|
 | `src/server.ts` | Start-up: connects to the database, opens port 4000 and Socket.IO, starts the scheduled jobs |
 | `src/app.ts` | The Express app: security headers, CORS, `/images` (uploaded photos), `/docs` (public API docs), `/api` routes, error handler |
-| `src/config/` | `env.ts` reads `.env` (a missing required setting stops the start), `database.ts` the database connection, `upload.ts` photo limits (5 MB, allowed types) and the `images/` folder |
+| `src/config/` | `env.ts` reads `.env` (a missing required setting stops the start), `database.ts` the database connection, `upload.ts` photo limits (9 MB accepted, stored at 3 MB or less; allowed types) and the `images/` folder |
 | `src/constants/` | Fixed lists: `roles.ts` (the four roles and **who may do what**), `notifications.ts`, `realtime.ts` (live event names), `products.ts` (rules for the *recommended* label) |
 | `src/routes/` | One file per area: `auth`, `user`, `approval`, `product`, `productCategory`, `review`, `tenant`, `image`, `notification`, `stats`, `apiLog`, `landing` (public pages), `serverDocs` (this guide), `serverMonitor` (Monitor Server). `index.ts` joins them under `/api` |
 | `src/controllers/` | Input checks and answers, one file per area |
@@ -870,6 +870,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 | Live notifications | Notifications, review lists and the unread badge update without reloading (Socket.IO) | `src/realtime/socket.ts` |
 | Login protection | 5 wrong passwords for one account from one network, or 20 from one network across accounts, in 15 minutes: that network must wait (429). Counted in the backend's memory, so a restart clears it | `src/services/loginGuard.service.ts` |
 | Sessions | A login ends after **1 hour without activity**: while the user clicks or types, the website renews it (at most once a minute), up to **12 hours** after the login. Logout, deactivation or a password reset ends the session at once | `src/services/auth.service.ts` (`refreshSession`), frontend `src/lib/auth.tsx` |
+| Picture preparation | Before upload the website crops each picture to the shape of where it is shown (product 1:1, UMKM logo 1:1, carousel category 2:3, BUMDES 16:10) and compresses it to 3 MB; the account photo is taken with the camera only. The form says the shape and recommended size | frontend `src/lib/imageTools.ts` (`CROP`), `ImageCropDialog.tsx`, `CameraCapture.tsx` |
 | Account photo check | A new account photo must show a face. A face detector on the server looks at it during the upload (about half a second) and again when it is saved; a logo, product or landscape is refused. Nothing about the face is stored. The first check after a restart loads the detector, which adds about 300 MB to the backend's memory | `src/services/faceDetection.service.ts` |
 | Photo uploads | A photo uploads when picked and is attached on *Simpan*; unused ones are deleted every night | sections 7 and 12 |
 | Review protection | "Not a robot" check, one review per product per day, at most 5 reviews in 10 minutes per network, reporting and hiding. Visitors' IP addresses are stored only as a hash | `src/services/review.service.ts` |

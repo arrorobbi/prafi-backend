@@ -257,7 +257,7 @@ export const FLOWS: Record<string, Chart[]> = {
       nodes: [
         start('POST /api/images (multipart)'),
         ...auth(),
-        check({ en: 'Field `image`: JPEG, PNG, WebP or GIF up to 5 MB?', id: 'Field `image`: JPEG, PNG, WebP atau GIF maks. 5 MB?' }, '400'),
+        check({ en: 'Field `image`: JPEG, PNG, WebP or GIF up to 9 MB?', id: 'Field `image`: JPEG, PNG, WebP atau GIF maks. 9 MB?' }, '400'),
         step({ en: 'Save the file under a random name + Image record', id: 'Simpan file dengan nama acak + data Image' }),
         end(
           '201 { id, imgUrl, url }',
