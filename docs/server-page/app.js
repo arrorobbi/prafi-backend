@@ -144,7 +144,7 @@
     var chips = el('div', 'chips');
     chips.appendChild(el('span', 'chip', sections.length + t('sections')));
     chips.appendChild(el('span', 'chip', t('updated') + new Date(updatedAt).toLocaleDateString(t('locale'), { day: 'numeric', month: 'long', year: 'numeric' })));
-    var heroPrint = el('button', '', '⎙ ' + t('print'));
+    var heroPrint = el('button', '', t('print'));
     heroPrint.type = 'button';
     heroPrint.addEventListener('click', function () { printGuide(null); });
     chips.appendChild(heroPrint);
