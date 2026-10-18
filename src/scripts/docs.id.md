@@ -60,6 +60,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Produk | `PATCH /api/products/{{productId}}` | tenant |
 | Produk | `DELETE /api/products/{{productId}}` | tenant |
 | Landing | `GET /api/landing/site` | Publik |
+| Landing | `GET /api/landing/guides` | Publik |
 | Landing | `GET /api/landing/categories` | Publik |
 | Landing | `GET /api/landing/products` | Publik |
 | Landing | `GET /api/landing/products/{{productId}}` | Publik |
@@ -69,6 +70,15 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Landing | `GET /api/landing/tenants/{{tenantProfileId}}` | Publik |
 | Konten Situs | `GET /api/site-content` | disnakertrans, admin |
 | Konten Situs | `PATCH /api/site-content` | disnakertrans, admin |
+| Panduan | `GET /api/guides` | superadmin, disnakertrans, admin |
+| Panduan | `POST /api/guides` | superadmin, disnakertrans, admin |
+| Panduan | `PATCH /api/guides/{{guideSectionId}}` | superadmin, disnakertrans, admin |
+| Panduan | `PATCH /api/guides/order` | superadmin, disnakertrans, admin |
+| Panduan | `DELETE /api/guides/{{guideSectionId}}` | superadmin, disnakertrans, admin |
+| Panduan | `POST /api/guides/{{guideSectionId}}/steps` | superadmin, disnakertrans, admin |
+| Panduan | `PATCH /api/guides/{{guideSectionId}}/steps/{{guideStepId}}` | superadmin, disnakertrans, admin |
+| Panduan | `PATCH /api/guides/{{guideSectionId}}/steps/order` | superadmin, disnakertrans, admin |
+| Panduan | `DELETE /api/guides/{{guideSectionId}}/steps/{{guideStepId}}` | superadmin, disnakertrans, admin |
 | Ulasan | `GET /api/reviews/mine` | tenant |
 | Ulasan | `POST /api/reviews/{{reviewId}}/report` | tenant |
 | Ulasan | `GET /api/reviews` | disnakertrans, admin |
@@ -101,7 +111,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Realtime (WebSocket) | Socket.IO di `{{baseUrl}}` | Semua role (Bearer token) |
 
 ## Variabel yang disimpan
-Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` / `temporaryPassword` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `reviewId`, `reviewClientId` · `categoryId` · `tenantProfileId` · `notificationId` · `logId`. Setiap penyimpanan dicetak di Postman Console.
+Request menyimpan nilai yang dibutuhkan request berikutnya: `token`, `currentUserId`, `currentRole` (Login) · `userId`, `userRole`, `registeredEmail`, `otp` / `verifyToken` / `temporaryPassword` (Register, Resend) · `resetToken` (Forgot Password) · `imageId`, `imagePath` (Upload Image) · `productId` · `reviewId`, `reviewClientId` · `categoryId` · `tenantProfileId` · `guideSectionId`, `guideStepId` · `notificationId` · `logId`. Setiap penyimpanan dicetak di Postman Console.
 
 ## Contoh alur
 1. **Login** sebagai superadmin → **Register Disnakertrans** (tanpa password: kata sandi sementara dikirim lewat email) → **Check Activation Link** → **Activate Account** (mengatur password menjadi `{{newUserPassword}}`; atau buka link dari email).
@@ -339,6 +349,11 @@ Halaman publik untuk pengunjung: tanpa token, tanpa data pribadi (tanpa email/te
 === REQ Site Texts (Public) => Teks Situs
 Teks yang diubah admin dan disnakertrans di *Konten Situs*: `footerAbout`, teks "tentang" di footer setiap halaman publik. Teks biasa: baris kosong memulai paragraf baru, `**teks**` ditebalkan (tampilkan sebagai teks, jangan sebagai HTML). Memakai teks bawaan sampai ada yang menyimpan teks.
 
+=== REQ Landing Guides (Public) => Panduan Landing
+Panduan (halaman bantuan) yang diubah di *Kelola Panduan*: setiap topik untuk `audience` (`public` = /panduan, bawaan; `tenant` = Bantuan & Ketentuan di dashboard penjual), sesuai urutan halaman, masing-masing dengan `steps` bernomor. Sebuah langkah memiliki `desktopImage` (layar lebar) dan `mobileImage` (HP; frontend berganti pada 640 px), masing-masing null bila belum diisi: bila hanya satu yang diisi, tampilkan di semua layar. `slug` adalah jangkar topik (`/panduan#<slug>`).
+
+Teks (`intro`, `outro`, `body` langkah) berupa teks biasa: baris kosong memulai paragraf, baris yang diawali `- ` menjadi daftar, `**teks**` ditebalkan, `[label](/path)` menjadi tautan (halaman situs, `https://`, `mailto:` atau `tel:`), dan `{{kontak-admin}}` pada barisnya sendiri menampilkan WhatsApp dan email administrator. Tampilkan sebagai teks, jangan sebagai HTML.
+
 === REQ Landing Categories (Public) => Kategori Landing
 Semua kategori produk urut A→Z beserta `image` (null hanya untuk kategori lama yang belum diberi gambar) dan `productCount` (hanya produk yang sudah disetujui), untuk carousel beranda: setiap slide adalah gambar kategori, dan di sebelahnya *Produk Landing* dengan `categoryId` menampilkan produk kategori tersebut.
 
@@ -377,6 +392,44 @@ Setiap teks yang dapat diubah dengan `value` saat ini, `default`, `maxLength`, `
 
 === REQ Update Site Content (disnakertrans, admin) => Ubah Konten Situs
 Body: `footerAbout` (maksimal 1500 karakter). Akhir baris dirapikan, spasi di ujung baris dihapus dan paling banyak satu baris kosong di antara paragraf. `""` atau `null` kembali ke teks bawaan. Halaman publik website langsung diperbarui.
+
+=== FOLDER Guides => Panduan
+Panduan (halaman bantuan) sebagai konten yang dapat diubah (menu dashboard *Kelola Panduan*): topik dengan langkah bernomor; setiap langkah dapat memiliki gambar desktop dan HP. Pengunjung membacanya melalui *Landing → Panduan Landing*. Gambar yang diganti, atau yang langkah maupun topiknya dihapus, juga dihapus dari disk.
+
+=== REQ List Guides (superadmin, disnakertrans, admin) => Daftar Panduan
+Semua topik (kedua audience) sesuai urutan halaman beserta langkah dan gambarnya, ditambah `editor` (yang terakhir mengubah). `meta.limits` berisi batas panjang teks.
+
+=== REQ Create Guide Section (superadmin, disnakertrans, admin) => Tambah Topik Panduan
+Topik baru, ditambahkan di akhir. `slug` dibuat sekali dari judul (ditambah angka bila sudah dipakai) dan tetap walaupun judul diganti, sehingga tautan `/panduan#<slug>` tetap berfungsi.
+
+Field: `title` (wajib saat membuat, maksimal 120), `summary` (maksimal 255), `icon` (salah satu dari: search, user, users, store, plus, check, bell, camera, lock, settings, docs, headset, help, box, tag, message, calculator, home, heart, map), `color` (hex, mis. `#ea7b25`), `audience` (`public` = /panduan, `tenant` = Bantuan penjual; minimal satu), `intro` dan `outro` (maksimal 5000; `""` atau `null` menghapus).
+
+Teks (`intro`, `outro`, `body` langkah) berupa teks biasa: baris kosong memulai paragraf, baris yang diawali `- ` menjadi daftar, `**teks**` ditebalkan, `[label](/path)` menjadi tautan (halaman situs, `https://`, `mailto:` atau `tel:`), dan `{{kontak-admin}}` pada barisnya sendiri menampilkan WhatsApp dan email administrator. Tampilkan sebagai teks, jangan sebagai HTML.
+
+Cache halaman publik website langsung diperbarui. Menyimpan `{{guideSectionId}}`.
+
+=== REQ Update Guide Section (superadmin, disnakertrans, admin) => Ubah Topik Panduan
+Kirim hanya field yang diubah. Field: `title` (wajib saat membuat, maksimal 120), `summary` (maksimal 255), `icon` (salah satu dari: search, user, users, store, plus, check, bell, camera, lock, settings, docs, headset, help, box, tag, message, calculator, home, heart, map), `color` (hex, mis. `#ea7b25`), `audience` (`public` = /panduan, `tenant` = Bantuan penjual; minimal satu), `intro` dan `outro` (maksimal 5000; `""` atau `null` menghapus).
+
+=== REQ Reorder Guide Sections (superadmin, disnakertrans, admin) => Urutkan Topik Panduan
+Body `ids`: **semua** id topik tepat satu kali, dalam urutan halaman yang baru (selain itu 400). Mengembalikan seluruh daftar.
+
+=== REQ Delete Guide Section (superadmin, disnakertrans, admin) => Hapus Topik Panduan
+Menghapus topik, langkah-langkahnya **dan gambarnya** (baris `images` dan berkas di disk).
+
+=== REQ Add Guide Step (superadmin, disnakertrans, admin) => Tambah Langkah Panduan
+Langkah baru di akhir topik. `body` (wajib, maksimal 3000), `imageAlt` (maksimal 255), `desktopImageId` dan `mobileImageId`: gambar yang diunggah dengan *Unggah Gambar* (desktop 16:10, mis. 1280×800; HP 9:16, mis. 720×1280), atau null. Gambar yang sudah dipakai di tempat lain (langkah lain, produk, logo…) ditolak (400), dan keduanya harus unggahan yang berbeda. Mengembalikan topik beserta langkahnya. Menyimpan `{{guideStepId}}`.
+
+Teks (`intro`, `outro`, `body` langkah) berupa teks biasa: baris kosong memulai paragraf, baris yang diawali `- ` menjadi daftar, `**teks**` ditebalkan, `[label](/path)` menjadi tautan (halaman situs, `https://`, `mailto:` atau `tel:`), dan `{{kontak-admin}}` pada barisnya sendiri menampilkan WhatsApp dan email administrator. Tampilkan sebagai teks, jangan sebagai HTML.
+
+=== REQ Update Guide Step (superadmin, disnakertrans, admin) => Ubah Langkah Panduan
+Kirim hanya field yang diubah. `desktopImageId` / `mobileImageId` yang baru mengganti gambar, `null` menghapusnya: gambar lama **dihapus** (baris `images` dan berkas di disk).
+
+=== REQ Reorder Guide Steps (superadmin, disnakertrans, admin) => Urutkan Langkah Panduan
+Body `ids`: semua id langkah topik tepat satu kali, dalam urutan baru (selain itu 400). Nomor langkah mengikuti urutan.
+
+=== REQ Delete Guide Step (superadmin, disnakertrans, admin) => Hapus Langkah Panduan
+Menghapus langkah **dan gambarnya** (baris dan berkas). Mengembalikan topik dengan langkah yang tersisa.
 
 === FOLDER Reviews => Ulasan
 Menjaga ulasan produk (`/api/reviews`, Bearer `{{token}}`). Pengunjung menulis ulasan tanpa login (*Landing → Tulis Ulasan*); di sini **penjual melaporkan** ulasan pada produknya sendiri dan **admin / disnakertrans memutuskan**: `hide` (tidak lagi tampil dan tidak dihitung dalam rating maupun rekomendasi; datanya tetap tersimpan), `keep` (tetap tampil; penjual tidak dapat melaporkannya lagi) atau `unhide` (menampilkan kembali ulasan yang disembunyikan).

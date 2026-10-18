@@ -3992,6 +3992,125 @@
           ]
         },
         {
+          "name": "Landing Guides (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/landing/guides?audience=public",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "landing",
+                "guides"
+              ],
+              "query": [
+                {
+                  "key": "audience",
+                  "value": "public"
+                }
+              ]
+            },
+            "description": "**Access:** public, no token\n\nThe Panduan (help pages) edited in *Kelola Panduan*: every topic for `audience` (`public` = /panduan, the default; `tenant` = Bantuan & Ketentuan in the seller dashboard), in page order, each with its numbered `steps`. A step has `desktopImage` (wide screens) and `mobileImage` (phones; the frontend switches at 640 px), each null when not set: when only one is set, show it everywhere. `slug` is the topic's anchor (`/panduan#<slug>`).\n\nTexts (`intro`, `outro`, step `body`) are plain text: an empty line starts a paragraph, lines starting with `- ` make a list, `**text**` is bold, `[label](/path)` is a link (a page of the site, `https://`, `mailto:` or `tel:`), and `{{kontak-admin}}` on its own line shows the administrator's WhatsApp and email. Render them as text, never as HTML.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/landing/guides?audience=public",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "landing",
+                    "guides"
+                  ],
+                  "query": [
+                    {
+                      "key": "audience",
+                      "value": "public"
+                    }
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nThe Panduan (help pages) edited in *Kelola Panduan*: every topic for `audience` (`public` = /panduan, the default; `tenant` = Bantuan & Ketentuan in the seller dashboard), in page order, each with its numbered `steps`. A step has `desktopImage` (wide screens) and `mobileImage` (phones; the frontend switches at 640 px), each null when not set: when only one is set, show it everywhere. `slug` is the topic's anchor (`/panduan#<slug>`).\n\nTexts (`intro`, `outro`, step `body`) are plain text: an empty line starts a paragraph, lines starting with `- ` make a list, `**text**` is bold, `[label](/path)` is a link (a page of the site, `https://`, `mailto:` or `tel:`), and `{{kontak-admin}}` on its own line shows the administrator's WhatsApp and email. Render them as text, never as HTML.",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": 1,\n      \"slug\": \"mencari-produk\",\n      \"title\": \"Cara Mencari Produk\",\n      \"summary\": \"Menjelajah beranda, mencari produk, dan melihat detail\",\n      \"icon\": \"search\",\n      \"color\": \"#0e3c69\",\n      \"audience\": [\n        \"public\"\n      ],\n      \"intro\": null,\n      \"outro\": null,\n      \"sortOrder\": 1,\n      \"updatedAt\": \"2026-10-18T17:18:52.406Z\",\n      \"steps\": [\n        {\n          \"id\": 1,\n          \"body\": \"Gunakan menu **Beranda**, **Produk**, dan **UMKM** di bagian atas untuk menjelajah produk dan toko. Di Beranda, carousel menampilkan gambar setiap **kategori produk**, dan di sebelahnya produk dari kategori yang sedang tampil. Produk berikon jempol adalah **rekomendasi**: memiliki minimal 3 ulasan dengan rata-rata 4,8 bintang atau lebih. Menu **Produk** mengurutkan produk dari **rating tertinggi**; pilih **Terbaru** untuk melihat produk yang baru tayang lebih dulu.\",\n          \"imageAlt\": \"Menu utama di beranda\",\n          \"sortOrder\": 0,\n          \"desktopImageId\": 1,\n          \"mobileImageId\": null,\n          \"desktopImage\": {\n            \"url\": \"https://api.transniaga.manokwarikab.go.id/images/dab25ce3-fb4f-46b8-a388-defeaccbabfd.jpg\",\n            \"id\": 1,\n            \"imgUrl\": \"/images/dab25ce3-fb4f-46b8-a388-defeaccbabfd.jpg\",\n            \"altText\": \"Menu utama di beranda\"\n          },\n          \"mobileImage\": null\n        }\n      ]\n    }\n  ]\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/landing/guides?audience=public",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "landing",
+                    "guides"
+                  ],
+                  "query": [
+                    {
+                      "key": "audience",
+                      "value": "public"
+                    }
+                  ]
+                },
+                "description": "**Access:** public, no token\n\nThe Panduan (help pages) edited in *Kelola Panduan*: every topic for `audience` (`public` = /panduan, the default; `tenant` = Bantuan & Ketentuan in the seller dashboard), in page order, each with its numbered `steps`. A step has `desktopImage` (wide screens) and `mobileImage` (phones; the frontend switches at 640 px), each null when not set: when only one is set, show it everywhere. `slug` is the topic's anchor (`/panduan#<slug>`).\n\nTexts (`intro`, `outro`, step `body`) are plain text: an empty line starts a paragraph, lines starting with `- ` make a list, `**text**` is bold, `[label](/path)` is a link (a page of the site, `https://`, `mailto:` or `tel:`), and `{{kontak-admin}}` on its own line shows the administrator's WhatsApp and email. Render them as text, never as HTML.",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"audience\",\n        \"message\": \"audience harus salah satu dari: public, tenant\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
           "name": "Landing Categories (Public)",
           "request": {
             "method": "GET",
@@ -5168,6 +5287,945 @@
               ],
               "cookie": [],
               "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"footerAbout\",\n        \"message\": \"footerAbout maksimal 1500 karakter (saat ini 1501)\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Guides",
+      "description": "The Panduan (help pages) as editable content (dashboard menu *Kelola Panduan*): topics with numbered steps; each step may have a desktop and an HP picture. Visitors read them through *Landing → Landing Guides*. Pictures that are replaced, or whose step or topic is deleted, are deleted from the disk too.",
+      "item": [
+        {
+          "name": "List Guides (superadmin, disnakertrans, admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/guides",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "guides"
+              ]
+            },
+            "description": "**Access:** superadmin, disnakertrans, admin\n\nEvery topic (both audiences) in page order with its steps and pictures, plus `editor` (who changed it last). `meta.limits` has the text limits."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var d = pm.response.code < 300 && pm.response.json().data;",
+                  "if (d && d.length) { pm.environment.set('guideSectionId', d[0].id); if (d[0].steps.length) pm.environment.set('guideStepId', d[0].steps[0].id); }"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/guides",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "guides"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nEvery topic (both audiences) in page order with its steps and pictures, plus `editor` (who changed it last). `meta.limits` has the text limits."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": 1,\n      \"slug\": \"mencari-produk\",\n      \"title\": \"Cara Mencari Produk\",\n      \"summary\": \"Menjelajah beranda, mencari produk, dan melihat detail\",\n      \"icon\": \"search\",\n      \"color\": \"#0e3c69\",\n      \"audience\": [\n        \"public\"\n      ],\n      \"intro\": null,\n      \"outro\": null,\n      \"sortOrder\": 1,\n      \"updatedBy\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n      \"createdAt\": \"2026-10-18T17:18:04.168Z\",\n      \"updatedAt\": \"2026-10-18T17:18:52.406Z\",\n      \"steps\": [\n        {\n          \"id\": 1,\n          \"sectionId\": 1,\n          \"body\": \"Gunakan menu **Beranda**, **Produk**, dan **UMKM** di bagian atas untuk menjelajah produk dan toko. Di Beranda, carousel menampilkan gambar setiap **kategori produk**, dan di sebelahnya produk dari kategori yang sedang tampil. Produk berikon jempol adalah **rekomendasi**: memiliki minimal 3 ulasan dengan rata-rata 4,8 bintang atau lebih. Menu **Produk** mengurutkan produk dari **rating tertinggi**; pilih **Terbaru** untuk melihat produk yang baru tayang lebih dulu.\",\n          \"imageAlt\": \"Menu utama di beranda\",\n          \"desktopImageId\": 1,\n          \"mobileImageId\": null,\n          \"sortOrder\": 0,\n          \"createdAt\": \"2026-10-18T17:18:04.211Z\",\n          \"updatedAt\": \"2026-10-18T17:18:04.211Z\",\n          \"desktopImage\": {\n            \"url\": \"https://api.transniaga.manokwarikab.go.id/images/dab25ce3-fb4f-46b8-a388-defeaccbabfd.jpg\",\n            \"id\": 1,\n            \"imgUrl\": \"/images/dab25ce3-fb4f-46b8-a388-defeaccbabfd.jpg\",\n            \"altText\": \"Menu utama di beranda\"\n          },\n          \"mobileImage\": null\n        }\n      ],\n      \"editor\": {\n        \"id\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n        \"firstName\": \"Andi\",\n        \"lastName\": \"Wijaya\",\n        \"role\": \"admin\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"limits\": {\n      \"title\": 120,\n      \"summary\": 255,\n      \"text\": 5000,\n      \"body\": 3000,\n      \"imageAlt\": 255\n    }\n  }\n}"
+            },
+            {
+              "name": "403 Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/guides",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "guides"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nEvery topic (both audiences) in page order with its steps and pictures, plus `editor` (who changed it last). `meta.limits` has the text limits."
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"FORBIDDEN\",\n    \"message\": \"Anda tidak memiliki izin untuk mengakses data ini\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Guide Section (superadmin, disnakertrans, admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/guides",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "guides"
+              ]
+            },
+            "description": "**Access:** superadmin, disnakertrans, admin\n\nA new topic, added at the end. `slug` is made once from the title (a number is added when taken) and stays when the title changes, so `/panduan#<slug>` links keep working.\n\nFields: `title` (required on create, max 120), `summary` (max 255), `icon` (one of: search, user, users, store, plus, check, bell, camera, lock, settings, docs, headset, help, box, tag, message, calculator, home, heart, map), `color` (hex, e.g. `#ea7b25`), `audience` (`public` = /panduan, `tenant` = the seller's Bantuan; at least one), `intro` and `outro` (max 5000; `\"\"` or `null` removes).\n\nTexts (`intro`, `outro`, step `body`) are plain text: an empty line starts a paragraph, lines starting with `- ` make a list, `**text**` is bold, `[label](/path)` is a link (a page of the site, `https://`, `mailto:` or `tel:`), and `{{kontak-admin}}` on its own line shows the administrator's WhatsApp and email. Render them as text, never as HTML.\n\nThe website's cached public pages refresh right away. Saves `{{guideSectionId}}`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Cara Memberi Ulasan\",\n  \"summary\": \"Memberi bintang dan ulasan pada produk\",\n  \"icon\": \"message\",\n  \"color\": \"#ea7b25\",\n  \"audience\": [\n    \"public\",\n    \"tenant\"\n  ],\n  \"intro\": \"Ulasan membantu pembeli lain memilih produk.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) { pm.environment.set('guideSectionId', pm.response.json().data.id); console.log('saved {{guideSectionId}} = ' + pm.response.json().data.id); }"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/guides",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "guides"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nA new topic, added at the end. `slug` is made once from the title (a number is added when taken) and stays when the title changes, so `/panduan#<slug>` links keep working.\n\nFields: `title` (required on create, max 120), `summary` (max 255), `icon` (one of: search, user, users, store, plus, check, bell, camera, lock, settings, docs, headset, help, box, tag, message, calculator, home, heart, map), `color` (hex, e.g. `#ea7b25`), `audience` (`public` = /panduan, `tenant` = the seller's Bantuan; at least one), `intro` and `outro` (max 5000; `\"\"` or `null` removes).\n\nTexts (`intro`, `outro`, step `body`) are plain text: an empty line starts a paragraph, lines starting with `- ` make a list, `**text**` is bold, `[label](/path)` is a link (a page of the site, `https://`, `mailto:` or `tel:`), and `{{kontak-admin}}` on its own line shows the administrator's WhatsApp and email. Render them as text, never as HTML.\n\nThe website's cached public pages refresh right away. Saves `{{guideSectionId}}`.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Cara Memberi Ulasan\",\n  \"summary\": \"Memberi bintang dan ulasan pada produk\",\n  \"icon\": \"message\",\n  \"color\": \"#ea7b25\",\n  \"audience\": [\n    \"public\",\n    \"tenant\"\n  ],\n  \"intro\": \"Ulasan membantu pembeli lain memilih produk.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 16,\n    \"slug\": \"cara-memberi-ulasan\",\n    \"title\": \"Cara Memberi Ulasan\",\n    \"summary\": \"Memberi bintang dan ulasan pada produk\",\n    \"icon\": \"message\",\n    \"color\": \"#ea7b25\",\n    \"audience\": [\n      \"public\",\n      \"tenant\"\n    ],\n    \"intro\": \"Ulasan membantu pembeli lain memilih produk.\",\n    \"outro\": null,\n    \"sortOrder\": 14,\n    \"updatedBy\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n    \"createdAt\": \"2026-10-18T17:31:04.060Z\",\n    \"updatedAt\": \"2026-10-18T17:31:04.060Z\",\n    \"steps\": [],\n    \"editor\": {\n      \"id\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n      \"firstName\": \"Andi\",\n      \"lastName\": \"Wijaya\",\n      \"role\": \"admin\"\n    }\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/guides",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "guides"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nA new topic, added at the end. `slug` is made once from the title (a number is added when taken) and stays when the title changes, so `/panduan#<slug>` links keep working.\n\nFields: `title` (required on create, max 120), `summary` (max 255), `icon` (one of: search, user, users, store, plus, check, bell, camera, lock, settings, docs, headset, help, box, tag, message, calculator, home, heart, map), `color` (hex, e.g. `#ea7b25`), `audience` (`public` = /panduan, `tenant` = the seller's Bantuan; at least one), `intro` and `outro` (max 5000; `\"\"` or `null` removes).\n\nTexts (`intro`, `outro`, step `body`) are plain text: an empty line starts a paragraph, lines starting with `- ` make a list, `**text**` is bold, `[label](/path)` is a link (a page of the site, `https://`, `mailto:` or `tel:`), and `{{kontak-admin}}` on its own line shows the administrator's WhatsApp and email. Render them as text, never as HTML.\n\nThe website's cached public pages refresh right away. Saves `{{guideSectionId}}`.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Cara Memberi Ulasan\",\n  \"summary\": \"Memberi bintang dan ulasan pada produk\",\n  \"icon\": \"message\",\n  \"color\": \"#ea7b25\",\n  \"audience\": [\n    \"public\",\n    \"tenant\"\n  ],\n  \"intro\": \"Ulasan membantu pembeli lain memilih produk.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"title\",\n        \"message\": \"title wajib diisi\"\n      },\n      {\n        \"field\": \"icon\",\n        \"message\": \"icon harus salah satu dari: search, user, users, store, plus, check, bell, camera, lock, settings, docs, headset, help, box, tag, message, calculator, home, heart, map\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Guide Section (superadmin, disnakertrans, admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/guides/{{guideSectionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "guides",
+                "{{guideSectionId}}"
+              ]
+            },
+            "description": "**Access:** superadmin, disnakertrans, admin\n\nSend only the fields to change. Fields: `title` (required on create, max 120), `summary` (max 255), `icon` (one of: search, user, users, store, plus, check, bell, camera, lock, settings, docs, headset, help, box, tag, message, calculator, home, heart, map), `color` (hex, e.g. `#ea7b25`), `audience` (`public` = /panduan, `tenant` = the seller's Bantuan; at least one), `intro` and `outro` (max 5000; `\"\"` or `null` removes).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"summary\": \"Bintang 1–5 dan ulasan, tanpa login\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/guides/{{guideSectionId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "guides",
+                    "{{guideSectionId}}"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nSend only the fields to change. Fields: `title` (required on create, max 120), `summary` (max 255), `icon` (one of: search, user, users, store, plus, check, bell, camera, lock, settings, docs, headset, help, box, tag, message, calculator, home, heart, map), `color` (hex, e.g. `#ea7b25`), `audience` (`public` = /panduan, `tenant` = the seller's Bantuan; at least one), `intro` and `outro` (max 5000; `\"\"` or `null` removes).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"summary\": \"Bintang 1–5 dan ulasan, tanpa login\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 16,\n    \"slug\": \"cara-memberi-ulasan\",\n    \"title\": \"Cara Memberi Ulasan\",\n    \"summary\": \"Bintang 1–5 dan ulasan, tanpa login\",\n    \"icon\": \"message\",\n    \"color\": \"#ea7b25\",\n    \"audience\": [\n      \"public\",\n      \"tenant\"\n    ],\n    \"intro\": \"Ulasan membantu pembeli lain memilih produk.\",\n    \"outro\": null,\n    \"sortOrder\": 14,\n    \"updatedBy\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n    \"createdAt\": \"2026-10-18T17:31:04.060Z\",\n    \"updatedAt\": \"2026-10-18T17:31:04.153Z\",\n    \"steps\": [],\n    \"editor\": {\n      \"id\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n      \"firstName\": \"Andi\",\n      \"lastName\": \"Wijaya\",\n      \"role\": \"admin\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reorder Guide Sections (superadmin, disnakertrans, admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/guides/order",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "guides",
+                "order"
+              ]
+            },
+            "description": "**Access:** superadmin, disnakertrans, admin\n\nBody `ids`: **every** topic id exactly once, in the new page order (400 otherwise). Returns the full list.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    3,\n    1,\n    2\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/guides/order",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "guides",
+                    "order"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nBody `ids`: **every** topic id exactly once, in the new page order (400 otherwise). Returns the full list.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ids\": [\n    3,\n    1,\n    2\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": 1,\n      \"slug\": \"mencari-produk\",\n      \"title\": \"Cara Mencari Produk\",\n      \"summary\": \"Menjelajah beranda, mencari produk, dan melihat detail\",\n      \"icon\": \"search\",\n      \"color\": \"#0e3c69\",\n      \"audience\": [\n        \"public\"\n      ],\n      \"intro\": null,\n      \"outro\": null,\n      \"sortOrder\": 0,\n      \"updatedBy\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n      \"createdAt\": \"2026-10-18T17:18:04.168Z\",\n      \"updatedAt\": \"2026-10-18T17:31:04.857Z\",\n      \"steps\": [\n        {\n          \"id\": 1,\n          \"sectionId\": 1,\n          \"body\": \"Gunakan menu **Beranda**, **Produk**, dan **UMKM** di bagian atas untuk menjelajah produk dan toko. Di Beranda, carousel menampilkan gambar setiap **kategori produk**, dan di sebelahnya produk dari kategori yang sedang tampil. Produk berikon jempol adalah **rekomendasi**: memiliki minimal 3 ulasan dengan rata-rata 4,8 bintang atau lebih. Menu **Produk** mengurutkan produk dari **rating tertinggi**; pilih **Terbaru** untuk melihat produk yang baru tayang lebih dulu.\",\n          \"imageAlt\": \"Menu utama di beranda\",\n          \"desktopImageId\": 1,\n          \"mobileImageId\": null,\n          \"sortOrder\": 0,\n          \"createdAt\": \"2026-10-18T17:18:04.211Z\",\n          \"updatedAt\": \"2026-10-18T17:18:04.211Z\",\n          \"desktopImage\": {\n            \"url\": \"https://api.transniaga.manokwarikab.go.id/images/dab25ce3-fb4f-46b8-a388-defeaccbabfd.jpg\",\n            \"id\": 1,\n            \"imgUrl\": \"/images/dab25ce3-fb4f-46b8-a388-defeaccbabfd.jpg\",\n            \"altText\": \"Menu utama di beranda\"\n          },\n          \"mobileImage\": null\n        }\n      ],\n      \"editor\": {\n        \"id\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n        \"firstName\": \"Andi\",\n        \"lastName\": \"Wijaya\",\n        \"role\": \"admin\"\n      }\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Guide Section (superadmin, disnakertrans, admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/guides/{{guideSectionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "guides",
+                "{{guideSectionId}}"
+              ]
+            },
+            "description": "**Access:** superadmin, disnakertrans, admin\n\nDeletes the topic, its steps **and their pictures** (the `images` rows and the files on disk)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/guides/{{guideSectionId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "guides",
+                    "{{guideSectionId}}"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nDeletes the topic, its steps **and their pictures** (the `images` rows and the files on disk)."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": null\n}"
+            },
+            {
+              "name": "404 Error",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/guides/{{guideSectionId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "guides",
+                    "{{guideSectionId}}"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nDeletes the topic, its steps **and their pictures** (the `images` rows and the files on disk)."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Bagian panduan tidak ditemukan\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add Guide Step (superadmin, disnakertrans, admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/guides/{{guideSectionId}}/steps",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "guides",
+                "{{guideSectionId}}",
+                "steps"
+              ]
+            },
+            "description": "**Access:** superadmin, disnakertrans, admin\n\nA new step at the end of the topic. `body` (required, max 3000), `imageAlt` (max 255), `desktopImageId` and `mobileImageId`: images uploaded with *Upload Image* (desktop 16:10, e.g. 1280×800; HP 9:16, e.g. 720×1280), or null. An image already used anywhere else (another step, a product, a logo…) is refused (400), and the two must be different uploads. Returns the topic with its steps. Saves `{{guideStepId}}`.\n\nTexts (`intro`, `outro`, step `body`) are plain text: an empty line starts a paragraph, lines starting with `- ` make a list, `**text**` is bold, `[label](/path)` is a link (a page of the site, `https://`, `mailto:` or `tel:`), and `{{kontak-admin}}` on its own line shows the administrator's WhatsApp and email. Render them as text, never as HTML.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"Buka halaman produk, lalu di **Tulis Ulasan** pilih jumlah bintang.\",\n  \"imageAlt\": \"Form ulasan\",\n  \"desktopImageId\": {{imageId}},\n  \"mobileImageId\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) { var s = pm.response.json().data.steps; pm.environment.set('guideStepId', s[s.length - 1].id); console.log('saved {{guideStepId}} = ' + s[s.length - 1].id); }"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/guides/{{guideSectionId}}/steps",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "guides",
+                    "{{guideSectionId}}",
+                    "steps"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nA new step at the end of the topic. `body` (required, max 3000), `imageAlt` (max 255), `desktopImageId` and `mobileImageId`: images uploaded with *Upload Image* (desktop 16:10, e.g. 1280×800; HP 9:16, e.g. 720×1280), or null. An image already used anywhere else (another step, a product, a logo…) is refused (400), and the two must be different uploads. Returns the topic with its steps. Saves `{{guideStepId}}`.\n\nTexts (`intro`, `outro`, step `body`) are plain text: an empty line starts a paragraph, lines starting with `- ` make a list, `**text**` is bold, `[label](/path)` is a link (a page of the site, `https://`, `mailto:` or `tel:`), and `{{kontak-admin}}` on its own line shows the administrator's WhatsApp and email. Render them as text, never as HTML.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"body\": \"Buka halaman produk, lalu di **Tulis Ulasan** pilih jumlah bintang.\",\n  \"imageAlt\": \"Form ulasan\",\n  \"desktopImageId\": {{imageId}},\n  \"mobileImageId\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 16,\n    \"slug\": \"cara-memberi-ulasan\",\n    \"title\": \"Cara Memberi Ulasan\",\n    \"summary\": \"Bintang 1–5 dan ulasan, tanpa login\",\n    \"icon\": \"message\",\n    \"color\": \"#ea7b25\",\n    \"audience\": [\n      \"public\",\n      \"tenant\"\n    ],\n    \"intro\": \"Ulasan membantu pembeli lain memilih produk.\",\n    \"outro\": null,\n    \"sortOrder\": 14,\n    \"updatedBy\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n    \"createdAt\": \"2026-10-18T17:31:04.060Z\",\n    \"updatedAt\": \"2026-10-18T17:31:04.311Z\",\n    \"steps\": [\n      {\n        \"id\": 37,\n        \"sectionId\": 16,\n        \"body\": \"Buka halaman produk, lalu di **Tulis Ulasan** pilih jumlah bintang.\",\n        \"imageAlt\": \"Form ulasan\",\n        \"desktopImageId\": 52,\n        \"mobileImageId\": 53,\n        \"sortOrder\": 0,\n        \"createdAt\": \"2026-10-18T17:31:04.301Z\",\n        \"updatedAt\": \"2026-10-18T17:31:04.301Z\",\n        \"desktopImage\": {\n          \"url\": \"https://api.transniaga.manokwarikab.go.id/images/d2bdf287-ab1b-4d37-8273-1481c7eecc1e.jpg\",\n          \"id\": 52,\n          \"imgUrl\": \"/images/d2bdf287-ab1b-4d37-8273-1481c7eecc1e.jpg\",\n          \"altText\": \"g-desk\"\n        },\n        \"mobileImage\": {\n          \"url\": \"https://api.transniaga.manokwarikab.go.id/images/6ba7db82-4769-4b86-9b5e-a678390dde82.jpg\",\n          \"id\": 53,\n          \"imgUrl\": \"/images/6ba7db82-4769-4b86-9b5e-a678390dde82.jpg\",\n          \"altText\": \"g-hp\"\n        }\n      }\n    ],\n    \"editor\": {\n      \"id\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n      \"firstName\": \"Andi\",\n      \"lastName\": \"Wijaya\",\n      \"role\": \"admin\"\n    }\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/guides/{{guideSectionId}}/steps",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "guides",
+                    "{{guideSectionId}}",
+                    "steps"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nA new step at the end of the topic. `body` (required, max 3000), `imageAlt` (max 255), `desktopImageId` and `mobileImageId`: images uploaded with *Upload Image* (desktop 16:10, e.g. 1280×800; HP 9:16, e.g. 720×1280), or null. An image already used anywhere else (another step, a product, a logo…) is refused (400), and the two must be different uploads. Returns the topic with its steps. Saves `{{guideStepId}}`.\n\nTexts (`intro`, `outro`, step `body`) are plain text: an empty line starts a paragraph, lines starting with `- ` make a list, `**text**` is bold, `[label](/path)` is a link (a page of the site, `https://`, `mailto:` or `tel:`), and `{{kontak-admin}}` on its own line shows the administrator's WhatsApp and email. Render them as text, never as HTML.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"body\": \"Buka halaman produk, lalu di **Tulis Ulasan** pilih jumlah bintang.\",\n  \"imageAlt\": \"Form ulasan\",\n  \"desktopImageId\": {{imageId}},\n  \"mobileImageId\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"desktopImageId\",\n        \"message\": \"Gambar sudah dipakai di tempat lain, unggah gambar baru\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Guide Step (superadmin, disnakertrans, admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/guides/{{guideSectionId}}/steps/{{guideStepId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "guides",
+                "{{guideSectionId}}",
+                "steps",
+                "{{guideStepId}}"
+              ]
+            },
+            "description": "**Access:** superadmin, disnakertrans, admin\n\nSend only the fields to change. A new `desktopImageId` / `mobileImageId` replaces the picture, `null` removes it: the old picture is **deleted** (its `images` row and the file on disk).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"desktopImageId\": {{imageId}},\n  \"mobileImageId\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/guides/{{guideSectionId}}/steps/{{guideStepId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "guides",
+                    "{{guideSectionId}}",
+                    "steps",
+                    "{{guideStepId}}"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nSend only the fields to change. A new `desktopImageId` / `mobileImageId` replaces the picture, `null` removes it: the old picture is **deleted** (its `images` row and the file on disk).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"desktopImageId\": {{imageId}},\n  \"mobileImageId\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 16,\n    \"slug\": \"cara-memberi-ulasan\",\n    \"title\": \"Cara Memberi Ulasan\",\n    \"summary\": \"Bintang 1–5 dan ulasan, tanpa login\",\n    \"icon\": \"message\",\n    \"color\": \"#ea7b25\",\n    \"audience\": [\n      \"public\",\n      \"tenant\"\n    ],\n    \"intro\": \"Ulasan membantu pembeli lain memilih produk.\",\n    \"outro\": null,\n    \"sortOrder\": 14,\n    \"updatedBy\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n    \"createdAt\": \"2026-10-18T17:31:04.060Z\",\n    \"updatedAt\": \"2026-10-18T17:31:04.684Z\",\n    \"steps\": [\n      {\n        \"id\": 37,\n        \"sectionId\": 16,\n        \"body\": \"Buka halaman produk, lalu di **Tulis Ulasan** pilih jumlah bintang.\",\n        \"imageAlt\": \"Form ulasan\",\n        \"desktopImageId\": 54,\n        \"mobileImageId\": null,\n        \"sortOrder\": 0,\n        \"createdAt\": \"2026-10-18T17:31:04.301Z\",\n        \"updatedAt\": \"2026-10-18T17:31:04.572Z\",\n        \"desktopImage\": {\n          \"url\": \"https://api.transniaga.manokwarikab.go.id/images/73a15821-eda8-4fab-b98b-6676829594e5.jpg\",\n          \"id\": 54,\n          \"imgUrl\": \"/images/73a15821-eda8-4fab-b98b-6676829594e5.jpg\",\n          \"altText\": \"g-desk\"\n        },\n        \"mobileImage\": null\n      },\n      {\n        \"id\": 38,\n        \"sectionId\": 16,\n        \"body\": \"Klik **Kirim Ulasan**.\",\n        \"imageAlt\": null,\n        \"desktopImageId\": null,\n        \"mobileImageId\": null,\n        \"sortOrder\": 1,\n        \"createdAt\": \"2026-10-18T17:31:04.345Z\",\n        \"updatedAt\": \"2026-10-18T17:31:04.345Z\",\n        \"desktopImage\": null,\n        \"mobileImage\": null\n      }\n    ],\n    \"editor\": {\n      \"id\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n      \"firstName\": \"Andi\",\n      \"lastName\": \"Wijaya\",\n      \"role\": \"admin\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reorder Guide Steps (superadmin, disnakertrans, admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/guides/{{guideSectionId}}/steps/order",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "guides",
+                "{{guideSectionId}}",
+                "steps",
+                "order"
+              ]
+            },
+            "description": "**Access:** superadmin, disnakertrans, admin\n\nBody `ids`: every step id of the topic exactly once, in the new order (400 otherwise). Step numbers follow the order.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    2,\n    1\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/guides/{{guideSectionId}}/steps/order",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "guides",
+                    "{{guideSectionId}}",
+                    "steps",
+                    "order"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nBody `ids`: every step id of the topic exactly once, in the new order (400 otherwise). Step numbers follow the order.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ids\": [\n    2,\n    1\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 16,\n    \"slug\": \"cara-memberi-ulasan\",\n    \"title\": \"Cara Memberi Ulasan\",\n    \"summary\": \"Bintang 1–5 dan ulasan, tanpa login\",\n    \"icon\": \"message\",\n    \"color\": \"#ea7b25\",\n    \"audience\": [\n      \"public\",\n      \"tenant\"\n    ],\n    \"intro\": \"Ulasan membantu pembeli lain memilih produk.\",\n    \"outro\": null,\n    \"sortOrder\": 14,\n    \"updatedBy\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n    \"createdAt\": \"2026-10-18T17:31:04.060Z\",\n    \"updatedAt\": \"2026-10-18T17:31:04.739Z\",\n    \"steps\": [\n      {\n        \"id\": 38,\n        \"sectionId\": 16,\n        \"body\": \"Klik **Kirim Ulasan**.\",\n        \"imageAlt\": null,\n        \"desktopImageId\": null,\n        \"mobileImageId\": null,\n        \"sortOrder\": 0,\n        \"createdAt\": \"2026-10-18T17:31:04.345Z\",\n        \"updatedAt\": \"2026-10-18T17:31:04.726Z\",\n        \"desktopImage\": null,\n        \"mobileImage\": null\n      },\n      {\n        \"id\": 37,\n        \"sectionId\": 16,\n        \"body\": \"Buka halaman produk, lalu di **Tulis Ulasan** pilih jumlah bintang.\",\n        \"imageAlt\": \"Form ulasan\",\n        \"desktopImageId\": 54,\n        \"mobileImageId\": null,\n        \"sortOrder\": 1,\n        \"createdAt\": \"2026-10-18T17:31:04.301Z\",\n        \"updatedAt\": \"2026-10-18T17:31:04.732Z\",\n        \"desktopImage\": {\n          \"url\": \"https://api.transniaga.manokwarikab.go.id/images/73a15821-eda8-4fab-b98b-6676829594e5.jpg\",\n          \"id\": 54,\n          \"imgUrl\": \"/images/73a15821-eda8-4fab-b98b-6676829594e5.jpg\",\n          \"altText\": \"g-desk\"\n        },\n        \"mobileImage\": null\n      }\n    ],\n    \"editor\": {\n      \"id\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n      \"firstName\": \"Andi\",\n      \"lastName\": \"Wijaya\",\n      \"role\": \"admin\"\n    }\n  }\n}"
+            },
+            {
+              "name": "400 Error",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/guides/{{guideSectionId}}/steps/order",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "guides",
+                    "{{guideSectionId}}",
+                    "steps",
+                    "order"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nBody `ids`: every step id of the topic exactly once, in the new order (400 otherwise). Step numbers follow the order.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ids\": [\n    2,\n    1\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Validasi gagal\",\n    \"details\": [\n      {\n        \"field\": \"ids\",\n        \"message\": \"ids harus berisi semua id langkah (2) tepat satu kali, dalam urutan baru\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Guide Step (superadmin, disnakertrans, admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/guides/{{guideSectionId}}/steps/{{guideStepId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "guides",
+                "{{guideSectionId}}",
+                "steps",
+                "{{guideStepId}}"
+              ]
+            },
+            "description": "**Access:** superadmin, disnakertrans, admin\n\nDeletes the step **and its pictures** (rows and files). Returns the topic with its remaining steps."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/guides/{{guideSectionId}}/steps/{{guideStepId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "guides",
+                    "{{guideSectionId}}",
+                    "steps",
+                    "{{guideStepId}}"
+                  ]
+                },
+                "description": "**Access:** superadmin, disnakertrans, admin\n\nDeletes the step **and its pictures** (rows and files). Returns the topic with its remaining steps."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 16,\n    \"slug\": \"cara-memberi-ulasan\",\n    \"title\": \"Cara Memberi Ulasan\",\n    \"summary\": \"Bintang 1–5 dan ulasan, tanpa login\",\n    \"icon\": \"message\",\n    \"color\": \"#ea7b25\",\n    \"audience\": [\n      \"public\",\n      \"tenant\"\n    ],\n    \"intro\": \"Ulasan membantu pembeli lain memilih produk.\",\n    \"outro\": null,\n    \"sortOrder\": 13,\n    \"updatedBy\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n    \"createdAt\": \"2026-10-18T17:31:04.060Z\",\n    \"updatedAt\": \"2026-10-18T17:31:04.926Z\",\n    \"steps\": [\n      {\n        \"id\": 37,\n        \"sectionId\": 16,\n        \"body\": \"Buka halaman produk, lalu di **Tulis Ulasan** pilih jumlah bintang.\",\n        \"imageAlt\": \"Form ulasan\",\n        \"desktopImageId\": 54,\n        \"mobileImageId\": null,\n        \"sortOrder\": 1,\n        \"createdAt\": \"2026-10-18T17:31:04.301Z\",\n        \"updatedAt\": \"2026-10-18T17:31:04.732Z\",\n        \"desktopImage\": {\n          \"url\": \"https://api.transniaga.manokwarikab.go.id/images/73a15821-eda8-4fab-b98b-6676829594e5.jpg\",\n          \"id\": 54,\n          \"imgUrl\": \"/images/73a15821-eda8-4fab-b98b-6676829594e5.jpg\",\n          \"altText\": \"g-desk\"\n        },\n        \"mobileImage\": null\n      }\n    ],\n    \"editor\": {\n      \"id\": \"c1ca829e-ff05-4b7e-afa7-6d95d8be2012\",\n      \"firstName\": \"Andi\",\n      \"lastName\": \"Wijaya\",\n      \"role\": \"admin\"\n    }\n  }\n}"
             }
           ]
         }

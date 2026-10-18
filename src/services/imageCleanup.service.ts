@@ -10,7 +10,7 @@ import { sequelize } from '../models';
  * A form uploads its photo as soon as it is picked (POST /api/images) and only points at it on save. Not saving
  * deletes the upload again from the browser, but that can fail (tab closed while offline, crash, never coming back).
  * This job removes what is left:
- *  - image rows that no user photo, UMKM logo, product or product category points at, and their files;
+ *  - image rows that no user photo, UMKM logo, product, product category or guide step points at, and their files;
  *  - files in images/ that have no image row at all (e.g. a crash between saving the file and the row).
  * Only things older than ORPHAN_GRACE_HOURS are touched, so a form that is still being filled in is never affected.
  */
@@ -30,7 +30,8 @@ const ORPHAN_WHERE = `
   AND NOT EXISTS (SELECT 1 FROM users u WHERE u.face_image_id = i.id)
   AND NOT EXISTS (SELECT 1 FROM tenants t WHERE t.logo_id = i.id)
   AND NOT EXISTS (SELECT 1 FROM products p WHERE p.image_id = i.id)
-  AND NOT EXISTS (SELECT 1 FROM product_categories c WHERE c.image_id = i.id)`;
+  AND NOT EXISTS (SELECT 1 FROM product_categories c WHERE c.image_id = i.id)
+  AND NOT EXISTS (SELECT 1 FROM guide_steps g WHERE g.desktop_image_id = i.id OR g.mobile_image_id = i.id)`;
 
 export interface CleanupResult {
   /** Orphan image rows (deleted, or that would be with dryRun) */

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import * as productController from '../controllers/product.controller';
 import * as categoryController from '../controllers/productCategory.controller';
+import * as guideController from '../controllers/guide.controller';
 import * as reviewController from '../controllers/review.controller';
 import * as siteContentController from '../controllers/siteContent.controller';
 import * as tenantController from '../controllers/tenant.controller';
@@ -13,6 +14,8 @@ router.param('id', requireIdParam);
 
 // Texts staff edit in "Konten Situs" (the footer's about text)
 router.get('/site', siteContentController.getPublic);
+// The Panduan (help pages): ?audience=public (/panduan) or tenant (the seller's Bantuan)
+router.get('/guides', guideController.listPublic);
 
 // Product categories with their image (the home page carousel)
 router.get('/categories', categoryController.listPublic);

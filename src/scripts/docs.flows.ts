@@ -360,6 +360,36 @@ export const FLOWS: Record<string, Chart[]> = {
     },
   ],
 
+  Guides: [
+    {
+      title: { en: 'Edit a guide step (pictures)', id: 'Ubah langkah panduan (gambar)' },
+      nodes: [
+        start('POST | PATCH /api/guides/:id/steps[/:stepId]'),
+        ...auth({ en: 'superadmin, disnakertrans or admin', id: 'superadmin, disnakertrans atau admin' }),
+        check({ en: 'Topic (and step) exist?', id: 'Topik (dan langkah) ada?' }, '404'),
+        check({ en: 'body ≤ 3000, image ids numbers or null, two different uploads?', id: 'body ≤ 3000, id gambar berupa angka atau null, dua unggahan berbeda?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
+        check({ en: 'Each image exists and is not used elsewhere?', id: 'Setiap gambar ada dan tidak dipakai di tempat lain?' }, { en: '400 already used', id: '400 sudah dipakai' }),
+        step({ en: 'Save the step; the topic records who changed it', id: 'Simpan langkah; topik mencatat pengubahnya' }),
+        step(
+          { en: 'A replaced or removed picture: delete its row and file', id: 'Gambar yang diganti atau dihapus: hapus baris dan berkasnya' },
+          effect({ en: 'Website refreshes its cached /panduan', id: 'Website memperbarui cache /panduan' }),
+        ),
+        end({ en: '200 / 201 the topic with its steps', id: '200 / 201 topik beserta langkahnya' }),
+      ],
+    },
+    {
+      title: { en: 'Delete a topic or step', id: 'Hapus topik atau langkah' },
+      nodes: [
+        start('DELETE /api/guides/:id[/steps/:stepId]'),
+        ...auth({ en: 'superadmin, disnakertrans or admin', id: 'superadmin, disnakertrans atau admin' }),
+        check({ en: 'Exists?', id: 'Ada?' }, '404'),
+        step({ en: 'Delete the topic (with its steps) or the step', id: 'Hapus topik (beserta langkahnya) atau langkah' }),
+        step({ en: 'Delete every picture they had: rows and files on disk', id: 'Hapus semua gambarnya: baris dan berkas di disk' }),
+        end('200'),
+      ],
+    },
+  ],
+
   Approvals: [
     {
       title: { en: 'Activate / Deactivate User', id: 'Aktifkan / Nonaktifkan Pengguna' },
@@ -477,6 +507,17 @@ export const FLOWS: Record<string, Chart[]> = {
   ],
 
   Landing: [
+    {
+      title: { en: 'Landing Guides (Panduan)', id: 'Panduan Landing' },
+      nodes: [
+        start('GET /api/landing/guides?audience=public|tenant'),
+        step({ en: 'No token needed', id: 'Tanpa token' }),
+        end(
+          { en: '200 topics in page order, each with steps and pictures', id: '200 topik sesuai urutan halaman, masing-masing dengan langkah dan gambar' },
+          note({ en: 'desktopImage on wide screens, mobileImage on phones', id: 'desktopImage di layar lebar, mobileImage di HP' }),
+        ),
+      ],
+    },
     {
       title: { en: 'Site Texts', id: 'Teks Situs' },
       nodes: [

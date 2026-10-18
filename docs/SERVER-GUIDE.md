@@ -558,6 +558,7 @@ Run them in `/home/prafi/project/prafi-backend` as user `prafi`.
 | `npm run backup` | Makes a backup now (section 7) |
 | `npm run images:cleanup` | Deletes unused uploaded photos now (section 7) |
 | `npm run bounces:check` | Reads the inbox for emails that didn't arrive now; `-- --dry-run` only lists them and changes nothing (section 14) |
+| `npm run guides:seed` | Loads the default Panduan when its tables are empty (section 15) |
 
 ### Build and restart
 
@@ -591,6 +592,7 @@ Files so far, in the order they were run:
 | `20261013_tenant_links_optional.sql` | Every UMKM link optional |
 | `20261014_slugs.sql` | Readable addresses (slugs) for products, UMKM and categories; table `old_slugs` |
 | `20261018_site_content_email_issues.sql` | Table `site_settings` (*Konten Situs* texts); `users.email_issue*` (emails that didn't arrive) |
+| `20261019_guides.sql` | Tables `guide_sections` and `guide_steps` (*Kelola Panduan*); content loaded by `npm run guides:seed` |
 
 **Running a migration** (always back up first, and run it **before** restarting the backend with the new code):
 
@@ -672,7 +674,7 @@ The browser always calls `/api`, `/images` and `/socket.io` on the website's own
 | `src/lib/api.ts` | **Every API call** from the browser, one function per endpoint |
 | `src/lib/server-api.ts` | API calls for the public pages (server side, cached) |
 | `src/lib/auth.tsx` | The login session in the browser |
-| `src/lib/guides.tsx` | The Panduan content (section 15) |
+| `src/lib/guides.tsx` | Icons and labels of the Panduan topics; the content itself is in the database (section 15) |
 | `src/lib/seo.tsx` | Titles, descriptions and structured data for search engines |
 | `src/lib/format.ts`, `types.ts`, `adCalculator.ts`, … | Formatting (Rupiah, dates), data types, the profit calculator's formulas |
 | `src/middleware.ts` | Sends plain `http://` visits to `https://` |
@@ -720,7 +722,7 @@ Things to remember:
 | Change a colour or the font | `src/app/globals.css` |
 | Let a picture open larger when clicked | Use `<Thumb zoom … />` (`src/components/ui.tsx`); the popup is `src/components/Lightbox.tsx`. Not for a picture inside a link or a clickable card |
 | Make a whole card one link | Class `card-link` on the card and `card-link-main` on the link it should follow (explained in `globals.css`) |
-| Change the help pages | `src/lib/guides.tsx` (section 15) |
+| Change the help pages | **Kelola Panduan** on the website, no code (section 15) |
 | Change the contact shown in Panduan | `NEXT_PUBLIC_ADMIN_WHATSAPP`, `NEXT_PUBLIC_ADMIN_EMAIL` in `.env`, then build |
 | Change what search engines see | `src/lib/seo.tsx` and the page's `metadata`; the README has an *SEO* section |
 
@@ -830,6 +832,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 
 - **Manajemen Produk** (all products by status and category), **Notifikasi**, **Pengaturan**.
 - **Konten Situs**: the "about" text in the footer of every public page. An empty line starts a paragraph, `**text**` is bold; **Kembalikan Teks Bawaan** restores the original. The website shows a change at once.
+- **Kelola Panduan**: the help pages (`/panduan` and the sellers' Bantuan): add, edit, reorder and delete topics and steps, each step with a desktop and an HP picture. Replaced or removed pictures are deleted from the server (section 15).
 
 ### Disnakertrans
 
@@ -841,7 +844,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 
 ![Aktivasi Admin](panduan/fitur-disnakertrans-admin.jpg)
 
-- **Konfirmasi Produk**, **Laporan Ulasan**, **Kategori Produk**, **Konten Situs**: the same as an admin. **Data Produk** and **Data UMKM** to read.
+- **Konfirmasi Produk**, **Laporan Ulasan**, **Kategori Produk**, **Konten Situs**, **Kelola Panduan**: the same as an admin. **Data Produk** and **Data UMKM** to read.
 
 ### Superadmin
 
@@ -855,6 +858,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 
 - **Semua Pengguna**, **Data Produk**, **Data UMKM**, **Kategori Produk**: read-only.
 - **Profil Pengguna**: one card per account with its data, the shop profile (sellers) and its Log API entries (opened per card), with search and role tabs.
+- **Kelola Panduan**: the same as an admin (section 15).
 
 ![Semua Pengguna](panduan/fitur-superadmin-pengguna.jpg)
 
@@ -890,107 +894,60 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 
 ## 15. Updating the Panduan (help pages)
 
-The **Panduan** is the website's help: `/panduan` for everyone (header and footer link) and **Bantuan & Ketentuan** in the seller (tenant) dashboard. Both show the same list of topics; each topic opens to show its text and step-by-step screenshots. All of it lives in the **frontend** code; the backend is not involved.
+The **Panduan** is the website's help: `/panduan` for everyone (header and footer link) and **Bantuan & Ketentuan** in the seller (tenant) dashboard. Each topic opens to show its text and numbered steps; a step can have a **desktop** picture (shown on wide screens) and an **HP** picture (shown on phones). It is content in the database, edited on the website: no code change, no rebuild.
 
-### Where the files are
+### Editing on the website (Kelola Panduan)
 
-All paths are inside `/home/prafi/project/prafi-frontend`.
+The **superadmin**, **disnakertrans** and **admin** accounts have the menu **Kelola Panduan**. Every change shows on `/panduan` and in the sellers' Bantuan at once.
 
-| file | what it does |
+1. **Tambah Topik** makes a new topic: title, one-line summary, icon and colour, where it shows (*Halaman Panduan* = `/panduan`, *Bantuan & Ketentuan* = seller dashboard), and an optional text before and after the steps. The arrows move a topic up or down; the order is the order on the page.
+2. Click a topic's title to open it. **Tambah Langkah** adds a step: its text, a **desktop** picture (16:10, 1280 × 800) and an **HP** picture (9:16, 720 × 1280). Both are optional; when only one is given it is shown on every screen. Each picture is cropped and compressed to 3 MB before upload, like other pictures of the site.
+3. The pencil edits a step (pick a new picture, or **Hapus gambar**), the arrows reorder steps (numbers follow automatically), the bin deletes it.
+4. **Lihat Halaman Panduan** opens `/panduan` in a new tab to check the result.
+
+Each topic keeps its address `/panduan#<slug>` (made once from the first title) even when renamed, so links keep working (e.g. the login page links to `/panduan#ketentuan` and `/panduan#privasi`).
+
+### Writing the text
+
+| write | shows |
 |---|---|
-| `src/lib/guides.tsx` | **The content.** The `GUIDES` list: every topic with its title, icon, who sees it, and its text. This is the file you edit |
-| `public/panduan/*.jpg` | The screenshots used by the steps (1024×640 JPG) |
-| `src/components/GuideSteps.tsx` | `Steps` and `Step`: the numbered steps, each with an optional screenshot (a click opens it larger in a popup) |
-| `src/components/GuideList.tsx` | Draws the topic list (each topic is an expandable box) |
-| `src/app/(public)/panduan/page.tsx` | The public page `/panduan`: shows topics whose `audience` has `"public"` |
-| `src/app/tenant/bantuan/page.tsx` | The seller page `/tenant/bantuan`: shows topics whose `audience` has `"tenant"` |
-| `docs/PANDUAN-PENGGUNA.md` | The same guide as a document (for printing / sharing). Not shown on the website: update it by hand when a topic changes |
-| `prafi-backend/docs/SERVER-GUIDE.md` and `.id.md`, section 14 | This guide's feature list has its own screenshots in the same folder (`fitur-*.jpg`): add a line and a picture there when a new feature arrives |
+| an empty line | a new paragraph |
+| lines starting with `- ` | a bulleted list |
+| `**Simpan**` | **bold** (use it for button and menu names) |
+| `[Daftar](/register)` | a link (a page of the site, or `https://…`, `mailto:`, `tel:`) |
+| `{{kontak-admin}}` on its own line | the administrator's WhatsApp and email (`NEXT_PUBLIC_ADMIN_*` in the frontend `.env`) |
 
-### How a topic is written
+The step form shows a preview under the text.
 
-Each entry in `GUIDES` (in `src/lib/guides.tsx`) has these fields:
+### Pictures and storage
 
-| field | meaning |
+- Pictures are uploaded like any other (`POST /api/images`) into the backend's `images/` folder.
+- Replacing a picture, **Hapus gambar**, deleting a step or deleting a topic deletes the old pictures: their row in `images` **and the file on disk**.
+- A picture uploaded but never saved (the form was closed) is removed by the nightly cleanup (section 7), which counts guide pictures as in use.
+- Use screenshots with sample data, not real customers, and outline the part the step talks about in red, as in the existing pictures.
+
+### Where it is stored
+
+| place | what |
 |---|---|
-| `id` | Short name with dashes, unique. Also the topic's link: `/panduan#<id>` (e.g. the login page links to `/panduan#ketentuan`) |
-| `title` | Topic title (Bahasa Indonesia) |
-| `summary` | One line under the title |
-| `icon` | An icon from `src/components/Icons.tsx` (e.g. `IconPlus`, `IconStore`); import it at the top of the file |
-| `color` | Icon colour, e.g. `"#0e3c69"` (navy) or `"#ea7b25"` (orange) |
-| `audience` | Where it shows: `"public"` = `/panduan`, `"tenant"` = seller dashboard. `"admin"` is accepted but no page shows it yet |
-| `body` | The content: steps (`<Steps>` / `<Step>`), or ordinary text (`<p>`, `<ul><li>`) |
+| table `guide_sections` | Topics: `slug`, `title`, `summary`, `icon`, `color`, `audience` (`public` / `tenant`), `intro`, `outro`, `sort_order` |
+| table `guide_steps` | Steps: `section_id`, `body`, `image_alt`, `desktop_image_id`, `mobile_image_id`, `sort_order` |
+| `src/services/guide.service.ts` | Validation, ordering and deleting replaced pictures; routes `/api/guides` (editors) and `/api/landing/guides` (public) |
+| `db/seeds/guides.json` | The default content, loaded by `npm run guides:seed` |
+| frontend `src/components/dashboard/GuideManager.tsx` | The **Kelola Panduan** page |
+| frontend `GuideList.tsx`, `GuideSteps.tsx`, `GuideImage.tsx`, `RichText.tsx` | Draw the topics; `GuideImage` picks the desktop or HP picture by screen width (640 px and narrower = HP) |
+| frontend `public/panduan/*.jpg` | The original screenshots: copied into `images/` by the seed, and still used by `docs/PANDUAN-PENGGUNA.md` and this guide (`fitur-*.jpg`) |
 
-Inside the text, `<b>…</b>` makes words bold (use it for button and menu names, as the other topics do) and `<Link href="/register">…</Link>` links to a page of the website. The topics show in the order of the list.
+### First setup (default content)
 
-A step with a screenshot:
-
-```tsx
-<Step image="produk-2-foto" alt="Kotak unggah foto produk">
-  Klik kotak <b>UNGGAH FOTO PRODUK</b> lalu <b>PILIH FILE</b>.
-</Step>
-```
-
-`image` is the file name in `public/panduan/` **without** `.jpg`; `alt` describes the picture for screen readers. Leave out `image` for a step without a picture.
-
-### Example 1: add a new topic
-
-A new topic *Cara Memberi Ulasan* for visitors and sellers. It uses the thumbs-up icon `IconThumb` (any icon exported by `src/components/Icons.tsx` works): add it to the `import { … } from "@/components/Icons"` list at the top of `src/lib/guides.tsx`. Then add an entry to `GUIDES`, between two existing `{ … },` entries, at the place it should appear:
-
-```tsx
-  {
-    id: "beri-ulasan",
-    title: "Cara Memberi Ulasan",
-    summary: "Memberi bintang dan ulasan pada produk",
-    icon: IconThumb,
-    color: "#ea7b25",
-    audience: ["public", "tenant"],
-    body: (
-      <Steps>
-        <Step image="ulasan-1-form" alt="Form ulasan di halaman produk">
-          Buka halaman produk, gulir ke bagian <b>ULASAN PEMBELI</b>, lalu di <b>Tulis Ulasan</b> pilih jumlah bintang (1 – 5).
-        </Step>
-        <Step>
-          Isi nama dan ulasan Anda, lalu klik <b>Kirim Ulasan</b>. Tidak perlu login.
-        </Step>
-      </Steps>
-    ),
-  },
-```
-
-Put the screenshot at `public/panduan/ulasan-1-form.jpg` (section below). The topic is then at `/panduan#beri-ulasan`.
-
-### Example 2: change an existing topic
-
-Search `src/lib/guides.tsx` for the topic's `id` (e.g. `id: "tambah-produk"`) and edit its text, or add a `<Step>` between two existing ones. For example, to tell sellers about photo quality in *Panduan Menambahkan Produk*, add after the photo step:
-
-```tsx
-        <Step>
-          Gunakan foto yang terang dan jelas, dengan latar polos. Lihat juga topik <b>Ketentuan Foto / Deskripsi</b>.
-        </Step>
-```
-
-Step numbers are added automatically. For a topic without steps (like *Kebijakan Privasi*), add or edit `<li>…</li>` lines in its `<ul>`.
-
-### Screenshots
-
-- Take the screenshot from the real website (with sample data, not real customers), and outline the part the step talks about in **red**, as in the existing pictures.
-- Save it as **JPG, 1024×640** pixels (the page reserves that shape), under about 200 KB.
-- Name it `<topic>-<number>-<what>.jpg` (e.g. `ulasan-1-form.jpg`) and put it in `public/panduan/`. Pictures used only by this server guide are named `fitur-<what>.jpg`.
-- To replace a picture, overwrite the file with the same name: no code change needed.
-
-### Publishing the change
-
-The Panduan is part of the frontend build, so a change shows only after a rebuild. Work in git as for any change (section 5):
+The migration `20261019_guides.sql` makes the two tables; then `npm run guides:seed` loads the 13 original topics, their steps and 27 screenshots (copied from the frontend's `public/panduan` into `images/`). It does nothing once the tables have content, so it is safe to repeat. `~/deploy.sh` runs both.
 
 ```bash
-cd /home/prafi/project/prafi-frontend
-npm run lint                  # catches a missing import or a typo in the tags
-npm run build                 # a mistake in guides.tsx stops here; the live site is untouched
-sudo systemctl restart prafi-frontend
+cd /home/prafi/project/prafi-backend
+npm run guides:seed           # "already has content, nothing changed" after the first time
 ```
 
-Then check `/panduan` (and **Bantuan & Ketentuan** as a seller). Common mistakes: a tag opened but not closed (`<b>` without `</b>`), a missing `,` after `},`, an icon used but not imported, or an `image` name that doesn't match the file (the step then shows a broken picture).
+`docs/PANDUAN-PENGGUNA.md` (the printable guide) is not generated from this content: update it by hand when a topic changes a lot.
 
 ## 16. Troubleshooting
 

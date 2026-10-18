@@ -2,7 +2,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { IMAGES_DIR, IMAGES_URL_PATH } from '../config/upload';
 import { HttpError } from '../errors/HttpError';
-import { Image, Product, ProductCategory, Tenant, User } from '../models';
+import { Op } from 'sequelize';
+import { GuideStep, Image, Product, ProductCategory, Tenant, User } from '../models';
 import { assertFaceInFile, rememberFaceImage } from './faceDetection.service';
 import { shrinkToLimit } from './imageCompress.service';
 
@@ -83,15 +84,16 @@ export async function createFromUpload(file: Express.Multer.File, altText: strin
   }
 }
 
-/** Whether a user photo, tenant logo, product or product category uses this image. */
-async function isInUse(imageId: number) {
-  const [products, tenants, users, categories] = await Promise.all([
+/** Whether a user photo, tenant logo, product, product category or guide step uses this image. */
+export async function isInUse(imageId: number) {
+  const [products, tenants, users, categories, guideSteps] = await Promise.all([
     Product.count({ where: { imageId } }),
     Tenant.count({ where: { logoId: imageId } }),
     User.count({ where: { faceImageId: imageId } }),
     ProductCategory.count({ where: { imageId } }),
+    GuideStep.count({ where: { [Op.or]: [{ desktopImageId: imageId }, { mobileImageId: imageId }] } }),
   ]);
-  return products + tenants + users + categories > 0;
+  return products + tenants + users + categories + guideSteps > 0;
 }
 
 /**
@@ -123,7 +125,7 @@ export async function remove(id: number) {
 const deleteFile = (imgUrl: string) => fs.unlink(path.join(IMAGES_DIR, path.basename(imgUrl))).catch(() => {});
 
 /**
- * Called after a product image, face image, tenant logo or category image was replaced (or removed):
+ * Called after a product image, face image, tenant logo, category image or guide picture was replaced (or removed):
  * deletes the old image record and file, unless something still uses it.
  * Never throws, so a cleanup problem can't fail the update that triggered it.
  */

@@ -109,3 +109,6 @@ export const SITE_CONTENT_EDITOR_ROLES: Role[] = [ROLES.DISNAKERTRANS, ROLES.ADM
 
 /** Roles that may change a seller's (tenant's) email address (PATCH /api/users/:id/email); the new one must be verified. */
 export const SELLER_EMAIL_EDITOR_ROLES: Role[] = [ROLES.ADMIN];
+
+/** Roles that manage the Panduan (help pages): topics, steps and their pictures ("Kelola Panduan", /api/guides). */
+export const GUIDE_EDITOR_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.DISNAKERTRANS, ROLES.ADMIN];

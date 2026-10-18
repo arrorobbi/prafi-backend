@@ -558,6 +558,7 @@ Jalankan di `/home/prafi/project/prafi-backend` sebagai user `prafi`.
 | `npm run backup` | Membuat cadangan sekarang (bagian 7) |
 | `npm run images:cleanup` | Menghapus foto unggahan yang tidak terpakai sekarang (bagian 7) |
 | `npm run bounces:check` | Membaca kotak masuk untuk email yang tidak sampai sekarang; `-- --dry-run` hanya menampilkan daftarnya tanpa mengubah apa pun (bagian 14) |
+| `npm run guides:seed` | Memuat Panduan bawaan bila tabelnya masih kosong (bagian 15) |
 
 ### Build dan restart
 
@@ -591,6 +592,7 @@ Berkas sejauh ini, sesuai urutan dijalankannya:
 | `20261013_tenant_links_optional.sql` | Semua tautan UMKM menjadi opsional |
 | `20261014_slugs.sql` | Alamat yang mudah dibaca (slug) untuk produk, UMKM, dan kategori; tabel `old_slugs` |
 | `20261018_site_content_email_issues.sql` | Tabel `site_settings` (teks *Konten Situs*); `users.email_issue*` (email yang tidak sampai) |
+| `20261019_guides.sql` | Tabel `guide_sections` dan `guide_steps` (*Kelola Panduan*); isi dimuat oleh `npm run guides:seed` |
 
 **Menjalankan migrasi** (selalu cadangkan dulu, dan jalankan **sebelum** me-restart backend dengan kode baru):
 
@@ -672,7 +674,7 @@ Browser selalu memanggil `/api`, `/images`, dan `/socket.io` pada domain website
 | `src/lib/api.ts` | **Semua pemanggilan API** dari browser, satu fungsi per endpoint |
 | `src/lib/server-api.ts` | Pemanggilan API untuk halaman publik (sisi server, di-cache) |
 | `src/lib/auth.tsx` | Sesi login di browser |
-| `src/lib/guides.tsx` | Isi Panduan (bagian 15) |
+| `src/lib/guides.tsx` | Ikon dan label topik Panduan; isinya sendiri ada di database (bagian 15) |
 | `src/lib/seo.tsx` | Judul, deskripsi, dan data terstruktur untuk mesin pencari |
 | `src/lib/format.ts`, `types.ts`, `adCalculator.ts`, … | Format (Rupiah, tanggal), tipe data, rumus kalkulator profit |
 | `src/middleware.ts` | Mengalihkan kunjungan `http://` biasa ke `https://` |
@@ -720,7 +722,7 @@ Hal yang perlu diingat:
 | Mengubah warna atau huruf | `src/app/globals.css` |
 | Membuat gambar membesar saat diklik | Gunakan `<Thumb zoom … />` (`src/components/ui.tsx`); popup-nya ada di `src/components/Lightbox.tsx`. Bukan untuk gambar di dalam tautan atau kartu yang dapat diklik |
 | Menjadikan seluruh kartu satu tautan | Class `card-link` pada kartu dan `card-link-main` pada tautan yang diikutinya (dijelaskan di `globals.css`) |
-| Mengubah halaman bantuan | `src/lib/guides.tsx` (bagian 15) |
+| Mengubah halaman bantuan | **Kelola Panduan** di website, tanpa kode (bagian 15) |
 | Mengubah kontak yang tampil di Panduan | `NEXT_PUBLIC_ADMIN_WHATSAPP`, `NEXT_PUBLIC_ADMIN_EMAIL` di `.env`, lalu build |
 | Mengubah yang dilihat mesin pencari | `src/lib/seo.tsx` dan `metadata` halaman; README memiliki bagian *SEO* |
 
@@ -830,6 +832,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 
 - **Manajemen Produk** (semua produk menurut status dan kategori), **Notifikasi**, **Pengaturan**.
 - **Konten Situs**: teks "tentang" di footer setiap halaman publik. Baris kosong memulai paragraf, `**teks**` menjadi tebal; **Kembalikan Teks Bawaan** memulihkan teks asli. Website langsung menampilkan perubahan.
+- **Kelola Panduan**: halaman bantuan (`/panduan` dan Bantuan penjual): menambah, mengubah, mengurutkan dan menghapus topik serta langkah, setiap langkah dengan gambar desktop dan HP. Gambar yang diganti atau dihapus juga dihapus dari server (bagian 15).
 
 ### Disnakertrans
 
@@ -841,7 +844,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 
 ![Aktivasi Admin](panduan/fitur-disnakertrans-admin.jpg)
 
-- **Konfirmasi Produk**, **Laporan Ulasan**, **Kategori Produk**, **Konten Situs**: sama seperti admin. **Data Produk** dan **Data UMKM** untuk dibaca.
+- **Konfirmasi Produk**, **Laporan Ulasan**, **Kategori Produk**, **Konten Situs**, **Kelola Panduan**: sama seperti admin. **Data Produk** dan **Data UMKM** untuk dibaca.
 
 ### Superadmin
 
@@ -855,6 +858,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 
 - **Semua Pengguna**, **Data Produk**, **Data UMKM**, **Kategori Produk**: hanya baca.
 - **Profil Pengguna**: satu kartu per akun berisi datanya, profil toko (penjual) dan catatan Log API-nya (dibuka per kartu), dengan pencarian dan tab role.
+- **Kelola Panduan**: sama seperti admin (bagian 15).
 
 ![Semua Pengguna](panduan/fitur-superadmin-pengguna.jpg)
 
@@ -890,107 +894,60 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 
 ## 15. Memperbarui Panduan (halaman bantuan)
 
-**Panduan** adalah bantuan milik website: `/panduan` untuk semua orang (tautan di header dan footer) dan **Bantuan & Ketentuan** di dashboard penjual (tenant). Keduanya menampilkan daftar topik yang sama; setiap topik dapat dibuka untuk melihat teks dan tangkapan layar langkah demi langkah. Semuanya ada di kode **frontend**; backend tidak terlibat.
+**Panduan** adalah bantuan milik website: `/panduan` untuk semua orang (tautan di header dan footer) dan **Bantuan & Ketentuan** di dashboard penjual (tenant). Setiap topik dapat dibuka untuk melihat teks dan langkah bernomor; sebuah langkah dapat memiliki gambar **desktop** (tampil di layar lebar) dan gambar **HP** (tampil di HP). Isinya tersimpan di database dan diubah lewat website: tanpa mengubah kode, tanpa build ulang.
 
-### Lokasi berkas
+### Mengubah lewat website (Kelola Panduan)
 
-Semua lokasi berada di dalam `/home/prafi/project/prafi-frontend`.
+Akun **superadmin**, **disnakertrans** dan **admin** memiliki menu **Kelola Panduan**. Setiap perubahan langsung tampil di `/panduan` dan di Bantuan penjual.
 
-| berkas | fungsi |
+1. **Tambah Topik** membuat topik baru: judul, ringkasan satu baris, ikon dan warna, tempat tampil (*Halaman Panduan* = `/panduan`, *Bantuan & Ketentuan* = dashboard penjual), serta teks opsional sebelum dan sesudah langkah-langkah. Tombol panah memindahkan topik ke atas atau ke bawah; urutannya sama dengan urutan di halaman.
+2. Klik judul topik untuk membukanya. **Tambah Langkah** menambah langkah: teksnya, gambar **desktop** (16:10, 1280 × 800) dan gambar **HP** (9:16, 720 × 1280). Keduanya opsional; bila hanya satu yang diisi, gambar itu tampil di semua layar. Setiap gambar dipotong dan dikompres hingga 3 MB sebelum diunggah, seperti gambar lain di situs.
+3. Tombol pensil mengubah langkah (pilih gambar baru, atau **Hapus gambar**), tombol panah mengubah urutan langkah (nomor menyesuaikan otomatis), tombol tempat sampah menghapusnya.
+4. **Lihat Halaman Panduan** membuka `/panduan` di tab baru untuk memeriksa hasilnya.
+
+Setiap topik tetap memiliki alamat `/panduan#<slug>` (dibuat sekali dari judul pertama) walaupun judulnya diganti, sehingga tautan tetap berfungsi (mis. halaman login menautkan ke `/panduan#ketentuan` dan `/panduan#privasi`).
+
+### Menulis teks
+
+| tulis | tampil |
 |---|---|
-| `src/lib/guides.tsx` | **Isinya.** Daftar `GUIDES`: setiap topik dengan judul, ikon, siapa yang melihatnya, dan teksnya. Inilah berkas yang Anda ubah |
-| `public/panduan/*.jpg` | Tangkapan layar yang dipakai langkah-langkah (JPG 1024×640) |
-| `src/components/GuideSteps.tsx` | `Steps` dan `Step`: langkah bernomor, masing-masing dengan tangkapan layar opsional (klik untuk memperbesarnya di popup) |
-| `src/components/GuideList.tsx` | Menggambar daftar topik (setiap topik adalah kotak yang dapat dibuka) |
-| `src/app/(public)/panduan/page.tsx` | Halaman publik `/panduan`: menampilkan topik yang `audience`-nya memuat `"public"` |
-| `src/app/tenant/bantuan/page.tsx` | Halaman penjual `/tenant/bantuan`: menampilkan topik yang `audience`-nya memuat `"tenant"` |
-| `docs/PANDUAN-PENGGUNA.md` | Panduan yang sama dalam bentuk dokumen (untuk dicetak / dibagikan). Tidak tampil di website: perbarui manual saat sebuah topik berubah |
-| `prafi-backend/docs/SERVER-GUIDE.md` dan `.id.md`, bagian 14 | Daftar fitur di panduan ini memiliki tangkapan layar sendiri di folder yang sama (`fitur-*.jpg`): tambahkan satu baris dan satu gambar di sana saat ada fitur baru |
+| satu baris kosong | paragraf baru |
+| baris yang diawali `- ` | daftar berpoin |
+| `**Simpan**` | **tebal** (gunakan untuk nama tombol dan menu) |
+| `[Daftar](/register)` | tautan (halaman situs, atau `https://…`, `mailto:`, `tel:`) |
+| `{{kontak-admin}}` pada barisnya sendiri | WhatsApp dan email administrator (`NEXT_PUBLIC_ADMIN_*` di `.env` frontend) |
 
-### Cara sebuah topik ditulis
+Form langkah menampilkan pratinjau di bawah teks.
 
-Setiap entri di `GUIDES` (di `src/lib/guides.tsx`) memiliki field berikut:
+### Gambar dan penyimpanan
 
-| field | arti |
+- Gambar diunggah seperti gambar lain (`POST /api/images`) ke folder `images/` milik backend.
+- Mengganti gambar, **Hapus gambar**, menghapus langkah atau menghapus topik akan menghapus gambar lama: barisnya di `images` **dan berkasnya di disk**.
+- Gambar yang diunggah tetapi tidak pernah disimpan (form ditutup) dihapus oleh pembersihan malam hari (bagian 7), yang menghitung gambar panduan sebagai gambar terpakai.
+- Gunakan tangkapan layar dengan data contoh, bukan pelanggan sungguhan, dan tandai bagian yang dibahas langkah itu dengan garis merah, seperti gambar yang sudah ada.
+
+### Tempat penyimpanan
+
+| tempat | isi |
 |---|---|
-| `id` | Nama pendek dengan tanda hubung, unik. Juga menjadi tautan topik: `/panduan#<id>` (mis. halaman login menautkan ke `/panduan#ketentuan`) |
-| `title` | Judul topik (Bahasa Indonesia) |
-| `summary` | Satu baris di bawah judul |
-| `icon` | Ikon dari `src/components/Icons.tsx` (mis. `IconPlus`, `IconStore`); import di bagian atas berkas |
-| `color` | Warna ikon, mis. `"#0e3c69"` (navy) atau `"#ea7b25"` (oranye) |
-| `audience` | Tempat tampilnya: `"public"` = `/panduan`, `"tenant"` = dashboard penjual. `"admin"` diterima tetapi belum ada halaman yang menampilkannya |
-| `body` | Isinya: langkah-langkah (`<Steps>` / `<Step>`), atau teks biasa (`<p>`, `<ul><li>`) |
+| tabel `guide_sections` | Topik: `slug`, `title`, `summary`, `icon`, `color`, `audience` (`public` / `tenant`), `intro`, `outro`, `sort_order` |
+| tabel `guide_steps` | Langkah: `section_id`, `body`, `image_alt`, `desktop_image_id`, `mobile_image_id`, `sort_order` |
+| `src/services/guide.service.ts` | Validasi, urutan, dan penghapusan gambar yang diganti; route `/api/guides` (editor) dan `/api/landing/guides` (publik) |
+| `db/seeds/guides.json` | Isi bawaan, dimuat oleh `npm run guides:seed` |
+| frontend `src/components/dashboard/GuideManager.tsx` | Halaman **Kelola Panduan** |
+| frontend `GuideList.tsx`, `GuideSteps.tsx`, `GuideImage.tsx`, `RichText.tsx` | Menggambar topik; `GuideImage` memilih gambar desktop atau HP menurut lebar layar (640 px ke bawah = HP) |
+| frontend `public/panduan/*.jpg` | Tangkapan layar asli: disalin ke `images/` oleh seed, dan masih dipakai `docs/PANDUAN-PENGGUNA.md` serta panduan ini (`fitur-*.jpg`) |
 
-Di dalam teks, `<b>…</b>` menebalkan kata (gunakan untuk nama tombol dan menu, seperti pada topik lain) dan `<Link href="/register">…</Link>` menautkan ke halaman website. Topik tampil sesuai urutan di daftar.
+### Penyiapan pertama (isi bawaan)
 
-Langkah dengan tangkapan layar:
-
-```tsx
-<Step image="produk-2-foto" alt="Kotak unggah foto produk">
-  Klik kotak <b>UNGGAH FOTO PRODUK</b> lalu <b>PILIH FILE</b>.
-</Step>
-```
-
-`image` adalah nama berkas di `public/panduan/` **tanpa** `.jpg`; `alt` menjelaskan gambar untuk pembaca layar. Hilangkan `image` untuk langkah tanpa gambar.
-
-### Contoh 1: menambah topik baru
-
-Topik baru *Cara Memberi Ulasan* untuk pengunjung dan penjual. Topik ini memakai ikon jempol `IconThumb` (ikon apa pun yang diekspor `src/components/Icons.tsx` dapat dipakai): tambahkan ke daftar `import { … } from "@/components/Icons"` di bagian atas `src/lib/guides.tsx`. Lalu tambahkan sebuah entri ke `GUIDES`, di antara dua entri `{ … },` yang ada, di tempat topik itu seharusnya muncul:
-
-```tsx
-  {
-    id: "beri-ulasan",
-    title: "Cara Memberi Ulasan",
-    summary: "Memberi bintang dan ulasan pada produk",
-    icon: IconThumb,
-    color: "#ea7b25",
-    audience: ["public", "tenant"],
-    body: (
-      <Steps>
-        <Step image="ulasan-1-form" alt="Form ulasan di halaman produk">
-          Buka halaman produk, gulir ke bagian <b>ULASAN PEMBELI</b>, lalu di <b>Tulis Ulasan</b> pilih jumlah bintang (1 – 5).
-        </Step>
-        <Step>
-          Isi nama dan ulasan Anda, lalu klik <b>Kirim Ulasan</b>. Tidak perlu login.
-        </Step>
-      </Steps>
-    ),
-  },
-```
-
-Letakkan tangkapan layarnya di `public/panduan/ulasan-1-form.jpg` (bagian di bawah). Topik itu kemudian ada di `/panduan#beri-ulasan`.
-
-### Contoh 2: mengubah topik yang ada
-
-Cari `id` topik di `src/lib/guides.tsx` (mis. `id: "tambah-produk"`) lalu ubah teksnya, atau tambahkan `<Step>` di antara dua langkah yang ada. Misalnya, untuk memberi tahu penjual tentang kualitas foto di *Panduan Menambahkan Produk*, tambahkan setelah langkah foto:
-
-```tsx
-        <Step>
-          Gunakan foto yang terang dan jelas, dengan latar polos. Lihat juga topik <b>Ketentuan Foto / Deskripsi</b>.
-        </Step>
-```
-
-Nomor langkah ditambahkan otomatis. Untuk topik tanpa langkah (seperti *Kebijakan Privasi*), tambahkan atau ubah baris `<li>…</li>` di dalam `<ul>`-nya.
-
-### Tangkapan layar
-
-- Ambil tangkapan layar dari website yang sebenarnya (dengan data contoh, bukan pelanggan asli), dan beri garis **merah** pada bagian yang dibahas langkah tersebut, seperti pada gambar yang sudah ada.
-- Simpan sebagai **JPG, 1024×640** piksel (halaman menyediakan ruang sebesar itu), di bawah sekitar 200 KB.
-- Beri nama `<topik>-<nomor>-<apa>.jpg` (mis. `ulasan-1-form.jpg`) dan letakkan di `public/panduan/`. Gambar yang hanya dipakai panduan server ini diberi nama `fitur-<apa>.jpg`.
-- Untuk mengganti gambar, timpa berkas dengan nama yang sama: tidak perlu mengubah kode.
-
-### Menerbitkan perubahan
-
-Panduan adalah bagian dari build frontend, jadi perubahan baru terlihat setelah build ulang. Kerjakan lewat git seperti perubahan lainnya (bagian 5):
+Migrasi `20261019_guides.sql` membuat kedua tabel; lalu `npm run guides:seed` memuat 13 topik asli, langkah-langkahnya dan 27 tangkapan layar (disalin dari `public/panduan` milik frontend ke `images/`). Perintah ini tidak melakukan apa pun bila tabel sudah berisi, jadi aman diulang. `~/deploy.sh` menjalankan keduanya.
 
 ```bash
-cd /home/prafi/project/prafi-frontend
-npm run lint                  # menangkap import yang hilang atau salah ketik pada tag
-npm run build                 # kesalahan di guides.tsx berhenti di sini; situs yang berjalan tidak tersentuh
-sudo systemctl restart prafi-frontend
+cd /home/prafi/project/prafi-backend
+npm run guides:seed           # "already has content, nothing changed" setelah yang pertama
 ```
 
-Lalu periksa `/panduan` (dan **Bantuan & Ketentuan** sebagai penjual). Kesalahan yang sering terjadi: tag dibuka tetapi tidak ditutup (`<b>` tanpa `</b>`), `,` yang hilang setelah `},`, ikon dipakai tetapi tidak di-import, atau nama `image` yang tidak cocok dengan berkasnya (langkah itu akan menampilkan gambar rusak).
+`docs/PANDUAN-PENGGUNA.md` (panduan untuk dicetak) tidak dibuat dari isi ini: perbarui manual bila sebuah topik banyak berubah.
 
 ## 16. Mengatasi masalah
 

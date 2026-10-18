@@ -1,0 +1,320 @@
+[
+  {
+    "slug": "mencari-produk",
+    "title": "Cara Mencari Produk",
+    "summary": "Menjelajah beranda, mencari produk, dan melihat detail",
+    "icon": "search",
+    "color": "#0e3c69",
+    "audience": [
+      "public"
+    ],
+    "steps": [
+      {
+        "body": "Gunakan menu **Beranda**, **Produk**, dan **UMKM** di bagian atas untuk menjelajah produk dan toko. Di Beranda, carousel menampilkan gambar setiap **kategori produk**, dan di sebelahnya produk dari kategori yang sedang tampil. Produk berikon jempol adalah **rekomendasi**: memiliki minimal 3 ulasan dengan rata-rata 4,8 bintang atau lebih. Menu **Produk** mengurutkan produk dari **rating tertinggi**; pilih **Terbaru** untuk melihat produk yang baru tayang lebih dulu.",
+        "image": "pengunjung-1-beranda",
+        "alt": "Menu utama di beranda"
+      },
+      {
+        "body": "Klik ikon **kaca pembesar**, ketik nama produk atau toko. Pilih salah satu saran, atau tekan **Enter** untuk melihat semua hasil.",
+        "image": "pengunjung-2-cari",
+        "alt": "Kotak pencarian"
+      },
+      {
+        "body": "Halaman detail menampilkan harga, deskripsi, informasi produk, dan ulasan pembeli. Anda dapat memberi bintang dan ulasan tanpa login, setelah verifikasi singkat **\"Saya bukan robot\"**; ulasan minimal 3 kata, satu ulasan per produk per hari dari perangkat dan jaringan yang sama. Tombol **Hubungi & Kunjungi Toko** (WhatsApp, Shopee, Instagram, Google Bisnis, Facebook, Lokasi) hanya muncul untuk tautan yang diisi penjual; tombol **WhatsApp** membuka chat dengan pesan tentang produk itu (nama dan tautannya) yang siap dikirim. Klik nama toko untuk membuka halaman UMKM: profil, alamat, jam buka, tombol WhatsApp/Instagram/Shopee/Google Bisnis, jumlah produk, rata-rata bintang, dan semua produknya.",
+        "image": "pengunjung-3-detail",
+        "alt": "Halaman detail produk"
+      }
+    ]
+  },
+  {
+    "slug": "cara-daftar",
+    "title": "Cara Mendaftar sebagai Penjual",
+    "summary": "Membuat akun penjual dan memverifikasi email",
+    "icon": "user",
+    "color": "#ea7b25",
+    "audience": [
+      "public",
+      "tenant"
+    ],
+    "steps": [
+      {
+        "body": "Buka halaman [Daftar](/register) (tombol **Login** → **DAFTAR**).",
+        "image": "daftar-1-login",
+        "alt": "Tombol DAFTAR di halaman login"
+      },
+      {
+        "body": "**Tahap 1 – Informasi Akun:** isi nama lengkap, nomor telepon/WhatsApp, email aktif, nama usaha/toko, dan password (minimal 8 karakter), lalu klik **SELANJUTNYA**.",
+        "image": "daftar-2-informasi-akun",
+        "alt": "Formulir informasi akun"
+      },
+      {
+        "body": "**Tahap 2 – Review Data:** periksa kembali data Anda. Klik **EDIT DATA** bila ada yang salah, lalu **KIRIM PENDAFTARAN**.",
+        "image": "daftar-3-review",
+        "alt": "Halaman review data"
+      },
+      {
+        "body": "**Tahap 3 – Verifikasi Email:** buka email Anda, salin **kode OTP 6 digit** (berlaku 15 menit) dan masukkan. Tidak menerima kode? Periksa folder spam atau klik **Kirim ulang kode** setelah 60 detik.",
+        "image": "daftar-4-otp",
+        "alt": "Kolom kode OTP"
+      },
+      {
+        "body": "**Tahap 4 – Selesai:** Anda otomatis masuk. Klik **LENGKAPI PROFIL TOKO** untuk melanjutkan.",
+        "image": "daftar-5-selesai",
+        "alt": "Halaman pendaftaran selesai"
+      }
+    ]
+  },
+  {
+    "slug": "profil-toko",
+    "title": "Membuat Profil Toko (Profil UMKM)",
+    "summary": "Logo, wilayah, alamat, jam operasional, dan kontak",
+    "icon": "store",
+    "color": "#0e3c69",
+    "audience": [
+      "public",
+      "tenant"
+    ],
+    "steps": [
+      {
+        "body": "Masuk, lalu buka menu **Profil UMKM**. Jika profil sudah ada, klik **Ubah Profil**; jika belum, formulir langsung terbuka.",
+        "image": "profil-1-lihat",
+        "alt": "Halaman Profil UMKM"
+      },
+      {
+        "body": "Pilih logo atau foto toko (JPG/PNG/WEBP; foto di atas 3 MB dikompres otomatis), lalu atur potongannya (persegi). Foto langsung terunggah, tetapi baru tersimpan setelah Anda klik **SIMPAN PROFIL**. Isi nama toko, wilayah (SP 1 – SP 4 atau lainnya), deskripsi, alamat lengkap, dan jam operasional (hari, jam buka, jam tutup). Nomor WhatsApp dan semua tautan (Google Maps, Instagram, Google Bisnis, Shopee, Facebook / toko online) **boleh dikosongkan**; isi yang Anda miliki agar pembeli mudah menghubungi toko. Tautan diawali https://.",
+        "image": "profil-2-form",
+        "alt": "Formulir profil toko"
+      },
+      {
+        "body": "Klik **SIMPAN PROFIL**. Profil dapat diubah kapan saja lewat tombol **Ubah Profil**. Agar dapat menambahkan produk, profil harus lengkap **dan** akun Anda harus memiliki foto profil (menu **Pengaturan Akun**).",
+        "image": "profil-3-simpan",
+        "alt": "Tombol simpan profil"
+      }
+    ]
+  },
+  {
+    "slug": "tambah-produk",
+    "title": "Panduan Menambahkan Produk",
+    "summary": "Langkah-langkah menambahkan produk baru ke Trans Niaga",
+    "icon": "plus",
+    "color": "#13a10e",
+    "audience": [
+      "public",
+      "tenant"
+    ],
+    "steps": [
+      {
+        "body": "Masuk ke dashboard penjual, lalu klik menu **Tambah Produk** (atau tombol **+** di halaman Produk Saya). Bila muncul pesan **Lengkapi data Anda dulu**, klik tombolnya untuk melengkapi Profil UMKM atau mengunggah foto profil akun.",
+        "image": "produk-1-menu",
+        "alt": "Menu Tambah Produk"
+      },
+      {
+        "body": "Klik kotak **UNGGAH FOTO PRODUK** → **PILIH FILE** dan pilih foto produk. Foto langsung terunggah (ada tanda persen), tetapi baru tersimpan setelah Anda klik **Ajukan Produk**.",
+        "image": "produk-2-foto",
+        "alt": "Kotak unggah foto produk"
+      },
+      {
+        "body": "Isi **Nama Produk**, **Harga** (dalam Rupiah), dan pilih **Kategori Produk**, lalu **Deskripsi Produk** (penjelasan singkat) dan **Informasi Produk** (bahan, ukuran, cara penggunaan, keunggulan). Masing-masing maksimal 255 karakter. Produk otomatis menjadi **rekomendasi** bila memiliki minimal 3 ulasan dengan rata-rata 4,8 bintang atau lebih.",
+        "image": "produk-3-isi-data",
+        "alt": "Isian data produk"
+      },
+      {
+        "body": "Klik **Ajukan Produk**. Status produk menjadi **Menunggu Konfirmasi** dan Anda menerima notifikasi.",
+        "image": "produk-4-ajukan",
+        "alt": "Tombol Ajukan Produk"
+      },
+      {
+        "body": "Pantau status di **Produk Saya**. Setelah administrator atau Disnakertrans menyetujui, status berubah menjadi **Aktif** dan produk tampil di halaman utama. Anda juga menerima notifikasi untuk setiap perubahan status.",
+        "image": "produk-5-status",
+        "alt": "Status produk di Produk Saya"
+      }
+    ]
+  },
+  {
+    "slug": "status-produk",
+    "title": "Status Produk & Produk Ditolak",
+    "summary": "Arti setiap status dan cara mengajukan ulang",
+    "icon": "check",
+    "color": "#1aa5d9",
+    "audience": [
+      "public",
+      "tenant"
+    ],
+    "intro": "- **Menunggu Konfirmasi** – produk sedang diperiksa administrator atau Disnakertrans.\n- **Aktif** – produk disetujui dan tampil untuk pengunjung.\n- **Ditolak** – produk belum memenuhi ketentuan; alasannya terlihat di menu **Produk Ditolak**.\n- **Dinonaktifkan** – produk diturunkan administrator atau Disnakertrans dari halaman utama.\n\nUntuk mengajukan ulang produk yang ditolak:",
+    "steps": [
+      {
+        "body": "Buka **Produk Ditolak**, baca alasan penolakan, lalu klik ikon **pensil**.",
+        "image": "status-1-ditolak",
+        "alt": "Daftar produk ditolak"
+      },
+      {
+        "body": "Perbaiki data sesuai alasan, lalu klik **Simpan & Ajukan Ulang**. Produk kembali berstatus **Menunggu Konfirmasi**.",
+        "image": "status-2-ajukan-ulang",
+        "alt": "Halaman ubah produk"
+      }
+    ]
+  },
+  {
+    "slug": "notifikasi",
+    "title": "Notifikasi",
+    "summary": "Pemberitahuan untuk setiap perubahan pada produk Anda",
+    "icon": "bell",
+    "color": "#ea7b25",
+    "audience": [
+      "public",
+      "tenant"
+    ],
+    "steps": [
+      {
+        "body": "Notifikasi baru langsung muncul (angka di menu **Notifikasi** bertambah seketika, tanpa memuat ulang halaman). Menu **Notifikasi** memiliki tab **Semua**, **Belum Dibaca**, dan **Dibaca**. Klik notifikasi untuk membuka halaman terkait, atau klik **Tandai semua sebagai sudah dibaca**.",
+        "image": "notifikasi-1",
+        "alt": "Halaman notifikasi"
+      },
+      {
+        "body": "Penjual menerima notifikasi untuk setiap perubahan pada produknya: **Produk Berhasil Diajukan**, **Produk Disetujui**, **Produk Ditolak** atau **Produk Dinonaktifkan** (beserta alasannya), **Perubahan Produk Tersimpan**, **Ulasan Baru** dari pembeli, dan **Keputusan Laporan Ulasan**."
+      },
+      {
+        "body": "Menu **Ulasan Produk** menampilkan semua ulasan untuk produk Anda. Ulasan palsu, kasar, atau tidak berkaitan dengan produk dapat Anda **Laporkan** (dengan alasan). Administrator atau Disnakertrans akan menyembunyikannya atau tetap menampilkannya; ulasan yang disembunyikan tidak dihitung dalam rating. Setiap ulasan hanya dapat dilaporkan satu kali."
+      },
+      {
+        "body": "Menu **Kalkulator Profit & Iklan** membantu menghitung apakah iklan masih menguntungkan. Isi harga jual, modal produk (termasuk kemasan), biaya iklan per penjualan, dan target penjualan per bulan; kalkulator menampilkan margin kotor, batas maksimal biaya iklan per unit (**Batas Max CPA**), **Break-Even ROAS**, serta perkiraan profit bersih per unit dan per bulan. Angka merah berarti rugi. Angka yang diisi tidak disimpan."
+      }
+    ]
+  },
+  {
+    "slug": "ketentuan-foto",
+    "title": "Ketentuan Foto / Deskripsi",
+    "summary": "Aturan foto produk dan deskripsi yang harus dipenuhi",
+    "icon": "camera",
+    "color": "#1aa5d9",
+    "audience": [
+      "public",
+      "tenant"
+    ],
+    "intro": "- Format JPG, PNG, WEBP, atau GIF. Foto lebih dari 3 MB dikompres otomatis sebelum diunggah.\n- Setelah memilih foto, atur potongannya: foto produk dan logo berbentuk persegi (1:1, disarankan 1000 × 1000 px untuk produk).\n- Foto jelas, terang, tidak buram, dan menampilkan produk yang sebenarnya dijual.\n- Tidak memuat nomor telepon, tautan, atau watermark toko lain.\n- Nama produk singkat dan sesuai isi; deskripsi jujur dan tidak menyesatkan.\n- Produk tidak melanggar hukum, norma kesusilaan, maupun hak cipta.\n- Satu foto hanya dapat dipakai untuk satu produk."
+  },
+  {
+    "slug": "akun",
+    "title": "Mengelola Akun & Password",
+    "summary": "Ubah data akun, foto, password, dan lupa password",
+    "icon": "lock",
+    "color": "#0e3c69",
+    "audience": [
+      "public",
+      "tenant"
+    ],
+    "outro": "Jika Anda meninggalkan halaman sebelum menyimpan foto yang baru diunggah, akan muncul konfirmasi **Tinggalkan halaman ini?**: pilih **Lanjut Suntingan** untuk kembali menyunting, atau **Setuju** untuk keluar (foto tersebut dihapus dan tidak ada data yang berubah).\n\nDemi keamanan, sesi login berakhir otomatis setelah **1 jam tanpa aktivitas** (selama Anda masih memakai situs, sesi diperpanjang sendiri), dan paling lama 12 jam sejak login; setelah itu silakan login kembali.",
+    "steps": [
+      {
+        "body": "Menu **Pengaturan Akun**: ubah nama, email, nomor telepon, atau foto profil, lalu klik **SIMPAN PERUBAHAN**. Foto baru langsung terunggah saat dipilih, tetapi baru terpasang setelah Anda klik **SIMPAN PERUBAHAN**. Untuk mengganti password, klik **Ubah Password**, masukkan password saat ini dan password baru (minimal 8 karakter). Foto profil harus menampilkan **wajah Anda** dengan jelas: logo, foto produk, atau pemandangan akan ditolak.",
+        "image": "akun-1-pengaturan",
+        "alt": "Halaman pengaturan akun"
+      },
+      {
+        "body": "Lupa password? Di halaman Login klik **Lupa Password**, masukkan email, lalu buka tautan di email (berlaku 30 menit, sekali pakai) untuk membuat password baru. Semua sesi login lain akan berakhir.",
+        "image": "akun-2-lupa-password",
+        "alt": "Halaman lupa password"
+      },
+      {
+        "body": "Demi keamanan, setelah **5 kali salah memasukkan password** Anda harus menunggu 15 menit sebelum mencoba lagi dari jaringan yang sama. Jika lupa, gunakan **Lupa Password** daripada menebak."
+      }
+    ]
+  },
+  {
+    "slug": "panduan-admin",
+    "title": "Panduan Administrator",
+    "summary": "Konfirmasi produk, kategori, dan aktivasi akun penjual",
+    "icon": "settings",
+    "color": "#ea7b25",
+    "audience": [
+      "public"
+    ],
+    "steps": [
+      {
+        "body": "Daftar di [halaman pendaftaran admin](/register/admin), verifikasi email dengan OTP, lalu tunggu akun diaktifkan oleh Disnakertrans. Anda akan menerima **email** begitu akun sudah aktif dan siap dipakai untuk masuk."
+      },
+      {
+        "body": "**Kategori Produk**: isi nama kategori di panel oranye, unggah **gambarnya** (wajib; tampil di carousel Beranda, dapat diganti tetapi tidak dihapus), lalu klik **Simpan** (mis. Makanan Berat, Minuman). Penjual memilih kategori ini untuk setiap produk. Kategori yang masih dipakai produk tidak dapat dihapus.",
+        "image": "admin-1-kategori",
+        "alt": "Halaman Kategori Produk"
+      },
+      {
+        "body": "**Konfirmasi Produk**: produk baru tampil di sini. Klik **Lihat Detail**, atau langsung ✔ untuk menerima dan ✖ untuk menolak.",
+        "image": "admin-2-konfirmasi",
+        "alt": "Daftar konfirmasi produk"
+      },
+      {
+        "body": "Di halaman detail, klik **TERIMA PRODUK** atau isi **Alasan Penolakan** dan klik **TOLAK PRODUK**. Produk aktif dapat dinonaktifkan dari halaman yang sama.",
+        "image": "admin-3-detail",
+        "alt": "Detail produk untuk dikonfirmasi"
+      },
+      {
+        "body": "**Dashboard** menampilkan grafik **Statistik**: aktivitas produk, UMKM, dan akun baru per hari, status produk, produk per kategori, dan akun per role (pilih 7, 30, atau 90 hari terakhir). **Manajemen UMKM**: aktifkan/nonaktifkan akun penjual (tab **Akun Penjual**) dan lihat detail toko (tab **Profil Toko**). Tombol **Detail** menampilkan foto wajah, email, telepon, nama toko, dan alamat penjual; di sana admin dapat **mengubah email** penjual (penjual lalu mengeklik tautan konfirmasi yang dikirim ke email baru sebelum login lagi). Catatan merah di bawah email berarti email verifikasi/OTP tidak sampai. **Konten Situs**: ubah teks **Tentang** di footer situs. **Kelola Panduan**: ubah topik, langkah, dan gambar halaman Panduan ini. **Manajemen Produk** menampilkan semua produk per status, kategori, dan penjual; **Notifikasi** berisi pengajuan produk baru dan pendaftaran penjual.",
+        "image": "admin-4-umkm",
+        "alt": "Manajemen UMKM"
+      },
+      {
+        "body": "**Laporan Ulasan**: ulasan yang dilaporkan penjual tampil di tab **Menunggu**. Periksa isinya, lalu pilih **Sembunyikan** (tidak tampil dan tidak dihitung dalam rating) atau **Tetap Tampilkan**, dengan catatan opsional untuk penjual. Ulasan yang disembunyikan dapat ditampilkan lagi dari tab **Disembunyikan**. Disnakertrans memiliki menu yang sama."
+      }
+    ]
+  },
+  {
+    "slug": "panduan-disnakertrans",
+    "title": "Panduan Disnakertrans & Superadmin",
+    "summary": "Aktivasi akun admin, kategori produk, dan pembuatan akun Disnakertrans",
+    "icon": "user",
+    "color": "#0e3c69",
+    "audience": [
+      "public"
+    ],
+    "outro": "**Disnakertrans** juga dapat menyetujui, menolak, dan menonaktifkan produk di menu **Konfirmasi Produk**, sama seperti admin, dan menerima notifikasi produk yang sama. Disnakertrans juga mengelola **Kategori Produk** (tambah, ubah, hapus, dan gambar carousel Beranda), **Konten Situs** (teks footer) dan **Kelola Panduan** seperti admin.\n\n**Superadmin** dapat melihat semua data (hanya baca) dan juga dapat **Kelola Panduan**. Menu **Profil Pengguna** menampilkan satu kartu per akun berisi data akun, data toko, dan log aktivitasnya. Akun yang email verifikasi/OTP-nya tidak sampai (alamat tidak ditemukan, kotak masuk penuh) diberi catatan merah di **Semua Pengguna**. Menu **Log API** berisi catatan setiap penambahan, perubahan, dan penghapusan data oleh pengguna yang login, serta semua aktivitas akun (login, password salah, daftar, OTP, lupa/reset password) termasuk dari tamu beserta email yang dicoba, baik yang berhasil maupun yang gagal. Permintaan baca dan permintaan tamu lainnya tidak dicatat. Gunakan filter **Hasil** untuk melihat yang gagal dan filter **Email** untuk mencari satu akun. Log baru muncul otomatis di halaman ini (tanda **● Live**) tanpa perlu memuat ulang. Di bagian atas ada **Grafik Log**: permintaan per hari (berhasil / gagal), per method, endpoint terbanyak, dan error terbanyak. Menu **Monitor Server** menampilkan pemakaian CPU, RAM, dan penyimpanan server secara langsung, status layanan, dan besar data; bila penyimpanan hampir penuh (90%), sistem mengirim email peringatan.",
+    "steps": [
+      {
+        "body": "**Superadmin** membuat akun Disnakertrans di menu **Akun Disnakertrans → TAMBAH AKUN**, lalu klik **Buat Akun**. Superadmin tidak mengisi password: pemilik akun menerima email berisi **kata sandi sementara** dan tombol aktivasi (berlaku 24 jam). Ia menekan tombol itu, memasukkan kata sandi sementara, lalu membuat password sendiri; setelah itu akun bisa dipakai masuk. Email tidak sampai atau kedaluwarsa? Klik **Kirim Ulang Verifikasi** (kata sandi sementara yang lama tidak berlaku lagi).",
+        "image": "superadmin-1-tambah",
+        "alt": "Form tambah akun Disnakertrans"
+      },
+      {
+        "body": "**Disnakertrans** mengaktifkan akun admin baru di menu **Aktivasi Admin** dengan tombol **Aktifkan**. Admin baru hanya bisa login setelah diaktifkan; menonaktifkan akun langsung mengakhiri sesi admin tersebut.",
+        "image": "disnakertrans-1-aktivasi",
+        "alt": "Halaman aktivasi admin"
+      }
+    ]
+  },
+  {
+    "slug": "ketentuan",
+    "title": "Syarat & Ketentuan",
+    "summary": "Ketentuan penggunaan Trans Niaga",
+    "icon": "docs",
+    "color": "#4a4a4a",
+    "audience": [
+      "public",
+      "tenant"
+    ],
+    "intro": "- Penjual wajib memberikan data diri dan data usaha yang benar.\n- Setiap produk diverifikasi administrator sebelum tampil dan dapat dinonaktifkan bila melanggar ketentuan.\n- Transaksi dilakukan langsung antara pembeli dan penjual; Trans Niaga berperan sebagai direktori UMKM.\n- Akun yang melanggar ketentuan dapat dinonaktifkan oleh administrator."
+  },
+  {
+    "slug": "privasi",
+    "title": "Kebijakan Privasi",
+    "summary": "Data apa yang ditampilkan kepada publik",
+    "icon": "lock",
+    "color": "#4a4a4a",
+    "audience": [
+      "public",
+      "tenant"
+    ],
+    "intro": "- Halaman publik hanya menampilkan produk yang disetujui, nama toko, dan nama pemilik.\n- Email dan nomor telepon akun tidak ditampilkan di halaman publik.\n- Password disimpan terenkripsi dan tidak dapat dilihat siapa pun, termasuk administrator."
+  },
+  {
+    "slug": "hubungi-admin",
+    "title": "Hubungi Administrator",
+    "summary": "Butuh bantuan? Hubungi administrator UMKM Trans Niaga",
+    "icon": "headset",
+    "color": "#e53030",
+    "audience": [
+      "public",
+      "tenant"
+    ],
+    "intro": "Butuh bantuan pendaftaran, verifikasi produk, atau akun Anda dinonaktifkan? Hubungi administrator Trans Niaga:\n\n{{kontak-admin}}\n\nSertakan nama toko dan email akun Anda agar kami dapat membantu lebih cepat."
+  }
+]

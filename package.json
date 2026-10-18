@@ -13,6 +13,7 @@
     "images:cleanup": "tsx src/scripts/cleanupImages.ts",
     "backup": "tsx src/scripts/backup.ts",
     "bounces:check": "tsx src/scripts/checkBounces.ts",
+    "guides:seed": "tsx src/scripts/seedGuides.ts",
     "docs": "tsx src/scripts/docs.ts"
   },
   "author": "",
