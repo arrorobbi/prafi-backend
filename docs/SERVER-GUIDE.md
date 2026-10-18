@@ -2,7 +2,7 @@
 
 How the Trans Niaga (UMKM Prafi) server is set up and how to run, update and look after it. Written for whoever takes over the server.
 
-> This guide is kept in two files that must stay in step: `docs/SERVER-GUIDE.md` (English) and `docs/SERVER-GUIDE.id.md` (Bahasa Indonesia). The page has an **ID / EN** switch and a **light / dark** theme switch; both choices are remembered in the browser.
+> This guide is kept in two files that must stay in step: `docs/SERVER-GUIDE.md` (English) and `docs/SERVER-GUIDE.id.md` (Bahasa Indonesia). The page has an **ID / EN** switch and a **light / dark** theme switch (both remembered in the browser), and can be printed: **Cetak / Print** in the top bar prints the whole guide, **Cetak bagian / Print section** next to a section title prints only that section (or use the browser's Save as PDF).
 
 > This guide holds no passwords or secrets. They live only in the two `.env` files on the server (see *Configuration*). Never commit `.env` files or paste their contents into chats or tickets.
 

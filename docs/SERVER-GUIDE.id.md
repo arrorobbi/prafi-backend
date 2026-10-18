@@ -2,7 +2,7 @@
 
 Cara server Trans Niaga (UMKM Prafi) disusun, serta cara menjalankan, memperbarui, dan merawatnya. Ditulis untuk siapa pun yang mengambil alih pengelolaan server.
 
-> Panduan ini disimpan dalam dua berkas yang harus selalu sama isinya: `docs/SERVER-GUIDE.md` (bahasa Inggris) dan `docs/SERVER-GUIDE.id.md` (Bahasa Indonesia). Halaman ini memiliki tombol bahasa **ID / EN** dan tombol tema **terang / gelap**; kedua pilihan diingat di browser.
+> Panduan ini disimpan dalam dua berkas yang harus selalu sama isinya: `docs/SERVER-GUIDE.md` (bahasa Inggris) dan `docs/SERVER-GUIDE.id.md` (Bahasa Indonesia). Halaman ini memiliki tombol bahasa **ID / EN** dan tombol tema **terang / gelap** (keduanya diingat di browser), dan dapat dicetak: **Cetak** di bar atas mencetak seluruh panduan, **Cetak bagian** di samping judul bagian hanya mencetak bagian itu (atau gunakan *Simpan sebagai PDF* di browser).
 
 > Panduan ini tidak memuat password atau rahasia apa pun. Semuanya hanya ada di dua berkas `.env` di server (lihat *Konfigurasi*). Jangan pernah memasukkan berkas `.env` ke git atau menempelkan isinya ke chat maupun tiket.
 

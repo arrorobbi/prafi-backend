@@ -82,26 +82,62 @@
   // Mobile menu
   var sidebar = document.getElementById('sidebar');
   document.getElementById('menu-toggle').addEventListener('click', function () { sidebar.classList.toggle('open'); });
-  sidebar.addEventListener('click', function (e) { if (e.target.closest('a')) sidebar.classList.remove('open'); });
 
   // Highlight the endpoint in view
   var links = {};
   document.querySelectorAll('aside li[data-search] a').forEach(function (a) { links[a.getAttribute('href').slice(1)] = a; });
+  var current = null;
+  /** True while the page is being scrolled to a clicked link: the highlight then doesn't move the sidebar */
+  var jumping = false, jumpTimer = null;
+  var setActive = function (a) {
+    if (!a || a === current) return;
+    if (current) current.classList.remove('active');
+    current = a; a.classList.add('active');
+  };
+  // Keeps the highlighted link visible by scrolling the sidebar only. (scrollIntoView would scroll the page too,
+  // which cut a click on a link low in the sidebar short: the page stopped before reaching the endpoint.)
+  var keepVisible = function (a) {
+    var r = a.getBoundingClientRect(), s = sidebar.getBoundingClientRect();
+    if (r.top < s.top + 8) sidebar.scrollTop -= s.top + 8 - r.top;
+    else if (r.bottom > s.bottom - 8) sidebar.scrollTop += r.bottom - (s.bottom - 8);
+  };
   if ('IntersectionObserver' in window) {
-    var current = null;
     var io = new IntersectionObserver(function (entries) {
+      if (jumping) return;
       entries.forEach(function (en) {
         if (!en.isIntersecting) return;
         var a = links[en.target.id];
         if (!a || a === current) return;
-        if (current) current.classList.remove('active');
-        current = a; a.classList.add('active');
-        var r = a.getBoundingClientRect(), s = sidebar.getBoundingClientRect();
-        if (r.top < s.top || r.bottom > s.bottom) a.scrollIntoView({ block: 'nearest' });
+        setActive(a);
+        keepVisible(a);
       });
     }, { rootMargin: '-80px 0px -65% 0px' });
     endpoints.forEach(function (el) { io.observe(el); });
   }
+
+  // A click on a sidebar link: scroll the page to that section, below the sticky header, wherever the link is
+  var header = document.querySelector('header');
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  sidebar.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    sidebar.classList.remove('open');
+    var id = decodeURIComponent(a.getAttribute('href').slice(1));
+    var target = id === 'top' ? null : document.getElementById(id);
+    if (id !== 'top' && !target) return;
+    e.preventDefault();
+    var offset = (header ? header.getBoundingClientRect().height : 64) + 12;
+    var y = target ? target.getBoundingClientRect().top + window.scrollY - offset : 0;
+    jumping = true;
+    clearTimeout(jumpTimer);
+    window.scrollTo({ top: Math.max(0, y), behavior: reduceMotion ? 'auto' : 'smooth' });
+    history.replaceState(null, '', '#' + id);
+    if (links[id]) setActive(links[id]);
+    // Highlighting follows the page again once the scroll has ended
+    var done = function () { jumping = false; window.removeEventListener('scrollend', done); };
+    window.addEventListener('scrollend', done);
+    jumpTimer = setTimeout(done, 1200);
+  });
 
   // Back to top
   var top = document.getElementById('to-top');
