@@ -150,17 +150,8 @@ export function disnakertransAccountCreated(
   return { subject, html, text };
 }
 
-/**
- * To a self-registered admin or tenant: the account exists, confirm the email with this OTP. `emailChanged`: an
- * admin changed the seller's email to this address, which is confirmed the same way before the account can log in.
- */
-export function accountCreatedOtp(
-  user: Recipient,
-  code: string,
-  validMinutes: number,
-  resent = false,
-  emailChanged = false,
-): Omit<MailMessage, 'to'> {
+/** To a self-registered admin or tenant: the account exists, confirm the email with this OTP. */
+export function accountCreatedOtp(user: Recipient, code: string, validMinutes: number, resent = false): Omit<MailMessage, 'to'> {
   const name = `${user.firstName} ${user.lastName}`;
   const subject = `${code} adalah kode verifikasi ${BRAND} Anda`;
   const role = ROLE_NAMES[user.role] ?? user.role;
@@ -169,13 +160,10 @@ export function accountCreatedOtp(
       ? '<p>Setelah email terverifikasi, akun Admin Anda masih perlu diaktifkan oleh Disnakertrans sebelum dapat digunakan.</p>'
       : '';
   const html = layout(
-    emailChanged ? 'Verifikasi email baru Anda' : resent ? 'Kode OTP baru' : 'Akun Anda telah dibuat',
+    resent ? 'Kode OTP baru' : 'Akun Anda telah dibuat',
     `<p>Halo <strong>${escape(name)}</strong>,</p>
      ${
-       emailChanged
-         ? `<p>Administrator ${BRAND} telah mengubah email akun <strong>${role}</strong> Anda menjadi <strong>${escape(user.email)}</strong>.</p>
-            <p>Akun Anda dapat digunakan kembali setelah email baru ini diverifikasi. Saat login, masukkan kode OTP berikut:</p>`
-         : resent
+       resent
          ? '<p>Berikut kode OTP baru untuk memverifikasi email Anda. Kode sebelumnya sudah tidak berlaku.</p>'
          : `<p>Akun <strong>${role}</strong> Anda di ${BRAND} telah berhasil dibuat dengan email <strong>${escape(user.email)}</strong>.</p>
             <p>Untuk memastikan email ini aktif, masukkan kode OTP berikut:</p>`
@@ -191,9 +179,7 @@ export function accountCreatedOtp(
   const text = [
     `Halo ${name},`,
     '',
-    emailChanged
-      ? `Administrator ${BRAND} telah mengubah email akun ${role} Anda menjadi ${user.email}.\nAkun Anda dapat digunakan kembali setelah email baru ini diverifikasi. Saat login, masukkan kode OTP berikut:`
-      : resent
+    resent
       ? 'Berikut kode OTP baru untuk memverifikasi email Anda. Kode sebelumnya sudah tidak berlaku.'
       : `Akun ${role} Anda di ${BRAND} telah berhasil dibuat dengan email ${user.email}.\nUntuk memastikan email ini aktif, masukkan kode OTP berikut:`,
     '',
@@ -201,6 +187,41 @@ export function accountCreatedOtp(
     '',
     `Kode ini berlaku selama ${validMinutes} menit. Jangan berikan kode ini kepada siapa pun.`,
     ...(user.role === 'admin' ? ['Setelah email terverifikasi, akun Admin Anda masih perlu diaktifkan oleh Disnakertrans sebelum dapat digunakan.'] : []),
+    ...TEXT_SIGN_OFF,
+  ].join('\n');
+  return { subject, html, text };
+}
+
+/**
+ * To the new address after an admin changed a seller's email: one click on the button confirms it, then the seller
+ * logs in with it. `resent`: a new link asked for later (the earlier one no longer works).
+ */
+export function emailChangeConfirm(user: Recipient, link: string, validHours: number, resent = false): Omit<MailMessage, 'to'> {
+  const name = `${user.firstName} ${user.lastName}`;
+  const subject = resent ? `Tautan konfirmasi email baru ${BRAND} Anda` : `Konfirmasi email baru akun ${BRAND} Anda`;
+  const intro = resent
+    ? `Berikut tautan konfirmasi baru untuk email akun penjual Anda di ${BRAND} (${user.email}). Tautan pada email sebelumnya tidak berlaku lagi.`
+    : `Administrator ${BRAND} telah mengubah email akun penjual Anda menjadi ${user.email}.`;
+  const html = layout(
+    'Konfirmasi email baru Anda',
+    `<p>Halo <strong>${escape(name)}</strong>,</p>
+     <p>${escape(intro)}</p>
+     <p>Tekan tombol berikut untuk mengonfirmasi email ini. Setelah itu Anda dapat login kembali dengan email baru dan kata sandi yang sama.</p>
+     ${button(link, 'Konfirmasi Email')}
+     ${copyLink(link)}
+     <p>Tautan ini berlaku selama <strong>${validHours} jam</strong>. Jika Anda tidak mengenali perubahan ini, abaikan email ini dan hubungi administrator ${BRAND}.</p>
+     ${SIGN_OFF}`,
+    'Tekan tombol untuk mengonfirmasi email baru akun Anda.',
+  );
+  const text = [
+    `Halo ${name},`,
+    '',
+    intro,
+    '',
+    'Buka tautan berikut untuk mengonfirmasi email ini. Setelah itu Anda dapat login kembali dengan email baru dan kata sandi yang sama:',
+    link,
+    '',
+    `Tautan ini berlaku selama ${validHours} jam. Jika Anda tidak mengenali perubahan ini, abaikan email ini dan hubungi administrator ${BRAND}.`,
     ...TEXT_SIGN_OFF,
   ].join('\n');
   return { subject, html, text };
@@ -214,7 +235,7 @@ export function emailChangedNotice(user: Recipient, oldEmail: string, newEmail: 
     'Email akun Anda telah diubah',
     `<p>Halo <strong>${escape(name)}</strong>,</p>
      <p>Administrator ${BRAND} telah mengubah email akun penjual Anda dari <strong>${escape(oldEmail)}</strong> menjadi <strong>${escape(newEmail)}</strong>.</p>
-     <p>Mulai sekarang semua email akun dikirim ke alamat baru tersebut, dan akun dapat digunakan kembali setelah alamat baru diverifikasi dengan kode OTP yang dikirim ke sana.</p>
+     <p>Mulai sekarang semua email akun dikirim ke alamat baru tersebut, dan akun dapat digunakan kembali setelah tautan konfirmasi yang dikirim ke alamat baru diklik.</p>
      <p>Jika Anda tidak meminta perubahan ini, segera hubungi administrator ${BRAND}.</p>
      ${SIGN_OFF}`,
     `Email akun Anda diubah menjadi ${newEmail}.`,
@@ -223,7 +244,7 @@ export function emailChangedNotice(user: Recipient, oldEmail: string, newEmail: 
     `Halo ${name},`,
     '',
     `Administrator ${BRAND} telah mengubah email akun penjual Anda dari ${oldEmail} menjadi ${newEmail}.`,
-    'Mulai sekarang semua email akun dikirim ke alamat baru tersebut, dan akun dapat digunakan kembali setelah alamat baru diverifikasi dengan kode OTP yang dikirim ke sana.',
+    'Mulai sekarang semua email akun dikirim ke alamat baru tersebut, dan akun dapat digunakan kembali setelah tautan konfirmasi yang dikirim ke alamat baru diklik.',
     '',
     `Jika Anda tidak meminta perubahan ini, segera hubungi administrator ${BRAND}.`,
     ...TEXT_SIGN_OFF,

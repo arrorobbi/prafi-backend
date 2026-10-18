@@ -40,6 +40,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Auth | `POST /api/auth/verify-otp/{{userId}}` | Publik |
 | Auth | `POST /api/auth/activate/check` | Publik |
 | Auth | `POST /api/auth/activate` | Publik |
+| Auth | `POST /api/auth/confirm-email` | Publik |
 | Auth | `POST /api/auth/resend-verification/{{userId}}` | Publik |
 | Auth | `POST /api/auth/forgot-password` | Publik |
 | Auth | `POST /api/auth/reset-password/check` | Publik |
@@ -162,7 +163,7 @@ Masuk dan menyimpan access token sebagai `{{token}}` (berlaku 1 jam, diperpanjan
 
 **Batas percobaan:** hanya password salah yang dihitung. Setelah **5 kali salah untuk satu email dari satu jaringan (IP)**, atau **20 kali salah dari satu jaringan** untuk email mana pun, dalam 15 menit, jaringan itu mendapat 429 `TOO_MANY_REQUESTS` (`details.retryAfterSeconds`) sampai percobaan tertua berumur 15 menit, juga bila password-nya benar. Login yang berhasil menghapus hitungan akun tersebut. Jawaban 401 menyertakan `details.attemptsLeft`.
 
-Error: 401 email/password salah (`details.attemptsLeft`), 429 terlalu banyak percobaan gagal, 403 `EMAIL_NOT_VERIFIED` (verifikasi email dulu; `details` berisi `userId` dan `method`), 403 `USER_NOT_ACTIVATED` (akun belum diaktifkan). Lupa kata sandi? Gunakan *Lupa Kata Sandi*.
+Error: 401 email/password salah (`details.attemptsLeft`), 429 terlalu banyak percobaan gagal, 403 `EMAIL_NOT_VERIFIED` (verifikasi email dulu; `details` berisi `userId` dan `method`: `otp`, `link`, atau `confirm` jika admin mengubah email dan tautan konfirmasi belum dibuka), 403 `USER_NOT_ACTIVATED` (akun belum diaktifkan). Lupa kata sandi? Gunakan *Lupa Kata Sandi*.
 
 `data.user` adalah profil lengkap, sama seperti *Profil Saya* (`faceImage`, `approval`), sehingga foto dapat langsung ditampilkan setelah login.
 
@@ -212,8 +213,13 @@ Akun disnakertrans: mengganti **kata sandi sementara** dari email aktivasi denga
 
 Error lain: 400 validasi, 400 `LINK_INVALID`, 400 `LINK_EXPIRED`, 409 `EMAIL_ALREADY_VERIFIED`.
 
+=== REQ Confirm Email (Public) => Konfirmasi Email
+Penjual yang emailnya diubah admin (*Pengguna → Ubah Email Penjual*): tautan di email konfirmasi membuka halaman frontend `/konfirmasi-email`, yang memanggil endpoint ini dengan `userId` dan `token` dari tautan. Satu panggilan mengonfirmasi alamat baru (`mailActive: true`); penjual lalu login dengan email baru dan password yang sama.
+
+Error: 400 `LINK_INVALID` (token salah, atau sudah diganti tautan yang lebih baru), 400 `LINK_EXPIRED` (lebih dari 24 jam: *Kirim Ulang Verifikasi* mengirim tautan baru), 409 `EMAIL_ALREADY_VERIFIED` (sudah dikonfirmasi).
+
 === REQ Resend Verification (Public) => Kirim Ulang Verifikasi
-Mengirim OTP baru (admin, tenant), atau untuk disnakertrans email aktivasi baru: link baru **dan kata sandi sementara baru** (yang lama hanya tersimpan sebagai hash, sehingga tidak bisa dikirim ulang). Kode, link, dan kata sandi sementara sebelumnya tidak berlaku lagi. Paling sering sekali per 60 detik (429 `TOO_MANY_REQUESTS`, `details.retryAfterSeconds`). Menyimpan `{{otp}}`, atau `{{verifyToken}}` dan `{{temporaryPassword}}`, yang baru saat development.
+Mengirim OTP baru (admin, tenant), tautan konfirmasi baru (penjual yang emailnya diubah admin), atau untuk disnakertrans email aktivasi baru: link baru **dan kata sandi sementara baru** (yang lama hanya tersimpan sebagai hash, sehingga tidak bisa dikirim ulang). Kode, link, dan kata sandi sementara sebelumnya tidak berlaku lagi. Paling sering sekali per 60 detik (429 `TOO_MANY_REQUESTS`, `details.retryAfterSeconds`). Menyimpan `{{otp}}`, atau `{{verifyToken}}` dan `{{temporaryPassword}}`, yang baru saat development.
 
 === REQ Forgot Password (Public) => Lupa Kata Sandi
 Mengirim email (Bahasa Indonesia) berisi link untuk mengatur ulang kata sandi, berlaku **30 menit** dan sekali pakai. Link membuka halaman **frontend** `<FRONTEND_URL>/reset-password?userId=…&token=…` (`FRONTEND_URL` di `.env`), yang memanggil *Cek Link Atur Ulang* dan *Atur Ulang Kata Sandi*.
@@ -273,7 +279,9 @@ Ditemukan oleh pemeriksaan email gagal (backend membaca kotak masuk situs untuk 
 === REQ Change Seller Email (admin) => Ubah Email Penjual
 Memperbaiki email penjual (tenant). Body: `email`. Hanya akun tenant (selain itu 403); 409 `EMAIL_TAKEN` jika dipakai akun lain.
 
-Penjual harus memverifikasi alamat baru: `mailActive` menjadi false (semua sesi penjual berakhir, koneksi WebSocket menerima `session:ended` dengan reason `email_changed`, dan login menjawab 403 `EMAIL_NOT_VERIFIED` dengan `userId`), OTP dikirim ke alamat baru (verifikasi dengan *Auth → Verifikasi OTP*; *Kirim Ulang Verifikasi* mengirim kode baru), dan alamat lama menerima pemberitahuan perubahan. Catatan pengiriman email dihapus. `data.verification.emailSent` false = email OTP gagal dikirim (penjual dapat meminta kode baru).
+Penjual harus mengonfirmasi alamat baru: `mailActive` menjadi false (semua sesi penjual berakhir, koneksi WebSocket menerima `session:ended` dengan reason `email_changed`, dan login menjawab 403 `EMAIL_NOT_VERIFIED` dengan `details.method` = `confirm`), **tautan konfirmasi** (berlaku 24 jam) dikirim ke alamat baru: `<FRONTEND_URL>/konfirmasi-email?userId=…&token=…`. Membukanya langsung mengonfirmasi alamat (*Auth → Konfirmasi Email*); tidak ada kode atau kata sandi yang perlu diketik. *Kirim Ulang Verifikasi* mengirim tautan baru. Alamat lama menerima pemberitahuan perubahan. Catatan pengiriman email dihapus.
+
+`data.verification.method` bernilai `confirm`; `emailSent` false = email gagal dikirim (penjual dapat meminta tautan baru saat login). Saat development token disimpan sebagai `{{verifyToken}}`.
 
 === FOLDER Approvals => Persetujuan
 Mengaktifkan / menonaktifkan akun dan produk: `PATCH /api/approvals/:id?type=user|product`. `:id` adalah **id user** atau **id produk** (bukan id approval).

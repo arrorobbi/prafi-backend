@@ -820,7 +820,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 
 ![Kategori Produk](panduan/fitur-admin-kategori.jpg)
 
-- **Manajemen UMKM**: mengaktifkan atau menonaktifkan akun penjual, dan membaca profil tokonya. **Detail** menampilkan foto wajah, nama, email, telepon, nama toko dan alamat penjual; admin hanya dapat mengubah **email**. Penjual lalu harus memverifikasi alamat baru dengan OTP yang dikirim ke sana sebelum dapat login lagi (sesinya diakhiri), dan alamat lama menerima pemberitahuan.
+- **Manajemen UMKM**: mengaktifkan atau menonaktifkan akun penjual, dan membaca profil tokonya. **Detail** menampilkan foto wajah, nama, email, telepon, nama toko dan alamat penjual; admin hanya dapat mengubah **email**. Sesi penjual diakhiri dan alamat baru menerima tautan konfirmasi: sekali klik mengonfirmasi alamat itu, lalu penjual login dengannya (halaman `/konfirmasi-email`). Alamat lama menerima pemberitahuan.
 
 ![Manajemen UMKM](panduan/fitur-admin-umkm.jpg)
 

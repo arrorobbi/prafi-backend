@@ -161,7 +161,7 @@ async function note(recipient: string, issue: EmailIssue, detail: string, at: Da
   const user = await User.findOne({ where: { email: recipient }, attributes: ['id', 'emailIssue', 'emailIssueAt', 'email'] });
   if (!user) return false;
   const verifiedLater = await Otp.findOne({
-    where: { userId: user.id, purpose: ['otp', 'link'], usedAt: { [Op.gt]: at } },
+    where: { userId: user.id, purpose: ['otp', 'link', 'confirm'], usedAt: { [Op.gt]: at } },
     attributes: ['id'],
   });
   if (verifiedLater) return false;

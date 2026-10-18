@@ -13,9 +13,10 @@ import type { User } from './user.model';
 
 /**
  * 'otp' = 6-digit email verification code (admin/tenant), 'link' = account activation link token (disnakertrans; used with the emailed temporary password),
- * 'reset' = forgot-password link token.
+ * 'reset' = forgot-password link token, 'confirm' = email confirmation link after an admin changed a seller's email
+ * (one click verifies the new address).
  */
-export const OTP_PURPOSES = ['otp', 'link', 'reset'] as const;
+export const OTP_PURPOSES = ['otp', 'link', 'reset', 'confirm'] as const;
 export type OtpPurpose = (typeof OTP_PURPOSES)[number];
 
 /**

@@ -32,6 +32,8 @@ router.post('/resend-verification/:userId', authController.resendVerification);
 // Disnakertrans: the email links to the frontend's /aktivasi page, which calls these two (temporary password → own password)
 router.post('/activate/check', authController.checkActivation);
 router.post('/activate', authController.activate);
+// Seller whose email an admin changed: the email links to the frontend's /konfirmasi-email page, which calls this
+router.post('/confirm-email', authController.confirmEmail);
 
 // Forgot password: public. The email links to the frontend's /reset-password page, which calls these two
 router.post('/forgot-password', authController.forgotPassword);

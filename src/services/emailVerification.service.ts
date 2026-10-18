@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import { env } from '../config/env';
 import { EMAIL_VERIFICATION_METHOD, type Role } from '../constants/roles';
 import { HttpError } from '../errors/HttpError';
-import { accountCreatedOtp, disnakertransAccountCreated } from '../mail/templates';
+import { accountCreatedOtp, disnakertransAccountCreated, emailChangeConfirm } from '../mail/templates';
 import { Otp, sequelize, User } from '../models';
 import type { OtpPurpose } from '../models/otp.model';
 import { readablePassword } from '../utils/readablePassword';
@@ -49,6 +49,16 @@ export const ACTIVATION_PAGE_PATH = '/aktivasi';
 export const activationLink = (userId: string, token: string) =>
   `${env.frontendUrl}${ACTIVATION_PAGE_PATH}?userId=${encodeURIComponent(userId)}&token=${encodeURIComponent(token)}`;
 
+/** The frontend page the email-change confirmation links to; opening it confirms the address. */
+export const CONFIRM_PAGE_PATH = '/konfirmasi-email';
+export const CONFIRM_LINK_VALID_HOURS = 24;
+
+const confirmLink = (userId: string, token: string) =>
+  `${env.frontendUrl}${CONFIRM_PAGE_PATH}?userId=${encodeURIComponent(userId)}&token=${encodeURIComponent(token)}`;
+
+/** Every kind of code that verifies an email address (not the password reset). */
+const VERIFY_PURPOSES: OtpPurpose[] = ['otp', 'link', 'confirm'];
+
 /**
  * Creates a new code for the user (replacing any unused one) and emails it:
  * a 6-digit OTP for admin/tenant; for disnakertrans an activation link together with a temporary password
@@ -58,11 +68,7 @@ export const activationLink = (userId: string, token: string) =>
  */
 export async function startVerification(
   user: VerifiableUser,
-  {
-    resent = false,
-    temporaryPassword,
-    emailChanged = false,
-  }: { resent?: boolean; temporaryPassword?: string; emailChanged?: boolean } = {},
+  { resent = false, temporaryPassword }: { resent?: boolean; temporaryPassword?: string } = {},
 ): Promise<VerificationInfo> {
   const method = EMAIL_VERIFICATION_METHOD[user.role];
   const secret = method === 'otp' ? String(randomInt(0, 1_000_000)).padStart(6, '0') : randomBytes(32).toString('hex');
@@ -84,7 +90,7 @@ export async function startVerification(
   const link = method === 'link' ? activationLink(user.id, secret) : undefined;
   const content =
     method === 'otp'
-      ? accountCreatedOtp(user, secret, OTP_VALID_MINUTES, resent, emailChanged)
+      ? accountCreatedOtp(user, secret, OTP_VALID_MINUTES, resent)
       : disnakertransAccountCreated(user, link!, emailedPassword!, LINK_VALID_HOURS, resent);
 
   let emailSent = true;
@@ -125,7 +131,7 @@ async function complete(user: User, code: Otp) {
   await sequelize.transaction(async (transaction) => {
     await code.update({ usedAt: new Date() }, { transaction });
     await user.update({ mailActive: true, ...EMAIL_OK }, { transaction });
-    await Otp.destroy({ where: { userId: user.id, purpose: ['otp', 'link'], usedAt: null, id: { [Op.ne]: code.id } }, transaction });
+    await Otp.destroy({ where: { userId: user.id, purpose: VERIFY_PURPOSES, usedAt: null, id: { [Op.ne]: code.id } }, transaction });
   });
 }
 
@@ -210,11 +216,63 @@ export async function activate(userId: string, token: string, temporaryPassword:
 export async function resend(userId: string) {
   const user = await findUnverifiedUser(userId);
 
-  const last = await Otp.findOne({ where: { userId: user.id, purpose: ['otp', 'link'] }, order: [['createdAt', 'DESC']], attributes: ['createdAt'] });
+  const last = await Otp.findOne({ where: { userId: user.id, purpose: VERIFY_PURPOSES }, order: [['createdAt', 'DESC']], attributes: ['createdAt', 'purpose'] });
   const waitSeconds = last ? Math.ceil(RESEND_COOLDOWN_SECONDS - (Date.now() - last.createdAt.getTime()) / 1000) : 0;
   if (waitSeconds > 0) {
-    throw HttpError.tooManyRequests(`Tunggu ${waitSeconds} detik sebelum meminta kode baru`, { retryAfterSeconds: waitSeconds });
+    const what = last?.purpose === 'otp' ? 'kode' : 'tautan';
+    throw HttpError.tooManyRequests(`Tunggu ${waitSeconds} detik sebelum meminta ${what} baru`, { retryAfterSeconds: waitSeconds });
   }
 
+  // An admin changed this seller's email: a new confirmation link, not an OTP
+  if (last?.purpose === 'confirm') return startEmailConfirmation(user, { resent: true });
   return startVerification(user, { resent: true });
+}
+
+/**
+ * How this unverified account verifies its email now: 'confirm' while an admin's email change waits for its link to
+ * be clicked, otherwise the role's method (OTP or activation link). Sent with 403 EMAIL_NOT_VERIFIED at login.
+ */
+export async function pendingMethod(user: { id: string; role: Role }): Promise<OtpPurpose> {
+  const last = await Otp.findOne({ where: { userId: user.id, purpose: VERIFY_PURPOSES, usedAt: null }, order: [['createdAt', 'DESC']], attributes: ['purpose'] });
+  return last?.purpose === 'confirm' ? 'confirm' : EMAIL_VERIFICATION_METHOD[user.role];
+}
+
+/**
+ * After an admin changed a seller's email: emails a confirmation link (valid CONFIRM_LINK_VALID_HOURS) to the new
+ * address. Opening it confirms the address (POST /api/auth/confirm-email). A failed email does not throw.
+ */
+export async function startEmailConfirmation(user: VerifiableUser, { resent = false } = {}): Promise<VerificationInfo> {
+  const token = randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + CONFIRM_LINK_VALID_HOURS * 3_600_000);
+  await sequelize.transaction(async (transaction) => {
+    await Otp.destroy({ where: { userId: user.id, purpose: VERIFY_PURPOSES, usedAt: null }, transaction });
+    await Otp.create({ userId: user.id, purpose: 'confirm', code: hash(token), expiresAt }, { transaction });
+  });
+
+  const link = confirmLink(user.id, token);
+  let emailSent = true;
+  try {
+    await sendMail({ to: user.email, ...emailChangeConfirm(user, link, CONFIRM_LINK_VALID_HOURS, resent) });
+  } catch (err) {
+    emailSent = false;
+    console.error(`[mail] could not send the email confirmation to ${user.email}:`, (err as Error).message);
+    await recordSendFailure(user.id, err as Error);
+  }
+
+  const dev = mailIsSimulated && !env.isProduction;
+  return { method: 'confirm', sentTo: user.email, expiresAt, emailSent, ...(dev && { devLink: link, devToken: token }) };
+}
+
+/** POST /api/auth/confirm-email — the link from the email-change confirmation: one click verifies the new address. */
+export async function confirmEmail(userId: string, token: string) {
+  const user = await findUnverifiedUser(userId);
+  const code = await latestCode(user.id, 'confirm');
+  if (!code || !sameHash(hash(token), code.code)) {
+    throw new HttpError(400, 'Tautan konfirmasi tidak valid atau sudah diganti oleh email konfirmasi yang lebih baru', 'LINK_INVALID');
+  }
+  if (code.expiresAt.getTime() < Date.now()) {
+    throw new HttpError(400, `Tautan konfirmasi sudah kedaluwarsa (berlaku ${CONFIRM_LINK_VALID_HOURS} jam), silakan minta tautan baru`, 'LINK_EXPIRED');
+  }
+  await complete(user, code);
+  return { email: user.email };
 }

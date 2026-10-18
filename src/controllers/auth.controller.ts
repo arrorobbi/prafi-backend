@@ -201,7 +201,12 @@ export const verifyOtp: RequestHandler = async (req, res) => {
 /** POST /api/auth/resend-verification/:userId — a new OTP (admin, tenant) or activation email (disnakertrans). */
 export const resendVerification: RequestHandler = async (req, res) => {
   const verification = await emailVerification.resend(parseUserId(req.params.userId));
-  const what = verification.method === 'link' ? 'Email aktivasi baru (tautan dan kata sandi sementara baru)' : 'Kode verifikasi baru';
+  const what =
+    verification.method === 'link'
+      ? 'Email aktivasi baru (tautan dan kata sandi sementara baru)'
+      : verification.method === 'confirm'
+        ? 'Tautan konfirmasi email baru'
+        : 'Kode verifikasi baru';
   res.json({ success: true, data: { message: `${what} telah dikirim ke ${verification.sentTo}` }, meta: { verification } });
 };
 
@@ -255,6 +260,13 @@ export const resetPassword: RequestHandler = async (req, res) => {
 };
 
 // ---------- disnakertrans account activation (public: the link in the email goes to the frontend's /aktivasi) ----------
+
+/** POST /api/auth/confirm-email — body { userId, token }: the email-change confirmation link; verifies the new address. */
+export const confirmEmail: RequestHandler = async (req, res) => {
+  const { userId, token } = parseResetBody((req.body ?? {}) as Record<string, unknown>, false);
+  const { email } = await emailVerification.confirmEmail(userId, token);
+  res.json({ success: true, data: { message: `Email ${email} berhasil dikonfirmasi, silakan login`, email } });
+};
 
 /** POST /api/auth/activate/check — body { userId, token }: is this activation link still usable? */
 export const checkActivation: RequestHandler = async (req, res) => {

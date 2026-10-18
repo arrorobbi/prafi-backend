@@ -820,7 +820,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 
 ![Kategori Produk](panduan/fitur-admin-kategori.jpg)
 
-- **Manajemen UMKM**: activate or deactivate seller accounts, and read their shop profiles. **Detail** shows a seller's face photo, name, email, phone, store name and address; the admin can change only the **email**. The seller must then verify the new address with an OTP sent there before logging in again (they are logged out), and the old address gets a notice.
+- **Manajemen UMKM**: activate or deactivate seller accounts, and read their shop profiles. **Detail** shows a seller's face photo, name, email, phone, store name and address; the admin can change only the **email**. They are logged out and get a confirmation link at the new address: one click on it confirms the address, then they log in with it (page `/konfirmasi-email`). The old address gets a notice.
 
 ![Manajemen UMKM](panduan/fitur-admin-umkm.jpg)
 

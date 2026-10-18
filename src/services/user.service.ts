@@ -59,8 +59,8 @@ export async function list({ readableRoles, role, q, emailIssue, page, limit }: 
 
 /**
  * PATCH /api/users/:id/email — an admin corrects a seller's (tenant's) email address. The new address must be
- * verified by the seller: the account's email counts as unverified (mailActive = false, so its sessions end and it
- * can't log in), a new OTP goes to the new address, and the old address is told about the change.
+ * confirmed by the seller: the account's email counts as unverified (mailActive = false, so its sessions end and it
+ * can't log in), a confirmation link goes to the new address (one click confirms it), and the old address is told.
  */
 export async function changeTenantEmail(id: string, email: string) {
   const user = await User.findByPk(id);
@@ -83,12 +83,12 @@ export async function changeTenantEmail(id: string, email: string) {
       { transaction },
     );
     // Codes sent to the old address must not verify the new one
-    await Otp.destroy({ where: { userId: user.id, purpose: ['otp', 'link'], usedAt: null }, transaction });
+    await Otp.destroy({ where: { userId: user.id, purpose: ['otp', 'link', 'confirm'], usedAt: null }, transaction });
   });
 
   // Open tabs of the seller are logged out at once (their next request would be refused anyway)
   await endUserSessions(user.id, 'email_changed');
-  const verification = await emailVerification.startVerification(user, { emailChanged: true });
+  const verification = await emailVerification.startEmailConfirmation(user);
 
   // Tell the old address, so the owner knows if the change was not theirs (a failure here is only logged)
   try {

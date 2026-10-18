@@ -47,8 +47,8 @@ export const list: RequestHandler = async (req, res) => {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * PATCH /api/users/:id/email { email } — admin: corrects a seller's email. The seller must verify the new address
- * (OTP sent there) before logging in again; the old address gets a notice.
+ * PATCH /api/users/:id/email { email } — admin: corrects a seller's email. The seller must confirm the new address
+ * (one click on the link sent there) before logging in again; the old address gets a notice.
  */
 export const changeEmail: RequestHandler = async (req, res) => {
   const { email } = (req.body ?? {}) as { email?: unknown };
@@ -59,8 +59,8 @@ export const changeEmail: RequestHandler = async (req, res) => {
   res.json({
     success: true,
     message: verification.emailSent
-      ? `Email diubah. Kode OTP dikirim ke ${user.email}; penjual harus memverifikasinya sebelum dapat login kembali.`
-      : `Email diubah, tetapi kode OTP gagal dikirim ke ${user.email}. Penjual dapat meminta kode baru saat login.`,
+      ? `Email diubah. Tautan konfirmasi dikirim ke ${user.email}; penjual harus mengekliknya sebelum dapat login kembali.`
+      : `Email diubah, tetapi tautan konfirmasi gagal dikirim ke ${user.email}. Penjual dapat meminta tautan baru saat login.`,
     data: { user, verification },
   });
 };

@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { Op } from 'sequelize';
-import { ACTIVE_ON_REGISTRATION, CREATABLE_ROLES, EMAIL_VERIFICATION_METHOD, PUBLIC_REGISTRATION_ROLES, ROLES, type Role } from '../constants/roles';
+import { ACTIVE_ON_REGISTRATION, CREATABLE_ROLES, PUBLIC_REGISTRATION_ROLES, ROLES, type Role } from '../constants/roles';
 import { env } from '../config/env';
 import { HttpError } from '../errors/HttpError';
 import { Approval, Image, RevokedToken, sequelize, User } from '../models';
@@ -54,7 +54,7 @@ export async function login(email: string, password: string, ip: string | null =
   // Checked only after the password is correct, so these states aren't revealed to anyone else.
   // Email first: the user can fix that themselves (the userId lets the frontend open the OTP screen).
   if (!user.mailActive) {
-    throw HttpError.emailNotVerified({ userId: user.id, method: EMAIL_VERIFICATION_METHOD[user.role] });
+    throw HttpError.emailNotVerified({ userId: user.id, method: await emailVerification.pendingMethod(user) });
   }
   if (user.approval?.isActive !== true) throw HttpError.notActivated();
 

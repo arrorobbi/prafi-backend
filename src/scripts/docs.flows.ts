@@ -148,6 +148,17 @@ export const FLOWS: Record<string, Chart[]> = {
       ],
     },
     {
+      title: { en: 'Confirm Email (seller, after an admin changed it)', id: 'Konfirmasi Email (penjual, setelah diubah admin)' },
+      nodes: [
+        start('POST /api/auth/confirm-email'),
+        check({ en: 'userId a UUID and token 64 characters?', id: 'userId berupa UUID dan token 64 karakter?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
+        check({ en: 'User exists and email not confirmed yet?', id: 'Pengguna ada dan email belum dikonfirmasi?' }, '404 / 409 EMAIL_ALREADY_VERIFIED'),
+        check({ en: 'Token is the newest link, within 24 hours?', id: 'Token adalah tautan terbaru, masih dalam 24 jam?' }, '400 LINK_INVALID / LINK_EXPIRED'),
+        step({ en: 'Mark the link used, set `mailActive: true`', id: 'Tandai tautan terpakai, set `mailActive: true`' }),
+        end({ en: '200, can log in with the new email', id: '200, bisa login dengan email baru' }),
+      ],
+    },
+    {
       title: { en: 'Activate Account (disnakertrans)', id: 'Aktifkan Akun (disnakertrans)' },
       nodes: [
         start('POST /api/auth/activate { userId, token, temporaryPassword, password }'),
@@ -320,13 +331,13 @@ export const FLOWS: Record<string, Chart[]> = {
           note({ en: "The seller's sessions end (403 EMAIL_NOT_VERIFIED)", id: 'Sesi penjual berakhir (403 EMAIL_NOT_VERIFIED)' }),
         ),
         step(
-          { en: 'Send the OTP to the new address', id: 'Kirim OTP ke alamat baru' },
-          effect({ en: 'Email: your email was changed + 6-digit OTP, valid 15 min', id: 'Email: email Anda diubah + OTP 6 digit, berlaku 15 menit' }),
+          { en: 'Send a confirmation link to the new address (valid 24 h)', id: 'Kirim tautan konfirmasi ke alamat baru (berlaku 24 jam)' },
+          effect({ en: 'Email: your email was changed + Konfirmasi Email button', id: 'Email: email Anda diubah + tombol Konfirmasi Email' }),
           effect({ en: 'Email to the old address: notice of the change', id: 'Email ke alamat lama: pemberitahuan perubahan' }),
         ),
         end(
           { en: '200 user + verification', id: '200 user + verification' },
-          note({ en: 'Logs in again after Verify OTP', id: 'Bisa login lagi setelah Verifikasi OTP' }),
+          note({ en: 'Logs in again after opening the link (Confirm Email)', id: 'Bisa login lagi setelah membuka tautan (Konfirmasi Email)' }),
         ),
       ],
     },
