@@ -299,7 +299,52 @@ export const FLOWS: Record<string, Chart[]> = {
           note({ en: 'disnakertrans → admins only', id: 'disnakertrans → hanya admin' }),
           note({ en: 'admin → tenants only', id: 'admin → hanya tenant' }),
         ),
-        end({ en: '200 paginated list', id: '200 daftar berhalaman' }),
+        step({ en: 'Optional: ?role=, ?q= (name, email, phone, store), ?emailIssue=true', id: 'Opsional: ?role=, ?q= (nama, email, telepon, toko), ?emailIssue=true' }),
+        end(
+          { en: '200 paginated list', id: '200 daftar berhalaman' },
+          note({ en: 'Tenants with their shop profile; emailIssue = emails that did not arrive', id: 'Tenant beserta profil tokonya; emailIssue = email yang tidak sampai' }),
+        ),
+      ],
+    },
+    {
+      title: { en: 'Change Seller Email (admin)', id: 'Ubah Email Penjual (admin)' },
+      nodes: [
+        start('PATCH /api/users/:id/email'),
+        ...auth('admin'),
+        check({ en: 'email valid?', id: 'email valid?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
+        check({ en: 'User exists?', id: 'Pengguna ada?' }, '404'),
+        check({ en: 'User is a tenant?', id: 'Pengguna adalah tenant?' }, '403 Forbidden'),
+        check({ en: 'New and not used by another account?', id: 'Baru dan belum dipakai akun lain?' }, '400 / 409 EMAIL_TAKEN'),
+        step(
+          { en: 'Save the email, `mailActive: false`, clear `emailIssue`, drop old codes', id: 'Simpan email, `mailActive: false`, hapus `emailIssue`, hapus kode lama' },
+          note({ en: "The seller's sessions end (403 EMAIL_NOT_VERIFIED)", id: 'Sesi penjual berakhir (403 EMAIL_NOT_VERIFIED)' }),
+        ),
+        step(
+          { en: 'Send the OTP to the new address', id: 'Kirim OTP ke alamat baru' },
+          effect({ en: 'Email: your email was changed + 6-digit OTP, valid 15 min', id: 'Email: email Anda diubah + OTP 6 digit, berlaku 15 menit' }),
+          effect({ en: 'Email to the old address: notice of the change', id: 'Email ke alamat lama: pemberitahuan perubahan' }),
+        ),
+        end(
+          { en: '200 user + verification', id: '200 user + verification' },
+          note({ en: 'Logs in again after Verify OTP', id: 'Bisa login lagi setelah Verifikasi OTP' }),
+        ),
+      ],
+    },
+  ],
+
+  'Site Content': [
+    {
+      title: { en: 'Edit the site texts', id: 'Ubah teks situs' },
+      nodes: [
+        start('GET | PATCH /api/site-content'),
+        ...auth(DK_ADMIN),
+        check({ en: 'Known fields, footerAbout text ≤ 1500 characters?', id: 'Field dikenal, teks footerAbout ≤ 1500 karakter?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
+        step({ en: 'Tidy line breaks; "" or null = back to the default', id: 'Rapikan baris; "" atau null = kembali ke teks bawaan' }),
+        step(
+          { en: 'Save in site_settings with who changed it', id: 'Simpan di site_settings beserta pengubahnya' },
+          effect({ en: 'Website refreshes its cached public pages', id: 'Website memperbarui cache halaman publik' }),
+        ),
+        end({ en: '200 texts + default + last editor', id: '200 teks + bawaan + pengubah terakhir' }),
       ],
     },
   ],
@@ -421,6 +466,17 @@ export const FLOWS: Record<string, Chart[]> = {
   ],
 
   Landing: [
+    {
+      title: { en: 'Site Texts', id: 'Teks Situs' },
+      nodes: [
+        start('GET /api/landing/site'),
+        step({ en: 'No token needed', id: 'Tanpa token' }),
+        end(
+          { en: '200 { footerAbout }', id: '200 { footerAbout }' },
+          note({ en: 'Default text until someone saves one in Konten Situs', id: 'Teks bawaan sampai ada yang menyimpan di Konten Situs' }),
+        ),
+      ],
+    },
     {
       title: { en: 'Landing Categories (carousel)', id: 'Kategori Landing (carousel)' },
       nodes: [

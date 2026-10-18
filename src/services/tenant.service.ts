@@ -29,9 +29,12 @@ export interface ListTenantsOptions {
   limit: number;
 }
 
+/** Staff lists only (never the public ones): the owner's contact and whether our emails reach them. */
+const OWNER_ATTRIBUTES = ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'tenantName', 'mailActive', 'emailIssue', 'emailIssueDetail', 'emailIssueAt'];
+
 const tenantInclude = (withOwner: boolean): Includeable[] => [
   { association: 'logo' },
-  ...(withOwner ? [{ association: 'owner', attributes: ['id', 'firstName', 'lastName', 'email', 'tenantName'] }] : []),
+  ...(withOwner ? [{ association: 'owner', attributes: OWNER_ATTRIBUTES }] : []),
 ];
 
 const NO_PROFILE = 'Anda belum memiliki profil tenant, buat terlebih dahulu melalui POST /api/tenants/me';

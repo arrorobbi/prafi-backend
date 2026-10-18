@@ -42,4 +42,4 @@ export const REALTIME_EVENTS = {
 
 export type ReviewChange = 'created' | 'reported' | 'hidden' | 'kept' | 'unhidden';
 
-export type SessionEndReason = 'token_expired' | 'logged_out' | 'deactivated' | 'password_reset';
+export type SessionEndReason = 'token_expired' | 'logged_out' | 'deactivated' | 'password_reset' | 'email_changed';

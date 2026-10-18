@@ -100,6 +100,7 @@ const SESSION_MESSAGES: Record<SessionEndReason, string> = {
   logged_out: 'Anda telah logout',
   deactivated: 'Akun Anda telah dinonaktifkan, hubungi administrator',
   password_reset: 'Kata sandi Anda telah diubah, silakan login kembali dengan kata sandi baru',
+  email_changed: 'Email akun Anda diubah oleh administrator. Login dengan email baru dan masukkan kode OTP yang dikirim ke sana',
 };
 
 function endSession(socket: Socket, reason: SessionEndReason) {

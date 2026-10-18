@@ -155,7 +155,9 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
   // The password is hashed by the model's beforeSave hook.
   // Email taken / faceImageId used by another user → UniqueConstraintError → 409 via the error handler
   const oldFaceImageId = user.faceImageId;
-  await user.update(changes);
+  // A new address starts without the old one's delivery problem
+  const newEmail = changes.email !== undefined && changes.email.trim().toLowerCase() !== user.email;
+  await user.update({ ...changes, ...(newEmail && { emailIssue: null, emailIssueDetail: null, emailIssueAt: null }) });
   // A new face image (or null) replaces the old one: its record and file are deleted
   if (changes.faceImageId !== undefined) await imageService.removeReplaced(oldFaceImageId, changes.faceImageId);
   return getProfile(user.id);

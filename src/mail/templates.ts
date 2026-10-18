@@ -150,8 +150,17 @@ export function disnakertransAccountCreated(
   return { subject, html, text };
 }
 
-/** To a self-registered admin or tenant: the account exists, confirm the email with this OTP. */
-export function accountCreatedOtp(user: Recipient, code: string, validMinutes: number, resent = false): Omit<MailMessage, 'to'> {
+/**
+ * To a self-registered admin or tenant: the account exists, confirm the email with this OTP. `emailChanged`: an
+ * admin changed the seller's email to this address, which is confirmed the same way before the account can log in.
+ */
+export function accountCreatedOtp(
+  user: Recipient,
+  code: string,
+  validMinutes: number,
+  resent = false,
+  emailChanged = false,
+): Omit<MailMessage, 'to'> {
   const name = `${user.firstName} ${user.lastName}`;
   const subject = `${code} adalah kode verifikasi ${BRAND} Anda`;
   const role = ROLE_NAMES[user.role] ?? user.role;
@@ -160,10 +169,13 @@ export function accountCreatedOtp(user: Recipient, code: string, validMinutes: n
       ? '<p>Setelah email terverifikasi, akun Admin Anda masih perlu diaktifkan oleh Disnakertrans sebelum dapat digunakan.</p>'
       : '';
   const html = layout(
-    resent ? 'Kode OTP baru' : 'Akun Anda telah dibuat',
+    emailChanged ? 'Verifikasi email baru Anda' : resent ? 'Kode OTP baru' : 'Akun Anda telah dibuat',
     `<p>Halo <strong>${escape(name)}</strong>,</p>
      ${
-       resent
+       emailChanged
+         ? `<p>Administrator ${BRAND} telah mengubah email akun <strong>${role}</strong> Anda menjadi <strong>${escape(user.email)}</strong>.</p>
+            <p>Akun Anda dapat digunakan kembali setelah email baru ini diverifikasi. Saat login, masukkan kode OTP berikut:</p>`
+         : resent
          ? '<p>Berikut kode OTP baru untuk memverifikasi email Anda. Kode sebelumnya sudah tidak berlaku.</p>'
          : `<p>Akun <strong>${role}</strong> Anda di ${BRAND} telah berhasil dibuat dengan email <strong>${escape(user.email)}</strong>.</p>
             <p>Untuk memastikan email ini aktif, masukkan kode OTP berikut:</p>`
@@ -179,7 +191,9 @@ export function accountCreatedOtp(user: Recipient, code: string, validMinutes: n
   const text = [
     `Halo ${name},`,
     '',
-    resent
+    emailChanged
+      ? `Administrator ${BRAND} telah mengubah email akun ${role} Anda menjadi ${user.email}.\nAkun Anda dapat digunakan kembali setelah email baru ini diverifikasi. Saat login, masukkan kode OTP berikut:`
+      : resent
       ? 'Berikut kode OTP baru untuk memverifikasi email Anda. Kode sebelumnya sudah tidak berlaku.'
       : `Akun ${role} Anda di ${BRAND} telah berhasil dibuat dengan email ${user.email}.\nUntuk memastikan email ini aktif, masukkan kode OTP berikut:`,
     '',
@@ -187,6 +201,31 @@ export function accountCreatedOtp(user: Recipient, code: string, validMinutes: n
     '',
     `Kode ini berlaku selama ${validMinutes} menit. Jangan berikan kode ini kepada siapa pun.`,
     ...(user.role === 'admin' ? ['Setelah email terverifikasi, akun Admin Anda masih perlu diaktifkan oleh Disnakertrans sebelum dapat digunakan.'] : []),
+    ...TEXT_SIGN_OFF,
+  ].join('\n');
+  return { subject, html, text };
+}
+
+/** To the old address after an admin changed a seller's email: where the account's emails go from now on. */
+export function emailChangedNotice(user: Recipient, oldEmail: string, newEmail: string): Omit<MailMessage, 'to'> {
+  const name = `${user.firstName} ${user.lastName}`;
+  const subject = `Email akun ${BRAND} Anda telah diubah`;
+  const html = layout(
+    'Email akun Anda telah diubah',
+    `<p>Halo <strong>${escape(name)}</strong>,</p>
+     <p>Administrator ${BRAND} telah mengubah email akun penjual Anda dari <strong>${escape(oldEmail)}</strong> menjadi <strong>${escape(newEmail)}</strong>.</p>
+     <p>Mulai sekarang semua email akun dikirim ke alamat baru tersebut, dan akun dapat digunakan kembali setelah alamat baru diverifikasi dengan kode OTP yang dikirim ke sana.</p>
+     <p>Jika Anda tidak meminta perubahan ini, segera hubungi administrator ${BRAND}.</p>
+     ${SIGN_OFF}`,
+    `Email akun Anda diubah menjadi ${newEmail}.`,
+  );
+  const text = [
+    `Halo ${name},`,
+    '',
+    `Administrator ${BRAND} telah mengubah email akun penjual Anda dari ${oldEmail} menjadi ${newEmail}.`,
+    'Mulai sekarang semua email akun dikirim ke alamat baru tersebut, dan akun dapat digunakan kembali setelah alamat baru diverifikasi dengan kode OTP yang dikirim ke sana.',
+    '',
+    `Jika Anda tidak meminta perubahan ini, segera hubungi administrator ${BRAND}.`,
     ...TEXT_SIGN_OFF,
   ].join('\n');
   return { subject, html, text };

@@ -85,6 +85,22 @@ export const env = {
     alertEmailTo: process.env.DISK_ALERT_EMAIL_TO ?? '',
   },
 
+  /**
+   * Bounce check: every `minutes` the site's inbox is read (IMAP, read-only) for "message not delivered" replies
+   * (address not found, mailbox full …), and the account with that address gets a note in the dashboards.
+   * Uses the SMTP account unless IMAP_USER/IMAP_PASS are set; the host is IMAP_HOST, or imap.gmail.com when
+   * SMTP_HOST is Gmail. BOUNCE_CHECK_MINUTES=0 or no host = off.
+   */
+  bounceCheck: {
+    host: process.env.IMAP_HOST || (/(^|\.)gmail\.com$/i.test(process.env.SMTP_HOST ?? '') ? 'imap.gmail.com' : ''),
+    port: Number(process.env.IMAP_PORT ?? 993) || 993,
+    user: process.env.IMAP_USER || process.env.SMTP_USER || '',
+    pass: process.env.IMAP_PASS || process.env.SMTP_PASS || '',
+    minutes: Math.max(0, Number(process.env.BOUNCE_CHECK_MINUTES ?? 10) || 0),
+    /** The first check (nothing read yet) looks this many days back. */
+    lookbackDays: Math.max(1, Number(process.env.BOUNCE_LOOKBACK_DAYS ?? 30) || 30),
+  },
+
   /** API request/error logs (GET /api/logs) older than this many days are deleted. */
   logRetentionDays: Math.max(1, Number(process.env.LOG_RETENTION_DAYS ?? 30) || 30),
 

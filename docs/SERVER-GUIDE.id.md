@@ -197,6 +197,7 @@ Setiap aplikasi membaca berkas `.env` miliknya saat mulai. Backend membacanya sa
 | `TURNSTILE_SECRET_KEY` | Kunci **rahasia** Cloudflare Turnstile: backend memastikan pemeriksaan "bukan robot" pada form ulasan dengannya. Kosong = pemeriksaan dilewati (ada peringatan saat start). Jaga kerahasiaannya; kunci *site* pasangannya ada di `.env` frontend |
 | `LOG_RETENTION_DAYS` | Lama penyimpanan log API dalam hari (bawaan 30) |
 | `BACKUP_DIR`, `BACKUP_KEEP`, `BACKUP_EMAIL_TO` | Cadangan mingguan (bagian 7): folder (bawaan `~/backups/prafi`), jumlah cadangan yang disimpan (8), dan penerima email (bawaan: akun SMTP; `off` = tidak dikirim) |
+| `BOUNCE_CHECK_MINUTES`, `BOUNCE_LOOKBACK_DAYS`, `IMAP_HOST`, `IMAP_PORT`, `IMAP_USER`, `IMAP_PASS` | Cek email gagal terkirim (bagian 14): setiap `BOUNCE_CHECK_MINUTES` (10; 0 = mati) backend membaca kotak masuk situs untuk balasan "tidak terkirim". Dengan SMTP Gmail tidak perlu pengaturan lain: memakai `imap.gmail.com` dengan akun dan app password yang sama. Pemeriksaan pertama melihat `BOUNCE_LOOKBACK_DAYS` (30) hari ke belakang. `IMAP_*` hanya untuk penyedia email lain |
 | `DISK_ALERT_PERCENT`, `DISK_ALERT_EMAIL_TO` | Monitor server (bagian 14): email dikirim saat disk terisi sebanyak ini (persen, bawaan 90; 0 = tanpa peringatan), ke alamat ini (bawaan: akun SMTP; `off` = tidak dikirim) |
 | `DB_LOGGING` | `true` mencetak setiap kueri SQL (hanya untuk mencari masalah) |
 
@@ -556,6 +557,7 @@ Jalankan di `/home/prafi/project/prafi-backend` sebagai user `prafi`.
 | `npm run db:sync` | Membuat tabel yang belum ada (hanya untuk database baru yang kosong) |
 | `npm run backup` | Membuat cadangan sekarang (bagian 7) |
 | `npm run images:cleanup` | Menghapus foto unggahan yang tidak terpakai sekarang (bagian 7) |
+| `npm run bounces:check` | Membaca kotak masuk untuk email yang tidak sampai sekarang; `-- --dry-run` hanya menampilkan daftarnya tanpa mengubah apa pun (bagian 14) |
 
 ### Build dan restart
 
@@ -588,6 +590,7 @@ Berkas sejauh ini, sesuai urutan dijalankannya:
 | `20261012_google_business_link_text.sql` | Tautan Google Bisnis yang lebih panjang |
 | `20261013_tenant_links_optional.sql` | Semua tautan UMKM menjadi opsional |
 | `20261014_slugs.sql` | Alamat yang mudah dibaca (slug) untuk produk, UMKM, dan kategori; tabel `old_slugs` |
+| `20261018_site_content_email_issues.sql` | Tabel `site_settings` (teks *Konten Situs*); `users.email_issue*` (email yang tidak sampai) |
 
 **Menjalankan migrasi** (selalu cadangkan dulu, dan jalankan **sebelum** me-restart backend dengan kode baru):
 
@@ -627,6 +630,7 @@ Semuanya berjalan di dalam service backend; tidak ada cron yang perlu diurus. Se
 | Cadangan database dan foto, dikirim lewat email | setiap Minggu, 00:00 | `src/services/backup.service.ts` |
 | Menghapus baris Log API yang lama (lebih tua dari `LOG_RETENTION_DAYS`) | harian | `src/services/apiLog.service.ts` |
 | Pemeriksaan disk, dengan email saat hampir penuh | setiap 10 menit | `src/services/serverMonitor.service.ts` |
+| Membaca kotak masuk untuk email yang tidak sampai | setiap `BOUNCE_CHECK_MINUTES` (10) | `src/services/bounceCheck.service.ts` |
 
 ### Menambah atau mengubah endpoint
 
@@ -816,7 +820,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 
 ![Kategori Produk](panduan/fitur-admin-kategori.jpg)
 
-- **Manajemen UMKM**: mengaktifkan atau menonaktifkan akun penjual, dan membaca profil tokonya.
+- **Manajemen UMKM**: mengaktifkan atau menonaktifkan akun penjual, dan membaca profil tokonya. **Detail** menampilkan foto wajah, nama, email, telepon, nama toko dan alamat penjual; admin hanya dapat mengubah **email**. Penjual lalu harus memverifikasi alamat baru dengan OTP yang dikirim ke sana sebelum dapat login lagi (sesinya diakhiri), dan alamat lama menerima pemberitahuan.
 
 ![Manajemen UMKM](panduan/fitur-admin-umkm.jpg)
 
@@ -825,6 +829,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 ![Laporan Ulasan](panduan/fitur-admin-ulasan.jpg)
 
 - **Manajemen Produk** (semua produk menurut status dan kategori), **Notifikasi**, **Pengaturan**.
+- **Konten Situs**: teks "tentang" di footer setiap halaman publik. Baris kosong memulai paragraf, `**teks**` menjadi tebal; **Kembalikan Teks Bawaan** memulihkan teks asli. Website langsung menampilkan perubahan.
 
 ### Disnakertrans
 
@@ -836,7 +841,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 
 ![Aktivasi Admin](panduan/fitur-disnakertrans-admin.jpg)
 
-- **Konfirmasi Produk**, **Laporan Ulasan**, **Kategori Produk**: sama seperti admin. **Data Produk** dan **Data UMKM** untuk dibaca.
+- **Konfirmasi Produk**, **Laporan Ulasan**, **Kategori Produk**, **Konten Situs**: sama seperti admin. **Data Produk** dan **Data UMKM** untuk dibaca.
 
 ### Superadmin
 
@@ -849,6 +854,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 ![Menambah akun Disnakertrans](panduan/superadmin-1-tambah.jpg)
 
 - **Semua Pengguna**, **Data Produk**, **Data UMKM**, **Kategori Produk**: hanya baca.
+- **Profil Pengguna**: satu kartu per akun berisi datanya, profil toko (penjual) dan catatan Log API-nya (dibuka per kartu), dengan pencarian dan tab role.
 
 ![Semua Pengguna](panduan/fitur-superadmin-pengguna.jpg)
 
@@ -875,6 +881,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 | Unggah foto | Foto terunggah saat dipilih dan ditautkan saat *Simpan*; yang tidak terpakai dihapus setiap malam | bagian 7 dan 12 |
 | Perlindungan ulasan | Pemeriksaan "bukan robot", satu ulasan per produk per hari, maksimal 5 ulasan dalam 10 menit per jaringan, pelaporan dan penyembunyian. Alamat IP pengunjung hanya disimpan sebagai hash | `src/services/review.service.ts` |
 | Cadangan mingguan | Database dan foto, disimpan di server dan dikirim lewat email | bagian 7 |
+| Email yang tidak sampai | Saat email verifikasi atau OTP tidak dapat dikirim (alamat tidak ada, kotak masuk penuh, ditolak), Gmail mengirim balasan ke kotak masuk situs. Backend membaca balasan itu (hanya baca) dan memberi catatan merah pada akun tersebut di *Semua Pengguna*, *Profil Pengguna*, *Manajemen UMKM* dan *Data UMKM*. Catatan hilang saat alamat diverifikasi atau diubah | `src/services/bounceCheck.service.ts`, `npm run bounces:check` |
 | Peringatan disk | Setiap 10 menit backend memeriksa disk; pada `DISK_ALERT_PERCENT` (90) atau lebih, backend mengirim email ke kotak surat situs berisi apa yang memakai ruang dan apa yang dapat dikosongkan, paling sering sekali sehari | `src/services/serverMonitor.service.ts` |
 | Alamat yang mudah dibaca (slug) | Halaman dialamatkan dengan nama: `/produk/brownis-prafi`, `/umkm/dapur-mama`, `/produk?kategori=kuliner`. Slug produk atau UMKM yang sudah dipakai diberi angka (`-1`, `-2`, …); nama kategori tidak boleh berulang sama sekali. Mengubah nama membuat slug baru, dan alamat lama (juga yang lama dengan id) meneruskan pengunjung ke alamat baru | `src/utils/slug.ts`, hook `beforeSave` pada model; frontend `productPath` / `tenantPath` / `categoryPath` di `src/lib/format.ts` |
 | Mesin pencari (SEO) | Judul, deskripsi, sitemap, data terstruktur, `http` ke `https` | README frontend, *SEO* |

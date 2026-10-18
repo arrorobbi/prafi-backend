@@ -7,6 +7,7 @@ import { accountCreatedOtp, disnakertransAccountCreated } from '../mail/template
 import { Otp, sequelize, User } from '../models';
 import type { OtpPurpose } from '../models/otp.model';
 import { readablePassword } from '../utils/readablePassword';
+import { recordSendFailure } from './bounceCheck.service';
 import { mailIsSimulated, sendMail } from './mail.service';
 
 export const OTP_VALID_MINUTES = 15;
@@ -57,7 +58,11 @@ export const activationLink = (userId: string, token: string) =>
  */
 export async function startVerification(
   user: VerifiableUser,
-  { resent = false, temporaryPassword }: { resent?: boolean; temporaryPassword?: string } = {},
+  {
+    resent = false,
+    temporaryPassword,
+    emailChanged = false,
+  }: { resent?: boolean; temporaryPassword?: string; emailChanged?: boolean } = {},
 ): Promise<VerificationInfo> {
   const method = EMAIL_VERIFICATION_METHOD[user.role];
   const secret = method === 'otp' ? String(randomInt(0, 1_000_000)).padStart(6, '0') : randomBytes(32).toString('hex');
@@ -79,7 +84,7 @@ export async function startVerification(
   const link = method === 'link' ? activationLink(user.id, secret) : undefined;
   const content =
     method === 'otp'
-      ? accountCreatedOtp(user, secret, OTP_VALID_MINUTES, resent)
+      ? accountCreatedOtp(user, secret, OTP_VALID_MINUTES, resent, emailChanged)
       : disnakertransAccountCreated(user, link!, emailedPassword!, LINK_VALID_HOURS, resent);
 
   let emailSent = true;
@@ -88,6 +93,7 @@ export async function startVerification(
   } catch (err) {
     emailSent = false;
     console.error(`[mail] could not send the verification email to ${user.email}:`, (err as Error).message);
+    await recordSendFailure(user.id, err as Error);
   }
 
   const dev = mailIsSimulated && !env.isProduction;
@@ -111,11 +117,14 @@ async function findUnverifiedUser(userId: string) {
 const latestCode = (userId: string, purpose: OtpPurpose) =>
   Otp.findOne({ where: { userId, purpose, usedAt: null }, order: [['createdAt', 'DESC']] });
 
+/** A verified address evidently receives our emails: any earlier delivery problem is cleared. */
+const EMAIL_OK = { emailIssue: null, emailIssueDetail: null, emailIssueAt: null };
+
 /** Marks the code as used and the user's email as verified, together. */
 async function complete(user: User, code: Otp) {
   await sequelize.transaction(async (transaction) => {
     await code.update({ usedAt: new Date() }, { transaction });
-    await user.update({ mailActive: true }, { transaction });
+    await user.update({ mailActive: true, ...EMAIL_OK }, { transaction });
     await Otp.destroy({ where: { userId: user.id, purpose: ['otp', 'link'], usedAt: null, id: { [Op.ne]: code.id } }, transaction });
   });
 }
@@ -189,7 +198,7 @@ export async function activate(userId: string, token: string, temporaryPassword:
   await sequelize.transaction(async (transaction) => {
     await code.update({ usedAt: new Date() }, { transaction });
     // The model's beforeSave hook hashes the password
-    await account.update({ password, mailActive: true }, { transaction });
+    await account.update({ password, mailActive: true, ...EMAIL_OK }, { transaction });
     await Otp.destroy({ where: { userId: user.id, purpose: ['otp', 'link'], usedAt: null, id: { [Op.ne]: code.id } }, transaction });
   });
 }

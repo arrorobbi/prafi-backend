@@ -103,3 +103,9 @@ export const LOG_READER_ROLES: Role[] = [ROLES.SUPERADMIN];
 
 /** Roles that see the dashboard statistics (GET /api/stats/overview); user numbers follow READABLE_ROLES. */
 export const STATS_READER_ROLES: Role[] = [ROLES.SUPERADMIN, ROLES.DISNAKERTRANS, ROLES.ADMIN];
+
+/** Roles that edit the texts of the public site, e.g. the footer's "about" text (GET/PATCH /api/site-content). */
+export const SITE_CONTENT_EDITOR_ROLES: Role[] = [ROLES.DISNAKERTRANS, ROLES.ADMIN];
+
+/** Roles that may change a seller's (tenant's) email address (PATCH /api/users/:id/email); the new one must be verified. */
+export const SELLER_EMAIL_EDITOR_ROLES: Role[] = [ROLES.ADMIN];

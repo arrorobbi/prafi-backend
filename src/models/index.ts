@@ -8,14 +8,15 @@ import { Product } from './product.model';
 import { ProductCategory } from './productCategory.model';
 import { Review } from './review.model';
 import { RevokedToken } from './revokedToken.model';
+import { SiteSetting } from './siteSetting.model';
 import { Tenant } from './tenant.model';
 import { User } from './user.model';
 
-const models = { ApiLog, Approval, Image, Notification, Otp, Product, ProductCategory, Review, RevokedToken, Tenant, User };
+const models = { ApiLog, Approval, Image, Notification, Otp, Product, ProductCategory, Review, RevokedToken, SiteSetting, Tenant, User };
 
 export type DbModels = typeof models;
 
 // Relations are defined in each model's static associate()
 Object.values(models).forEach((model) => model.associate(models));
 
-export { sequelize, ApiLog, Approval, Image, Notification, Otp, Product, ProductCategory, Review, RevokedToken, Tenant, User };
+export { sequelize, ApiLog, Approval, Image, Notification, Otp, Product, ProductCategory, Review, RevokedToken, SiteSetting, Tenant, User };

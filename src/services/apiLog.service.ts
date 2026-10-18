@@ -59,6 +59,8 @@ export interface ListLogsOptions {
   userId?: string;
   /** Substring of the user's email or of the email given to an auth endpoint, case-insensitive */
   email?: string;
+  /** true: `email` must match the whole address (one person's log), not a part of it */
+  emailExact?: boolean;
   errorCode?: string;
   from?: Date;
   to?: Date;
@@ -80,7 +82,7 @@ export async function list(opts: ListLogsOptions) {
   if (opts.userId) where.push({ userId: opts.userId });
   if (opts.email) {
     // The signed-in user's email, or the email given to an auth endpoint (e.g. a failed login)
-    const like = { [Op.iLike]: `%${escapeLike(opts.email)}%` };
+    const like = { [Op.iLike]: opts.emailExact ? escapeLike(opts.email) : `%${escapeLike(opts.email)}%` };
     where.push({ [Op.or]: [{ userEmail: like }, { authEmail: like }] });
   }
   if (opts.errorCode) where.push({ errorCode: opts.errorCode });

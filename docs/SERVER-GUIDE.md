@@ -197,6 +197,7 @@ Each app reads its `.env` file at start. The backend reads it when the service s
 | `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile **secret** key: the backend confirms the review form's "not a robot" check with it. Empty = the check is skipped (warning at startup). Keep it secret; the matching *site* key is in the frontend `.env` |
 | `LOG_RETENTION_DAYS` | Days of API logs to keep (default 30) |
 | `BACKUP_DIR`, `BACKUP_KEEP`, `BACKUP_EMAIL_TO` | Weekly backup (section 7): folder (default `~/backups/prafi`), how many runs to keep (8), and who gets the email (default: the SMTP account; `off` = none) |
+| `BOUNCE_CHECK_MINUTES`, `BOUNCE_LOOKBACK_DAYS`, `IMAP_HOST`, `IMAP_PORT`, `IMAP_USER`, `IMAP_PASS` | Bounce check (section 14): every `BOUNCE_CHECK_MINUTES` (10; 0 = off) the backend reads the site's inbox for "not delivered" replies. With Gmail SMTP nothing else is needed: it uses `imap.gmail.com` and the same account and app password. The first check looks `BOUNCE_LOOKBACK_DAYS` (30) back. `IMAP_*` only for another mail provider |
 | `DISK_ALERT_PERCENT`, `DISK_ALERT_EMAIL_TO` | Server monitor (section 14): an email is sent when the disk is this full (percent, default 90; 0 = no alert), to this address (default: the SMTP account; `off` = nobody) |
 | `DB_LOGGING` | `true` prints every SQL query (debugging only) |
 
@@ -556,6 +557,7 @@ Run them in `/home/prafi/project/prafi-backend` as user `prafi`.
 | `npm run db:sync` | Creates missing tables (a new, empty database only) |
 | `npm run backup` | Makes a backup now (section 7) |
 | `npm run images:cleanup` | Deletes unused uploaded photos now (section 7) |
+| `npm run bounces:check` | Reads the inbox for emails that didn't arrive now; `-- --dry-run` only lists them and changes nothing (section 14) |
 
 ### Build and restart
 
@@ -588,6 +590,7 @@ Files so far, in the order they were run:
 | `20261012_google_business_link_text.sql` | Longer Google Bisnis link |
 | `20261013_tenant_links_optional.sql` | Every UMKM link optional |
 | `20261014_slugs.sql` | Readable addresses (slugs) for products, UMKM and categories; table `old_slugs` |
+| `20261018_site_content_email_issues.sql` | Table `site_settings` (*Konten Situs* texts); `users.email_issue*` (emails that didn't arrive) |
 
 **Running a migration** (always back up first, and run it **before** restarting the backend with the new code):
 
@@ -627,6 +630,7 @@ They run inside the backend service; there is no cron to look after. All times a
 | Backup of database and photos, emailed | every Sunday, 00:00 | `src/services/backup.service.ts` |
 | Delete old Log API rows (older than `LOG_RETENTION_DAYS`) | daily | `src/services/apiLog.service.ts` |
 | Disk check, with an email when it is almost full | every 10 minutes | `src/services/serverMonitor.service.ts` |
+| Read the inbox for emails that didn't arrive (bounce check) | every `BOUNCE_CHECK_MINUTES` (10) | `src/services/bounceCheck.service.ts` |
 
 ### Adding or changing an endpoint
 
@@ -816,7 +820,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 
 ![Kategori Produk](panduan/fitur-admin-kategori.jpg)
 
-- **Manajemen UMKM**: activate or deactivate seller accounts, and read their shop profiles.
+- **Manajemen UMKM**: activate or deactivate seller accounts, and read their shop profiles. **Detail** shows a seller's face photo, name, email, phone, store name and address; the admin can change only the **email**. The seller must then verify the new address with an OTP sent there before logging in again (they are logged out), and the old address gets a notice.
 
 ![Manajemen UMKM](panduan/fitur-admin-umkm.jpg)
 
@@ -825,6 +829,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 ![Laporan Ulasan](panduan/fitur-admin-ulasan.jpg)
 
 - **Manajemen Produk** (all products by status and category), **Notifikasi**, **Pengaturan**.
+- **Konten Situs**: the "about" text in the footer of every public page. An empty line starts a paragraph, `**text**` is bold; **Kembalikan Teks Bawaan** restores the original. The website shows a change at once.
 
 ### Disnakertrans
 
@@ -836,7 +841,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 
 ![Aktivasi Admin](panduan/fitur-disnakertrans-admin.jpg)
 
-- **Konfirmasi Produk**, **Laporan Ulasan**, **Kategori Produk**: the same as an admin. **Data Produk** and **Data UMKM** to read.
+- **Konfirmasi Produk**, **Laporan Ulasan**, **Kategori Produk**, **Konten Situs**: the same as an admin. **Data Produk** and **Data UMKM** to read.
 
 ### Superadmin
 
@@ -849,6 +854,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 ![Adding a Disnakertrans account](panduan/superadmin-1-tambah.jpg)
 
 - **Semua Pengguna**, **Data Produk**, **Data UMKM**, **Kategori Produk**: read-only.
+- **Profil Pengguna**: one card per account with its data, the shop profile (sellers) and its Log API entries (opened per card), with search and role tabs.
 
 ![Semua Pengguna](panduan/fitur-superadmin-pengguna.jpg)
 
@@ -875,6 +881,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 | Photo uploads | A photo uploads when picked and is attached on *Simpan*; unused ones are deleted every night | sections 7 and 12 |
 | Review protection | "Not a robot" check, one review per product per day, at most 5 reviews in 10 minutes per network, reporting and hiding. Visitors' IP addresses are stored only as a hash | `src/services/review.service.ts` |
 | Weekly backup | Database and photos, kept on the server and emailed | section 7 |
+| Emails that didn't arrive | When a verification email or OTP can't be delivered (address doesn't exist, mailbox full, refused), Gmail sends a reply to the site's inbox. The backend reads those replies (read-only) and puts a red note on that account in *Semua Pengguna*, *Profil Pengguna*, *Manajemen UMKM* and *Data UMKM*. The note goes away when the address is verified or changed | `src/services/bounceCheck.service.ts`, `npm run bounces:check` |
 | Disk alert | Every 10 minutes the backend checks the disk; at `DISK_ALERT_PERCENT` (90) or more it emails the site's mailbox what takes space and what can be cleared, at most once a day | `src/services/serverMonitor.service.ts` |
 | Readable addresses (slugs) | Pages are addressed by name: `/produk/brownis-prafi`, `/umkm/dapur-mama`, `/produk?kategori=kuliner`. A product or UMKM slug that is taken gets a number (`-1`, `-2`, …); category names can't repeat at all. Renaming makes a new slug, and the old address (also the old ones with an id) sends the visitor on to the new one | `src/utils/slug.ts`, the models' `beforeSave` hooks; frontend `productPath` / `tenantPath` / `categoryPath` in `src/lib/format.ts` |
 | Search engines (SEO) | Titles, descriptions, sitemap, structured data, `http` to `https` | frontend README, *SEO* |

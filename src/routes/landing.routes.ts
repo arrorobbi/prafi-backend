@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as productController from '../controllers/product.controller';
 import * as categoryController from '../controllers/productCategory.controller';
 import * as reviewController from '../controllers/review.controller';
+import * as siteContentController from '../controllers/siteContent.controller';
 import * as tenantController from '../controllers/tenant.controller';
 import { requireIdParam } from '../middlewares/requireId';
 
@@ -9,6 +10,9 @@ const router = Router();
 
 // Public (no login): what visitors see on the landing page
 router.param('id', requireIdParam);
+
+// Texts staff edit in "Konten Situs" (the footer's about text)
+router.get('/site', siteContentController.getPublic);
 
 // Product categories with their image (the home page carousel)
 router.get('/categories', categoryController.listPublic);

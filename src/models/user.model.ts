@@ -22,6 +22,9 @@ import type { Tenant } from './tenant.model';
 
 const SALT_ROUNDS = 12;
 
+export const EMAIL_ISSUES = ['not_found', 'mailbox_full', 'rejected', 'delayed', 'send_failed'] as const;
+export type EmailIssue = (typeof EMAIL_ISSUES)[number];
+
 /** A user's role is set once at registration and can never be changed afterwards. */
 function roleIsImmutable(value: unknown, instance: Model | null = null): never {
   const message = 'role tidak dapat diubah';
@@ -46,6 +49,15 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   declare mailActive: CreationOptional<boolean>;
   /** Set when the password is reset; access tokens issued before this moment are refused (logged out everywhere). */
   declare passwordChangedAt: CreationOptional<Date | null>;
+  /**
+   * Our emails to this address did not arrive: `not_found` (no such mailbox), `mailbox_full`, `rejected` (refused
+   * for another reason), `delayed` (still being retried) or `send_failed` (our mail server could not send it).
+   * Found by the bounce check (services/bounceCheck.service.ts); cleared when the email is verified or changed.
+   */
+  declare emailIssue: CreationOptional<EmailIssue | null>;
+  /** The receiving server's own words, e.g. "550 5.1.1 The email account that you tried to reach does not exist". */
+  declare emailIssueDetail: CreationOptional<string | null>;
+  declare emailIssueAt: CreationOptional<Date | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
@@ -118,6 +130,9 @@ User.init(
     tenantName: { type: DataTypes.STRING, allowNull: true, validate: { notEmpty: true } },
     mailActive: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     passwordChangedAt: { type: DataTypes.DATE, allowNull: true },
+    emailIssue: { type: DataTypes.STRING(32), allowNull: true, validate: { isIn: [EMAIL_ISSUES] } },
+    emailIssueDetail: { type: DataTypes.TEXT, allowNull: true },
+    emailIssueAt: { type: DataTypes.DATE, allowNull: true },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },

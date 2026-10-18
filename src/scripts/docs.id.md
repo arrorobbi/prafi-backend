@@ -50,6 +50,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Gambar | `GET {{imagePath}}` | Publik |
 | Gambar | `DELETE /api/images/{{imageId}}` | tenant |
 | Pengguna | `GET /api/users` | superadmin, disnakertrans, admin |
+| Pengguna | `PATCH /api/users/{{userId}}/email` | admin |
 | Persetujuan | `PATCH /api/approvals/{{userId}}` | disnakertrans, admin |
 | Persetujuan | `PATCH /api/approvals/{{productId}}` | disnakertrans, admin |
 | Produk | `GET /api/products` | Semua role |
@@ -57,6 +58,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Produk | `POST /api/products` | tenant |
 | Produk | `PATCH /api/products/{{productId}}` | tenant |
 | Produk | `DELETE /api/products/{{productId}}` | tenant |
+| Landing | `GET /api/landing/site` | Publik |
 | Landing | `GET /api/landing/categories` | Publik |
 | Landing | `GET /api/landing/products` | Publik |
 | Landing | `GET /api/landing/products/{{productId}}` | Publik |
@@ -64,6 +66,8 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 | Landing | `POST /api/landing/products/{{productId}}/reviews` | Publik |
 | Landing | `GET /api/landing/tenants` | Publik |
 | Landing | `GET /api/landing/tenants/{{tenantProfileId}}` | Publik |
+| Konten Situs | `GET /api/site-content` | disnakertrans, admin |
+| Konten Situs | `PATCH /api/site-content` | disnakertrans, admin |
 | Ulasan | `GET /api/reviews/mine` | tenant |
 | Ulasan | `POST /api/reviews/{{reviewId}}/report` | tenant |
 | Ulasan | `GET /api/reviews` | disnakertrans, admin |
@@ -257,10 +261,19 @@ Link publik gambar yang diunggah (`{{baseUrl}}` + `imgUrl`), seperti yang dimuat
 Menghapus data dan file gambar. Gambar yang masih dipakai sebagai logo tenant tidak bisa dihapus (409 `STILL_IN_USE`).
 
 === FOLDER Users => Pengguna
-Daftar akun. superadmin melihat semua akun, disnakertrans melihat akun admin, admin melihat akun tenant. Tenant hanya punya *Auth → Akun Saya*.
+Daftar akun. superadmin melihat semua akun, disnakertrans melihat akun admin, admin melihat akun tenant (dan dapat memperbaiki email penjual). Tenant hanya punya *Auth → Akun Saya*.
 
 === REQ List Users (superadmin, disnakertrans, admin) => Daftar Pengguna
-superadmin: semua akun; disnakertrans: hanya akun admin; admin: hanya akun tenant. Filter `role` opsional. Setiap user menyertakan `faceImage`, `approval`, dan `mailActive`.
+superadmin: semua akun; disnakertrans: hanya akun admin; admin: hanya akun tenant. Filter: `role`, `q` (bagian dari nama, email, nomor telepon atau nama tenant, tanpa membedakan huruf besar/kecil, maksimal 100), `emailIssue=true` (hanya akun yang emailnya tidak sampai). Setiap user menyertakan `faceImage`, `approval`, `mailActive`, `tenant` (tenant: profil tokonya beserta `logo`; null jika belum dibuat) dan catatan pengiriman email:
+- `emailIssue`: null, atau `not_found` (alamat tidak ada), `mailbox_full` (kotak masuk penuh), `rejected` (ditolak karena alasan lain), `delayed` (masih dicoba ulang), `send_failed` (server email kita gagal mengirim);
+- `emailIssueDetail`: pesan asli dari server penerima; `emailIssueAt`: waktunya.
+
+Ditemukan oleh pemeriksaan email gagal (backend membaca kotak masuk situs untuk balasan "tidak terkirim" setiap `BOUNCE_CHECK_MINUTES`); dihapus saat alamat diverifikasi atau diubah.
+
+=== REQ Change Seller Email (admin) => Ubah Email Penjual
+Memperbaiki email penjual (tenant). Body: `email`. Hanya akun tenant (selain itu 403); 409 `EMAIL_TAKEN` jika dipakai akun lain.
+
+Penjual harus memverifikasi alamat baru: `mailActive` menjadi false (semua sesi penjual berakhir, koneksi WebSocket menerima `session:ended` dengan reason `email_changed`, dan login menjawab 403 `EMAIL_NOT_VERIFIED` dengan `userId`), OTP dikirim ke alamat baru (verifikasi dengan *Auth → Verifikasi OTP*; *Kirim Ulang Verifikasi* mengirim kode baru), dan alamat lama menerima pemberitahuan perubahan. Catatan pengiriman email dihapus. `data.verification.emailSent` false = email OTP gagal dikirim (penjual dapat meminta kode baru).
 
 === FOLDER Approvals => Persetujuan
 Mengaktifkan / menonaktifkan akun dan produk: `PATCH /api/approvals/:id?type=user|product`. `:id` adalah **id user** atau **id produk** (bukan id approval).
@@ -315,6 +328,9 @@ Halaman publik untuk pengunjung: tanpa token, tanpa data pribadi (tanpa email/te
 
 **Ulasan** juga publik: siapa pun dapat membaca dan menulis ulasan tanpa login (`name`, `stars` 1–5, `review`), hanya untuk produk yang sudah disetujui. Maksimal 5 ulasan per pengunjung (IP) per 10 menit (429 `TOO_MANY_REQUESTS`). Produk memiliki `ratingAverage` (1 desimal, `null` jika belum ada ulasan) dan `reviewCount`; UMKM memiliki `productCount`, `ratingAverage`, dan `reviewCount` dari produknya yang sudah disetujui.
 
+=== REQ Site Texts (Public) => Teks Situs
+Teks yang diubah admin dan disnakertrans di *Konten Situs*: `footerAbout`, teks "tentang" di footer setiap halaman publik. Teks biasa: baris kosong memulai paragraf baru, `**teks**` ditebalkan (tampilkan sebagai teks, jangan sebagai HTML). Memakai teks bawaan sampai ada yang menyimpan teks.
+
 === REQ Landing Categories (Public) => Kategori Landing
 Semua kategori produk urut A→Z beserta `image` (null hanya untuk kategori lama yang belum diberi gambar) dan `productCount` (hanya produk yang sudah disetujui), untuk carousel beranda: setiap slide adalah gambar kategori, dan di sebelahnya *Produk Landing* dengan `categoryId` menampilkan produk kategori tersebut.
 
@@ -344,6 +360,15 @@ UMKM (profil tenant) yang akun pemiliknya aktif, urut A→Z, masing-masing denga
 
 === REQ Landing Tenant (Public) => Detail UMKM Landing
 Satu UMKM beserta ringkasannya. Id boleh berupa id profil **atau id user pemiliknya** (`product.tenant.id`), sehingga halaman produk dapat langsung menautkan ke UMKM-nya. Produknya: *Produk Landing* dengan `tenantId` = `userId`. **Slug** UMKM juga dapat dipakai (`/umkm/<slug>` di website), begitu pula slug sebelum namanya diubah.
+
+=== FOLDER Site Content => Konten Situs
+Teks halaman publik yang diubah admin dan disnakertrans (menu dashboard *Konten Situs*). Pengunjung membacanya melalui *Landing → Teks Situs*.
+
+=== REQ Get Site Content (disnakertrans, admin) => Lihat Konten Situs
+Setiap teks yang dapat diubah dengan `value` saat ini, `default`, `maxLength`, `isDefault` (belum pernah disimpan) dan siapa yang terakhir menyimpan (`updatedAt`, `updatedBy`).
+
+=== REQ Update Site Content (disnakertrans, admin) => Ubah Konten Situs
+Body: `footerAbout` (maksimal 1500 karakter). Akhir baris dirapikan, spasi di ujung baris dihapus dan paling banyak satu baris kosong di antara paragraf. `""` atau `null` kembali ke teks bawaan. Halaman publik website langsung diperbarui.
 
 === FOLDER Reviews => Ulasan
 Menjaga ulasan produk (`/api/reviews`, Bearer `{{token}}`). Pengunjung menulis ulasan tanpa login (*Landing → Tulis Ulasan*); di sini **penjual melaporkan** ulasan pada produknya sendiri dan **admin / disnakertrans memutuskan**: `hide` (tidak lagi tampil dan tidak dihitung dalam rating maupun rekomendasi; datanya tetap tersimpan), `keep` (tetap tampil; penjual tidak dapat melaporkannya lagi) atau `unhide` (menampilkan kembali ulasan yang disembunyikan).
@@ -460,7 +485,7 @@ Yang disimpan, satu baris saat responsnya dikirim: setiap permintaan **tambah / 
 - Baris yang lebih lama dari `LOG_RETENTION_DAYS` (bawaan 30 hari) dihapus setiap hari.
 
 === REQ List Logs (superadmin) => Daftar Log
-Terbaru di atas, berhalaman (`limit` maksimal 100). Semua filter opsional dan dapat digabung. `outcome=failed` menampilkan semua permintaan yang gagal (4xx, mis. password salah atau data tidak valid, dan 5xx kesalahan server); `level` mempersempitnya ke salah satunya. Tanpa `errorStack`. Menyimpan log terbaru sebagai `{{logId}}`.
+Terbaru di atas, berhalaman (`limit` maksimal 100). Semua filter opsional dan dapat digabung. `outcome=failed` menampilkan semua permintaan yang gagal (4xx, mis. password salah atau data tidak valid, dan 5xx kesalahan server); `level` mempersempitnya ke salah satunya. Filter `email` mencari bagian dari alamat; dengan `emailExact=true` seluruh alamat harus sama (log satu orang, dipakai *Profil Pengguna*). Tanpa `errorStack`. Menyimpan log terbaru sebagai `{{logId}}`.
 
 === REQ Log Stats (superadmin) => Statistik Log
 Angka untuk grafik log API selama `days` hari terakhir (WIT): `total`, `success`, `failed`, `perDay` (berhasil / gagal), `byMethod`, `byRole` (`guest` untuk aktivitas akun tanpa login), `topEndpoints` (id pada alamat digabung menjadi `:id`, beserta jumlah yang gagal) dan `topErrors`.
@@ -507,7 +532,7 @@ Notifikasi realtime (dan, untuk superadmin, log API langsung) melalui **Socket.I
 |---|---|---|
 | `notification:unread-count` | `{ count }` | tepat setelah terhubung, dan setelah tandai dibaca / tandai semua / hapus (menyinkronkan semua tab) |
 | `notification:new` | `{ notification, unreadCount }` | notifikasi baru dibuat untuk user ini (bentuknya sama dengan item `GET /api/notifications`) |
-| `session:ended` | `{ reason, message }` | `reason`: `logged_out` (token ini logout), `deactivated` (akun dinonaktifkan), `token_expired` (token habis: 1 jam tanpa aktivitas, atau batas sesi 12 jam), `password_reset` (kata sandi diatur ulang). Server lalu memutus koneksi; frontend sebaiknya me-logout user. |
+| `session:ended` | `{ reason, message }` | `reason`: `logged_out` (token ini logout), `deactivated` (akun dinonaktifkan), `token_expired` (token habis: 1 jam tanpa aktivitas, atau batas sesi 12 jam), `password_reset` (kata sandi diatur ulang), `email_changed` (admin mengubah email penjual ini; verifikasi email baru). Server lalu memutus koneksi; frontend sebaiknya me-logout user. |
 | `log:new` | `{ log }` | **hanya superadmin**: satu baris baru tersimpan di log API (bentuknya sama dengan item `GET /api/logs`, tanpa `errorStack`) |
 | `review:changed` | `{ reviewId, productId, action }` | **penjual** produk tersebut (setiap perubahan ulasan) serta **admin + disnakertrans** (laporan dan keputusan): ulasan `created`, `reported`, `hidden`, `kept`, atau `unhidden`. Halaman Ulasan memuat ulang daftarnya |
 | `server:metrics` | pembacaan dari *Keadaan Server* | **superadmin yang mengirim `monitor:watch`** (halaman Monitor Server): setiap 3 detik sampai `monitor:unwatch` atau koneksi terputus. Satu-satunya event yang dikirim client adalah `monitor:watch` dan `monitor:unwatch` (tanpa payload) |

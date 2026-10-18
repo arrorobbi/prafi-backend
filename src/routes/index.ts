@@ -14,6 +14,7 @@ import productCategoryRoutes from './productCategory.routes';
 import reviewRoutes from './review.routes';
 import serverDocsRoutes from './serverDocs.routes';
 import serverMonitorRoutes from './serverMonitor.routes';
+import siteContentRoutes from './siteContent.routes';
 import userRoutes from './user.routes';
 
 const router = Router();
@@ -30,6 +31,7 @@ router.use('/products', productRoutes);
 router.use('/tenants', tenantRoutes);
 router.use('/product-categories', productCategoryRoutes);
 router.use('/landing', landingRoutes);
+router.use('/site-content', siteContentRoutes);
 router.use('/reviews', reviewRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/logs', apiLogRoutes);

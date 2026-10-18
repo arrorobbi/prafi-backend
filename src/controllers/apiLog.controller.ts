@@ -18,7 +18,7 @@ function parseDate(value: string, endOfDay: boolean) {
 }
 
 /**
- * GET /api/logs?page=&limit=&outcome=&level=&method=&status=&path=&userId=&email=&errorCode=&from=&to= — superadmin
+ * GET /api/logs?page=&limit=&outcome=&level=&method=&status=&path=&userId=&email=&emailExact=&errorCode=&from=&to= — superadmin
  * only. Newest first. outcome: success (< 400) or failed (4xx and 5xx). status is an exact code (404) or a class (4xx).
  */
 export const list: RequestHandler = async (req, res) => {
@@ -70,6 +70,7 @@ export const list: RequestHandler = async (req, res) => {
     path: q.path?.trim() || undefined,
     userId: q.userId,
     email: q.email?.trim() || undefined,
+    emailExact: q.emailExact === 'true',
     errorCode: q.errorCode?.trim() || undefined,
     from: from ?? undefined,
     to: to ?? undefined,
