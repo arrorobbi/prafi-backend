@@ -915,9 +915,15 @@ Setiap topik tetap memiliki alamat `/panduan#<slug>` (dibuat sekali dari judul p
 | baris yang diawali `- ` | daftar berpoin |
 | `**Simpan**` | **tebal** (gunakan untuk nama tombol dan menu) |
 | `[Daftar](/register)` | tautan (halaman situs, atau `https://…`, `mailto:`, `tel:`) |
-| `{{kontak-admin}}` pada barisnya sendiri | WhatsApp dan email administrator (`NEXT_PUBLIC_ADMIN_*` di `.env` frontend) |
+| `{{kontak-admin}}` pada barisnya sendiri | tombol WhatsApp dan email administrator (`NEXT_PUBLIC_ADMIN_*` di `.env` frontend) |
+| `{email: admin@contoh.com}` | tombol **Email** (mailto) |
+| `{whatsapp: 0812… \| Chat Admin \| Halo, saya mau bertanya}` | tombol **WhatsApp**; bagian ke-2 adalah teks tombol, bagian ke-3 pesan awal (keduanya opsional). Menerima 08…, +62…, 62… atau tautan wa.me |
+| `{telepon: 0812…}` | tombol **telepon** |
+| `{instagram: @akun}`, `{facebook: halaman}` | tombol **Instagram** / **Facebook** (tautan `https://` lengkap juga bisa) |
+| `{lokasi: https://maps.app.goo.gl/… \| Lihat Lokasi}` | tombol **lokasi** (Google Maps) |
+| `{tombol: /register \| Daftar Sekarang}` | tombol ke halaman situs atau tautan `https://` |
 
-Form langkah menampilkan pratinjau di bawah teks.
+Setiap template tombol dapat diberi teks tombol opsional setelah `|`. Template yang tidak dapat dibaca (email salah, nomor telepon terlalu pendek, tautan yang bukan `https://` atau halaman situs) tampil sebagai teks biasa, sehingga penulis melihatnya di pratinjau. Bilah di atas setiap kotak teks menyisipkan template-template ini di posisi kursor dan memilih nilai contohnya, sehingga ketikan langsung menggantinya; pratinjau hasilnya ada di bawah teks.
 
 ### Gambar dan penyimpanan
 

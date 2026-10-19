@@ -915,9 +915,15 @@ Each topic keeps its address `/panduan#<slug>` (made once from the first title) 
 | lines starting with `- ` | a bulleted list |
 | `**Simpan**` | **bold** (use it for button and menu names) |
 | `[Daftar](/register)` | a link (a page of the site, or `https://…`, `mailto:`, `tel:`) |
-| `{{kontak-admin}}` on its own line | the administrator's WhatsApp and email (`NEXT_PUBLIC_ADMIN_*` in the frontend `.env`) |
+| `{{kontak-admin}}` on its own line | the administrator's WhatsApp and email buttons (`NEXT_PUBLIC_ADMIN_*` in the frontend `.env`) |
+| `{email: admin@contoh.com}` | an **Email** button (mailto) |
+| `{whatsapp: 0812… \| Chat Admin \| Halo, saya mau bertanya}` | a **WhatsApp** button; the 2nd part is the button text, the 3rd a pre-filled message (both optional). Accepts 08…, +62…, 62… or a wa.me link |
+| `{telepon: 0812…}` | a **call** button |
+| `{instagram: @akun}`, `{facebook: halaman}` | **Instagram** / **Facebook** buttons (a full `https://` link works too) |
+| `{lokasi: https://maps.app.goo.gl/… \| Lihat Lokasi}` | a **location** button (Google Maps) |
+| `{tombol: /register \| Daftar Sekarang}` | a button to a page of the site or an `https://` link |
 
-The step form shows a preview under the text.
+Every button template takes an optional button text after `|`. A template that can't be read (a wrong email, a phone number that is too short, a link that isn't `https://` or a page of the site) is shown as plain text, so the writer sees it in the preview. The bar above each text box inserts any of these at the cursor and selects the example value, so typing replaces it; a preview of the result is under the text.
 
 ### Pictures and storage
 
