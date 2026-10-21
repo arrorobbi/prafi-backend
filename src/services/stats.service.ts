@@ -54,7 +54,8 @@ export async function overview(user: AuthUser, days: number) {
   const roles: Role[] = READABLE_ROLES[user.role];
   const r = { tz: STATS_TIMEZONE, days, roles: roles.length ? roles : [''] };
 
-  const [statusRows, productDays, tenantTotal, categoryRows, areaRows, tenantDays, roleRows, userDays, stockRows] = await Promise.all([
+  const [statusRows, productDays, tenantTotal, categoryRows, areaRows, tenantDays, roleRows, userDays, stockRows, stockOutDays, stockInDays] =
+    await Promise.all([
     query<{ status: string; count: number }>(
       `SELECT ${PRODUCT_STATUS_SQL} AS status, COUNT(*)::int AS count
        FROM products p LEFT JOIN approvals a ON a.id = p.approval_id GROUP BY 1`,
@@ -93,6 +94,9 @@ export async function overview(user: AuthUser, days: number) {
        WHERE NOT p.is_available`,
       r,
     ),
+    // Switches by sellers per day: marked "Stok Kosong" / "Tersedia" again
+    query<DayCount>(perDay('product_stock_events', 'NOT is_available'), r),
+    query<DayCount>(perDay('product_stock_events', 'is_available'), r),
   ]);
 
   const byStatus = { active: 0, pending: 0, rejected: 0, inactive: 0 };
@@ -114,11 +118,14 @@ export async function overview(user: AuthUser, days: number) {
     },
     tenants: { total: tenantTotal[0]?.count ?? 0, byArea: areaRows },
     users: { roles, total: byRole.reduce((a, x) => a + x.active + x.inactive, 0), byRole },
-    // New products, UMKM profiles and accounts (readable roles) per day
+    // New products, UMKM profiles and accounts (readable roles) per day, and products switched to "Stok Kosong" /
+    // back to "Tersedia" by their sellers
     perDay: productDays.map((d, i) => ({
       date: d.date,
       products: d.count,
       tenants: tenantDays[i]?.count ?? 0,
+      outOfStock: stockOutDays[i]?.count ?? 0,
+      backInStock: stockInDays[i]?.count ?? 0,
       users: userDays[i]?.count ?? 0,
     })),
   };

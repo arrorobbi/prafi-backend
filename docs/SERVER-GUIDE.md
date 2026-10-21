@@ -594,6 +594,7 @@ Files so far, in the order they were run:
 | `20261018_site_content_email_issues.sql` | Table `site_settings` (*Konten Situs* texts); `users.email_issue*` (emails that didn't arrive) |
 | `20261019_guides.sql` | Tables `guide_sections` and `guide_steps` (*Kelola Panduan*); content loaded by `npm run guides:seed` |
 | `20261022_product_available.sql` | `products.is_available` (*Tersedia* / *Stok Kosong*), true for every existing product |
+| `20261022_2_product_stock_events.sql` | Table `product_stock_events`: every Tersedia / Stok Kosong switch (dashboard *Aktivitas* chart), filled from the notifications already sent |
 
 **Running a migration** (always back up first, and run it **before** restarting the backend with the new code):
 
@@ -809,7 +810,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 
 ### Admin
 
-- **Dashboard**: sellers and products by status for a chosen period (with a **Stok Kosong** card: active products the seller marked out of stock, hidden from visitors), and the products waiting for confirmation. The *Status Produk* chart splits active products into *Aktif · Tersedia* and *Aktif · Stok Kosong*.
+- **Dashboard**: sellers and products by status for a chosen period (with a **Stok Kosong** card: active products the seller marked out of stock, hidden from visitors), and the products waiting for confirmation. The *Status Produk* chart splits active products into *Aktif · Tersedia* and *Aktif · Stok Kosong*; the *Aktivitas* chart also shows, per day, products marked out of stock and available again.
 
 ![Admin dashboard](panduan/fitur-admin-dashboard.jpg)
 
@@ -880,7 +881,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 | Email | Sign-up OTP, Disnakertrans activation, password reset, "your admin account is active", weekly backup. All in Bahasa Indonesia | `src/mail/templates.ts`, `SMTP_*` in the backend `.env` |
 | Live notifications | Notifications, review lists and the unread badge update without reloading (Socket.IO) | `src/realtime/socket.ts` |
 | Login protection | 5 wrong passwords for one account from one network, or 20 from one network across accounts, in 15 minutes: that network must wait (429). Counted in the backend's memory, so a restart clears it | `src/services/loginGuard.service.ts` |
-| Sessions | A login ends after **1 hour without activity**: while the user clicks or types, the website renews it (at most once a minute), up to **12 hours** after the login. Logout, deactivation or a password reset ends the session at once | `src/services/auth.service.ts` (`refreshSession`), frontend `src/lib/auth.tsx` |
+| Sessions | A login ends after **1 hour without activity**: while the user clicks or types, the website renews it (at most once a minute), up to **12 hours** after the login. Logout, deactivation or a password reset ends the session at once. **Each browser tab keeps its own login**: tabs can use different accounts, a duplicated tab stays the same account, and a new tab starts with the most recent login. On `/login` a signed-in tab can continue or sign in with another account in that tab only | `src/services/auth.service.ts` (`refreshSession`), frontend `src/lib/auth.tsx` |
 | Picture preparation | Before upload the website crops each picture to the shape of where it is shown (product 1:1, UMKM logo 1:1, carousel category 2:3, BUMDES 16:10) and compresses it to 3 MB; the account photo is taken with the camera only. The form says the shape and recommended size | frontend `src/lib/imageTools.ts` (`CROP`), `ImageCropDialog.tsx`, `CameraCapture.tsx` |
 | Account photo check | A new account photo must show a face. A face detector on the server looks at it during the upload (about half a second) and again when it is saved; a logo, product or landscape is refused. Nothing about the face is stored. The first check after a restart loads the detector, which adds about 300 MB to the backend's memory | `src/services/faceDetection.service.ts` |
 | Photo uploads | A photo uploads when picked and is attached on *Simpan*; unused ones are deleted every night | sections 7 and 12 |

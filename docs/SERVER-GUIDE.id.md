@@ -594,6 +594,7 @@ Berkas sejauh ini, sesuai urutan dijalankannya:
 | `20261018_site_content_email_issues.sql` | Tabel `site_settings` (teks *Konten Situs*); `users.email_issue*` (email yang tidak sampai) |
 | `20261019_guides.sql` | Tabel `guide_sections` dan `guide_steps` (*Kelola Panduan*); isi dimuat oleh `npm run guides:seed` |
 | `20261022_product_available.sql` | `products.is_available` (*Tersedia* / *Stok Kosong*), true untuk semua produk yang sudah ada |
+| `20261022_2_product_stock_events.sql` | Tabel `product_stock_events`: setiap perubahan Tersedia / Stok Kosong (grafik *Aktivitas* dashboard), diisi dari notifikasi yang sudah terkirim |
 
 **Menjalankan migrasi** (selalu cadangkan dulu, dan jalankan **sebelum** me-restart backend dengan kode baru):
 
@@ -809,7 +810,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 
 ### Admin
 
-- **Dashboard**: jumlah penjual dan produk menurut status untuk periode yang dipilih (dengan kartu **Stok Kosong**: produk aktif yang ditandai habis oleh penjual, disembunyikan dari pengunjung), serta produk yang menunggu konfirmasi. Grafik *Status Produk* memisahkan produk aktif menjadi *Aktif · Tersedia* dan *Aktif · Stok Kosong*.
+- **Dashboard**: jumlah penjual dan produk menurut status untuk periode yang dipilih (dengan kartu **Stok Kosong**: produk aktif yang ditandai habis oleh penjual, disembunyikan dari pengunjung), serta produk yang menunggu konfirmasi. Grafik *Status Produk* memisahkan produk aktif menjadi *Aktif · Tersedia* dan *Aktif · Stok Kosong*; grafik *Aktivitas* juga menampilkan, per hari, produk yang ditandai stok kosong dan tersedia kembali.
 
 ![Dashboard admin](panduan/fitur-admin-dashboard.jpg)
 
@@ -880,7 +881,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 | Email | OTP pendaftaran, aktivasi Disnakertrans, atur ulang kata sandi, "akun admin Anda sudah aktif", cadangan mingguan. Semuanya dalam Bahasa Indonesia | `src/mail/templates.ts`, `SMTP_*` di `.env` backend |
 | Notifikasi langsung | Notifikasi, daftar ulasan, dan tanda belum dibaca diperbarui tanpa memuat ulang (Socket.IO) | `src/realtime/socket.ts` |
 | Perlindungan login | 5 password salah untuk satu akun dari satu jaringan, atau 20 dari satu jaringan untuk akun mana pun, dalam 15 menit: jaringan itu harus menunggu (429). Dihitung di memori backend, jadi restart menghapusnya | `src/services/loginGuard.service.ts` |
-| Sesi | Login berakhir setelah **1 jam tanpa aktivitas**: selama pengguna mengeklik atau mengetik, website memperpanjangnya (paling sering sekali semenit), sampai **12 jam** setelah login. Logout, penonaktifan, atau atur ulang kata sandi langsung mengakhiri sesi | `src/services/auth.service.ts` (`refreshSession`), frontend `src/lib/auth.tsx` |
+| Sesi | Login berakhir setelah **1 jam tanpa aktivitas**: selama pengguna mengeklik atau mengetik, website memperpanjangnya (paling sering sekali semenit), sampai **12 jam** setelah login. Logout, penonaktifan, atau atur ulang kata sandi langsung mengakhiri sesi. **Setiap tab browser menyimpan login-nya sendiri**: tab dapat memakai akun yang berbeda, tab yang diduplikasi tetap akun yang sama, dan tab baru memakai login terakhir. Di `/login`, tab yang sudah masuk dapat melanjutkan atau masuk dengan akun lain khusus di tab itu | `src/services/auth.service.ts` (`refreshSession`), frontend `src/lib/auth.tsx` |
 | Persiapan gambar | Sebelum diunggah, website memotong setiap gambar sesuai bentuk tempat tampilnya (produk 1:1, logo UMKM 1:1, kategori carousel 2:3, BUMDES 16:10) dan mengompresnya menjadi 3 MB; foto akun hanya dapat diambil dengan kamera. Form menyebutkan rasio dan ukuran yang disarankan | frontend `src/lib/imageTools.ts` (`CROP`), `ImageCropDialog.tsx`, `CameraCapture.tsx` |
 | Pemeriksaan foto akun | Foto akun yang baru harus menampilkan wajah. Pendeteksi wajah di server memeriksanya saat diunggah (sekitar setengah detik) dan sekali lagi saat disimpan; logo, produk, atau pemandangan ditolak. Tidak ada data wajah yang disimpan. Pemeriksaan pertama setelah restart memuat pendeteksi, yang menambah sekitar 300 MB memori backend | `src/services/faceDetection.service.ts` |
 | Unggah foto | Foto terunggah saat dipilih dan ditautkan saat *Simpan*; yang tidak terpakai dihapus setiap malam | bagian 7 dan 12 |

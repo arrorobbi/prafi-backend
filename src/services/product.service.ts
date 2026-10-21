@@ -1,7 +1,7 @@
 import { literal, type FindAttributeOptions, type Includeable, type WhereOptions } from 'sequelize';
 import { PRODUCT_READ_ALL_ROLES } from '../constants/roles';
 import { HttpError } from '../errors/HttpError';
-import { Approval, Image, Product, ProductCategory, sequelize, User } from '../models';
+import { Approval, Image, Product, ProductCategory, ProductStockEvent, sequelize, User } from '../models';
 import type { AuthUser } from '../types/express';
 import * as imageService from './image.service';
 import { findByOldSlug, isSlugConflict } from '../utils/slug';
@@ -227,7 +227,11 @@ export async function update(user: AuthUser, id: string, changes: Partial<Produc
   const owner = { tenantName: updated.tenant?.tenantName };
   // "Tersedia" / "Stok Kosong" switched: everyone is told. Other fields changed too: the usual "product updated"
   const availabilityChanged = changes.isAvailable !== undefined && changes.isAvailable !== wasAvailable;
-  if (availabilityChanged) await notify.productAvailabilityChanged(updated, owner, updated.isAvailable);
+  if (availabilityChanged) {
+    // History for the dashboards' Aktivitas chart (stats.service)
+    await ProductStockEvent.create({ productId: product.id, isAvailable: updated.isAvailable });
+    await notify.productAvailabilityChanged(updated, owner, updated.isAvailable);
+  }
   if (otherChanges) await notify.productUpdated(updated, owner, updated.approval?.isActive === true);
   return updated;
 }
