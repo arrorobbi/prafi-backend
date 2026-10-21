@@ -593,6 +593,7 @@ Files so far, in the order they were run:
 | `20261014_slugs.sql` | Readable addresses (slugs) for products, UMKM and categories; table `old_slugs` |
 | `20261018_site_content_email_issues.sql` | Table `site_settings` (*Konten Situs* texts); `users.email_issue*` (emails that didn't arrive) |
 | `20261019_guides.sql` | Tables `guide_sections` and `guide_steps` (*Kelola Panduan*); content loaded by `npm run guides:seed` |
+| `20261022_product_available.sql` | `products.is_available` (*Tersedia* / *Stok Kosong*), true for every existing product |
 
 **Running a migration** (always back up first, and run it **before** restarting the backend with the new code):
 
@@ -784,7 +785,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 
 ![Profil UMKM form](panduan/fitur-profil-umkm.jpg)
 
-- **Products**: add with photo, price, category, description; a new or changed product waits for approval (*Menunggu Konfirmasi*). Rejected products show the reason and can be fixed and sent again.
+- **Products**: add with photo, price, category, description; a new or changed product waits for approval (*Menunggu Konfirmasi*). Rejected products show the reason and can be fixed and sent again. Each product has a **Tersedia / Stok Kosong** switch (in *Produk Saya* and the product form, only the seller can change it): out of stock hides it from every public page until it is available again, and every superadmin, disnakertrans and admin gets a notification. The public pages never show the label itself.
 
 ![Adding a product](panduan/fitur-tambah-produk.jpg)
 

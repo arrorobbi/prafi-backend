@@ -593,6 +593,7 @@ Berkas sejauh ini, sesuai urutan dijalankannya:
 | `20261014_slugs.sql` | Alamat yang mudah dibaca (slug) untuk produk, UMKM, dan kategori; tabel `old_slugs` |
 | `20261018_site_content_email_issues.sql` | Tabel `site_settings` (teks *Konten Situs*); `users.email_issue*` (email yang tidak sampai) |
 | `20261019_guides.sql` | Tabel `guide_sections` dan `guide_steps` (*Kelola Panduan*); isi dimuat oleh `npm run guides:seed` |
+| `20261022_product_available.sql` | `products.is_available` (*Tersedia* / *Stok Kosong*), true untuk semua produk yang sudah ada |
 
 **Menjalankan migrasi** (selalu cadangkan dulu, dan jalankan **sebelum** me-restart backend dengan kode baru):
 
@@ -784,7 +785,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 
 ![Form Profil UMKM](panduan/fitur-profil-umkm.jpg)
 
-- **Produk**: tambah dengan foto, harga, kategori, deskripsi; produk baru atau yang diubah menunggu persetujuan (*Menunggu Konfirmasi*). Produk yang ditolak menampilkan alasannya dan dapat diperbaiki lalu diajukan lagi.
+- **Produk**: tambah dengan foto, harga, kategori, deskripsi; produk baru atau yang diubah menunggu persetujuan (*Menunggu Konfirmasi*). Produk yang ditolak menampilkan alasannya dan dapat diperbaiki lalu diajukan lagi. Setiap produk memiliki sakelar **Tersedia / Stok Kosong** (di *Produk Saya* dan form produk, hanya penjual yang dapat mengubahnya): stok kosong menyembunyikan produk dari semua halaman publik sampai tersedia lagi, dan semua superadmin, disnakertrans dan admin menerima notifikasi. Halaman publik tidak pernah menampilkan labelnya.
 
 ![Menambah produk](panduan/fitur-tambah-produk.jpg)
 

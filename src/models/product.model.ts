@@ -33,6 +33,11 @@ export class Product extends Model<InferAttributes<Product>, InferCreationAttrib
    * stars or more (recomputed on every new review). Shown in the landing page's recommended products.
    */
   declare isRecommended: CreationOptional<boolean>;
+  /**
+   * Set by the seller: true = "Tersedia" (in stock), false = "Stok Kosong" (out of stock). Out-of-stock products are
+   * hidden from every public page (lists, detail, UMKM counts, new reviews) until they are available again.
+   */
+  declare isAvailable: CreationOptional<boolean>;
   /** The product category (created by an admin). Required for new products; null only for older ones. */
   declare categoryId: ForeignKey<ProductCategory['id']> | null;
   declare imageId: ForeignKey<Image['id']> | null;
@@ -72,6 +77,7 @@ Product.init(
     details: { type: DataTypes.STRING, allowNull: false },
     price: { type: DataTypes.INTEGER, allowNull: false, validate: { min: 0 } },
     isRecommended: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    isAvailable: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     imageId: {
       type: DataTypes.INTEGER,
       allowNull: true,

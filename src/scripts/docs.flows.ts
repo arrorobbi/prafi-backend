@@ -486,8 +486,15 @@ export const FLOWS: Record<string, Chart[]> = {
           { en: 'Save changes', id: 'Simpan perubahan' },
           effect({ en: 'Replaced image: record + file deleted', id: 'Gambar lama: data + file dihapus' }),
           effect({ en: 'Notify admins + disnakertrans: product updated', id: 'Notifikasi ke admin + disnakertrans: produk diubah' }),
+          effect({
+            en: '`isAvailable` changed: notify every superadmin, disnakertrans, admin + the tenant (PRODUCT_AVAILABILITY_CHANGED)',
+            id: '`isAvailable` berubah: notifikasi ke semua superadmin, disnakertrans, admin + tenant (PRODUCT_AVAILABILITY_CHANGED)',
+          }),
         ),
-        end({ en: '200 product', id: '200 produk' }),
+        end(
+          { en: '200 product', id: '200 produk' },
+          note({ en: '"Stok Kosong" (false): hidden from the public pages', id: '"Stok Kosong" (false): disembunyikan dari halaman publik' }),
+        ),
       ],
     },
     {
@@ -545,7 +552,7 @@ export const FLOWS: Record<string, Chart[]> = {
       nodes: [
         start('GET /api/landing/products'),
         step({ en: 'No token needed', id: 'Tanpa token' }),
-        step({ en: 'Only products whose approval is active', id: 'Hanya produk dengan approval aktif' }),
+        step({ en: 'Only products whose approval is active and that are in stock (isAvailable)', id: 'Hanya produk dengan approval aktif dan stok tersedia (isAvailable)' }),
         step({ en: 'Public fields only (no owner email/phone, no reason)', id: 'Hanya field publik (tanpa email/telepon pemilik, tanpa reason)' }),
         step({ en: 'Optional: ?recommended=true, ?tenantId=, ?categoryId=, ?sort=newest|rating', id: 'Opsional: ?recommended=true, ?tenantId=, ?categoryId=, ?sort=newest|rating' }),
         end(

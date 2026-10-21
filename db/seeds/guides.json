@@ -140,7 +140,7 @@
       "public",
       "tenant"
     ],
-    "intro": "- **Menunggu Konfirmasi** – produk sedang diperiksa administrator atau Disnakertrans.\n- **Aktif** – produk disetujui dan tampil untuk pengunjung.\n- **Ditolak** – produk belum memenuhi ketentuan; alasannya terlihat di menu **Produk Ditolak**.\n- **Dinonaktifkan** – produk diturunkan administrator atau Disnakertrans dari halaman utama.\n\nUntuk mengajukan ulang produk yang ditolak:",
+    "intro": "- **Menunggu Konfirmasi** – produk sedang diperiksa administrator atau Disnakertrans.\n- **Aktif** – produk disetujui dan tampil untuk pengunjung.\n- **Ditolak** – produk belum memenuhi ketentuan; alasannya terlihat di menu **Produk Ditolak**.\n- **Dinonaktifkan** – produk diturunkan administrator atau Disnakertrans dari halaman utama.\n- **Stok Kosong** – Anda menandai produk habis di **Produk Saya** (sakelar **Tersedia / Stok Kosong**); produk disembunyikan dari halaman utama sampai Anda ubah menjadi **Tersedia** lagi.\n\nUntuk mengajukan ulang produk yang ditolak:",
     "steps": [
       {
         "body": "Buka **Produk Ditolak**, baca alasan penolakan, lalu klik ikon **pensil**.",

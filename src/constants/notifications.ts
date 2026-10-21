@@ -10,6 +10,7 @@
  *   tenant        — about their own products: PRODUCT_UNDER_REVIEW, PRODUCT_APPROVED, PRODUCT_TAKEN_DOWN,
  *                   PRODUCT_CHANGES_SAVED, PRODUCT_REVIEWED, REVIEW_MODERATED
  *   admin + disnakertrans also get REVIEW_REPORTED
+ *   every staff role + the product's tenant get PRODUCT_AVAILABILITY_CHANGED
  */
 export const NOTIFICATION_TYPES = {
   /** To superadmins: a new account of any role was created. */
@@ -46,6 +47,8 @@ export const NOTIFICATION_TYPES = {
   REVIEW_REPORTED: 'REVIEW_REPORTED',
   /** To the tenant: an admin / disnakertrans hid, kept or showed again a review of their product. */
   REVIEW_MODERATED: 'REVIEW_MODERATED',
+  /** To superadmins, disnakertrans, admins and the product's tenant: the seller marked a product in stock / out of stock. */
+  PRODUCT_AVAILABILITY_CHANGED: 'PRODUCT_AVAILABILITY_CHANGED',
 } as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[keyof typeof NOTIFICATION_TYPES];

@@ -199,6 +199,35 @@ export const notify = {
       });
     }),
 
+  /**
+   * Every superadmin, disnakertrans and admin, and the seller: a product was marked "Tersedia" or "Stok Kosong"
+   * (out of stock products are hidden from the landing page).
+   */
+  productAvailabilityChanged: (
+    product: { id: string; name: string; tenantId: string; approvalId: number | null },
+    owner: { tenantName?: string | null },
+    isAvailable: boolean,
+  ) =>
+    safely('productAvailabilityChanged', async () => {
+      const link = { entityType: 'product' as const, entityId: product.id };
+      const state = isAvailable ? 'available' : 'out of stock';
+      await toRole([ROLES.SUPERADMIN, ROLES.DISNAKERTRANS, ROLES.ADMIN], {
+        type: T.PRODUCT_AVAILABILITY_CHANGED,
+        name: isAvailable ? 'Product available again' : 'Product out of stock',
+        description: `${owner.tenantName ?? 'A tenant'} marked "${product.name}" as ${state}.${isAvailable ? '' : ' It is hidden from the landing page.'}`,
+        ...link,
+      });
+      await toUsers([product.tenantId], {
+        type: T.PRODUCT_AVAILABILITY_CHANGED,
+        name: isAvailable ? 'Product available again' : 'Product out of stock',
+        description: isAvailable
+          ? `You marked "${product.name}" as available. It shows on the landing page again.`
+          : `You marked "${product.name}" as out of stock. It is hidden from the landing page until it is available again.`,
+        ...link,
+        approvalId: product.approvalId,
+      });
+    }),
+
   /** admins + disnakertrans: a tenant deleted a product (it no longer exists, so there is nothing to link to) */
   productDeleted: (product: { name: string }, owner: { tenantName?: string | null }) =>
     safely('productDeleted', () =>

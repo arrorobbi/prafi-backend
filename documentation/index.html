@@ -4663,6 +4663,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
         &quot;details&quot;: &quot;200 gram&quot;,
         &quot;price&quot;: 30000,
         &quot;isRecommended&quot;: true,
+      &quot;isAvailable&quot;: true,
         &quot;imageId&quot;: 13,
         &quot;approvalId&quot;: 15,
         &quot;tenantId&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
@@ -4736,6 +4737,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
         &quot;details&quot;: &quot;200 gram&quot;,
         &quot;price&quot;: 30000,
         &quot;isRecommended&quot;: true,
+      &quot;isAvailable&quot;: true,
         &quot;imageId&quot;: 13,
         &quot;approvalId&quot;: 15,
         &quot;tenantId&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
@@ -4944,7 +4946,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 </figure>
 <figure class="flow">
   <figcaption>Update Product</figcaption>
-  <svg class="fc" viewBox="0 0 480 726" width="480" height="726" role="img" aria-label="Update Product">
+  <svg class="fc" viewBox="0 0 480 846" width="480" height="846" role="img" aria-label="Update Product">
     <defs><marker id="fc-arrow-92" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
     <rect class="fc-box fc-start" x="8" y="8" width="224" height="32" rx="16"/>
     <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">PATCH /api/products/:id</text>
@@ -5003,19 +5005,25 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <text class="fc-label" x="237" y="477">no</text>
     <rect class="fc-box fc-error" x="276" y="466" width="196" height="32" rx="8"/>
     <text class="fc-text fc-text-error" x="374" y="487" text-anchor="middle">400</text>
-    <line class="fc-line" x1="120" y1="506" x2="120" y2="579" marker-end="url(#fc-arrow-92)"/>
-    <text class="fc-label" x="126" y="547">yes</text>
-    <rect class="fc-box fc-step" x="8" y="580" width="224" height="32" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="601" text-anchor="middle">Save changes</text>
-    <path class="fc-line fc-line-effect" d="M232,596 H254 V560 H275" fill="none" marker-end="url(#fc-arrow-92)"/>
+    <line class="fc-line" x1="120" y1="506" x2="120" y2="631" marker-end="url(#fc-arrow-92)"/>
+    <text class="fc-label" x="126" y="573">yes</text>
+    <rect class="fc-box fc-step" x="8" y="632" width="224" height="32" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="653" text-anchor="middle">Save changes</text>
+    <path class="fc-line fc-line-effect" d="M232,648 H254 V560 H275" fill="none" marker-end="url(#fc-arrow-92)"/>
     <rect class="fc-box fc-effect" x="276" y="536" width="196" height="48" rx="8"/>
     <text class="fc-text fc-text-effect" x="374" y="557" text-anchor="middle">Replaced image: record + file</text><text class="fc-text fc-text-effect" x="374" y="573" text-anchor="middle">deleted</text>
-    <path class="fc-line fc-line-effect" d="M232,596 H254 V624 H275" fill="none" marker-end="url(#fc-arrow-92)"/>
+    <path class="fc-line fc-line-effect" d="M232,648 H254 V624 H275" fill="none" marker-end="url(#fc-arrow-92)"/>
     <rect class="fc-box fc-effect" x="276" y="592" width="196" height="64" rx="8"/>
     <text class="fc-text fc-text-effect" x="374" y="613" text-anchor="middle">Notify admins +</text><text class="fc-text fc-text-effect" x="374" y="629" text-anchor="middle">disnakertrans: product</text><text class="fc-text fc-text-effect" x="374" y="645" text-anchor="middle">updated</text>
-    <line class="fc-line" x1="120" y1="612" x2="120" y2="685" marker-end="url(#fc-arrow-92)"/>
-    <rect class="fc-box fc-end" x="8" y="686" width="224" height="32" rx="16"/>
-    <text class="fc-text fc-text-end" x="120" y="707" text-anchor="middle">200 product</text>
+    <path class="fc-line fc-line-effect" d="M232,648 H254 V712 H275" fill="none" marker-end="url(#fc-arrow-92)"/>
+    <rect class="fc-box fc-effect" x="276" y="664" width="196" height="96" rx="8"/>
+    <text class="fc-text fc-text-effect" x="374" y="685" text-anchor="middle"><tspan class="fc-code">isAvailable</tspan> changed: notify</text><text class="fc-text fc-text-effect" x="374" y="701" text-anchor="middle">every superadmin,</text><text class="fc-text fc-text-effect" x="374" y="717" text-anchor="middle">disnakertrans, admin + the</text><text class="fc-text fc-text-effect" x="374" y="733" text-anchor="middle">tenant</text><text class="fc-text fc-text-effect" x="374" y="749" text-anchor="middle">(PRODUCT_AVAILABILITY_CHANGED)</text>
+    <line class="fc-line" x1="120" y1="664" x2="120" y2="797" marker-end="url(#fc-arrow-92)"/>
+    <rect class="fc-box fc-end" x="8" y="798" width="224" height="32" rx="16"/>
+    <text class="fc-text fc-text-end" x="120" y="819" text-anchor="middle">200 product</text>
+    <path class="fc-line fc-line-note" d="M232,814 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="790" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="811" text-anchor="middle">&quot;Stok Kosong&quot; (false): hidden</text><text class="fc-text fc-text-note" x="374" y="827" text-anchor="middle">from the public pages</text>
   </svg>
 </figure>
 <figure class="flow">
@@ -5251,7 +5259,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 </figure>
 <figure class="flow">
   <figcaption>Ubah Produk</figcaption>
-  <svg class="fc" viewBox="0 0 480 726" width="480" height="726" role="img" aria-label="Ubah Produk">
+  <svg class="fc" viewBox="0 0 480 862" width="480" height="862" role="img" aria-label="Ubah Produk">
     <defs><marker id="fc-arrow-96" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
     <rect class="fc-box fc-start" x="8" y="8" width="224" height="32" rx="16"/>
     <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">PATCH /api/products/:id</text>
@@ -5310,19 +5318,25 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <text class="fc-label" x="237" y="493">tidak</text>
     <rect class="fc-box fc-error" x="276" y="482" width="196" height="32" rx="8"/>
     <text class="fc-text fc-text-error" x="374" y="503" text-anchor="middle">400</text>
-    <line class="fc-line" x1="120" y1="522" x2="120" y2="587" marker-end="url(#fc-arrow-96)"/>
-    <text class="fc-label" x="126" y="559">ya</text>
-    <rect class="fc-box fc-step" x="8" y="588" width="224" height="32" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="609" text-anchor="middle">Simpan perubahan</text>
-    <path class="fc-line fc-line-effect" d="M232,604 H254 V576 H275" fill="none" marker-end="url(#fc-arrow-96)"/>
+    <line class="fc-line" x1="120" y1="522" x2="120" y2="639" marker-end="url(#fc-arrow-96)"/>
+    <text class="fc-label" x="126" y="585">ya</text>
+    <rect class="fc-box fc-step" x="8" y="640" width="224" height="32" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="661" text-anchor="middle">Simpan perubahan</text>
+    <path class="fc-line fc-line-effect" d="M232,656 H254 V576 H275" fill="none" marker-end="url(#fc-arrow-96)"/>
     <rect class="fc-box fc-effect" x="276" y="552" width="196" height="48" rx="8"/>
     <text class="fc-text fc-text-effect" x="374" y="573" text-anchor="middle">Gambar lama: data + file</text><text class="fc-text fc-text-effect" x="374" y="589" text-anchor="middle">dihapus</text>
-    <path class="fc-line fc-line-effect" d="M232,604 H254 V632 H275" fill="none" marker-end="url(#fc-arrow-96)"/>
+    <path class="fc-line fc-line-effect" d="M232,656 H254 V632 H275" fill="none" marker-end="url(#fc-arrow-96)"/>
     <rect class="fc-box fc-effect" x="276" y="608" width="196" height="48" rx="8"/>
     <text class="fc-text fc-text-effect" x="374" y="629" text-anchor="middle">Notifikasi ke admin +</text><text class="fc-text fc-text-effect" x="374" y="645" text-anchor="middle">disnakertrans: produk diubah</text>
-    <line class="fc-line" x1="120" y1="620" x2="120" y2="685" marker-end="url(#fc-arrow-96)"/>
-    <rect class="fc-box fc-end" x="8" y="686" width="224" height="32" rx="16"/>
-    <text class="fc-text fc-text-end" x="120" y="707" text-anchor="middle">200 produk</text>
+    <path class="fc-line fc-line-effect" d="M232,656 H254 V712 H275" fill="none" marker-end="url(#fc-arrow-96)"/>
+    <rect class="fc-box fc-effect" x="276" y="664" width="196" height="96" rx="8"/>
+    <text class="fc-text fc-text-effect" x="374" y="685" text-anchor="middle"><tspan class="fc-code">isAvailable</tspan> berubah:</text><text class="fc-text fc-text-effect" x="374" y="701" text-anchor="middle">notifikasi ke semua</text><text class="fc-text fc-text-effect" x="374" y="717" text-anchor="middle">superadmin, disnakertrans,</text><text class="fc-text fc-text-effect" x="374" y="733" text-anchor="middle">admin + tenant</text><text class="fc-text fc-text-effect" x="374" y="749" text-anchor="middle">(PRODUCT_AVAILABILITY_CHANGED)</text>
+    <line class="fc-line" x1="120" y1="672" x2="120" y2="805" marker-end="url(#fc-arrow-96)"/>
+    <rect class="fc-box fc-end" x="8" y="806" width="224" height="32" rx="16"/>
+    <text class="fc-text fc-text-end" x="120" y="827" text-anchor="middle">200 produk</text>
+    <path class="fc-line fc-line-note" d="M232,822 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="790" width="196" height="64" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="811" text-anchor="middle">&quot;Stok Kosong&quot; (false):</text><text class="fc-text fc-text-note" x="374" y="827" text-anchor="middle">disembunyikan dari halaman</text><text class="fc-text fc-text-note" x="374" y="843" text-anchor="middle">publik</text>
   </svg>
 </figure>
 <figure class="flow">
@@ -5420,6 +5434,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
       &quot;details&quot;: &quot;d&quot;,
       &quot;price&quot;: 1000,
       &quot;isRecommended&quot;: false,
+      &quot;isAvailable&quot;: true,
       &quot;imageId&quot;: 23,
       &quot;categoryId&quot;: 4,
       &quot;approvalId&quot;: 14,
@@ -5473,6 +5488,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
       &quot;details&quot;: &quot;d&quot;,
       &quot;price&quot;: 1000,
       &quot;isRecommended&quot;: false,
+      &quot;isAvailable&quot;: true,
       &quot;imageId&quot;: 23,
       &quot;categoryId&quot;: 4,
       &quot;approvalId&quot;: 14,
@@ -5568,6 +5584,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;details&quot;: &quot;d&quot;,
     &quot;price&quot;: 1000,
     &quot;isRecommended&quot;: false,
+      &quot;isAvailable&quot;: true,
     &quot;imageId&quot;: 23,
     &quot;categoryId&quot;: 4,
     &quot;approvalId&quot;: 14,
@@ -5613,6 +5630,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;details&quot;: &quot;d&quot;,
     &quot;price&quot;: 1000,
     &quot;isRecommended&quot;: false,
+      &quot;isAvailable&quot;: true,
     &quot;imageId&quot;: 23,
     &quot;categoryId&quot;: 4,
     &quot;approvalId&quot;: 14,
@@ -5677,7 +5695,9 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   </div>
   <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <div data-l="en"><p>Your tenant profile must be <strong>complete</strong> first (<em>Tenants → Create My Tenant</em>) and your account needs a <strong>profile photo</strong> (<code>faceImageId</code>, <em>Auth → Update Me</em>); otherwise 403 <code>TENANT_PROFILE_INCOMPLETE</code> with <code>details.missingFields</code> (e.g. <code>[&quot;faceImageId&quot;]</code>). Upload the image first (<em>Images → Upload Image</em>); <code>imageId</code> is required. <code>categoryId</code> is required: a product category (<em>Product Categories → List</em>). <code>isRecommended</code> cannot be sent: the server sets it (true while the reviews average 4.8 stars or more, see <em>Landing → Create Review</em>). Saves <code>{{productId}}</code>. Superadmins, admins and disnakertrans get <code>PRODUCT_SUBMITTED</code>, the tenant gets <code>PRODUCT_UNDER_REVIEW</code>. The answer carries <code>slug</code>, the readable part of the product's address on the website (<code>/produk/&lt;slug&gt;</code>), made from the name: when another product already has it, a number is added (<code>brownis-prafi</code>, <code>brownis-prafi-1</code>, <code>brownis-prafi-2</code>, …). <code>slug</code> can't be sent.</p></div><div data-l="id"><p>Profil tenant Anda harus <strong>lengkap</strong> terlebih dahulu (<em>Tenant → Buat Profil Tenant Saya</em>) dan akun Anda harus memiliki <strong>foto profil</strong> (<code>faceImageId</code>, <em>Auth → Ubah Profil Saya</em>); jika belum, 403 <code>TENANT_PROFILE_INCOMPLETE</code> dengan <code>details.missingFields</code> (mis. <code>[&quot;faceImageId&quot;]</code>). Unggah gambarnya dulu (<em>Gambar → Unggah Gambar</em>); <code>imageId</code> wajib diisi. <code>categoryId</code> wajib: kategori produk (<em>Kategori Produk → Daftar</em>). <code>isRecommended</code> tidak boleh dikirim: server yang mengaturnya (lihat <em>Landing → Tulis Ulasan</em>). Menyimpan <code>{{productId}}</code>. Superadmin, admin, dan disnakertrans menerima <code>PRODUCT_SUBMITTED</code>, tenant menerima <code>PRODUCT_UNDER_REVIEW</code>. Jawaban berisi <code>slug</code>, bagian alamat produk yang mudah dibaca di website (<code>/produk/&lt;slug&gt;</code>), dibuat dari nama: bila sudah dipakai produk lain, sebuah angka ditambahkan (<code>brownis-prafi</code>, <code>brownis-prafi-1</code>, <code>brownis-prafi-2</code>, …). <code>slug</code> tidak dapat dikirim.</p></div>
+    <div data-l="en"><p>Your tenant profile must be <strong>complete</strong> first (<em>Tenants → Create My Tenant</em>) and your account needs a <strong>profile photo</strong> (<code>faceImageId</code>, <em>Auth → Update Me</em>); otherwise 403 <code>TENANT_PROFILE_INCOMPLETE</code> with <code>details.missingFields</code> (e.g. <code>[&quot;faceImageId&quot;]</code>). Upload the image first (<em>Images → Upload Image</em>); <code>imageId</code> is required. <code>categoryId</code> is required: a product category (<em>Product Categories → List</em>). <code>isRecommended</code> cannot be sent: the server sets it (true while the reviews average 4.8 stars or more, see <em>Landing → Create Review</em>). Saves <code>{{productId}}</code>. Superadmins, admins and disnakertrans get <code>PRODUCT_SUBMITTED</code>, the tenant gets <code>PRODUCT_UNDER_REVIEW</code>. The answer carries <code>slug</code>, the readable part of the product's address on the website (<code>/produk/&lt;slug&gt;</code>), made from the name: when another product already has it, a number is added (<code>brownis-prafi</code>, <code>brownis-prafi-1</code>, <code>brownis-prafi-2</code>, …). <code>slug</code> can't be sent.</p>
+<p><strong>Availability:</strong> optional <code>isAvailable</code> (default <code>true</code> = &quot;Tersedia&quot;; <code>false</code> = &quot;Stok Kosong&quot;). Out-of-stock products are hidden from every public page (Landing lists and detail answer as if the product didn't exist, UMKM and category counts leave them out, new reviews are refused).</p></div><div data-l="id"><p>Profil tenant Anda harus <strong>lengkap</strong> terlebih dahulu (<em>Tenant → Buat Profil Tenant Saya</em>) dan akun Anda harus memiliki <strong>foto profil</strong> (<code>faceImageId</code>, <em>Auth → Ubah Profil Saya</em>); jika belum, 403 <code>TENANT_PROFILE_INCOMPLETE</code> dengan <code>details.missingFields</code> (mis. <code>[&quot;faceImageId&quot;]</code>). Unggah gambarnya dulu (<em>Gambar → Unggah Gambar</em>); <code>imageId</code> wajib diisi. <code>categoryId</code> wajib: kategori produk (<em>Kategori Produk → Daftar</em>). <code>isRecommended</code> tidak boleh dikirim: server yang mengaturnya (lihat <em>Landing → Tulis Ulasan</em>). Menyimpan <code>{{productId}}</code>. Superadmin, admin, dan disnakertrans menerima <code>PRODUCT_SUBMITTED</code>, tenant menerima <code>PRODUCT_UNDER_REVIEW</code>. Jawaban berisi <code>slug</code>, bagian alamat produk yang mudah dibaca di website (<code>/produk/&lt;slug&gt;</code>), dibuat dari nama: bila sudah dipakai produk lain, sebuah angka ditambahkan (<code>brownis-prafi</code>, <code>brownis-prafi-1</code>, <code>brownis-prafi-2</code>, …). <code>slug</code> tidak dapat dikirim.</p>
+<p><strong>Ketersediaan:</strong> <code>isAvailable</code> opsional (bawaan <code>true</code> = &quot;Tersedia&quot;; <code>false</code> = &quot;Stok Kosong&quot;). Produk stok kosong disembunyikan dari semua halaman publik (daftar dan detail Landing menjawab seolah produk tidak ada, jumlah produk UMKM dan kategori tidak menghitungnya, ulasan baru ditolak).</p></div>
     
     <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;name&quot;: &quot;Kopi Susu Gula Aren&quot;,
@@ -5703,6 +5723,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;details&quot;: &quot;250 ml, es&quot;,
     &quot;price&quot;: 18000,
     &quot;isRecommended&quot;: false,
+      &quot;isAvailable&quot;: true,
     &quot;imageId&quot;: 32,
     &quot;categoryId&quot;: 3,
     &quot;approvalId&quot;: 17,
@@ -5748,6 +5769,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;details&quot;: &quot;250 ml, es&quot;,
     &quot;price&quot;: 18000,
     &quot;isRecommended&quot;: false,
+      &quot;isAvailable&quot;: true,
     &quot;imageId&quot;: 32,
     &quot;categoryId&quot;: 3,
     &quot;approvalId&quot;: 17,
@@ -5824,7 +5846,9 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
   </div>
   <p class="auth"><span class="dot dot-lock"></span><span data-l="en">Authorization:</span><span data-l="id">Otorisasi:</span> <code>Bearer {{token}}</code></p>
   <div class="endpoint-body">
-    <div data-l="en"><p>Own products only. Send any of <code>name</code>, <code>description</code>, <code>details</code>, <code>price</code>, <code>categoryId</code>, <code>imageId</code>. Activation and <code>isRecommended</code> cannot be changed here. Admins and disnakertrans get <code>PRODUCT_UPDATED</code>. Replacing <code>imageId</code> deletes the old image and its file. Changing <code>name</code> makes a new <code>slug</code> (numbered when taken); the old one keeps leading to the same product.</p></div><div data-l="id"><p>Hanya produk milik sendiri. Kirim salah satu dari <code>name</code>, <code>description</code>, <code>details</code>, <code>price</code>, <code>categoryId</code>, <code>imageId</code>. Aktivasi dan <code>isRecommended</code> tidak bisa diubah di sini. Admin dan disnakertrans menerima <code>PRODUCT_UPDATED</code>. Jika <code>imageId</code> diganti, gambar lama beserta filenya dihapus. Mengubah <code>name</code> membuat <code>slug</code> baru (diberi angka bila sudah dipakai); slug lama tetap mengarah ke produk yang sama.</p></div>
+    <div data-l="en"><p>Own products only. Send any of <code>name</code>, <code>description</code>, <code>details</code>, <code>price</code>, <code>categoryId</code>, <code>imageId</code>. Activation and <code>isRecommended</code> cannot be changed here. Admins and disnakertrans get <code>PRODUCT_UPDATED</code>. Replacing <code>imageId</code> deletes the old image and its file. Changing <code>name</code> makes a new <code>slug</code> (numbered when taken); the old one keeps leading to the same product.</p>
+<p><strong>Availability:</strong> <code>isAvailable</code> (<code>true</code> = &quot;Tersedia&quot;, <code>false</code> = &quot;Stok Kosong&quot;) can only be changed by the owner (this tenant-only route). Out of stock hides the product from every public page until it is available again. When it changes, every superadmin, disnakertrans and admin and the tenant get <code>PRODUCT_AVAILABILITY_CHANGED</code> (<code>name</code> &quot;Product out of stock&quot; / &quot;Product available again&quot;); <code>PRODUCT_UPDATED</code> is only sent when other fields changed too.</p></div><div data-l="id"><p>Hanya produk milik sendiri. Kirim salah satu dari <code>name</code>, <code>description</code>, <code>details</code>, <code>price</code>, <code>categoryId</code>, <code>imageId</code>, <code>isAvailable</code>. Aktivasi dan <code>isRecommended</code> tidak bisa diubah di sini. Admin dan disnakertrans menerima <code>PRODUCT_UPDATED</code>. Jika <code>imageId</code> diganti, gambar lama beserta filenya dihapus. Mengubah <code>name</code> membuat <code>slug</code> baru (diberi angka bila sudah dipakai); slug lama tetap mengarah ke produk yang sama.</p>
+<p><strong>Ketersediaan:</strong> <code>isAvailable</code> (<code>true</code> = &quot;Tersedia&quot;, <code>false</code> = &quot;Stok Kosong&quot;) hanya dapat diubah pemiliknya (route khusus tenant ini). Stok kosong menyembunyikan produk dari semua halaman publik sampai tersedia lagi. Saat berubah, semua superadmin, disnakertrans dan admin serta tenant menerima <code>PRODUCT_AVAILABILITY_CHANGED</code> (<code>name</code> &quot;Product out of stock&quot; / &quot;Product available again&quot;); <code>PRODUCT_UPDATED</code> hanya dikirim bila field lain ikut berubah.</p></div>
     
     <div class="block-head"><h4><span data-l="en">Request body</span><span data-l="id">Body request</span> <span class="muted">application/json</span></h4><button class="copy" type="button" data-copy="{
   &quot;price&quot;: 20000,
@@ -5842,6 +5866,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;details&quot;: &quot;250 ml, es&quot;,
     &quot;price&quot;: 20000,
     &quot;isRecommended&quot;: false,
+      &quot;isAvailable&quot;: true,
     &quot;imageId&quot;: 32,
     &quot;categoryId&quot;: 1,
     &quot;approvalId&quot;: 17,
@@ -5887,6 +5912,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;details&quot;: &quot;250 ml, es&quot;,
     &quot;price&quot;: 20000,
     &quot;isRecommended&quot;: false,
+      &quot;isAvailable&quot;: true,
     &quot;imageId&quot;: 32,
     &quot;categoryId&quot;: 1,
     &quot;approvalId&quot;: 17,
@@ -6052,7 +6078,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
 </figure>
 <figure class="flow">
   <figcaption>Landing Products</figcaption>
-  <svg class="fc" viewBox="0 0 480 438" width="480" height="438" role="img" aria-label="Landing Products">
+  <svg class="fc" viewBox="0 0 480 454" width="480" height="454" role="img" aria-label="Landing Products">
     <defs><marker id="fc-arrow-101" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fc-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>
     <rect class="fc-box fc-start" x="8" y="8" width="224" height="32" rx="16"/>
     <text class="fc-text fc-text-start" x="120" y="29" text-anchor="middle">GET /api/landing/products</text>
@@ -6060,20 +6086,20 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <rect class="fc-box fc-step" x="8" y="70" width="224" height="32" rx="8"/>
     <text class="fc-text fc-text-step" x="120" y="91" text-anchor="middle">No token needed</text>
     <line class="fc-line" x1="120" y1="102" x2="120" y2="131" marker-end="url(#fc-arrow-101)"/>
-    <rect class="fc-box fc-step" x="8" y="132" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="153" text-anchor="middle">Only products whose approval is</text><text class="fc-text fc-text-step" x="120" y="169" text-anchor="middle">active</text>
-    <line class="fc-line" x1="120" y1="180" x2="120" y2="209" marker-end="url(#fc-arrow-101)"/>
-    <rect class="fc-box fc-step" x="8" y="210" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="231" text-anchor="middle">Public fields only (no owner</text><text class="fc-text fc-text-step" x="120" y="247" text-anchor="middle">email/phone, no reason)</text>
-    <line class="fc-line" x1="120" y1="258" x2="120" y2="287" marker-end="url(#fc-arrow-101)"/>
-    <rect class="fc-box fc-step" x="8" y="288" width="224" height="64" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="309" text-anchor="middle">Optional: ?recommended=true,</text><text class="fc-text fc-text-step" x="120" y="325" text-anchor="middle">?tenantId=, ?categoryId=,</text><text class="fc-text fc-text-step" x="120" y="341" text-anchor="middle">?sort=newest|rating</text>
-    <line class="fc-line" x1="120" y1="352" x2="120" y2="389" marker-end="url(#fc-arrow-101)"/>
-    <rect class="fc-box fc-end" x="8" y="390" width="224" height="32" rx="16"/>
-    <text class="fc-text fc-text-end" x="120" y="411" text-anchor="middle">200 paginated list, newest first</text>
-    <path class="fc-line fc-line-note" d="M232,406 H275" fill="none"/>
-    <rect class="fc-box fc-note" x="276" y="382" width="196" height="48" rx="8"/>
-    <text class="fc-text fc-text-note" x="374" y="403" text-anchor="middle">Each with ratingAverage +</text><text class="fc-text fc-text-note" x="374" y="419" text-anchor="middle">reviewCount</text>
+    <rect class="fc-box fc-step" x="8" y="132" width="224" height="64" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="153" text-anchor="middle">Only products whose approval is</text><text class="fc-text fc-text-step" x="120" y="169" text-anchor="middle">active and that are in stock</text><text class="fc-text fc-text-step" x="120" y="185" text-anchor="middle">(isAvailable)</text>
+    <line class="fc-line" x1="120" y1="196" x2="120" y2="225" marker-end="url(#fc-arrow-101)"/>
+    <rect class="fc-box fc-step" x="8" y="226" width="224" height="48" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="247" text-anchor="middle">Public fields only (no owner</text><text class="fc-text fc-text-step" x="120" y="263" text-anchor="middle">email/phone, no reason)</text>
+    <line class="fc-line" x1="120" y1="274" x2="120" y2="303" marker-end="url(#fc-arrow-101)"/>
+    <rect class="fc-box fc-step" x="8" y="304" width="224" height="64" rx="8"/>
+    <text class="fc-text fc-text-step" x="120" y="325" text-anchor="middle">Optional: ?recommended=true,</text><text class="fc-text fc-text-step" x="120" y="341" text-anchor="middle">?tenantId=, ?categoryId=,</text><text class="fc-text fc-text-step" x="120" y="357" text-anchor="middle">?sort=newest|rating</text>
+    <line class="fc-line" x1="120" y1="368" x2="120" y2="405" marker-end="url(#fc-arrow-101)"/>
+    <rect class="fc-box fc-end" x="8" y="406" width="224" height="32" rx="16"/>
+    <text class="fc-text fc-text-end" x="120" y="427" text-anchor="middle">200 paginated list, newest first</text>
+    <path class="fc-line fc-line-note" d="M232,422 H275" fill="none"/>
+    <rect class="fc-box fc-note" x="276" y="398" width="196" height="48" rx="8"/>
+    <text class="fc-text fc-text-note" x="374" y="419" text-anchor="middle">Each with ratingAverage +</text><text class="fc-text fc-text-note" x="374" y="435" text-anchor="middle">reviewCount</text>
   </svg>
 </figure>
 <figure class="flow">
@@ -6240,7 +6266,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     <text class="fc-text fc-text-step" x="120" y="91" text-anchor="middle">Tanpa token</text>
     <line class="fc-line" x1="120" y1="102" x2="120" y2="131" marker-end="url(#fc-arrow-107)"/>
     <rect class="fc-box fc-step" x="8" y="132" width="224" height="48" rx="8"/>
-    <text class="fc-text fc-text-step" x="120" y="153" text-anchor="middle">Hanya produk dengan approval</text><text class="fc-text fc-text-step" x="120" y="169" text-anchor="middle">aktif</text>
+    <text class="fc-text fc-text-step" x="120" y="153" text-anchor="middle">Hanya produk dengan approval</text><text class="fc-text fc-text-step" x="120" y="169" text-anchor="middle">aktif dan stok tersedia (isAvailable)</text>
     <line class="fc-line" x1="120" y1="180" x2="120" y2="209" marker-end="url(#fc-arrow-107)"/>
     <rect class="fc-box fc-step" x="8" y="210" width="224" height="64" rx="8"/>
     <text class="fc-text fc-text-step" x="120" y="231" text-anchor="middle">Hanya field publik (tanpa</text><text class="fc-text fc-text-step" x="120" y="247" text-anchor="middle">email/telepon pemilik, tanpa</text><text class="fc-text fc-text-step" x="120" y="263" text-anchor="middle">reason)</text>
@@ -6628,6 +6654,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;details&quot;: &quot;d&quot;,
     &quot;price&quot;: 1000,
     &quot;isRecommended&quot;: false,
+      &quot;isAvailable&quot;: true,
     &quot;imageId&quot;: 23,
     &quot;categoryId&quot;: 4,
     &quot;tenantId&quot;: &quot;5dc9b118-6576-42be-9844-adb04013d65e&quot;,
@@ -6671,6 +6698,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;details&quot;: &quot;d&quot;,
     &quot;price&quot;: 1000,
     &quot;isRecommended&quot;: false,
+      &quot;isAvailable&quot;: true,
     &quot;imageId&quot;: 23,
     &quot;categoryId&quot;: 4,
     &quot;tenantId&quot;: &quot;5dc9b118-6576-42be-9844-adb04013d65e&quot;,
@@ -6759,6 +6787,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;details&quot;: &quot;200 gram&quot;,
     &quot;price&quot;: 30000,
     &quot;isRecommended&quot;: true,
+      &quot;isAvailable&quot;: true,
     &quot;imageId&quot;: 13,
     &quot;tenantId&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
     &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.601Z&quot;,
@@ -6791,6 +6820,7 @@ html:not([data-lang="id"]) [data-l="id"], html[data-lang="id"] [data-l="en"] { d
     &quot;details&quot;: &quot;200 gram&quot;,
     &quot;price&quot;: 30000,
     &quot;isRecommended&quot;: true,
+      &quot;isAvailable&quot;: true,
     &quot;imageId&quot;: 13,
     &quot;tenantId&quot;: &quot;d7ef971c-b652-40f5-a7fb-1147f7c3e57e&quot;,
     &quot;createdAt&quot;: &quot;2026-10-07T17:19:58.601Z&quot;,
@@ -14029,7 +14059,7 @@ socket.on('connect_error', (err) =&gt; { if (['UNAUTHORIZED', 'USER_NOT_ACTIVATE
   </div>
 </article>
 </section>
-  <footer><span data-l="en">Generated from <code>postman/Prafi-API.postman_collection.json</code> on 2026-10-19 · regenerate with <code>npm run docs</code></span><span data-l="id">Dibuat dari <code>postman/Prafi-API.postman_collection.json</code> pada 2026-10-19 · buat ulang dengan <code>npm run docs</code></span></footer>
+  <footer><span data-l="en">Generated from <code>postman/Prafi-API.postman_collection.json</code> on 2026-10-21 · regenerate with <code>npm run docs</code></span><span data-l="id">Dibuat dari <code>postman/Prafi-API.postman_collection.json</code> pada 2026-10-21 · buat ulang dengan <code>npm run docs</code></span></footer>
 </div>
 </main>
 </div>

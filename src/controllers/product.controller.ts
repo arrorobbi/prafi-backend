@@ -8,7 +8,7 @@ const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
 const TEXT_FIELDS = ['name', 'description', 'details'] as const;
-const UPDATABLE_FIELDS: string[] = [...TEXT_FIELDS, 'price', 'categoryId', 'imageId'];
+const UPDATABLE_FIELDS: string[] = [...TEXT_FIELDS, 'price', 'categoryId', 'imageId', 'isAvailable'];
 /** Rupiah (IDR); also keeps the value inside the INTEGER column */
 const MAX_PRICE = 2_000_000_000;
 const LOCKED_FIELDS: Record<string, string> = {
@@ -71,6 +71,12 @@ function parseProductBody(body: Record<string, unknown>, partial: boolean) {
     errors.push({ field: 'imageId', message: 'imageId harus berupa ID gambar (bilangan bulat)' });
   } else {
     input.imageId = body.imageId as number;
+  }
+
+  // Optional on create (default true = "Tersedia"); false = "Stok Kosong", hidden from the public pages
+  if (body.isAvailable !== undefined) {
+    if (typeof body.isAvailable !== 'boolean') errors.push({ field: 'isAvailable', message: 'isAvailable harus bernilai true (Tersedia) atau false (Stok Kosong)' });
+    else input.isAvailable = body.isAvailable;
   }
 
   if (errors.length) throw HttpError.badRequest('Validasi gagal', errors);

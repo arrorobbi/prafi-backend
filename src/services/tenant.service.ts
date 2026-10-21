@@ -165,9 +165,9 @@ export async function getById(id: string) {
 
 // ---------- public (landing page, no login) ----------
 
-/** Approved products only, matched on the owner (products belong to the tenant user). */
+/** Approved, in-stock products only, matched on the owner (products belong to the tenant user). */
 const ACTIVE_PRODUCTS = `FROM products p JOIN approvals a ON a.id = p.approval_id
-  WHERE p.tenant_id = "Tenant"."user_id" AND a.is_active = true`;
+  WHERE p.tenant_id = "Tenant"."user_id" AND a.is_active = true AND p.is_available`;
 
 /** Public-safe: no owner email/phone. productCount, ratingAverage and reviewCount cover approved products. */
 const PUBLIC_ATTRIBUTES = {

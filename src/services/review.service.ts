@@ -20,9 +20,10 @@ export interface ReviewInput {
 /** Visible reviews only: hidden ones (by an admin / disnakertrans) are never shown or counted */
 const VISIBLE = { isHidden: false };
 
-/** Reviews are only for products visitors can see: approved ones. */
+/** Reviews are only for products visitors can see: approved and in stock. */
 async function findActiveProduct(productId: string) {
-  const product = await Product.findByPk(productId, {
+  const product = await Product.findOne({
+    where: { id: productId, isAvailable: true },
     attributes: ['id', 'name', 'tenantId', 'approvalId'],
     include: [{ association: 'approval', attributes: [], where: { isActive: true }, required: true }],
   });

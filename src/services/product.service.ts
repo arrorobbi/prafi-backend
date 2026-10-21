@@ -18,6 +18,8 @@ export interface ProductInput {
   categoryId: number;
   /** Required: upload the image first via POST /api/images. */
   imageId: number;
+  /** "Tersedia" (true, the default) or "Stok Kosong" (false): out-of-stock products are hidden from the public pages */
+  isAvailable?: boolean;
 }
 
 export interface ListProductsOptions {
@@ -122,9 +124,10 @@ const PUBLIC_INCLUDE: Includeable[] = [
   },
 ];
 
-/** Public landing page: only products whose approval is active. */
+/** Public landing page: only products whose approval is active and that are in stock. */
 export async function listActive({ page, limit, recommended, tenantId, categoryId, sort }: ListActiveOptions) {
   const where: WhereOptions = {
+    isAvailable: true,
     ...(recommended !== undefined && { isRecommended: recommended }),
     ...(tenantId && { tenantId }),
     ...(categoryId !== undefined && { categoryId }),
@@ -151,10 +154,12 @@ export async function listActive({ page, limit, recommended, tenantId, categoryI
 
 /**
  * Public: one approved product, by its slug (/produk/brownis-prafi) or its id (links from before slugs).
- * 404 for unknown or not-yet-approved ones.
+ * 404 for unknown, not-yet-approved or out-of-stock ones.
  */
 export async function getActive(idOrSlug: string) {
-  const find = (where: WhereOptions) => Product.findOne({ where, attributes: withRating(['approvalId']), include: PUBLIC_INCLUDE });
+  // Out of stock: hidden like an unapproved product
+  const find = (where: WhereOptions) =>
+    Product.findOne({ where: { ...where, isAvailable: true }, attributes: withRating(['approvalId']), include: PUBLIC_INCLUDE });
   let product = await find(UUID_RE.test(idOrSlug) ? { id: idOrSlug } : { slug: idOrSlug });
   // A slug from before the product was renamed: still the same product (its current slug is in the answer)
   if (!product && !UUID_RE.test(idOrSlug)) {
@@ -210,11 +215,17 @@ export async function update(user: AuthUser, id: string, changes: Partial<Produc
   if (changes.imageId !== undefined) await assertImageExists(changes.imageId);
 
   const oldImageId = product.imageId;
+  const wasAvailable = product.isAvailable;
   await product.update(changes);
   // A new image replaces the old one: its record and file are deleted
   if (changes.imageId !== undefined) await imageService.removeReplaced(oldImageId, changes.imageId);
   const updated = await getById(user, product.id);
-  await notify.productUpdated(updated, { tenantName: updated.tenant?.tenantName }, updated.approval?.isActive === true);
+  const owner = { tenantName: updated.tenant?.tenantName };
+  // "Tersedia" / "Stok Kosong" switched: everyone is told. Other fields changed too: the usual "product updated"
+  const availabilityChanged = changes.isAvailable !== undefined && changes.isAvailable !== wasAvailable;
+  if (availabilityChanged) await notify.productAvailabilityChanged(updated, owner, updated.isAvailable);
+  const otherChanges = Object.keys(changes).some((k) => k !== 'isAvailable');
+  if (otherChanges) await notify.productUpdated(updated, owner, updated.approval?.isActive === true);
   return updated;
 }
 

@@ -22,12 +22,12 @@ const WITH_COUNT: FindAttributeOptions = {
   include: [[literal('(SELECT COUNT(*)::int FROM products p WHERE p.category_id = "ProductCategory"."id")'), 'productCount']],
 };
 
-/** Approved products only, for the public list */
+/** Approved, in-stock products only, for the public list */
 const WITH_ACTIVE_COUNT: FindAttributeOptions = {
   include: [
     [
       literal(`(SELECT COUNT(*)::int FROM products p JOIN approvals a ON a.id = p.approval_id
-        WHERE p.category_id = "ProductCategory"."id" AND a.is_active = true)`),
+        WHERE p.category_id = "ProductCategory"."id" AND a.is_active = true AND p.is_available)`),
       'productCount',
     ],
   ],
