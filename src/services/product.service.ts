@@ -216,7 +216,11 @@ export async function update(user: AuthUser, id: string, changes: Partial<Produc
 
   const oldImageId = product.imageId;
   const wasAvailable = product.isAvailable;
-  await product.update(changes);
+  const otherChanges = Object.keys(changes).some((k) => k !== 'isAvailable');
+  // Only "Tersedia" / "Stok Kosong" switched: not an edit of the product. `silent` keeps updatedAt, which the status
+  // rule compares with the last decision (edited after it = sent for review again), so a rejected or deactivated
+  // product doesn't turn into "Menunggu Konfirmasi"
+  await product.update(changes, { silent: !otherChanges });
   // A new image replaces the old one: its record and file are deleted
   if (changes.imageId !== undefined) await imageService.removeReplaced(oldImageId, changes.imageId);
   const updated = await getById(user, product.id);
@@ -224,7 +228,6 @@ export async function update(user: AuthUser, id: string, changes: Partial<Produc
   // "Tersedia" / "Stok Kosong" switched: everyone is told. Other fields changed too: the usual "product updated"
   const availabilityChanged = changes.isAvailable !== undefined && changes.isAvailable !== wasAvailable;
   if (availabilityChanged) await notify.productAvailabilityChanged(updated, owner, updated.isAvailable);
-  const otherChanges = Object.keys(changes).some((k) => k !== 'isAvailable');
   if (otherChanges) await notify.productUpdated(updated, owner, updated.approval?.isActive === true);
   return updated;
 }

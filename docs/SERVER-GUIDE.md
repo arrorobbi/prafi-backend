@@ -777,7 +777,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 
 ![Email OTP](panduan/fitur-daftar-otp.jpg)
 
-- **Dashboard**: the number of products by status (active, waiting, rejected, taken down), with shortcuts to edit the profile and add a product.
+- **Dashboard**: the number of products by status (active, waiting, rejected, taken down) and how many active ones are marked **Stok Kosong**, with shortcuts to edit the profile and add a product.
 
 ![Seller dashboard](panduan/fitur-tenant-dashboard.jpg)
 
@@ -809,7 +809,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 
 ### Admin
 
-- **Dashboard**: sellers and products by status for a chosen period, and the products waiting for confirmation.
+- **Dashboard**: sellers and products by status for a chosen period (with a **Stok Kosong** card: active products the seller marked out of stock, hidden from visitors), and the products waiting for confirmation. The *Status Produk* chart splits active products into *Aktif · Tersedia* and *Aktif · Stok Kosong*.
 
 ![Admin dashboard](panduan/fitur-admin-dashboard.jpg)
 
@@ -849,7 +849,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 
 ### Superadmin
 
-- **Dashboard**: totals of every kind of account and of products by status.
+- **Dashboard**: totals of every kind of account and of products by status, including **Stok Kosong**.
 
 ![Superadmin dashboard](panduan/fitur-superadmin-dashboard.jpg)
 

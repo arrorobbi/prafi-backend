@@ -54,7 +54,7 @@ export async function overview(user: AuthUser, days: number) {
   const roles: Role[] = READABLE_ROLES[user.role];
   const r = { tz: STATS_TIMEZONE, days, roles: roles.length ? roles : [''] };
 
-  const [statusRows, productDays, tenantTotal, categoryRows, areaRows, tenantDays, roleRows, userDays] = await Promise.all([
+  const [statusRows, productDays, tenantTotal, categoryRows, areaRows, tenantDays, roleRows, userDays, stockRows] = await Promise.all([
     query<{ status: string; count: number }>(
       `SELECT ${PRODUCT_STATUS_SQL} AS status, COUNT(*)::int AS count
        FROM products p LEFT JOIN approvals a ON a.id = p.approval_id GROUP BY 1`,
@@ -86,6 +86,13 @@ export async function overview(user: AuthUser, days: number) {
       r,
     ),
     query<DayCount>(perDay('users', 'role IN (:roles)'), r),
+    // "Stok Kosong" (products.is_available false): all of them, and the approved ones (hidden from visitors right now)
+    query<{ total: number; active: number }>(
+      `SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE a.is_active)::int AS active
+       FROM products p LEFT JOIN approvals a ON a.id = p.approval_id
+       WHERE NOT p.is_available`,
+      r,
+    ),
   ]);
 
   const byStatus = { active: 0, pending: 0, rejected: 0, inactive: 0 };
@@ -98,7 +105,13 @@ export async function overview(user: AuthUser, days: number) {
   return {
     days,
     timezone: STATS_TIMEZONE,
-    products: { total: Object.values(byStatus).reduce((a, b) => a + b, 0), byStatus, byCategory: categoryRows },
+    products: {
+      total: Object.values(byStatus).reduce((a, b) => a + b, 0),
+      byStatus,
+      byCategory: categoryRows,
+      // Marked "Stok Kosong" by their seller: every one, and those that are approved (byStatus.active includes them)
+      outOfStock: { total: stockRows[0]?.total ?? 0, active: stockRows[0]?.active ?? 0 },
+    },
     tenants: { total: tenantTotal[0]?.count ?? 0, byArea: areaRows },
     users: { roles, total: byRole.reduce((a, x) => a + x.active + x.inactive, 0), byRole },
     // New products, UMKM profiles and accounts (readable roles) per day

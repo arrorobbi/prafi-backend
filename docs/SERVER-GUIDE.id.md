@@ -777,7 +777,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 
 ![OTP email](panduan/fitur-daftar-otp.jpg)
 
-- **Dashboard**: jumlah produk menurut status (aktif, menunggu, ditolak, dinonaktifkan), dengan jalan pintas untuk mengubah profil dan menambah produk.
+- **Dashboard**: jumlah produk menurut status (aktif, menunggu, ditolak, dinonaktifkan) dan berapa produk aktif yang ditandai **Stok Kosong**, dengan jalan pintas untuk mengubah profil dan menambah produk.
 
 ![Dashboard penjual](panduan/fitur-tenant-dashboard.jpg)
 
@@ -809,7 +809,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 
 ### Admin
 
-- **Dashboard**: jumlah penjual dan produk menurut status untuk periode yang dipilih, serta produk yang menunggu konfirmasi.
+- **Dashboard**: jumlah penjual dan produk menurut status untuk periode yang dipilih (dengan kartu **Stok Kosong**: produk aktif yang ditandai habis oleh penjual, disembunyikan dari pengunjung), serta produk yang menunggu konfirmasi. Grafik *Status Produk* memisahkan produk aktif menjadi *Aktif · Tersedia* dan *Aktif · Stok Kosong*.
 
 ![Dashboard admin](panduan/fitur-admin-dashboard.jpg)
 
@@ -849,7 +849,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 
 ### Superadmin
 
-- **Dashboard**: jumlah total setiap jenis akun dan produk menurut status.
+- **Dashboard**: jumlah total setiap jenis akun dan produk menurut status, termasuk **Stok Kosong**.
 
 ![Dashboard superadmin](panduan/fitur-superadmin-dashboard.jpg)
 
