@@ -854,7 +854,7 @@ What the system does, by who uses it. The pictures are screenshots of the websit
 
 ![Superadmin dashboard](panduan/fitur-superadmin-dashboard.jpg)
 
-- **Akun Disnakertrans**: create accounts (name, phone, email; no password) and resend the activation email.
+- **Akun Disnakertrans**: create accounts (name, phone, email; no password), resend the activation email, and **deactivate / reactivate** an account (optional reason): the officer is logged out at once and gets an email.
 
 ![Adding a Disnakertrans account](panduan/superadmin-1-tambah.jpg)
 

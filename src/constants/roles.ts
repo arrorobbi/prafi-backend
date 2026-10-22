@@ -59,10 +59,11 @@ export const READABLE_ROLES: Record<Role, Role[]> = {
 
 /**
  * Which roles' accounts each role may activate/deactivate (PATCH /api/approvals/:id?type=user).
- * The superadmin is read-only: it creates disnakertrans accounts (active right away) but approves nobody.
+ * The superadmin creates disnakertrans accounts (active right away) and can deactivate / reactivate them; otherwise
+ * it is read-only.
  */
 export const APPROVABLE_ROLES: Record<Role, Role[]> = {
-  [ROLES.SUPERADMIN]: [],
+  [ROLES.SUPERADMIN]: [ROLES.DISNAKERTRANS],
   [ROLES.DISNAKERTRANS]: [ROLES.ADMIN],
   [ROLES.ADMIN]: [ROLES.TENANT],
   [ROLES.TENANT]: [],

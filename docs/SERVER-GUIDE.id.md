@@ -854,7 +854,7 @@ Yang dilakukan sistem ini, menurut penggunanya. Gambarnya adalah tangkapan layar
 
 ![Dashboard superadmin](panduan/fitur-superadmin-dashboard.jpg)
 
-- **Akun Disnakertrans**: membuat akun (nama, telepon, email; tanpa password) dan mengirim ulang email aktivasi.
+- **Akun Disnakertrans**: membuat akun (nama, telepon, email; tanpa password), mengirim ulang email aktivasi, dan **menonaktifkan / mengaktifkan kembali** akun (alasan opsional): petugas langsung dikeluarkan dan menerima email.
 
 ![Menambah akun Disnakertrans](panduan/superadmin-1-tambah.jpg)
 

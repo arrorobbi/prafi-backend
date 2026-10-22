@@ -351,16 +351,21 @@ export const notify = {
 
   /** superadmin: a disnakertrans or admin deactivated a user account (only real changes notify) */
   userDeactivatedByAdmin: (actor: AuthUser, user: { id: string; email: string; role: Role }, approvalId: number) =>
-    safely('userDeactivatedByAdmin', () =>
-      toRole(ROLES.SUPERADMIN, {
-        type: T.USER_DEACTIVATED,
-        name: `User deactivated by ${actor.role}`,
-        description: `${actor.email} deactivated the ${user.role} account ${user.email}.`,
-        entityType: 'user',
-        entityId: user.id,
-        approvalId,
-      }),
-    ),
+    safely('userDeactivatedByAdmin', async () => {
+      // Every superadmin except the one who did it (a superadmin can deactivate disnakertrans accounts)
+      const superadmins = await User.findAll({ where: { role: ROLES.SUPERADMIN }, attributes: ['id'] });
+      await toUsers(
+        superadmins.map((u) => u.id).filter((id) => id !== actor.id),
+        {
+          type: T.USER_DEACTIVATED,
+          name: `User deactivated by ${actor.role}`,
+          description: `${actor.email} deactivated the ${user.role} account ${user.email}.`,
+          entityType: 'user',
+          entityId: user.id,
+          approvalId,
+        },
+      );
+    }),
 };
 
 // ---------- reading (own notifications only) ----------

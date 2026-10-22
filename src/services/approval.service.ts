@@ -4,7 +4,7 @@ import { Approval, Product, sequelize, User } from '../models';
 import type { AuthUser } from '../types/express';
 import { notify } from './notification.service';
 import { endUserSessions } from '../realtime/socket';
-import { adminAccountActivated } from '../mail/templates';
+import { adminAccountActivated, disnakertransAccountStatus } from '../mail/templates';
 import { sendMail } from './mail.service';
 
 /** What an approval can belong to. Add a new entry here (and a handler below) to support another model. */
@@ -31,7 +31,7 @@ export async function setApproval(actor: AuthUser, type: ApprovalType, id: strin
   return type === 'user' ? setUserApproval(actor, id, input.role!, values) : setProductApproval(actor, id, values);
 }
 
-/** disnakertrans → admin accounts, admin → tenant accounts; the superadmin is read-only (see APPROVABLE_ROLES). */
+/** superadmin → disnakertrans accounts, disnakertrans → admin accounts, admin → tenant accounts (see APPROVABLE_ROLES). */
 async function setUserApproval(
   actor: AuthUser,
   userId: string,
@@ -71,8 +71,20 @@ async function setUserApproval(
     const note = values.reason === defaultReason(actor, true) ? null : values.reason;
     sendAdminActivatedEmail(user, note);
   }
+  // A disnakertrans account deactivated or reactivated by a superadmin: the officer is told by email, with the reason
+  if (user.role === ROLES.DISNAKERTRANS && wasActive !== values.isActive) {
+    const note = values.reason === defaultReason(actor, values.isActive) ? null : values.reason;
+    sendInBackground(user.email, disnakertransAccountStatus(user, { isActive: values.isActive, note }), 'disnakertrans account status');
+  }
 
   return { type: 'user' as const, id: user.id, email: user.email, role: user.role, approval };
+}
+
+/** In the background: a mail server problem never fails (or slows down) the change itself. */
+function sendInBackground(to: string, content: ReturnType<typeof disnakertransAccountStatus>, what: string) {
+  sendMail({ to, ...content })
+    .then(() => console.log(`[mail] ${what} email sent to ${to}`))
+    .catch((err) => console.error(`[mail] could not send the ${what} email to ${to}:`, (err as Error).message));
 }
 
 /** In the background: a mail server problem never fails (or slows down) the activation itself. */

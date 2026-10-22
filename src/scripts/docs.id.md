@@ -22,7 +22,7 @@ Backend API untuk Prafi (Express + Sequelize + PostgreSQL), dengan notifikasi re
 
 | role | dibuat oleh | verifikasi email | approval awal | dapat |
 |---|---|---|---|---|
-| superadmin | seed (`npm run db:seed`) | sudah terverifikasi | aktif | membuat akun disnakertrans; **hanya membaca** data lainnya (user, produk, tenant, kategori produk); menerima notifikasi setiap akun dan produk baru |
+| superadmin | seed (`npm run db:seed`) | sudah terverifikasi | aktif | membuat, menonaktifkan, dan mengaktifkan kembali akun disnakertrans; **hanya membaca** data lainnya (user, produk, tenant, kategori produk); menerima notifikasi setiap akun dan produk baru |
 | disnakertrans | superadmin (*Register Disnakertrans*) | kata sandi sementara + link aktivasi lewat email (24 jam), diganti dengan kata sandi sendiri | aktif | melihat serta mengaktifkan/menonaktifkan akun **admin** dan **produk**, melihat semua produk dan tenant, mengelola kategori produk |
 | admin | daftar sendiri (*Register Admin*) | OTP (15 menit) | **tidak aktif** sampai diaktifkan disnakertrans | mengaktifkan akun tenant **dan produk**, membaca user (tenant)/produk/tenant, mengelola kategori produk |
 | tenant | daftar sendiri (*Register Tenant*) | OTP (15 menit) | aktif | mengelola produk dan profil tenant miliknya sendiri |
@@ -298,14 +298,14 @@ Mengaktifkan / menonaktifkan akun dan produk: `PATCH /api/approvals/:id?type=use
 
 | type | siapa yang bisa | dampak |
 |---|---|---|
-| `user` | disnakertrans → akun admin; admin → akun tenant | akun yang tidak aktif tidak bisa login, dan langsung diputus dari realtime |
+| `user` | superadmin → akun disnakertrans; disnakertrans → akun admin; admin → akun tenant | akun yang tidak aktif tidak bisa login, dan langsung diputus dari realtime |
 | `product` | disnakertrans, admin | produk aktif tampil di halaman landing |
 
-Superadmin **hanya membaca** dan tidak bisa mengaktifkan apa pun (akun disnakertrans yang dibuatnya langsung aktif). Setiap penonaktifan akun memberi tahu superadmin (`USER_DEACTIVATED`).
+Superadmin hanya dapat menonaktifkan / mengaktifkan kembali akun **disnakertrans** (yang dibuatnya langsung aktif); petugas tersebut menerima email beserta alasan (bila diisi). Selain itu superadmin hanya membaca. Setiap penonaktifan akun memberi tahu superadmin lain (`USER_DEACTIVATED`).
 
 Setiap approval memiliki `type` (`user` = approval akun, `product` = approval produk) dan `userId` (pemilik akun, atau tenant pemilik produk).
 
-=== REQ Activate / Deactivate User (disnakertrans, admin) => Aktifkan / Nonaktifkan Pengguna
+=== REQ Activate / Deactivate User (superadmin, disnakertrans, admin) => Aktifkan / Nonaktifkan Pengguna
 `isActive`: true/false. `role`: role akun yang dituju, sebagai konfirmasi (harus sesuai). `reason`: opsional.
 
 disnakertrans mengaktifkan/menonaktifkan akun **admin**; admin mengaktifkan/menonaktifkan akun **tenant**. Memakai `{{userId}}` / `{{userRole}}` yang disimpan oleh request Register. Menonaktifkan akun mengakhiri sesi user tersebut (`session:ended`, reason `deactivated`) dan memberi tahu superadmin.

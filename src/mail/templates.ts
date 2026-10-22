@@ -253,6 +253,46 @@ export function emailChangedNotice(user: Recipient, oldEmail: string, newEmail: 
 }
 
 /**
+ * To a disnakertrans officer whose account a superadmin deactivated (they are logged out and can't log in) or
+ * activated again. `note`: the reason the superadmin typed, if any.
+ */
+export function disnakertransAccountStatus(user: Recipient, { isActive, note }: { isActive: boolean; note?: string | null }): Omit<MailMessage, 'to'> {
+  const name = `${user.firstName} ${user.lastName}`;
+  const loginUrl = `${env.frontendUrl}/login`;
+  const subject = isActive ? `Akun Disnakertrans ${BRAND} Anda telah diaktifkan kembali` : `Akun Disnakertrans ${BRAND} Anda telah dinonaktifkan`;
+  const intro = isActive
+    ? `Akun Disnakertrans Anda di ${BRAND} dengan email ${user.email} telah diaktifkan kembali oleh Superadmin.`
+    : `Akun Disnakertrans Anda di ${BRAND} dengan email ${user.email} telah dinonaktifkan oleh Superadmin. Sesi yang sedang berjalan telah diakhiri dan akun ini tidak dapat digunakan untuk masuk.`;
+  const html = layout(
+    isActive ? 'Akun Anda aktif kembali' : 'Akun Anda dinonaktifkan',
+    `<p>Halo <strong>${escape(name)}</strong>,</p>
+     <p>${escape(intro)}</p>
+     ${
+       note
+         ? `<p style="margin:18px 0;padding:12px 16px;background:${ORANGE_SOFT};border-left:4px solid ${ORANGE};border-radius:8px;"><strong>Catatan dari Superadmin:</strong><br>${escape(note)}</p>`
+         : ''
+     }
+     ${
+       isActive
+         ? `<p>Anda dapat masuk kembali dengan email dan kata sandi Anda.</p>${button(loginUrl, 'Masuk ke Trans Niaga')}`
+         : '<p>Jika menurut Anda ini sebuah kekeliruan, hubungi Superadmin Trans Niaga.</p>'
+     }
+     ${SIGN_OFF}`,
+    isActive ? 'Akun Disnakertrans Anda dapat digunakan kembali.' : 'Akun Disnakertrans Anda tidak dapat digunakan untuk sementara.',
+  );
+  const text = [
+    `Halo ${name},`,
+    '',
+    intro,
+    ...(note ? ['', `Catatan dari Superadmin: ${note}`] : []),
+    '',
+    isActive ? `Anda dapat masuk kembali dengan email dan kata sandi Anda: ${loginUrl}` : 'Jika menurut Anda ini sebuah kekeliruan, hubungi Superadmin Trans Niaga.',
+    ...TEXT_SIGN_OFF,
+  ].join('\n');
+  return { subject, html, text };
+}
+
+/**
  * To a self-registered admin whose account a disnakertrans has just activated: they can log in now.
  * `note`: the reason the disnakertrans typed, if any. `emailVerified` false: the OTP step is still to be done first.
  */

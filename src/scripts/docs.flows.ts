@@ -395,18 +395,22 @@ export const FLOWS: Record<string, Chart[]> = {
       title: { en: 'Activate / Deactivate User', id: 'Aktifkan / Nonaktifkan Pengguna' },
       nodes: [
         start('PATCH /api/approvals/:id?type=user'),
-        ...auth(DK_ADMIN),
+        ...auth(READERS),
         check({ en: 'type, UUID id, isActive and role valid?', id: 'type, id UUID, isActive dan role valid?' }, { en: '400 Validation failed', id: '400 Validasi gagal' }),
         check({ en: 'User exists?', id: 'Pengguna ada?' }, '404'),
         check({ en: 'Body role matches the user?', id: 'role di body sesuai pengguna?' }, '400'),
         check(
-          { en: 'Allowed? disnakertrans → admin · admin → tenant', id: 'Diizinkan? disnakertrans → admin · admin → tenant' },
+          {
+            en: 'Allowed? superadmin → disnakertrans · disnakertrans → admin · admin → tenant',
+            id: 'Diizinkan? superadmin → disnakertrans · disnakertrans → admin · admin → tenant',
+          },
           '403 Forbidden',
         ),
         step(
           { en: 'Save approval (created the first time)', id: 'Simpan approval (dibuat jika belum ada)' },
           effect({ en: 'Admin activated by disnakertrans → email to the admin (Bahasa Indonesia)', id: 'Admin diaktifkan disnakertrans → email ke admin tersebut' }),
-          effect({ en: 'Deactivated → notify superadmins (USER_DEACTIVATED)', id: 'Dinonaktifkan → notifikasi ke superadmin (USER_DEACTIVATED)' }),
+          effect({ en: 'Disnakertrans deactivated / reactivated by a superadmin → email to the officer', id: 'Disnakertrans dinonaktifkan / diaktifkan kembali oleh superadmin → email ke petugas' }),
+          effect({ en: 'Deactivated → notify the other superadmins (USER_DEACTIVATED)', id: 'Dinonaktifkan → notifikasi ke superadmin lain (USER_DEACTIVATED)' }),
           effect({ en: 'Deactivated → user\'s sockets closed (session:ended)', id: 'Dinonaktifkan → socket pengguna ditutup (session:ended)' }),
         ),
         end('200 { type, id, email, role, approval }'),
